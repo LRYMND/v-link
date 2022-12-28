@@ -1,0 +1,28 @@
+.topbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    position: absolute;
+    top: 0;
+
+    height: 66px;
+    width: 100%;
+    background: #000000;
+
+    &__info {
+      margin-left: 3rem;
+    }
+
+    &__time {
+      margin-right: 3rem;
+    }
+
+
+    &__icon {
+      margin-top: 1rem;
+      margin-right:1rem;
+      width:  1rem;
+      height: 1rem;
+      fill:#7c7c7c;
+    }
+  }

@@ -1,0 +1,165 @@
+body {
+    background: #000000;
+}
+
+.settings {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 3rem;
+    align-items: center;
+    justify-content: space-between;
+
+    &__title {
+        color: #dddddd;
+    }
+
+    &__body {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: stretch;
+        background-color: #111111;
+        width: 44rem;
+        height: 18rem;
+        margin-bottom: 1rem;
+    }
+
+    &__connections {
+        //background-color: #73ce86;
+        width: 50%;
+        height: 100%;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        margin-left: 1rem;
+
+        &__wifi {
+            display: flex;
+            justify-content: flex-start;
+            flex-direction: column;
+            align-items: center;
+            background-color: #111111;
+            width: 90%;
+            height: 40%;
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            &__item {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+
+            }
+        }
+
+        &__wifi::-webkit-scrollbar {
+            width: 0.5rem;
+        }
+
+        &__wifi::-webkit-scrollbar-track {
+            background-color: #111111;
+        }
+
+        &__wifi::-webkit-scrollbar-thumb {
+            background-color: #444444;
+        }
+
+        &__bt {
+            background-color: #111111;
+            width: 90%;
+            height: 40%;
+            overflow-y: auto;
+        }
+    }
+
+    &__app {
+	display: flex;
+        flex-direction: row;
+        align-items: center;
+	justify-content: center;
+	width: 100%;
+    }
+
+    &__modules {
+        //background-color: #ce73c0;
+        width: 50%;
+        height: 100%;
+    }
+
+
+}
+
+.selectNetworkButton {
+    background-color: #222222;
+    margin-top: .3rem;
+    border: none;
+    color: #7c7c7c;
+    width: 97%;
+    padding-top: .15rem;
+    padding-bottom: .15rem;
+    user-select: none;
+    text-align: center;
+    font-size: .8rem;
+
+    &:hover {
+        background-color: #1a1a1a;
+        color: #dddddd;
+    }
+
+    &:active {
+        background-color: #1a1a1a;
+        color: #3f77a4;
+    }
+}
+
+.relaunchButton {
+    margin-bottom: 3.5rem;
+    background-color: #1d1d1d;
+    border: none;
+    color: #7c7c7c;
+    width: 40%;
+    height: 3rem;
+    //padding: 0.5rem 16rem;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+
+    &:hover {
+        background-color: #1a1a1a;
+        color: #dddddd;
+    }
+
+    &:active {
+        background-color: #1a1a1a;
+        color: #3f77a4;
+    }
+
+}
+
+.closeButton {
+    margin-bottom: 3.5rem;
+    background-color: #1d1d1d;
+    border: none;
+    color: #7c7c7c;
+    width: 40%;
+    height: 3rem;
+    //padding: 0.5rem 16rem;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+
+    &:hover {
+        background-color: #1a1a1a;
+        color: #dddddd;
+    }
+
+    &:active {
+        background-color: #1a1a1a;
+        color: #3f77a4;
+    }
+
+}

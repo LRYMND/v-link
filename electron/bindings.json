@@ -1,0 +1,14 @@
+{
+  "n": "next",
+  "m": "siri",
+  "v": "prev",
+  "Up": "back",
+  "Down": "down",
+  "Left": "left",
+  "Right": "right",
+  "Space": "selectDown",
+  "h": "home",
+  "q": "wifi",
+  "w": "wifiOk",
+  "e": "auto"
+}

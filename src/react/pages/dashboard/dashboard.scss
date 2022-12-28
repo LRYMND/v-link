@@ -1,0 +1,15 @@
+body {
+  background: #000000;
+}
+
+.dashboard { 
+  display: flex;
+  justify-content: center;
+
+  flex-direction: row;
+  align-items: center;
+
+  width: 100%;
+  margin-bottom: 20px;
+  gap: 0.75rem;
+}

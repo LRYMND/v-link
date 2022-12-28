@@ -1,0 +1,16 @@
+#directories
+
+node_modules
+dist
+build
+assets
+
+
+
+#files
+
+*.tgz
+*.log
+*.apk
+._*
+.DS*
