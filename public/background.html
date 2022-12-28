@@ -1,0 +1,45 @@
+<script>
+	const { PythonShell } = require('python-shell');
+	const { ipcRenderer } = require('electron');
+	const path = require('path');
+
+
+	let pyshell
+
+	ipcRenderer.on('START_PROCESSING', (event, args) => {
+		
+		const scriptPath = path.join(process.resourcesPath, '/scripts/python.py')
+		ipcRenderer.send('BG_CONSOLE', { message: scriptPath });
+
+		const { data } = args;
+		pyshell = new PythonShell(scriptPath, {
+			pythonPath: 'python',
+			pythonOptions: ['-u'],
+			args: [data]
+		});
+
+		pyshell.on('message', function (data) {
+			ipcRenderer.send('BG_CONSOLE', { message: data });
+		});
+		
+		pyshell.on('error', function (error) {
+			ipcRenderer.send('BG_CONSOLE', { message: error });
+		});
+		
+		pyshell.on('stderr', function (stderr) {
+			ipcRenderer.send('BG_CONSOLE', { message: stderr });
+		});
+		
+		pyshell.on('pythonError', function (data) {
+			ipcRenderer.send('BG_CONSOLE', { message: pythonError });
+		});
+
+	});
+
+	ipcRenderer.on('QUIT_PYTHON', (event, args) => {
+		pyshell.kill();
+		ipcRenderer.send('CLOSE_BACKGROUND');
+	});
+
+	ipcRenderer.send('BACKGROUND_READY');
+</script>

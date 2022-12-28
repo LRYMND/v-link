@@ -1,0 +1,30 @@
+.nav {
+  display: flex;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  bottom: 0;
+  gap: 10rem;
+  height: 60px;
+  width: 100%;
+  background: #1f272d;
+
+  &__icon {
+    width: 1.5rem;
+    height: 1.5rem;
+
+    fill: rgb(124, 124, 124);
+
+    transition: fill 0.3s;
+
+    &:hover {
+      fill: #bcbcbc;
+    }
+  }
+}
+
+.active {
+  .nav__icon {
+    fill: #3f77a4;
+  }
+}
