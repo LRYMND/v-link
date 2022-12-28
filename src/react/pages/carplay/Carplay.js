@@ -3,10 +3,12 @@ import React, { Component } from "react";
 import "@fontsource/montserrat";
 import JMuxer from "jmuxer";
 
-import { WithRouter } from '../../components/WithRouter.js';
+import { Router } from '../../components/Router.js';
 import { GooSpinner } from "react-spinners-kit";
 
-//import TopBar from "../../sidebars/TopBar";
+const Store = window.require('electron-store');
+const store = new Store();
+const theme = store.get("colorTheme");
 
 const { ipcRenderer } = window;
 
@@ -59,11 +61,6 @@ class Carplay extends Component {
   }
 
   componentDidMount() {
-
-    //Test Codes
-    //ipcRenderer.send("show", "test data");
-
-    //console.log(this.props);
 
     const jmuxer = new JMuxer({
       node: "player",
@@ -185,7 +182,7 @@ class Carplay extends Component {
           ref={(divElement) => {
             this.divElement = divElement;
           }}
-          className="App"
+          className={`App ${theme}`}
           onTouchStart={handleDown}
           onTouchEnd={handleUp}
           onTouchMove={(e) => {
@@ -221,7 +218,7 @@ class Carplay extends Component {
             <div>
             <div
               style={{
-                marginTop: "31%",
+                marginTop: "35%",
                 marginBottom: "auto",
                 textAlign: "center",
                 flexGrow: "1",
@@ -230,14 +227,14 @@ class Carplay extends Component {
                 display: "flex",
                 position: "relativ",
               }}>
-                <h1 style={{ color: '#dddddd' }}>WAITING FOR BLUETOOTH DEVICE</h1>
+                <h1 style={{ color: '#7c7c7c' }}>WAITING FOR BLUETOOTH DEVICE</h1>
             </div>
             <div
               style={{
                 justifyContent: "center",
                 display: "flex",
               }}>
-                <GooSpinner size={40} color="#dddddd" loading={loading} />            
+                <GooSpinner size={40} color="#7c7c7c" loading={loading} />            
             </div>
             </div>
           )}
@@ -247,4 +244,4 @@ class Carplay extends Component {
   }
 }
 
-export default WithRouter(Carplay);
+export default Router(Carplay);

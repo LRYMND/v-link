@@ -1,6 +1,6 @@
 {
   "name": "volvo-rtvi",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "author": {
     "name": "Louis Raymond",
@@ -16,6 +16,7 @@
     "@testing-library/user-event": "^12.8.3",
     "canvas-gauges": "^2.1.7",
     "electron-is-dev": "^2.0.0",
+    "electron-store": "^8.1.0",
     "jmuxer": "^2.0.3",
     "node-carplay": "^2.0.8",
     "node-pty": "^0.10.1",
@@ -31,8 +32,7 @@
     "rpi-wifi-connection": "^1.0.17",
     "sass": "^1.52.3",
     "versiony": "^2.0.1",
-    "web-vitals": "^1.1.2",
-    "ws": "^8.11.0"
+    "web-vitals": "^1.1.2"
   },
   "scripts": {
     "dev": "concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && export ELECTRON_START_URL=http://localhost:3000 && nodemon --watch main.js --exec electron .\"",

@@ -10,12 +10,10 @@ import Carplay from "./pages/carplay/Carplay";
 import Settings from "./pages/settings/Settings";
 
 
-
 const App = () => {
 
   const [showNav, setShowNav] = React.useState(true);
   
-
   return (
     <HashRouter>
       {

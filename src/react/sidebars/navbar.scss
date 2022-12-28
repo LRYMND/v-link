@@ -1,4 +1,4 @@
-.nav {
+.navbar {
   display: flex;
   position: absolute;
   align-items: center;
@@ -7,24 +7,27 @@
   gap: 10rem;
   height: 60px;
   width: 100%;
-  background: #1f272d;
+  background: var(--background-color);
 
   &__icon {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 2rem;
+    height: 2rem;
 
-    fill: rgb(124, 124, 124);
+    margin-bottom: 1.5rem;
+
+    fill: var(--fillInactive);
 
     transition: fill 0.3s;
 
     &:hover {
-      fill: #bcbcbc;
+      fill: var(--fillHover);
     }
   }
 }
 
+
 .active {
-  .nav__icon {
-    fill: #3f77a4;
+  .navbar__icon {
+    fill: var(--fillActive);
   }
 }

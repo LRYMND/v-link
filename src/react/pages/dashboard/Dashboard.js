@@ -1,19 +1,60 @@
 import React, { Component } from 'react';
 import { RadialGauge } from "react-canvas-gauges";
 import './dashboard.scss';
+import '../../components/themes.scss';
 
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
-//let ismounted = false;
+const Store = window.require('electron-store');
+const store = new Store();
+const theme = store.get("colorTheme");
 
+let gaugeBoost = false;
+let gaugeIntake = false;
+let gaugeCoolant = false;
 
 class Dashboard extends Component {
 	constructor(props) {
 		super();
-		this.state = { boost: null };
-		this.state = { intake: null };
-		this.state = { coolant: null };
+
+		this.state = {
+			boost: 0,
+			intake: 0,
+			coolant: 0,
+
+			theme: null,
+
+			colorPlate: '#000000',
+			colorPlateEnd: '#000000',
+
+			colorTitle: '#000000',
+			colorUnits: '#000000',
+			colorHighlight: '#000000',
+
+			colorMinorTicks: '#000000',
+			colorMajorTicks: '#000000',
+			colorNumbers: '#000000',
+
+			colorNeedle: '#000000',
+			colorNeedleEnd: '#000000',
+			colorNeedleShadowUp: '#000000',
+			colorNeedleShadowDown: '#000000',
+
+			colorNeedleCircleInner: '#000000',
+			colorNeedleCircleInnerEnd: '#000000',
+			colorNeedleCircleOuter: '#000000',
+			colorNeedleCircleOuterEnd: '#000000',
+
+			colorBorderOuter: '#000000',
+			colorBorderMiddle: '#000000',
+			colorBorderInner: '#000000',
+			colorBorderOuterEnd: '#000000',
+			colorBorderMiddleEnd: '#000000',
+			colorBorderInnerEnd: '#000000'
+		};
+
+		this.loadTheme = this.loadTheme.bind(this);
 	}
 
 	msgFromBG = (event, args) => {
@@ -41,191 +82,251 @@ class Dashboard extends Component {
 
 	componentDidMount() {
 		this.ismounted = true;
+		this.loadTheme();
+
+		gaugeBoost = store.get("showGaugeBoost");
+		gaugeIntake = store.get("showGaugeIntake");
+		gaugeCoolant = store.get("showGaugeCoolant");
 
 		ipcRenderer.on('MESSAGE_FROM_BACKGROUND_VIA_MAIN', this.msgFromBG);
-
-		ipcRenderer.send('START_BACKGROUND_VIA_MAIN', {
-			//Message to BG Worker goes here
-		});
-
+		ipcRenderer.send('START_BACKGROUND_VIA_MAIN', {});
 	}
 
 	componentWillUnmount() {
 		this.ismounted = false;
-		ipcRenderer.send('QUIT_BACKGROUND');
 
+		ipcRenderer.send('QUIT_BACKGROUND');
 		ipcRenderer.removeListener('MESSAGE_FROM_BACKGROUND_VIA_MAIN', this.msgFromBG);
 	}
 
+	loadTheme() {
+		let style = getComputedStyle(document.querySelector(".dashboard"));
+
+		this.setState({
+			colorPlate: style.getPropertyValue("--colorPlate"),
+			colorPlateEnd: style.getPropertyValue("--colorPlateEnd"),
+
+			colorTitle: style.getPropertyValue("--colorTitle"),
+			colorUnits: style.getPropertyValue("--colorUnits"),
+			colorHighlight: style.getPropertyValue("--colorHighlight"),
+
+			colorMinorTicks: style.getPropertyValue("--colorMinorTicks"),
+			colorMajorTicks: style.getPropertyValue("--colorMajorTicks"),
+			colorNumbers: style.getPropertyValue("--colorNumbers"),
+
+			colorNeedle: style.getPropertyValue("--colorNeedle"),
+			colorNeedleEnd: style.getPropertyValue("--colorNeedleEnd"),
+			colorNeedleShadowUp: style.getPropertyValue("--colorNeedleShadowUp"),
+			colorNeedleShadowDown: style.getPropertyValue("--colorNeedleShadowDown"),
+
+			colorNeedleCircleInner: style.getPropertyValue("--colorNeedleCircleInner"),
+			colorNeedleCircleInnerEnd: style.getPropertyValue("--colorNeedleCircleInnerEnd"),
+			colorNeedleCircleOuter: style.getPropertyValue("--colorNeedleCircleOuter"),
+			colorNeedleCircleOuterEnd: style.getPropertyValue("--colorNeedleCircleOuterEnd"),
+
+
+			colorBorderOuter: style.getPropertyValue("--colorBorderOuter"),
+			colorBorderMiddle: style.getPropertyValue("--colorBorderMiddle"),
+			colorBorderInner: style.getPropertyValue("--colorBorderInner"),
+			colorBorderOuterEnd: style.getPropertyValue("--colorBorderOuterEnd"),
+			colorBorderMiddleEnd: style.getPropertyValue("--colorBorderMiddleEnd"),
+			colorBorderInnerEnd: style.getPropertyValue("--colorBorderInnerEnd")
+		});
+	}
+
 	render() {
-		return <div className="dashboard">
-			<RadialGauge
-				width={250}
-				height={250}
-				units='bar'
-				title='Boost'
-				value={this.state.boost}
-				minValue={0}
-				maxValue={2}
-				majorTicks={['0', '0.2', '0.4', '0.6', '0.8', '1.0', '1.2', '1.4', '1.6', '1.8', '2.0']}
-				minorTicks={2}
+		return <div className={`dashboard ${theme}`}>
+			<div className="dashboard__header">
+			</div>
+			<div className="dashboard__gauges">
 
-				//custom config:
-				valueBox={false}
+			{ gaugeBoost ? 
+				<RadialGauge
+					width={250}
+					height={250}
+					units='bar'
+					title='Boost'
+					value={this.state.boost}
+					minValue={0}
+					maxValue={1.5}
+					majorTicks={['0', '0.3', '0.6', '0.9', '1.2', '1.5']}
+					minorTicks={2}
 
-				colorPlate='#000000'
-				colorPlateEnd='#121212'
+					//custom config:
+					valueBox={false}
 
-				colorTitle='#ffffff'
-				colorUnits='#ffffff'
+					colorPlate={this.state.colorPlate}
+					colorPlateEnd={this.state.colorPlateEnd}
 
-				colorMinorTicks='#ffffff'
-				colorMajorTicks='#ffffff'
+					colorTitle={this.state.colorTitle}
+					colorUnits={this.state.colorUnits}
+					colorHighlight={this.state.colorHighlight}
 
-				colorNumbers='#ffffff'
+					colorMinorTicks={this.state.colorMinorTicks}
+					colorMajorTicks={this.state.colorMajorTicks}
+					colorNumbers={this.state.colorNumbers}
 
-				colorNeedle='#1a80d2'
-				colorNeedleEnd='#3f6baa'
-				colorNeedleShadowUp='#d73230'
-				colorNeedleShadowDown='#131c2e'
+					colorNeedle={this.state.colorNeedleEnd}
+					colorNeedleEnd={this.state.colorNeedleEnd}
+					colorNeedleShadowUp={this.state.colorNeedleShadowUp}
+					colorNeedleShadowDown={this.state.colorNeedleShadowDown}
 
-				needleType='line'
-				needleStart={0}
-				colorNeedleCircleInner='#282c35'
-				colorNeedleCircleInnerEnd='#282c35'
-				colorNeedleCircleOuter='#363a43'
-				colorNeedleCircleOuterEnd='#282c35'
-				needleCircleSize={13}
 
-				borderInnerWidth={0}
-				bordeeMiddleWidth={2}
-				bordeeOuterWidth={7}
+					needleType='line'
+					needleStart={0}
+					needleCircleSize={13}
 
-				colorBorderOuter='#777777'
-				colorBorderMiddle='#777777'
-				colorBorderInner='#777777'
+					colorNeedleCircleInner={this.state.colorNeedleCircleInner}
+					colorNeedleCircleInnerEnd={this.state.colorNeedleCircleInnerEnd}
+					colorNeedleCircleOuter={this.state.colorNeedleCircleOuter}
+					colorNeedleCircleOuterEnd={this.state.colorNeedleCircleOuterEnd}
 
-				colorBorderOuterEnd='#777777'
-				colorBorderMiddleEnd='#777777'
-				colorBorderInnerEnd='#777777'
 
-				highlights={[{}]}
-			></RadialGauge>
+					borderInnerWidth={0}
+					borderMiddleWidth={2}
+					borderOuterWidth={7}
 
-			<RadialGauge
-				width={250}
-				height={250}
-				units='°C'
-				title='Intake'
-				value={this.state.intake}
-				minValue={0}
-				maxValue={90}
-				majorTicks={['0', '30', '60', '90']}
-				minorTicks={3}
+					colorBorderOuter={this.state.colorBorderOuter}
+					colorBorderMiddle={this.state.colorBorderMiddle}
+					colorBorderInner={this.state.colorBorderInner}
 
-				//custom config:
-				valueBox={false}
+					colorBorderOuterEnd={this.state.colorBorderOuterEnd}
+					colorBorderMiddleEnd={this.state.colorBorderMiddleEnd}
+					colorBorderInnerEnd={this.state.colorBorderInnerEnd}
 
-				colorPlate='#000000'
-				colorPlateEnd='#121212'
+					highlights={[{}]}
+				></RadialGauge>
 
-				colorTitle='#ffffff'
-				colorUnits='#ffffff'
+				: <div></div> }
 
-				colorMinorTicks='#ffffff'
-				colorMajorTicks='#ffffff'
+				{ gaugeIntake ? 
+				<RadialGauge
+					width={250}
+					height={250}
+					units='°C'
+					title='Intake'
+					value={this.state.intake}
+					minValue={0}
+					maxValue={90}
+					majorTicks={['0', '30', '60', '90']}
+					minorTicks={3}
 
-				colorNumbers='#ffffff'
+					//custom config:
+					valueBox={false}
 
-				colorNeedle='#1a80d2'
-				colorNeedleEnd='#3f6baa'
-				colorNeedleShadowUp='#d73230'
-				colorNeedleShadowDown='#131c2e'
+					colorPlate={this.state.colorPlate}
+					colorPlateEnd={this.state.colorPlateEnd}
 
-				needleType='line'
-				needleStart={0}
-				colorNeedleCircleInner='#282c35'
-				colorNeedleCircleInnerEnd='#282c35'
-				colorNeedleCircleOuter='#363a43'
-				colorNeedleCircleOuterEnd='#282c35'
-				needleCircleSize={13}
+					colorTitle={this.state.colorTitle}
+					colorUnits={this.state.colorUnits}
+					colorHighlight={this.state.colorHighlight}
 
-				borderInnerWidth={0}
-				bordeeMiddleWidth={2}
-				bordeeOuterWidth={7}
+					colorMinorTicks={this.state.colorMinorTicks}
+					colorMajorTicks={this.state.colorMajorTicks}
+					colorNumbers={this.state.colorNumbers}
 
-				colorBorderOuter='#777777'
-				colorBorderMiddle='#777777'
-				colorBorderInner='#777777'
+					colorNeedle={this.state.colorNeedleEnd}
+					colorNeedleEnd={this.state.colorNeedleEnd}
+					colorNeedleShadowUp={this.state.colorNeedleShadowUp}
+					colorNeedleShadowDown={this.state.colorNeedleShadowDown}
 
-				colorBorderOuterEnd='#777777'
-				colorBorderMiddleEnd='#777777'
-				colorBorderInnerEnd='#777777'
 
-				highlights={[{
-					"from": 60,
-					"to": 90,
-					"color": '#4a5e7a'
-				}]}
+					needleType='line'
+					needleStart={0}
+					needleCircleSize={13}
 
-			></RadialGauge>
+					colorNeedleCircleInner={this.state.colorNeedleCircleInner}
+					colorNeedleCircleInnerEnd={this.state.colorNeedleCircleInnerEnd}
+					colorNeedleCircleOuter={this.state.colorNeedleCircleOuter}
+					colorNeedleCircleOuterEnd={this.state.colorNeedleCircleOuterEnd}
 
-			<RadialGauge
-				width={250}
-				height={250}
-				units='°C'
-				title='Coolant'
-				value={this.state.coolant}
-				minValue={0}
-				maxValue={150}
-				majorTicks={['0', '90', '150']}
-				minorTicks={9}
 
-				//custom config:
-				valueBox={false}
+					borderInnerWidth={0}
+					borderMiddleWidth={2}
+					borderOuterWidth={7}
 
-				colorPlate='#000000'
-				colorPlateEnd='#121212'
+					colorBorderOuter={this.state.colorBorderOuter}
+					colorBorderMiddle={this.state.colorBorderMiddle}
+					colorBorderInner={this.state.colorBorderInner}
 
-				colorTitle='#ffffff'
-				colorUnits='#ffffff'
+					colorBorderOuterEnd={this.state.colorBorderOuterEnd}
+					colorBorderMiddleEnd={this.state.colorBorderMiddleEnd}
+					colorBorderInnerEnd={this.state.colorBorderInnerEnd}
 
-				colorMinorTicks='#ffffff'
-				colorMajorTicks='#ffffff'
+					highlights={[{
+						"from": 60,
+						"to": 90,
+						"color": this.state.colorHighlight
+					}]}
 
-				colorNumbers='#ffffff'
+				></RadialGauge>
+				: <div></div> }
 
-				colorNeedle='#1a80d2'
-				colorNeedleEnd='#3f6baa'
-				colorNeedleShadowUp='#d73230'
-				colorNeedleShadowDown='#131c2e'
+				{ gaugeCoolant ?
+				<RadialGauge
+					width={250}
+					height={250}
+					units='°C'
+					title='Coolant'
+					value={this.state.coolant}
+					minValue={0}
+					maxValue={150}
+					majorTicks={['0', '50', '100', '150']}
+					minorTicks={5}
 
-				needleType='line'
-				needleStart={0}
-				colorNeedleCircleInner='#282c35'
-				colorNeedleCircleInnerEnd='#282c35'
-				colorNeedleCircleOuter='#363a43'
-				colorNeedleCircleOuterEnd='#282c35'
-				needleCircleSize={13}
+					//custom config:
+					valueBox={false}
 
-				borderInnerWidth={0}
-				bordeeMiddleWidth={2}
-				bordeeOuterWidth={7}
+					colorPlate={this.state.colorPlate}
+					colorPlateEnd={this.state.colorPlateEnd}
 
-				colorBorderOuter='#777777'
-				colorBorderMiddle='#777777'
-				colorBorderInner='#777777'
+					colorTitle={this.state.colorTitle}
+					colorUnits={this.state.colorUnits}
+					colorHighlight={this.state.colorHighlight}
 
-				colorBorderOuterEnd='#777777'
-				colorBorderMiddleEnd='#777777'
-				colorBorderInnerEnd='#777777'
+					colorMinorTicks={this.state.colorMinorTicks}
+					colorMajorTicks={this.state.colorMajorTicks}
+					colorNumbers={this.state.colorNumbers}
 
-				highlights={[{
-					"from": 120,
-					"to": 150,
-					"color": '#4a5e7a'
-				}]}
-			></RadialGauge>
+					colorNeedle={this.state.colorNeedleEnd}
+					colorNeedleEnd={this.state.colorNeedleEnd}
+					colorNeedleShadowUp={this.state.colorNeedleShadowUp}
+					colorNeedleShadowDown={this.state.colorNeedleShadowDown}
+
+
+					needleType='line'
+					needleStart={0}
+					needleCircleSize={13}
+
+					colorNeedleCircleInner={this.state.colorNeedleCircleInner}
+					colorNeedleCircleInnerEnd={this.state.colorNeedleCircleInnerEnd}
+					colorNeedleCircleOuter={this.state.colorNeedleCircleOuter}
+					colorNeedleCircleOuterEnd={this.state.colorNeedleCircleOuterEnd}
+
+
+					borderInnerWidth={0}
+					borderMiddleWidth={2}
+					borderOuterWidth={7}
+
+					colorBorderOuter={this.state.colorBorderOuter}
+					colorBorderMiddle={this.state.colorBorderMiddle}
+					colorBorderInner={this.state.colorBorderInner}
+
+					colorBorderOuterEnd={this.state.colorBorderOuterEnd}
+					colorBorderMiddleEnd={this.state.colorBorderMiddleEnd}
+					colorBorderInnerEnd={this.state.colorBorderInnerEnd}
+
+					highlights={[{
+						"from": 120,
+						"to": 150,
+						"color": this.state.colorHighlight
+					}]}
+				></RadialGauge>
+				: <div></div> }
+			</div>
+			<div className="dashboard__footer">
+				{store.get("activateCAN") ? <div></div> : <div><i>(CAN-Stream deactivated.)</i></div>}
+			</div>
 		</div>;
 	}
 

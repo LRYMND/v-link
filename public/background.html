@@ -8,7 +8,7 @@
 
 	ipcRenderer.on('START_PROCESSING', (event, args) => {
 		
-		const scriptPath = path.join(process.resourcesPath, '/scripts/python.py')
+		const scriptPath = path.join(process.resourcesPath, '/scripts/dashboard.py')
 		ipcRenderer.send('BG_CONSOLE', { message: scriptPath });
 
 		const { data } = args;
