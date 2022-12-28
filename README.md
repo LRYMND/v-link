@@ -121,19 +121,39 @@ NOTE: Make sure that you stress-relief all your wiring connections with zipties,
 
 ## 7 | Set Up
 
-In this last step I will show you how I set everything up. It is necessary to run the Raspberry on Buster, otherwise the App will not function due to incompatibility issues.
+### Running the app:
 
-1.) To build the App do the following:
+
+1.) Install prerequisites:
+
+```
+sudo apt-get install libudev-dev
+sudo apt-get install python-can
+```
+
+2.) Download the latest release, navigate to the folder and execute these commands:
+
+```
+sh setup-permissions.sh
+chmod +x App.AppImage
+sudo ./App.AppImage --no-sandbox
+```
+
+
+### Building the app:
+
+
+1.) Install prerequisites:
 
 ```
 sudo apt-get install libudev-dev
 sudo apt-get install python-can
 sudo apt-get install npm
 sudo npm install -g n
-sudo n 16.18.1
+sudo n 16.19.0
 ```
 
-When you type "node --version" it should now say 16.18.1.
+2.) Clone the repository and build it using npm:
 
 ```
 git clone https://github.com/LRYMND/volvo-rtvi/
@@ -142,60 +162,55 @@ npm install --force
 npm run build-package
 ```
 
-2.) OPTIONAL: In case you have difficulties with your CarPlay Dongle try the following. The new version of node-carplay has this fixed but somehow it doesnt get picked up by node.
 
-```
-sudo nano /node-modules/modules/node-carplay/modules/DongleHandler.js
-```
+### RasPi setup:
 
-In line 94 & 95, change the id values to the one that matches your dongle. (You can find the ID by using "lsusb" in a terminal.)
 
-```
-if(usb.findByIds(0x1314, 0x1520)) {
-    this._device = usb.findByIds(0x1314, 0x1520);
-```
-
-3.) Add these lines to your "/boot/config.txt" so the Raspberry shuts down gracefully and removes power from the PSU:
+1.) Add these lines to your "/boot/config.txt" so the Raspberry shuts down gracefully and removes power from the PSU:
 
 ```
 dtoverlay=gpio-shutdown,active_low=0,gpio_pull=up
 dtoverlay=gpio-poweroff
 ```
 
-4.) In order to not show anything on the screen until the Raspi is fully booted, add this to your "/boot/config.txt":
+2.) In order to have a black screen until the Raspi is fully booted, add this to your "/boot/config.txt":
 
 ```
 # Disable rainbow image at boot
 disable_splash=1
 ```
 
-5.) Afterwards open "/boot/cmdline.txt" and add this at the end of the line:
+3.) Open "/boot/cmdline.txt" and add this at the end of the line:
 
 ```
 logo.nologo vt.global_cursor_default=0
 ```
 
-6.) To automatically hide the taskbar you can simply right-click it to activate this setting.
-
-7.) Create a "startService.sh" file and add this line:
+4.) Create a "startService.sh" file and add this line:
 
 ```
 sudo /path/to/your/AppImage.AppImage --no-sandbox
 ```
 
-8.) Add this line to your "/etc/xdg/lxsession/LXDE-pi/autostart" so the app runs directly after booting:
+5.) Add this line to your "/etc/xdg/lxsession/LXDE-pi/autostart" so the app runs directly after booting:
 
 ```
 @bash '/path/to/your/startService.sh'
 ```
 
-9.) Done. The Raspberry should be booting fairly clean now and the app should open right after the boot process, ready to connect to your phone.
+6.) To automatically hide the taskbar you can simply right-click it to activate this setting.
 
-NOTE: Since I now have a working media interface in my car, I also wanted to use it as my audio source. For this I'm going to use the aux port of the Raspi and mod my radio with this little module from Lithuania: [V50 Aux-Input](https://dontpressthat.wordpress.com/2017/10/13/in-car-raspberry-pi-psu-controller/)
 
-He also got a bluetooth version available but since we're already wirelessly connected with our phone to Carplay, I thought running an aux-cable from the Raspi to the radio would be a cleaner solution and less prone to failure. 
+### Notes:
 
-NOTE: This is no advertisement, just a clean and simple solution IMO.
+
+The Raspberry should be booting fairly clean now and the app should open right after the boot process, ready to connect to your phone.
+
+Since there is now a working media interface in the car, we can add it as an audio source. For this you can use the aux port of the Raspi and mod the radio with this little module from Lithuania: [V50 Aux-Input](https://dontpressthat.wordpress.com/2017/10/13/in-car-raspberry-pi-psu-controller/)
+
+He also got a bluetooth version available but since the phone is already wirelessly connected to the Dongle, why not running a simple aux-cable from the Raspi to the radio? It's clean and less prone to failure. 
+
+#### -> This is no advertisement, just a clean and simple solution IMO.
 
 
 ## 8 | ToDo
