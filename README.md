@@ -166,39 +166,36 @@ npm run build-package
 ### RasPi setup:
 
 
-1.) Add these lines to your "/boot/config.txt" so the Raspberry shuts down gracefully and removes power from the PSU:
+1.) Add these lines to your "/boot/config.txt":
 
 ```
+#Shutdown and remove power from PSU
 dtoverlay=gpio-shutdown,active_low=0,gpio_pull=up
 dtoverlay=gpio-poweroff
-```
 
-2.) In order to have a black screen until the Raspi is fully booted, add this to your "/boot/config.txt":
-
-```
-# Disable rainbow image at boot
+#Disable rainbow image at boot
 disable_splash=1
 ```
 
-3.) Open "/boot/cmdline.txt" and add this at the end of the line:
+2.) Open "/boot/cmdline.txt" and add this at the end of the line:
 
 ```
 logo.nologo vt.global_cursor_default=0
 ```
 
-4.) Create a "startService.sh" file and add this line:
+3.) Create a "startService.sh" file and add this line:
 
 ```
 sudo /path/to/your/AppImage.AppImage --no-sandbox
 ```
 
-5.) Add this line to your "/etc/xdg/lxsession/LXDE-pi/autostart" so the app runs directly after booting:
+4.) Add this line to your "/etc/xdg/lxsession/LXDE-pi/autostart" so the app runs directly after booting:
 
 ```
-@bash '/path/to/your/startService.sh'
+bash '/path/to/your/startService.sh'
 ```
 
-6.) To automatically hide the taskbar you can simply right-click it to activate this setting.
+5.) To automatically hide the taskbar you can simply right-click it to activate this setting.
 
 
 ### Notes:

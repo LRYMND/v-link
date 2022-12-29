@@ -15,18 +15,18 @@ IAT_DATA = 0xCE
 COL_DATA = 0xD8
 
 REFRESH_RATE = 0.03
-INTERVAL = 3
-x = 0
+INTERVAL = 1
+x = 1
 
 bus = can.interface.Bus(channel='can0', bustype='socketcan', bitrate=500000)
 
 def can_rx_task():
+    boostOld = 0
+    boostNew = 0
+    difference = 0
+
     while (True):
         message = bus.recv()
-
-        boostOld = 0
-        boostNew = 0
-        difference = 0
 
 		#Catch Boost
         if (message.arbitration_id == REP_ID and message.data[4] == MAP_DATA):
@@ -37,20 +37,26 @@ def can_rx_task():
             if (boost < 0):
                 boost = 0
 
-            boostNew = boost
-            differene = abs(boostNew - boostOld)
-            i = 0.01
+#            boostNew = boost
+#            difference = abs(boostNew - boostOld)
+#            i = 0.01
+#
+#            #Simulate analogue feeling by iterating more on big value gaps
+#            if (difference >= 0.1):
+#		boost = boostOld
+#                while(i <= difference):
+#		    if (boost < boostNew):
+#                        boost = boost + 0.01
+#		    if (boost > boostNew):
+#			boost = boost - 0.01
+#                    print("map:"+str(float(boost)))
+#                    i = i + 0.01
+#            else:
+#                print("map:"+str(float(boost)))
+#
+#	    boostOld = boost
 
-            #Simulate analogue feeling by iterating more on big value gaps
-            if (difference >= 0.1):
-                while(i <= difference):
-                    boost = boost + i
-                    print("map:"+str(float(boost)))
-                    i = i + 0.01
-            else:
-                print("map:"+str(float(boost)))
-
-            boostOld = boostNew
+	    print("map:"+str(float(boost)))
             sys.stdout.flush()
 
 		#Catch Intake
