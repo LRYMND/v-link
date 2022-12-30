@@ -151,7 +151,7 @@ sudo apt-get install python-can
 sudo apt-get install npm
 sudo npm install -g n
 sudo n 18.12.1
-sudo npm install -g npm@8.19.12
+sudo npm install -g npm@8.19.2
 ```
 
 2.) Clone the repository and build it using npm:
