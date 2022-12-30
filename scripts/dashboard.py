@@ -21,9 +21,9 @@ x = 1
 bus = can.interface.Bus(channel='can0', bustype='socketcan', bitrate=500000)
 
 def can_rx_task():
-    boostOld = 0
-    boostNew = 0
-    difference = 0
+    #boostOld = 0
+    #boostNew = 0
+    #difference = 0
 
     while (True):
         message = bus.recv()
@@ -43,20 +43,19 @@ def can_rx_task():
 #
 #            #Simulate analogue feeling by iterating more on big value gaps
 #            if (difference >= 0.1):
-#		boost = boostOld
-#                while(i <= difference):
-#		    if (boost < boostNew):
-#                        boost = boost + 0.01
-#		    if (boost > boostNew):
-#			boost = boost - 0.01
-#                    print("map:"+str(float(boost)))
-#                    i = i + 0.01
-#            else:
-#                print("map:"+str(float(boost)))
-#
-#	    boostOld = boost
+#		        boost = boostOld
+#               while(i <= difference):
+#		            if (boost < boostNew):
+#                       boost = boost + 0.01
+#                   if (boost > boostNew):
+#                       boost = boost - 0.01
+#                   print("map:"+str(float(boost)))
+#                   i = i + 0.01
+#               else:
+#                   print("map:"+str(float(boost)))
+#               boostOld = boost
 
-	    print("map:"+str(float(boost)))
+            print("map:"+str(float(boost)))
             sys.stdout.flush()
 
 		#Catch Intake
@@ -86,8 +85,8 @@ t.start()
 try:
     while (True):
         x += REFRESH_RATE
-        if(x > INTERVAL):
 
+        if(x > INTERVAL):
             # Sent an intake temperature request
             msg = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x10,0xCE,0x01,0x00,0x00],is_extended_id=True)
             try:
@@ -105,16 +104,14 @@ try:
                 print("Nothing sent")
 
             x = 0
-        
-        else:
 
-            # Sent a boost pressure request
-            msg = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x12,0x9D,0x01,0x00,0x00],is_extended_id=True)
-            try:
-                bus.send(msg)
-                time.sleep(REFRESH_RATE)
-            except can.CanError:
-                print("Nothing sent")
+        # Sent a boost pressure request
+        msg = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x12,0x9D,0x01,0x00,0x00],is_extended_id=True)
+        try:
+            bus.send(msg)
+            time.sleep(REFRESH_RATE)
+        except can.CanError:
+            print("Nothing sent")
 
         time.sleep(REFRESH_RATE)
 
