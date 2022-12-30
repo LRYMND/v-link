@@ -136,7 +136,7 @@ sudo apt-get install python-can
 ```
 sh setup-permissions.sh
 chmod +x App.AppImage
-sudo ./App.AppImage --no-sandbox
+./App.AppImage --no-sandbox
 ```
 
 
@@ -150,7 +150,8 @@ sudo apt-get install libudev-dev
 sudo apt-get install python-can
 sudo apt-get install npm
 sudo npm install -g n
-sudo n 16.19.0
+sudo n 18.12.1
+sudo npm install -g npm@8.19.12
 ```
 
 2.) Clone the repository and build it using npm:
@@ -187,7 +188,7 @@ logo.nologo vt.global_cursor_default=0
 
 ```
 #Execute app
-sudo /path/to/your/AppImage.AppImage --no-sandbox
+/path/to/your/AppImage.AppImage --no-sandbox
 ```
 
 4.) Add this line to your "/etc/xdg/lxsession/LXDE-pi/autostart"
