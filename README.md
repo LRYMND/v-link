@@ -43,7 +43,7 @@ In order to get this build running you will need the following hardware. Tools a
 
 * [Carlinkit Adapter](https://www.amazon.de/CarlinKit-Wireless-CarPlay-Aftermarket-Mirroring-Black/dp/B09ZPBL4HP/ref=sr_1_18_sspa?keywords=Carlinkit&qid=1662026978&sr=8-18-spons&psc=1&smid=AWLAK6Y9FEYBP&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUFLQVVHRlBSTkdIT0cmZW5jcnlwdGVkSWQ9QTA2NzUwNDAzTjhaUjJJQkQ1N0xXJmVuY3J5cHRlZEFkSWQ9QTAwNDAzNTMyNVdPTUdaM1VTQU8wJndpZGdldE5hbWU9c3BfbXRmJmFjdGlvbj1jbGlja1JlZGlyZWN0JmRvTm90TG9nQ2xpY2s9dHJ1ZQ==)
 * [12V 5A Fuse](https://www.amazon.de/Neuftech%C2%AE-Sicherungshalter-Flachsicherung-Sicherung-wasserdicht/dp/B00UX6NIQE/ref=asc_df_B00UX6NIQE/?tag=googshopde-21&linkCode=df0&hvadid=310359968785&hvpos=&hvnetw=g&hvrand=13883660999016731185&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9043309&hvtargid=pla-561148277227&psc=1&th=1&psc=1&tag=&ref=&adgrpid=62443302395&hvpone=&hvptwo=&hvadid=310359968785&hvpos=&hvnetw=g&hvrand=13883660999016731185&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9043309&hvtargid=pla-561148277227)
-- Raspberry PSU as described in this Readme
+- Raspberry PSU
 - OEM P1 RTI Display Unit
 - Raspberry Pi
 
@@ -64,7 +64,7 @@ Available solutions are way too bulky and I wanted a clean setup with some criti
 - Raspi gracefully shuts off when ignition turns off (via shutdown -h command)
 - Little to no power is consumed in the off state
 
-I went through many different forums and articles until I found a neat solution which is described in the article mentioned in the sources. After ordering the PCB and soldering the components I noticed that the circuit was not functioning as expected. Once the ignition was off the Raspberry would immediatley turn back on again.
+I went through hours of googling until I found an [article](https://dontpressthat.wordpress.com/2017/10/13/in-car-raspberry-pi-psu-controller/) that would end my quest. However, after ordering the PCB and soldering the components I had to find out that the circuit was not functioning as expected. Once the ignition was off the Raspberry would immediatley turn back on again.
 
 In short, here are the reasons why:
 - Capacitance of the buck converter itself
@@ -83,11 +83,11 @@ Make sure that you also set up the automatic can channel activation on boot!
 
 ## 5 | RTVI App
 
-As mentioned above, I used node.js, electron and react to set up a custom application in the fashion of Rhys Morgan's "react-carplay", though the only component I reused was his node-carplay npm package. Kudos to him at this point for figuring all this out and helping me to troubleshoot some things along the way.
+As mentioned above, I used node.js, electron and react to set up a custom application in the fashion of Rhys Morgan's "react-carplay". Kudos to him for figuring all of this out and for helping me to troubleshoot some things along the way.
 
 ![CARPLAY IMAGE](repo/carplay.jpg?raw=true "Carplay")
 
-I would say that the app is in a usable beta-stage and I engourage anyone to help me improve it. In this repository you can find the full source code and altering it to your needs is quiet straight forward. For example to change the displayed CAN data, you will only have to make a few changes to python.py and Dashboard.js. In order to use Carplay/Android Auto you will need to have a Carlinkit adpater.
+The app is in a usable state and I engourage anyone to help me improve it. In this repository you can find the full source code and altering it to your needs is quiet straight forward. For example to change the displayed CAN data, you will only have to make a few changes to python.py and Dashboard.js. In order to use Carplay/Android Auto you will need to have a Carlinkit adpater.
 
 NOTE: Your Raspi needs a working internet connection when you launch the app for the first time because it needs to download some resources for the dongle. You can find more information in Rhys' repositories or in the source code.
 
@@ -166,7 +166,7 @@ npm run build-package
 ### RasPi setup:
 
 
-1.) Add these lines to your "/boot/config.txt":
+1.) Add these lines to your "/boot/config.txt"
 
 ```
 #Shutdown and remove power from PSU
@@ -177,37 +177,39 @@ dtoverlay=gpio-poweroff
 disable_splash=1
 ```
 
-2.) Open "/boot/cmdline.txt" and add this at the end of the line:
+2.) Open "/boot/cmdline.txt" and add this at the end of the line
 
 ```
 logo.nologo vt.global_cursor_default=0
 ```
 
-3.) Create a "startService.sh" file and add this line:
+3.) Create a "startService.sh" file and add this line
 
 ```
+#Execute app
 sudo /path/to/your/AppImage.AppImage --no-sandbox
 ```
 
-4.) Add this line to your "/etc/xdg/lxsession/LXDE-pi/autostart" so the app runs directly after booting:
+4.) Add this line to your "/etc/xdg/lxsession/LXDE-pi/autostart"
 
 ```
+#Run script after boot
 bash '/path/to/your/startService.sh'
 ```
 
-5.) To automatically hide the taskbar you can simply right-click it to activate this setting.
+5.) To automatically hide the taskbar simply right-click it to activate this setting.
 
 
 ### Notes:
 
 
-The Raspberry should be booting fairly clean now and the app should open right after the boot process, ready to connect to your phone.
+The Raspberry is booting without any splash screens now and the app should open right after the login, ready to connect to your phone.
 
-Since there is now a working media interface in the car, we can add it as an audio source. For this you can use the aux port of the Raspi and mod the radio with this little module from Lithuania: [V50 Aux-Input](https://dontpressthat.wordpress.com/2017/10/13/in-car-raspberry-pi-psu-controller/)
+Since there is now a working media interface in the car, we can add it as an audio source. For this you can use the aux port of the Raspi and mod the radio with this little module from Lithuania: [V50 Aux-Input](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/)
 
-He also got a bluetooth version available but since the phone is already wirelessly connected to the Dongle, why not running a simple aux-cable from the Raspi to the radio? It's clean and less prone to failure. 
+There's also a bluetooth version but since the phone is already wirelessly connected to the Dongle, an aux-cable seems pretty clean and less prone to failure. 
 
-#### -> This is no advertisement, just a clean and simple solution IMO.
+##### -> This is no advertisement, just a clean and simple solution IMO.
 
 
 ## 8 | ToDo
@@ -226,11 +228,13 @@ The end goal would be to integrate the OEM control elements that are mounted to 
 
 ## 9 | Final Words
 
-I'm not a software developer, electrical engineer or automotive technician and doing stuff like this is purely a hobby for me. I'm distancing myself from any damage that you might do to your car in case you would like to give this mod a try. The setup I described above is the way I fitted things to my V50. Eventually you will need to find other places to mount your components and different paths to route your cables than I did, after all it's a DIY mod.
+I'm not a software developer, electrical engineer or automotive technician and doing stuff like this is just a hobby for me. I'm distancing myself from any damage that you might do to your car in case you want to follow this guide. The setup I described above is the way I fitted things to my V50. Eventually you will need to find other places to mount your components and different paths to route your cables, after all it's a DIY mod.
 
-That said, with this guide it should be quiet straight forward to implement it in your car though.  I'm running the setup since several months now. On the highway, over bumpy gravel roads, at 35°C in the sun and -5°C in the winter and so far it didn't let me down. It froze or lagged a couple of times but I could either reconnect the phone or restart the app via the settings page and it would work again for the rest of the ride. However this occurs very rarely. 
+The setup is installed in my car since several months now. I drove on the highway, over bumpy gravel roads, at 35°C in the sun and -10°C in the winter and so far it didn't let me down.
 
-I'd be happy if anybody who has tips for improvement can chime in and report their findings or ideas so the app can be further developed. For that matter I set up a [Swedespeed Thread](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/).
+It can happen that the Carplay interface freezes occasionally. In that case you can reconnect the phone or restart/reboot the app from the settings page. However, this rarely happens.
+
+I'd be happy if anybody who has tips for improvement can chime in. Check out the [Swedespeed Thread](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/) and share your ideas, findings or issues.
 
 Last but not least, thanks again to the people who shared their code and insights and Yosh for helping me to stitch together this app.
 
