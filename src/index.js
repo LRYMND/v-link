@@ -5,14 +5,27 @@ import './index.css';
 import App from './react/App';
 import reportWebVitals from './reportWebVitals';
 
+//Setup StrictMode:
+function RenderApp(props) {
+  const condition = props;
+
+  if(condition == true) {
+    return  <React.StrictMode>
+              <App />
+            </React.StrictMode>;
+  }
+  return <App />;
+}
+
 //ReactDOM.render(
 const container = document.getElementById('root');
 const root = createRoot(container);
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+  <RenderApp StrictMode={true} />
+  //<React.StrictMode>
+  //  <App />
+  //</React.StrictMode>,
+  //document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function

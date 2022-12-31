@@ -13,6 +13,7 @@ REP_ID = 0x00400021
 MAP_DATA = 0x9D
 IAT_DATA = 0xCE
 COL_DATA = 0xD8
+VOL_DATA = 0x0A
 
 REFRESH_RATE = 0.03
 INTERVAL = 1
@@ -75,6 +76,14 @@ def can_rx_task():
 
             print("col:"+str(float(coolant)))
             sys.stdout.flush()
+
+        #Catch Voltage
+        if (message.arbitration_id == REP_ID and message.data[4] == VOL_DATA):
+            voltage = message.data[5]
+            voltage = coolant * 0.07
+
+            print("vol:"+str(float(voltage)))
+            sys.stdout.flush()
         
 
 t = Thread(target = can_rx_task)
@@ -97,6 +106,14 @@ try:
 
             # Sent a coolant temperature request
             msg = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x10,0xD8,0x01,0x00,0x00],is_extended_id=True)
+            try:
+                bus.send(msg)
+                time.sleep(REFRESH_RATE)
+            except can.CanError:
+                print("Nothing sent")
+
+            # Sent a battery voltage request
+            msg = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x10,0x0A,0x01,0x00,0x00],is_extended_id=True)
             try:
                 bus.send(msg)
                 time.sleep(REFRESH_RATE)

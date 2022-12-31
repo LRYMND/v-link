@@ -64,7 +64,7 @@ const TopBar = () => {
   }, [theme]);
 
   return (
-    <div className={`topbar ${theme}`} style={{ backgroundImage: `url(${TopBarBackground})` }}>
+    <div className={`topbar ${theme}`} style={{ backgroundImage: `url(${TopBarBackground})`}}>
       <div className={"topbar__info"}>
           <svg className={`topbar__icon__wifi topbar__icon__wifi--${wifiState}`}>
             <use xlinkHref="./svg/wifi.svg#wifi"></use>

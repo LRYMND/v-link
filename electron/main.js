@@ -185,28 +185,47 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   });
 
-  mainWindow = new BrowserWindow({
-    width: 800,
-    height: 480,
-    //kiosk: true,
-    show: false,
-    backgroundColor: '#000000',
+  if (isDev) {
+    mainWindow = new BrowserWindow({
+      width: 800,
+      height: 480,
+      kiosk: false,
+      show: false,
+      backgroundColor: '#000000',
 
-    webPreferences: {
-      nodeIntegration: true,
-      preload: path.join(__dirname, "preload.js"),
-      contextIsolation: false,
-    },
+      webPreferences: {
+        nodeIntegration: true,
+        preload: path.join(__dirname, "preload.js"),
+        contextIsolation: false,
+      },
+    });
 
-  });
+    mainWindow.webContents.openDevTools();
+
+  } else {
+
+    mainWindow = new BrowserWindow({
+      width: 800,
+      height: 480,
+      kiosk: false,
+      show: false,
+      backgroundColor: '#000000',
+
+      webPreferences: {
+        nodeIntegration: true,
+        preload: path.join(__dirname, 'preload.js'),
+        contextIsolation: false
+      }
+    });
+  }
 
   mainWindow.removeMenu();
   mainWindow.loadURL(startUrl);
 
   mainWindow.on('ready-to-show', function () {
     console.log("Window READY")
+    if(!isDev) {mainWindow.setKiosk(true);}
     mainWindow.show();
-    mainWindow.setKiosk(true);
   });
 
   let size = mainWindow.getSize();
@@ -341,29 +360,48 @@ ipcMain.on('START_BACKGROUND_VIA_MAIN', (event, args) => {
   if (store.get("activateCAN")) {
     console.log("STARTING BACKGROUND WORKER");
     const backgroundFileURL = ""
+
+
+
     if (isDev) {
       backgroundFileUrl = url.format({
         pathname: path.join(__dirname, "../public/background.html"),
         protocol: "file:",
         slashes: true,
       });
+
+      hiddenWindow = new BrowserWindow({
+        width: 50,
+        height: 50,
+        show: true,
+
+        webPreferences: {
+          nodeIntegration: true,
+          enableRemoteModule: true,
+          contextIsolation: false,
+        },
+      });
+
+      hiddenWindow.webContents.openDevTools();
+
     } else {
+
       backgroundFileUrl = url.format({
         pathname: path.join(__dirname, "../background.html"),
         protocol: "file:",
         slashes: true,
       });
-    }
-    hiddenWindow = new BrowserWindow({
-      show: false,
 
-      webPreferences: {
-        nodeIntegration: true,
-        enableRemoteModule: true,
-        contextIsolation: false,
-      },
-    });
-    //hiddenWindow.webContents.openDevTools();
+      hiddenWindow = new BrowserWindow({
+        show: false,
+
+        webPreferences: {
+          nodeIntegration: true,
+          enableRemoteModule: true,
+          contextIsolation: false,
+        },
+      });
+    }
 
     hiddenWindow.loadURL(backgroundFileUrl);
 
@@ -377,6 +415,7 @@ ipcMain.on('START_BACKGROUND_VIA_MAIN', (event, args) => {
   }
 });
 
+
 // This event listener will start the execution of the background task
 ipcMain.on('BACKGROUND_READY', (event, args) => {
   event.reply('START_PROCESSING', {
@@ -386,9 +425,7 @@ ipcMain.on('BACKGROUND_READY', (event, args) => {
 
 // This event will quit the python script when Dashboard page will be unmounted
 ipcMain.on('QUIT_BACKGROUND', (event, args) => {
-  if (store.get("activateCAN")) {
     hiddenWindow.webContents.send("QUIT_PYTHON");
-  }
 });
 
 // This event will quit the python script when Dashboard page will be unmounted

@@ -22,6 +22,7 @@ class Dashboard extends Component {
 			boost: 0,
 			intake: 0,
 			coolant: 0,
+			voltage: 0,
 
 			theme: null,
 
@@ -77,6 +78,12 @@ class Dashboard extends Component {
 					coolant: args
 				});
 			}
+			if (args.includes("vol:")) {
+				args = args.replace("vol:", "")
+				this.setState({
+					voltage: args
+				});
+			}
 		}
 	}
 
@@ -94,7 +101,6 @@ class Dashboard extends Component {
 
 	componentWillUnmount() {
 		this.ismounted = false;
-
 		ipcRenderer.send('QUIT_BACKGROUND');
 		ipcRenderer.removeListener('MESSAGE_FROM_BACKGROUND_VIA_MAIN', this.msgFromBG);
 	}
@@ -325,7 +331,7 @@ class Dashboard extends Component {
 				: <div></div> }
 			</div>
 			<div className="dashboard__footer">
-				{store.get("activateCAN") ? <div></div> : <div><i>(CAN-Stream deactivated.)</i></div>}
+				{store.get("activateCAN") ? <div><h3>{this.state.voltage}V</h3></div> : <div><i>(CAN-Stream deactivated.)</i></div>}
 			</div>
 		</div>;
 	}

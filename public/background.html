@@ -29,10 +29,6 @@
 		pyshell.on('stderr', function (stderr) {
 			ipcRenderer.send('BG_CONSOLE', { message: stderr });
 		});
-		
-		pyshell.on('pythonError', function (data) {
-			ipcRenderer.send('BG_CONSOLE', { message: pythonError });
-		});
 
 	});
 
