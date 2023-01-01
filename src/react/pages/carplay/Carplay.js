@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-// import "./App.css";
+import "./carplay.scss";
 import "@fontsource/montserrat";
 import JMuxer from "jmuxer";
 
@@ -215,27 +215,13 @@ class Carplay extends Component {
           {this.state.status ? (
             <div></div>
           ) : (
-            <div>
-            <div
-              style={{
-                marginTop: "35%",
-                marginBottom: "auto",
-                textAlign: "center",
-                flexGrow: "1",
-                justifyContent: "center",
-                alignItems: "center",
-                display: "flex",
-                position: "relativ",
-              }}>
-                <h1 style={{ color: '#7c7c7c' }}>WAITING FOR BLUETOOTH DEVICE</h1>
-            </div>
-            <div
-              style={{
-                justifyContent: "center",
-                display: "flex",
-              }}>
-                <GooSpinner size={40} color="#7c7c7c" loading={loading} />            
-            </div>
+            <div className="content">
+              <div>
+                <h1>WAITING FOR DEVICE</h1>
+              </div>
+              <div>
+                <GooSpinner size={40} color="#7c7c7c" loading={loading} />
+              </div>
             </div>
           )}
         </div>

@@ -1,7 +1,7 @@
 import React from "react";
 import "./navbar.scss";
 import "../components/themes.scss"
-//import NavBarBackground from "./images/navbar.png"
+import NavBarBackground from "./images/navbar.png"
 
 import { NavLink } from "react-router-dom";
 
@@ -12,8 +12,7 @@ const NavBar = ({navbar}) => {
   const theme = store.get("colorTheme");
 
   return (
-    <div className={`navbar ${theme}`}>
-      {/* <div className={`navbar ${theme}`} style={{ backgroundImage: `url(${NavBarBackground})` }}> */ }
+    <div className={`navbar ${theme}`} style={{ backgroundImage: `url(${NavBarBackground})` }}>
       <NavLink to={"/dashboard"}>
         <svg className="navbar__icon">
           <use xlinkHref="./svg/gauge.svg#gauge"></use>

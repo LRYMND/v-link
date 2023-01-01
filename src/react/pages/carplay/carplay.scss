@@ -1,5 +1,12 @@
-body { 
-    background: #000000;
+body {
+    background: var(--backgroundColor);
     justify-content: center;
     font-family: "Montserrat";
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }

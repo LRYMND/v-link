@@ -160,39 +160,43 @@ const Settings = ({ reqReload }) => {
             <div className="settings__connections__wifi__list">
               {wifiList.map((item, i) => (
                 <div className="settings__connections__wifi__list__item" key={i}>
-                  <button className="network-button" type="button" onClick={() => openDialogue(item.ssid)}>{item.ssid}</button>
+                  <button className="app-button" type="button" onClick={() => openDialogue(item.ssid)}>{item.ssid}</button>
                 </div>
               ))}
             </div>
           </div>
           <div className="settings__connections__bt">
-            <p><i>Volvo RTVI v1.1.0</i></p>
+            <p><i>Volvo RTVI v1.2.0</i></p>
           </div>
         </div>
         <div className="settings__general">
-          <div className="settings__general__theme">
-            <label>
-              <i>Choose a color theme:</i>
-              <select color="Select a Color" onChange={colorSelect} defaultValue={store.get('colorTheme')} className="color-select">
-                <option color="blue">  Blue  </option>
-                <option color="green"> Green </option>
-                <option color="red">   Red   </option>
-                <option color="white"> White </option>
-              </select>
-            </label>
+          <div className="settings__general__section">
+            <div className="settings__general__section__column">
+              <h4>Choose a color theme:</h4>
+            </div>
+            <div className="settings__general__section__column">
+              <label>
+                <select className="app-button" color="Select a Color" onChange={colorSelect} defaultValue={store.get('colorTheme')}>
+                  <option color="blue">  Blue  </option>
+                  <option color="green"> Green </option>
+                  <option color="red">   Red   </option>
+                  <option color="white"> White </option>
+                </select>
+              </label>
+            </div>
           </div>
           <div className="settings__general__section">
             <div className="settings__general__section__column">
               <div><h4>Gauges:</h4></div>
-              <label><input type="checkbox" onChange={handleGaugeBoost} defaultChecked={store.get("showGaugeBoost")}/> Boost </label>
-              <label><input type="checkbox" onChange={handleGaugeIntake} defaultChecked={store.get("showGaugeIntake")}/> Intake </label>
-              <label><input type="checkbox" onChange={handleGaugeCoolant} defaultChecked={store.get("showGaugeCoolant")}/> Coolant </label>
+              <label><input type="checkbox" onChange={handleGaugeBoost} defaultChecked={store.get("showGaugeBoost")} /> Boost </label>
+              <label><input type="checkbox" onChange={handleGaugeIntake} defaultChecked={store.get("showGaugeIntake")} /> Intake </label>
+              <label><input type="checkbox" onChange={handleGaugeCoolant} defaultChecked={store.get("showGaugeCoolant")} /> Coolant </label>
             </div>
             <div className="settings__general__section__column">
               <div><h4>General:</h4></div>
-              <label><input type="checkbox" onChange={handleCruiseControl} defaultChecked={store.get("activateCC")}/> Enable CC on IGN </label>
-              <label><input type="checkbox" onChange={handleCAN} defaultChecked={store.get("activateCAN")}/> Enable CAN-Stream </label>
-              <label><input type="checkbox" onChange={handleMMI} defaultChecked={store.get("activateMMI")}/> Enable MMI </label>
+              <label><input type="checkbox" onChange={handleCruiseControl} defaultChecked={store.get("activateCC")} /> Enable CC on IGN </label>
+              <label><input type="checkbox" onChange={handleCAN} defaultChecked={store.get("activateCAN")} /> Enable CAN-Stream </label>
+              <label><input type="checkbox" onChange={handleMMI} defaultChecked={store.get("activateMMI")} /> Enable MMI </label>
             </div >
           </div>
           <div className="settings__general__section">

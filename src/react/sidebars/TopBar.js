@@ -66,13 +66,13 @@ const TopBar = () => {
   return (
     <div className={`topbar ${theme}`} style={{ backgroundImage: `url(${TopBarBackground})`}}>
       <div className={"topbar__info"}>
-          <svg className={`topbar__icon__wifi topbar__icon__wifi--${wifiState}`}>
+          <svg className={`topbar__icon topbar__icon--${wifiState}`}>
             <use xlinkHref="./svg/wifi.svg#wifi"></use>
           </svg>
-          <svg className={`topbar__icon__bluetooth`}>
+          <svg className={`topbar__icon topbar__icon_--${'disconnected'}`}>
             <use xlinkHref="./svg/bluetooth.svg#bluetooth" color={"7c7c7c"}></use>
           </svg>
-          <svg className={`topbar__icon__phone topbar__icon__phone--${phoneState}`}>
+          <svg className={`topbar__icon topbar__icon_--${phoneState}`}>
             <use xlinkHref="./svg/phone.svg#phone"></use>
           </svg>
       </div>

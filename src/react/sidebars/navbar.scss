@@ -1,22 +1,24 @@
 .navbar {
+  background: var(--background-color);
+  background-position: center;
+  background-repeat: no-repeat;
+
   display: flex;
   position: absolute;
   align-items: center;
   justify-content: center;
   bottom: 0;
   gap: 10rem;
-  height: 60px;
+  height: 5rem;
   width: 100%;
-  background: var(--background-color);
 
   &__icon {
-    width: 2rem;
-    height: 2rem;
+    width: 2.2rem;
+    height: 2.2rem;
 
-    margin-bottom: 1.5rem;
+    margin-top: 1rem;
 
     fill: var(--fillInactive);
-
     transition: fill 0.3s;
 
     &:hover {
@@ -24,7 +26,6 @@
     }
   }
 }
-
 
 .active {
   .navbar__icon {

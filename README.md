@@ -27,7 +27,8 @@ All of the above sources have been altered to my needs and are bundled with a cu
     <li><a>| RTVI App</a></li>
     <li><a>| Wiring</a></li>
     <li><a>| Set Up</a></li>
-    <li><a>| ToDo</a></li>
+    <li><a>| Audio</a></li>
+    <li><a>| Additional Information</a></li>
     <li><a>| Final Words</a></li>
   </ol>
 </details>
@@ -39,6 +40,7 @@ In order to get this build running you will need the following hardware. Tools a
 * [MCP2515 CAN Module](https://www.amazon.de/-/en/Intelligent-Electronics-Receiver-Controller-Development/dp/B07MY2D7TW/ref=sr_1_6?keywords=mcp2515&qid=1662026860&sr=8-6)
 * [LCD Driver](https://de.aliexpress.com/item/4001175095149.html?spm=a2g0o.order_list.0.0.30e65c5fXw0Aa6&gatewayAdapt=glo2deu)
 * [LCD Display](https://de.aliexpress.com/item/32835602509.html?spm=a2g0o.order_list.0.0.30e65c5fXw0Aa6&gatewayAdapt=glo2deu)
+* [6.5" Touch Screen Module](https://www.ebay.de/itm/170981315406)
 * [12V to 5V Buck Converter, 5A](https://www.amazon.de/gp/product/B071ZRXKJY/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&psc=1)
 
 * [Carlinkit Adapter](https://www.amazon.de/CarlinKit-Wireless-CarPlay-Aftermarket-Mirroring-Black/dp/B09ZPBL4HP/ref=sr_1_18_sspa?keywords=Carlinkit&qid=1662026978&sr=8-18-spons&psc=1&smid=AWLAK6Y9FEYBP&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUFLQVVHRlBSTkdIT0cmZW5jcnlwdGVkSWQ9QTA2NzUwNDAzTjhaUjJJQkQ1N0xXJmVuY3J5cHRlZEFkSWQ9QTAwNDAzNTMyNVdPTUdaM1VTQU8wJndpZGdldE5hbWU9c3BfbXRmJmFjdGlvbj1jbGlja1JlZGlyZWN0JmRvTm90TG9nQ2xpY2s9dHJ1ZQ==)
@@ -47,49 +49,52 @@ In order to get this build running you will need the following hardware. Tools a
 - OEM P1 RTI Display Unit
 - Raspberry Pi
 
-I advise to go for a Raspi 4 because the performance will be better but a Raspi 3 should work as well. Not tested though!
+I advise to go with a Raspberry Pi 4. It also works on the Raspberry Pi 3 but the performance will be much worse.
 
 ## 2 | Display Mod
 
-To swap the display, you will have to disassemble your original RTI unit and take all the display components out. Afterwards you glue the new display in place. I also mounted the buck converter and the display driver on the backside of the LCD panel because there is some space, and space is limited with this build. More information can also be found in laurynas' repo.
+This guide involves adding an aftermarket touchscreen to the 6.5" LCD to enhance the usability. This is optional but I highly recommend it. Don't expect the same responsiveness as your smartphone though.
+
+To swap the display, you will have to disassemble your original RTI unit and take all the display components out. Afterwards you will need to mount the touchscreen to your LCD panel and glue the new display/touchscreen unit into the RTI frame. The buck converter as well as the display and touch screen drivers are mounted to the backside of the LCD panel because space is quiet limited. More information can also be found in laurynas' repo.
 
 ![SCREENMOD IMAGE](repo/screenmod.jpg?raw=true "Screen Mod")
 
 
 ## 3 | Raspberry PSU
 
-Available solutions are way too bulky and I wanted a clean setup with some critical demands:
+The power supply should fulfill some critical demands and available solutions are quiet bulky.
 
-- Raspi boots when igniton is ON
-- Raspi gracefully shuts off when ignition turns off (via shutdown -h command)
-- Little to no power is consumed in the off state
+- Raspi boots when igniton is turned ON
+- Raspi gracefully shuts off when ignition is turned off
+- Little to no power is consumed in the off state so the battery isn't drained
 
-I went through hours of googling until I found an [article](https://dontpressthat.wordpress.com/2017/10/13/in-car-raspberry-pi-psu-controller/) that would end my quest. However, after ordering the PCB and soldering the components I had to find out that the circuit was not functioning as expected. Once the ignition was off the Raspberry would immediatley turn back on again.
+I went through hours of online research until I found an [article](https://dontpressthat.wordpress.com/2017/10/13/in-car-raspberry-pi-psu-controller/) that would end my quest. However, after ordering the PCB and soldering the components I had to find out that the circuit was not functioning as expected. Once the ignition was off the Raspberry would immediatley turn back on again.
 
 In short, here are the reasons why:
 - Capacitance of the buck converter itself
 - Floating states on Q2/Q3
 
-You can find an updated and working schematic in the schematics folder of this repository. As stated in the original article, it is adviseable to put a heatsink on the big transistor. If you want to know more about the issue and the solution you can follow this [link](https://forum.core-electronics.com.au/t/pi-power-switch-using-car-ignition-logic/6177/7).
-
+More infos on the issues and the solution can be found here: [link](https://forum.core-electronics.com.au/t/pi-power-switch-using-car-ignition-logic/6177/7). You can also find an updated and working schematic in the schematics folder of this repository. Basically you only need to add two resistors. As stated in the original article, it is adviseable to put a heatsink on the big transistor.
 
 
 ## 4 | CAN Implementation
 
-Since the Raspberry has the ability to communicate with a CAN network it would be a shame not to use this. The only thing you will need for this is a MCP2515 module and some scripting. In order to connect your Raspi with the module you can follow this [link](https://forums.raspberrypi.com/viewtopic.php?t=296117).
+CAN Communication with the Raspberry Pi is pretty straight forward. The only thing you will need for this is a MCP2515 module and adjust some settings. In order to connect your Raspi with the module you can follow this [link](https://forums.raspberrypi.com/viewtopic.php?t=296117).
 
 Make sure that you also set up the automatic can channel activation on boot!
 
 
 ## 5 | RTVI App
 
-As mentioned above, I used node.js, electron and react to set up a custom application in the fashion of Rhys Morgan's "react-carplay". Kudos to him for figuring all of this out and for helping me to troubleshoot some things along the way.
+This app uses a combination of node.js, Electron and React to set up a custom interface in the fashion of Rhys Morgan's "react-carplay". Kudos to him for figuring all of this out and for helping me to troubleshoot some things along the way.
 
 ![CARPLAY IMAGE](repo/carplay.jpg?raw=true "Carplay")
 
-The app is in a usable state and I engourage anyone to help me improve it. In this repository you can find the full source code and altering it to your needs is quiet straight forward. For example to change the displayed CAN data, you will only have to make a few changes to python.py and Dashboard.js. In order to use Carplay/Android Auto you will need to have a Carlinkit adpater.
+The app is in a usable state and I engourage anyone to help me improve it. In order to use Carplay/Android Auto you will need to have a Carlinkit adpater. In this repository you can find the full source code and altering it to your needs is quiet straight forward. For example to change the displayed CAN data, you will only have to make a few changes to python.py and Dashboard.js.
 
-NOTE: Your Raspi needs a working internet connection when you launch the app for the first time because it needs to download some resources for the dongle. You can find more information in Rhys' repositories or in the source code.
+### Note:
+
+You need a working internet connection when you launch the app for the first time because it needs to download some resources for the dongle.
 
 
 ## 6 | Wiring
@@ -201,39 +206,41 @@ bash '/path/to/your/startService.sh'
 5.) To automatically hide the taskbar simply right-click it to activate this setting.
 
 
-### Notes:
-
+### Note:
 
 The Raspberry is booting without any splash screens now and the app should open right after the login, ready to connect to your phone.
 
-Since there is now a working media interface in the car, we can add it as an audio source. For this you can use the aux port of the Raspi and mod the radio with this little module from Lithuania: [V50 Aux-Input](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/)
+## 7 | Audio
 
-There's also a bluetooth version but since the phone is already wirelessly connected to the Dongle, an aux-cable seems pretty clean and less prone to failure. 
+There are a couple of ways in order to use the raspberry as an audio source for your car speakers now. I propose a [small module](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/) from lithuania with which you can mod your radio to add an aux port. There's also a bluetooth version available but since the phone is already wirelessly connected to the Dongle, an aux-cable seems pretty clean and less prone to failure. 
 
-##### -> This is no advertisement, just a clean and simple solution IMO.
+### Note:
+
+##### This is no advertisement, just a clean and simple solution IMO.
 
 
-## 8 | ToDo
+## 8 | Additional Information
+
+### ToDo
 
 - Implement RTI folding mechanism
 - Implement OEM steering controls
-- Implement Schematic for Touchscreen
-- Rework settings page
 
-At first I was controlling the Software via mouse/keyboard. However there is a [touch screen module](https://www.ebay.de/itm/170981315406) which I recently installed and is working great so far. There were just some small changes I had to make to the touch input matrix because the Y-axis was flipped. It's not as smooth as the touch input on your smartphone but it is definitely usable and way more comfortable than whipping out a keyboard each and every time so I'd recommend to go for this straight away. I mounted the touch controller to the back of the display next to the buck converter. I also added a USB extension cable to the Raspi which ends up in the tray behind my waterfall so I can directly connect peripherals. This also works as a charging port for a phone. It's not fast but it works.
+
+To make life a bit easier I connected an USB extension cable to the Raspi which ends up in the tray behind the waterfall console so I can directly connect peripherals to it This also works as a charging port for a phone. It's not fast but it works.
 
 ![USB IMAGE](repo/usb.jpg?raw=true "USB")
 
-The end goal would be to integrate the OEM control elements that are mounted to the steering wheel. It is definitely possible to read these LIN commands with an arduino and forward them to the app. Infos on that can be found in LuukEsselbrugge's repositories. The carplay interface is already accepting keystrokes as input. Since I'm lacking the hardware, this was something I couldn't implement as of now.
+The end goal would be to integrate the OEM control elements that are mounted to the steering wheel. It is definitely possible to read the LIN messages and forward them to the app. More infos on that can be found in LuukEsselbrugge's repositories. The carplay interface is already accepting keystrokes as input.
+
+Since I'm lacking the hardware, this was something I couldn't implement as of now.
 
 
 ## 9 | Final Words
 
 I'm not a software developer, electrical engineer or automotive technician and doing stuff like this is just a hobby for me. I'm distancing myself from any damage that you might do to your car in case you want to follow this guide. The setup I described above is the way I fitted things to my V50. Eventually you will need to find other places to mount your components and different paths to route your cables, after all it's a DIY mod.
 
-The setup is installed in my car since several months now. I drove on the highway, over bumpy gravel roads, at 35°C in the sun and -10°C in the winter and so far it didn't let me down.
-
-It can happen that the Carplay interface freezes occasionally. In that case you can reconnect the phone or restart/reboot the app from the settings page. However, this rarely happens.
+The setup is installed in my car since several months now. I drove on the highway, over bumpy gravel roads, at 35°C in the sun and -10°C in the winter and so far it didn't let me down. It can happen that the Carplay interface freezes occasionally. In that case you can reconnect the phone or restart/reboot from the settings page. However, this rarely happens.
 
 I'd be happy if anybody who has tips for improvement can chime in. Check out the [Swedespeed Thread](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/) and share your ideas, findings or issues.
 

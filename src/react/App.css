@@ -27,7 +27,7 @@ body,
   display: flex;
   overflow: hidden;
 
-  animation: fadein 2s;
+  animation: fadein 5s;
 }
 
 body {

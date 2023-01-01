@@ -92,6 +92,16 @@ function setWifiIconState() {
     });
 }
 
+function getWifiStatus() {
+  wifi.getStatus().then((status) => {
+      mainWindow.webContents.send('wifi_on', status);
+  })
+    .catch((error) => {
+      mainWindow.webContents.send('wifi_off');
+      console.log(error);
+    });
+}
+
 function getWifiNetworks() {
   wifi.scan().then((networks) => {
     mainWindow.webContents.send('wifi_list', networks);
@@ -103,7 +113,10 @@ function getWifiNetworks() {
 
 function connectWifi(data) {
   wifi.connect({ ssid: data.ssid, psk: data.password }).then(() => {
-    mainWindow.webContents.send('wifi_connected', '- Connected');
+
+    wifi.getStatus().then((status) => {
+      mainWindow.webContents.send('wifi_connected', ("- Connected with IP: " + status.ip_address));
+    })
     console.log('Connected to WiFi network.');
   })
     .catch((error) => {
@@ -371,8 +384,8 @@ ipcMain.on('START_BACKGROUND_VIA_MAIN', (event, args) => {
       });
 
       hiddenWindow = new BrowserWindow({
-        width: 50,
-        height: 50,
+        width: 150,
+        height: 150,
         show: true,
 
         webPreferences: {

@@ -5,8 +5,8 @@
     z-index: 1040;
     width: 100vw;
     height: 100vh;
-    background-color: #000;
-    opacity: .5;
+    background-color: var(--backgroundColor);
+    opacity: .7;
 }
 
 .modal-wrapper {
@@ -29,7 +29,9 @@
     
     z-index: 100;
     top: 8rem;
-    background: #181818;
+    background: var(--sectionColor);
+    border-radius: 10px;
+
     position: relative;
     margin: 1rem auto;
     width: 20rem;
@@ -55,26 +57,28 @@
         }
 
         &__form .button {
-
-            margin-top: 1.5rem;
-            background-color: #0f0f0f;
+            color: var(--textColor);
+            background-color: var(--buttonBackground);
             border: none;
             border-radius: 10px;
-            color: #7c7c7c;
-            height: 1.8rem;
+            
             text-align: center;
             text-decoration: none;
             display: inline-block;
+
+            height: 2.5rem;
             width: 49%;
-            //font-size: 10px;
+
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
         
             &:hover {
-                background-color: #101010;
-                color: #dddddd;
+                background-color: var(--buttonBackgroundHover);
+                color: var(--fillHover);
             }
         
             &:active {
-                background-color: #1a1a1a;
+                background-color: var(--buttonBackgroundActive);
                 color: var(--fillActive);
             }
         }

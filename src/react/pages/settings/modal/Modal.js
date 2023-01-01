@@ -6,7 +6,7 @@ import './modal.scss';
 
 const Modal = ({ isShowing, ssid, hide, connect, status, reset }) => {
 
-    const [password, setPassword] = useState("Enter Password.")
+    const [password, setPassword] = useState("password")
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -14,7 +14,7 @@ const Modal = ({ isShowing, ssid, hide, connect, status, reset }) => {
     }
 
     function close() {
-        setPassword("Enter Password.");
+        setPassword("password");
         reset();
         hide();
     }
@@ -33,7 +33,7 @@ const Modal = ({ isShowing, ssid, hide, connect, status, reset }) => {
                                 <div className="modal__body__form">
                                     <form onSubmit={handleSubmit}>
                                         <label>
-                                            <input onChange={(e) => setPassword(e.target.value)} value={password} type="text" name="password" id="password"/>
+                                            <input onClick={(e) => setPassword("")} onChange={(e) => setPassword(e.target.value)} value={password} type="password" name="password" id="password"/>
                                         </label>
                                         <div className="buttons">
                                         <input type="submit" value="Connect" className="button"/>

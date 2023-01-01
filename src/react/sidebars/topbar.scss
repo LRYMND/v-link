@@ -1,51 +1,38 @@
 .topbar {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    position: absolute;
-    top: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  top: 0;
 
-    height: 66px;
-    width: 100%;
-    background: #000000;
+  height: 66px;
+  width: 100%;
+  background: #000000;
 
-    background-position: center;
+  background-position: center;
 
-    &__info {
-      margin-left: 3rem;
-    }
+  &__info {
+    margin-left: 3rem;
+  }
 
-    &__time {
-      margin-right: 3rem;
+  &__time {
+    margin-right: 3rem;
+    color: var(--fillActive);
+  }
+
+  &__icon {
+    margin-top: 1rem;
+    margin-right: 1rem;
+    width: 1rem;
+    height: 1rem;
+
+    &--connected {
       color: var(--fillActive);
     }
 
-    &__icon {
-      &__wifi {
-        margin-top: 1rem;
-        margin-right:1rem;
-        width:  1rem;
-        height: 1rem;
-
-        &--connected{
-          color: var(--fillActive);
-        }
-        &--disconnected{
-          color: var(--fillInactive);
-        }
-      }
-      &__bluetooth{
-        margin-top: 1rem;
-        margin-right:1rem;
-        width:  1rem;
-        height: 1rem;
-      }
-      &__phone {
-        margin-top: 1rem;
-        margin-right:1rem;
-        width:  1rem;
-        height: 1rem;
-      }
+    &--disconnected {
+      color: var(--fillInactive);
     }
   }
+}

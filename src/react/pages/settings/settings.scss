@@ -1,7 +1,9 @@
 body {
-    background: #000000;
+    background: var(--backgroundColor);
     color: var(--textColor);
     font-size: 10pt;
+
+    user-select: none;
 }
 
 .settings {
@@ -36,7 +38,7 @@ body {
             justify-content: center;
             flex-direction: column;
             align-items: center;
-            background-color: var(--section-color);
+            background-color: var(--sectionColor);
             border-radius: 10px;
             height: 75%;
             text-align: left;
@@ -53,22 +55,21 @@ body {
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    width: 100%;
+                    width: 95%;
 
                 }
             }
 
             &__list::-webkit-scrollbar {
-                width: 1rem;
+                width: 1.2rem;
             }
 
             &__list::-webkit-scrollbar-track {
-                background-color: #111111;
+                background-color: var(--scrollBarBackground);
                 border-radius: 10px;
             }
 
             &__list::-webkit-scrollbar-thumb {
-                //background-color: #444444;
                 background-color: var(--fillActive);
                 border-radius: 10px;
 
@@ -83,7 +84,7 @@ body {
             justify-content: center;
             flex-direction: column;
             align-items: center;
-            background-color: var(--section-color);
+            background-color: var(--sectionColor);
             border-radius: 10px;
             height: 20%;
             text-align: left;
@@ -96,110 +97,56 @@ body {
 
         margin-left: .5rem;
         border-radius: 10px;
-        background-color: var(--section-color);
+        background-color: var(--sectionColor);
 
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: space-around;
+        justify-content: flex-start;
+
         gap: .5rem;
 
-        &__theme {
-            //margin-top: .5rem;
-            width: 90%;
-        }
-
         &__section {
-            width: 95%;
-            height: 30%;
+            width: 90%;
+            margin-top: .5rem;
+
+            line-height: .2rem;
+
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: center;
 
             &__column {
                 display: flex;
                 flex-direction: column;
+                justify-content: space-around;
                 width: 50%;
-                gap: .3rem;
             }
         }
-    }
-
-    &__modules {
-        width: 50%;
-        height: 100%;
-    }
-}
-
-.color-select {
-    background-color: #222222;
-    border: none;
-    border-radius: 10px;
-    color: #7c7c7c;
-    width: 55%;
-    height: 1.5rem;
-    padding: .2rem;
-    margin-left: 1.5rem;
-    user-select: none;
-    text-align: center;
-    font-size: .8rem;
-
-    &:hover {
-        background-color: #1a1a1a;
-        color: #dddddd;
-    }
-
-    &:active {
-        background-color: #1a1a1a;
-        color: var(--fillActive);
-    }
-}
-
-.network-button {
-    background-color: #222222;
-    margin-top: .3rem;
-    border: none;
-    border-radius: 10px;
-    color: #7c7c7c;
-    width: 90%;
-    height: 1.5rem;
-    padding: .2rem;
-    user-select: none;
-    text-align: center;
-    font-size: .8rem;
-
-    &:hover {
-        background-color: #1a1a1a;
-        color: #dddddd;
-    }
-
-    &:active {
-        background-color: #1a1a1a;
-        color: var(--fillActive);
     }
 }
 
 .app-button {
-    background-color: #222222;
+    color: var(--textColor);
+    background-color: var(--buttonBackground);
     border: none;
     border-radius: 10px;
-    color: #7c7c7c;
+
     width: 95%;
-    height: 2rem;
+    height: 2.2rem;
+    margin: .2rem;
+
     text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    //font-size: 10px;
+    font-size: .8rem;
 
     &:hover {
-        background-color: #101010;
-        color: #dddddd;
+        color: var(--textColorHover);
+        background-color: var(--buttonBackgroundHover);
     }
 
     &:active {
-        background-color: #1a1a1a;
-        color: var(--fillActive);
+        color: var(--textColorActive);
+        background-color: var(--buttonBackgroundActive);
     }
 }
 
@@ -219,7 +166,7 @@ input[type=checkbox] {
     background-clip: content-box;
     border: .1rem solid var(--textColor);
     border-radius: 5px;
-    background-color: var(--section-color);
+    background-color: var(--sectionColor);
     margin-left: 2rem;
     margin-right: .5rem;
 

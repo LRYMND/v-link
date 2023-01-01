@@ -1,8 +1,17 @@
 :root {
     --textColor: #7c7c7c;
+    --textColorHover: #dddddd;
+    --textColorActive: #ffffff;
+
     --fillInactive: #444444;
-    --background-color: #000000;
-    --section-color:  #292929;
+    --backgroundColor: #000000;
+    --sectionColor:  #292929;
+
+    --buttonBackground:#222222;
+    --buttonBackroundHover:#1a1a1a;
+    --buttonBackgroundActive:#202020;
+
+    --scrollBarBackground:#222222;
 }
 
 .Blue {
