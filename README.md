@@ -39,7 +39,7 @@ All of the above sources have been altered to my needs and are bundled with a cu
 In order to get this build running you will need the following hardware. Tools and materials like wires or zipties are not included. The display components are optional but the one I'm proposing has a much better resolution than the original one. If you want to use the original display you can find a way to do so in the repositories from laurynas.
 
 * [MCP2515 CAN Module](https://www.amazon.de/-/en/Intelligent-Electronics-Receiver-Controller-Development/dp/B07MY2D7TW/ref=sr_1_6?keywords=mcp2515&qid=1662026860&sr=8-6)
-* MCP2004 LIN Transceiver (For steering wheel controls)
+* MCP2004 LIN Transceiver
 * [LCD Driver](https://de.aliexpress.com/item/4001175095149.html?spm=a2g0o.order_list.0.0.30e65c5fXw0Aa6&gatewayAdapt=glo2deu)
 * [LCD Display](https://de.aliexpress.com/item/32835602509.html?spm=a2g0o.order_list.0.0.30e65c5fXw0Aa6&gatewayAdapt=glo2deu)
 * [6.5" Touch Screen Module](https://www.ebay.de/itm/170981315406)
@@ -70,20 +70,20 @@ The power supply should fulfill some critical demands and available solutions ar
 - Raspi gracefully shuts off when ignition is turned off
 - Little to no power is consumed in the off state so the battery isn't drained
 
-I went through hours of online research until I found an [article](https://dontpressthat.wordpress.com/2017/10/13/in-car-raspberry-pi-psu-controller/) that would end my quest. However, after ordering the PCB and soldering the components I had to find out that the circuit was not functioning as expected. Once the ignition was off the Raspberry would immediatley turn back on again.
+I went through hours of online research until I found an [article](https://dontpressthat.wordpress.com/2017/10/13/in-car-raspberry-pi-psu-controller/) that would end my quest. However, after ordering the PCB and soldering the components I found out that the circuit was not functioning as expected. Once the ignition was off the Raspberry would immediately turn back on again.
 
 In short, here are the reasons why:
 - Capacitance of the buck converter itself
 - Floating states on Q2/Q3
 
-More infos on the issues and the solution can be found here: [link](https://forum.core-electronics.com.au/t/pi-power-switch-using-car-ignition-logic/6177/7). You can also find an updated and working schematic in the schematics folder of this repository. Basically you only need to add two resistors. As stated in the original article, it is adviseable to put a heatsink on the big transistor.
+More infos on the issues and the solution can be found here: [link](https://forum.core-electronics.com.au/t/pi-power-switch-using-car-ignition-logic/6177/7). You can also find an updated and working schematic in the schematics folder of this repository. Basically you only need to add two resistors. As stated in the original article, it is advisable to put a heatsink on the big transistor.
 
 
 ## 4 | CAN Implementation
 
-CAN Communication with the Raspberry Pi is pretty straight forward. The only thing you will need for this is a MCP2515 module and adjust some settings. In order to connect your Raspi with the module you can follow this [link](https://forums.raspberrypi.com/viewtopic.php?t=296117).
+CAN communication with the Raspberry Pi is pretty straightforward. The only thing you will need for this is a MCP2515 module and adjust some settings. In order to connect your Raspi with the module you can follow this [link](https://forums.raspberrypi.com/viewtopic.php?t=296117).
 
-Make sure that you also set up the automatic can channel activation on boot!
+Make sure that you also set up the automatic CAN channel activation on boot!
 
 
 ## 5 | RTVI App
@@ -92,7 +92,7 @@ This app uses a combination of node.js, Electron and React to set up a custom in
 
 ![CARPLAY IMAGE](repo/carplay.jpg?raw=true "Carplay")
 
-The app is in a usable state and I engourage anyone to help me improve it. In order to use Carplay/Android Auto you will need to have a Carlinkit adpater. In this repository you can find the full source code and altering it to your needs is quite straightforward. For example to change the displayed CAN data, you will only have to make a few changes to python.py and Dashboard.js.
+The app is in a usable state and I encourage anyone to help me improve it. In order to use Carplay/Android Auto you will need to have a Carlinkit adapter. In this repository you can find the full source code and altering it to your needs is quite straightforward. For example to change the displayed CAN data, you will only have to make a few changes to python.py and Dashboard.js.
 
 ### Note:
 
@@ -101,7 +101,7 @@ You need a working internet connection when you launch the app for the first tim
 
 ## 6 | Wiring
 
-In the installation schematic you can see how you connect everything with each other. I advise to keep the cables a bit longer and then shorten everything to the appropriate lenght once you install the package in your car.
+In the installation schematic you can see how you connect everything with each other. I advise to keep the cables a bit longer and then shorten everything to the appropriate length once you install the package in your car.
 
 ![PACKAGE2 IMAGE](repo/package2.jpg?raw=true "Package2")
 ![PACKAGE IMAGE](repo/package.jpg?raw=true "Package")
@@ -120,7 +120,7 @@ You need to make the following connections.
 | 12V         | E         | 21  |
 
 ![EWD SCHEMATIC](repo/ewdschematic.jpeg?raw=true "EWD Schematic")
-(Borrowed from the original Volvo Wiring Diagrams)
+(Borrowed from the original Volvo Electronic Wiring Diagrams)
 
 NOTE: Make sure that you stress-relief all your wiring connections with zipties, so the cable doesnt wiggle around and makes more damage in case a connection brakes.
 
@@ -214,7 +214,7 @@ The Raspberry is booting without any splash screens now and the app should open 
 
 ## 7 | Audio
 
-There are a couple of ways in order to use the raspberry as an audio source for your car speakers now. I propose a [small module](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/) from lithuania with which you can mod your radio to add an aux port. There's also a bluetooth version available but since the phone is already wirelessly connected to the Dongle, an aux-cable seems pretty clean and less prone to failure. 
+There are a couple of ways in order to use the raspberry as an audio source for your car speakers now. I propose a [small module](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/) from Lithuania with which you can mod your radio to add an aux port. There's also a bluetooth version available but since the phone is already wirelessly connected to the Carlinkit adapter dongle, an aux-cable seems pretty clean and less prone to failure. 
 
 If you already have an aux port in your car, you don't need this input board. Simply connect the raspberry pi directly to the aux port.
 
