@@ -36,6 +36,7 @@ function Carplay({
   const [width, setWidth] = useState(800);
   const [mouseDown, setMouseDown] = useState(false);
   const [running, setRunning] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const [lastX, setLastX] = useState(0);
   const [lastY, setLastY] = useState(0);
   const ref = useRef(null);
@@ -58,12 +59,16 @@ function Carplay({
     setHeight(height);
     setWidth(width);
 
+    let videoElement
+
     if (type === 'ws') {
       ws.onmessage = (event) => {
         if (!running) {
-          let video = document.getElementById('player')
-          video.play()
-          setRunning(true)
+          videoElement = document.getElementById('player')
+          if(videoElement != null) {
+            videoElement.play()
+            setRunning(true)
+          }
         }
         let buf = Buffer.from(event.data)
         let video = buf.slice(4)
@@ -80,6 +85,8 @@ function Carplay({
     }
 
     return function cleanup () {
+      videoElement.pause()
+      setRunning(false);
       ws.onmessage = () => {}
     }
   }, [])
@@ -105,10 +112,6 @@ function Carplay({
     x = x / width
     y = y / height
     setMouseDown(false)
-    console.log("Width-> ", width, ", Height-> ", height);
-    console.log("e.client: X-> ", e.clientX, ", Y-> ", e.clientY);
-    console.log("currentTargetRect: left-> ", currentTargetRect.left, ", top-> ", currentTargetRect.top);
-    console.log("handleMUp: X-> ", x, ", Y-> ", y);
     touchEvent(16, x, y)
   }
 
@@ -171,9 +174,7 @@ function Carplay({
         }}
         style={{ height: '100%', width: '100%', padding: 0, margin: 0, display: 'flex' }}>
         <video style={{ height: status ? "100%" : "0%" }} autoPlay muted id="player" />
-        {status ? <div></div>
-          :
-          <div className="content">
+        {status ? <div></div> : <div className="content">
             <div>
               <h1>WAITING FOR DEVICE</h1>
             </div>
