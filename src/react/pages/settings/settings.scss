@@ -14,12 +14,16 @@ body {
     align-items: center;
     justify-content: space-between;
 
+    &__header {
+	height: 3rem;
+    }
+
     &__body {
         display: flex;
         align-items: stretch;
         justify-content: center;
         width: 100%;
-        height: 18rem;
+        height: 19rem;
         margin-bottom: 6rem;
     }
 
@@ -41,10 +45,10 @@ body {
             background-color: var(--sectionColor);
             border-radius: 10px;
             height: 75%;
-            text-align: left;
+
 
             &__list {
-                margin-top: -.5rem;
+                //margin-top: -1rem;
                 margin-bottom: .5rem;
                 width: 90%;
                 height: 70%;
@@ -62,6 +66,7 @@ body {
 
             &__list::-webkit-scrollbar {
                 width: 1.2rem;
+					cursor: auto;
             }
 
             &__list::-webkit-scrollbar-track {
@@ -123,6 +128,13 @@ body {
                 width: 50%;
             }
         }
+
+        &__system {
+            width: 90%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
     }
 }
 
@@ -138,15 +150,23 @@ body {
 
     text-align: center;
     font-size: .8rem;
+	
 
     &:hover {
         color: var(--textColorHover);
         background-color: var(--buttonBackgroundHover);
+        cursor: pointer;
     }
 
     &:active {
         color: var(--textColorActive);
         background-color: var(--buttonBackgroundActive);
+    }
+
+    &:disabled {
+        color: var(--textColorInactive);
+        background-color: var(--buttonBackgroundInactive);
+        cursor: default;
     }
 }
 
@@ -170,11 +190,25 @@ input[type=checkbox] {
     margin-left: 2rem;
     margin-right: .5rem;
 
+    color: #ffffff;
+
+    &:hover {
+        cursor: pointer;
+    }
+
     &:checked{
         background-color: var(--fillActive);
     }
 
     &:focus{
         outline: none !important;
+    }
+    &:disabled {
+        background-color: var(--buttonBackgroundInactive);
+        cursor: default;
+
+    }
+    &:disabled + span{
+        color: var(--textColorInactive);
     }
 }

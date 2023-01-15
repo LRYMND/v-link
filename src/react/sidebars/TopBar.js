@@ -2,7 +2,6 @@ import React from "react";
 import { useState, useEffect } from "react";
 import "../components/themes.scss"
 import "./topbar.scss";
-import TopBarBackground from "./images/topbar.png";
 
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
@@ -16,7 +15,7 @@ const TopBar = () => {
   const [time, setDate] = useState(new Date());
 
   const [wifiState, setWifiState] = useState("disconnected");
-  const [phoneState, setPhoneState] = useState("unplugged");
+  const [phoneState, setPhoneState] = useState("disconnected");
 
 
   const wifiOn = () => {
@@ -28,11 +27,11 @@ const TopBar = () => {
   }
 
   const plugged = () => {
-    setPhoneState("plugged");
+    setPhoneState("connected");
   }
 
   const unplugged = () => {
-    setPhoneState("unplugged");
+    setPhoneState("disconnected");
   }
 
   function updateTime() {
@@ -64,22 +63,29 @@ const TopBar = () => {
   }, [theme]);
 
   return (
-    <div className={`topbar ${theme}`} style={{ backgroundImage: `url(${TopBarBackground})`}}>
-      <div className={"topbar__info"}>
-          <svg className={`topbar__icon topbar__icon--${wifiState}`}>
-            <use xlinkHref="./svg/wifi.svg#wifi"></use>
-          </svg>
-          <svg className={`topbar__icon topbar__icon_--${'disconnected'}`}>
-            <use xlinkHref="./svg/bluetooth.svg#bluetooth" color={"7c7c7c"}></use>
-          </svg>
-          <svg className={`topbar__icon topbar__icon_--${phoneState}`}>
-            <use xlinkHref="./svg/phone.svg#phone"></use>
-          </svg>
+    <div className={`topbar ${theme}`}>
+      <div className="topbar__info">
+        <svg className={`topbar__icon topbar__icon--${wifiState}`}>
+          <use xlinkHref="./svg/wifi.svg#wifi"></use>
+        </svg>
+        <svg className={`topbar__icon topbar__icon--${'disconnected'}`}>
+          <use xlinkHref="./svg/bluetooth.svg#bluetooth"></use>
+        </svg>
+        <svg className={`topbar__icon topbar__icon--${phoneState}`}>
+          <use xlinkHref="./svg/phone.svg#phone"></use>
+        </svg>
       </div>
-      <div className="topbar__page">
+      <div>
+        <div className="topbar__banner">
+          <svg className="topbar__banner__graphic">
+            <use xlinkHref="./svg/banner.svg#banner"></use>
+          </svg>
+        </div>
       </div>
       <div className="topbar__time">
-        <h2>{time.toLocaleTimeString('sv-SV', { hour: '2-digit', minute: '2-digit' })} </h2>
+        <div className="topbar__time__container">
+          <h2>{time.toLocaleTimeString('sv-SV', { hour: '2-digit', minute: '2-digit' })} </h2>
+        </div>
       </div>
     </div>
 

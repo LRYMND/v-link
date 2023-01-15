@@ -124,19 +124,24 @@ NOTE: Make sure that you stress-relief all your wiring connections with zipties,
 
 ![WIRING IMAGE](repo/wiring.jpg?raw=true "Wiring")
 
-## 7 | Set Up
+## 7 | Set 
 
-### Running the app:
+### Prerequisites:
 
-
-1.) Install prerequisites:
+Before you start, install the following packages:
 
 ```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install ffmpeg
 sudo apt-get install libudev-dev
 sudo apt-get install python-can
 ```
 
-2.) Download the latest release, navigate to the folder and execute these commands:
+
+### Running the app:
+
+Download the latest release, navigate to the folder and execute these commands:
 
 ```
 sh setup-permissions.sh
@@ -148,18 +153,16 @@ chmod +x App.AppImage
 ### Building the app:
 
 
-1.) Install prerequisites:
+1.) Install Node.js:
 
 ```
-sudo apt-get install libudev-dev
-sudo apt-get install python-can
 sudo apt-get install npm
 sudo npm install -g n
 sudo n 18.12.1
 sudo npm install -g npm@8.19.2
 ```
 
-2.) Clone the repository and build it using npm:
+2.) Clone the repository and build it:
 
 ```
 git clone https://github.com/LRYMND/volvo-rtvi/

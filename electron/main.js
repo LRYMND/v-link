@@ -7,43 +7,26 @@ const {
   ipcRenderer,
   globalShortcut,
 } = require("electron");
-const { channels } = require("../src/shared/constants");
+
+app.commandLine.appendSwitch('disable-gpu-vsync');
+app.commandLine.appendSwitch('ignore-gpu-blacklist');
+app.commandLine.appendSwitch('disable-gpu');
+app.commandLine.appendSwitch('disable-gpu-compositing');
 
 const isDev = require("electron-is-dev");
 
 
 // ------------------- Electron Store --------------------
 
-const ElectronStore = require('electron-store');
+const UserSettings = require('./UserSettings');
+const settings = new UserSettings;
+//settings.initRenderer();
 
-const schema = {
-  colorTheme: {
-    default: "Blue"
-  },
-  showGaugeBoost: {
-    default: true,
-  },
-  showGaugeIntake: {
-    default: true,
-  },
-  showGaugeCoolant: {
-    default: true,
-  },
-  activateCC: {
-    default: false,
-  },
-  activateCAN: {
-    default: true,
-  },
-  activateMMI: {
-    default: true,
-  },
-};
+//const ElectronStore = require('electron-store');
+//const store = new ElectronStore({ schema });
+//ElectronStore.initRenderer();
 
-const store = new ElectronStore({ schema });
-ElectronStore.initRenderer();
-
-console.log("Current Theme: ", store.get("colorTheme"));
+console.log("Current Theme: ", settings.store.get("colorTheme"));
 
 // ------------------- Carplay Setup --------------------
 
@@ -56,19 +39,19 @@ const Carplay = require("node-carplay");
 const bindings = ["n", "v", "b", "m"];
 const keys = require("./bindings.json");
 let wss;
-wss = new WebSocket.Server({ port: 3001 });
+wss = new WebSocket.Server({ port: 3001, perMessageDeflate: false });
 
 wss.on("connection", function connection(ws) {
   console.log("Socket connected. sending data...");
   const wsstream = WebSocket.createWebSocketStream(ws);
-  //lets pipe into jmuxer stream, then websocket
-  mp4Reader.pipe(wsstream);
-  ws.on("error", function error(error) {
-    console.log("WebSocket error");
-  });
-  ws.on("close", function close(msg) {
-    console.log("WebSocket close");
-  });
+    //lets pipe into jmuxer stream, then websocket
+    mp4Reader.pipe(wsstream);
+    ws.on('error', function error(error) {
+        console.log('WebSocket error');
+    });
+    ws.on('close', function close(msg) {
+        console.log('WebSocket close');
+    });
 });
 
 // ------------------- Wifi Setup --------------------
@@ -80,6 +63,9 @@ var wifi = new Wifi();
 const timer = setInterval(setWifiIconState, 5000); //Update status-icon every 5 Seconds
 
 function setWifiIconState() {
+  getWifiStatus();
+
+  /*
   wifi.getState().then((connected) => {
     if (connected) {
       mainWindow.webContents.send('wifi_on');
@@ -90,11 +76,17 @@ function setWifiIconState() {
     .catch((error) => {
       console.log(error);
     });
+    */
 }
 
 function getWifiStatus() {
   wifi.getStatus().then((status) => {
+    if (status.ssid != null && status.ip_address != null) {
       mainWindow.webContents.send('wifi_on', status);
+      console.log(status);
+    } else {
+      mainWindow.webContents.send('wifi_off');
+    }
   })
     .catch((error) => {
       mainWindow.webContents.send('wifi_off');
@@ -115,12 +107,12 @@ function connectWifi(data) {
   wifi.connect({ ssid: data.ssid, psk: data.password }).then(() => {
 
     wifi.getStatus().then((status) => {
-      mainWindow.webContents.send('wifi_connected', ("- Connected with IP: " + status.ip_address));
+      mainWindow.webContents.send('wifi_connected', ("Connected with IP: " + status.ip_address));
     })
     console.log('Connected to WiFi network.');
   })
     .catch((error) => {
-      mainWindow.webContents.send('wifi_connected', '- Could not connect.');
+      mainWindow.webContents.send('wifi_connected', 'Could not connect.');
       console.log(error);
     });
 }
@@ -132,7 +124,7 @@ function connectWifi(data) {
 // ------------------- User Setup --------------------
 
 function runScripts() {
-  if (store.get("activateCC")) { script(1); }
+  if (settings.store.get("activateCC")) { script(1); }
   //if (store.get("activateCAN")) { console.log("ACTIVATE CAN"); }
   //if (store.get("activateMMI")) { console.log("ACTIVATE MMI"); }
 }
@@ -208,6 +200,7 @@ function createWindow() {
 
       webPreferences: {
         nodeIntegration: true,
+        //enableRemoteModule: true
         preload: path.join(__dirname, "preload.js"),
         contextIsolation: false,
       },
@@ -237,7 +230,7 @@ function createWindow() {
 
   mainWindow.on('ready-to-show', function () {
     console.log("Window READY")
-    if(!isDev) {mainWindow.setKiosk(true);}
+    if (!isDev) { mainWindow.setKiosk(true); }
     mainWindow.show();
   });
 
@@ -266,7 +259,7 @@ function createWindow() {
     } else {
       mainWindow.webContents.send('unplugged');
     }
-    //console.log("data received", data);
+    console.log("data received", data);
   });
 
   carplay.on('quit', () => {
@@ -306,10 +299,6 @@ function createWindow() {
     });
   });
 
-  ipcMain.on('clearDTC', () => {
-    script(2);
-  });
-
   ipcMain.on('updateWifi', () => {
     setWifiIconState();
     getWifiNetworks();
@@ -323,6 +312,17 @@ function createWindow() {
     setBTState();
     getBTDevices();
   });
+
+  ipcMain.on('getSettings', () => {
+    mainWindow.webContents.send('allSettings', settings.store.store)
+  })
+
+  ipcMain.on('settingsUpdate', (event, { type, value }) => {
+    console.log("updating settings", type, value)
+    settings.store.set(type, value)
+    mainWindow.webContents.send('allSettings', settings.store.store)
+  })
+
 
   for (const [key, value] of Object.entries(keys)) {
     if (isDev) {
@@ -370,7 +370,7 @@ let hiddenWindow;
 // This event listener will listen for request from visible renderer process
 ipcMain.on('START_BACKGROUND_VIA_MAIN', (event, args) => {
 
-  if (store.get("activateCAN")) {
+  if (settings.store.get("activateCAN")) {
     console.log("STARTING BACKGROUND WORKER");
     const backgroundFileURL = ""
 
@@ -438,7 +438,9 @@ ipcMain.on('BACKGROUND_READY', (event, args) => {
 
 // This event will quit the python script when Dashboard page will be unmounted
 ipcMain.on('QUIT_BACKGROUND', (event, args) => {
+  if (hiddenWindow != null) {
     hiddenWindow.webContents.send("QUIT_PYTHON");
+  }
 });
 
 // This event will quit the python script when Dashboard page will be unmounted

@@ -2,6 +2,7 @@
 
 node_modules
 dist
+dist_OLD
 build
 assets
 

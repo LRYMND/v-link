@@ -9,12 +9,13 @@ import reportWebVitals from './reportWebVitals';
 function RenderApp(props) {
   const condition = props;
 
-  if(condition == true) {
+  if(condition === true) {
     return  <React.StrictMode>
               <App />
             </React.StrictMode>;
+  } else {
+  	return <App />;
   }
-  return <App />;
 }
 
 //ReactDOM.render(

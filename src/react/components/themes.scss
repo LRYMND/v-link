@@ -1,15 +1,17 @@
 :root {
     --textColor: #7c7c7c;
+    --textColorInactive: #535353;
     --textColorHover: #dddddd;
-    --textColorActive: #ffffff;
-
-    --fillInactive: #444444;
+    
+    //--fillActive: #dddddd;
+    //--fillInactive: #444444;
     --backgroundColor: #000000;
     --sectionColor:  #292929;
 
     --buttonBackground:#222222;
-    --buttonBackroundHover:#1a1a1a;
-    --buttonBackgroundActive:#202020;
+    --buttonBackgroundHover:#202020;
+    --buttonBackgroundActive:#1a1a1a;
+    --buttonBackgroundInactive:#313131;
 
     --scrollBarBackground:#222222;
 }
@@ -18,6 +20,8 @@
     //HMI
     --fillHover:                #708fa8;
     --fillActive:               #3f77a4;
+    --fillInactive:             #444444;
+    --textColorActive:          #3f77a4;
 
     //Gauges
     --colorPlate:               #000000;
@@ -53,6 +57,8 @@
     //HMI
     --fillHover:                #84c884;
     --fillActive:               #5acc5a;
+    --fillInactive:             #444444;
+    --textColorActive:          #5acc5a;
 
     //Gauges
     --colorPlate:               #000000;
@@ -88,6 +94,8 @@
     //HMI
     --fillHover:                #cd6969;
     --fillActive:               #cd2424;
+    --fillInactive:             #444444;
+    --textColorActive:          #cd2424;
 
     //Gauges
     --colorPlate:               #000000;
@@ -123,6 +131,8 @@
     //HMI
     --fillHover:                #9f9f9f;
     --fillActive:               #ffffff;
+    --fillInactive:             #444444;
+    --textColorActive:          #ffffff;
 
     //Gauges
     --colorPlate:               #000000;
