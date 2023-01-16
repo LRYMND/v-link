@@ -38,8 +38,6 @@
     "react-spinners-kit": "^1.9.1",
     "rpi-wifi-connection": "^1.0.17",
     "sass": "^1.52.3",
-    "socket.io": "^3.0.5",
-    "socket.io-client": "^3.0.5",
     "stream-browserify": "^3.0.0",
     "usb": "^1.7.1",
     "versiony": "^2.0.1",

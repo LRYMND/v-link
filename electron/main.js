@@ -31,15 +31,15 @@ console.log("Current Theme: ", settings.store.get("colorTheme"));
 // ------------------- Carplay Setup --------------------
 
 const { Readable } = require("stream");
-const WebSocket = require("ws");
 const mp4Reader = new Readable({
   read(size) { },
 });
 const Carplay = require("node-carplay");
 const bindings = ["n", "v", "b", "m"];
 const keys = require("./bindings.json");
-let wss;
-wss = new WebSocket.Server({ port: 3001, perMessageDeflate: false });
+
+const WebSocket = require("ws");
+let wss = new WebSocket.Server({ port: 3001, perMessageDeflate: false });
 
 wss.on("connection", function connection(ws) {
   console.log("Socket connected. sending data...");
@@ -281,6 +281,15 @@ function createWindow() {
     }
   });
 
+  
+  ipcMain.on('closeSocket', () => {
+    console.log("CLOSE SOCKET")
+    wss.clients.forEach((socket) => {
+      socket.terminate();
+    });
+  });
+  
+
   ipcMain.on('reqReload', () => {
     app.relaunch()
     app.quit();
@@ -395,7 +404,7 @@ ipcMain.on('START_BACKGROUND_VIA_MAIN', (event, args) => {
         },
       });
 
-      hiddenWindow.webContents.openDevTools();
+      //hiddenWindow.webContents.openDevTools();
 
     } else {
 

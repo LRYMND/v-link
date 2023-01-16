@@ -1,8 +1,8 @@
-import React from "react";
-import Modal from "./modal/Modal";
-import useModal from "./modal/useModal";
+import React from 'react';
+import Modal from './modal/Modal';
+import useModal from './modal/useModal';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 import './settings.scss';
 import '../../components/themes.scss';
@@ -25,82 +25,78 @@ const Settings = ({ settings }) => {
     };
   }, []);
 
-
-  const [wifiList, setWifiList] = useState([{ id: "", ssid: 'No Networks available' }]);
-  const [wifiStatus, setWifiStatus] = useState("");
-  const [ssidSelected, setSsidSelected] = useState("127.0.0.1");
+  const [theme, setTheme] = useState(settings.colorTheme);
+  const [wifiList, setWifiList] = useState([{ id: '', ssid: 'No Networks available' }]);
+  const [wifiStatus, setWifiStatus] = useState('');
+  const [ssidSelected, setSsidSelected] = useState('127.0.0.1');
 
   const { isShowing, toggle } = useModal();
 
-  //Handle Colortheme
-  const [theme, setTheme] = useState(settings.colorTheme);
-
+  /* Color Theme */
   const colorSelect = (event) => {
-    changeSetting("colorTheme", event.target.value);
+    changeSetting('colorTheme', event.target.value);
     //settings.set('colorTheme', event.target.value);
     //setTheme(settings.get('colorTheme'));
     reloadApp();
   };
 
-  //Handle Boost Gauge Checkbox
+  /* Checkbox Boost */
   const [toggleGaugeBoost, setGaugeBoost] = React.useState(settings.showGaugeBoost);
 
   const handleGaugeBoost = () => {
-    changeSetting("showGaugeBoost", !toggleGaugeBoost);
-    //settings.set("showGaugeBoost", !toggleGaugeBoost);
+    changeSetting('showGaugeBoost', !toggleGaugeBoost);
     setGaugeBoost(!toggleGaugeBoost);
-    //console.log(settings.get("showGaugeBoost"));
   };
 
-  //Handle Intake Gauge Checkbox
+  /* Checkbox Intake */
   const [toggleGaugeIntake, setGaugeIntake] = React.useState(settings.showGaugeIntake);
 
   const handleGaugeIntake = () => {
-    changeSetting("showGaugeIntake", !toggleGaugeIntake);
-    //settings.set("showGaugeIntake", !toggleGaugeIntake);
+    changeSetting('showGaugeIntake', !toggleGaugeIntake);
     setGaugeIntake(!toggleGaugeIntake);
-    //console.log(settings.get("showGaugeIntake"));
   };
 
-  //Handle Coolant Gauge Checkbox
+  /* Checkbox Coolant */
   const [toggleGaugeCoolant, setGaugeCoolant] = React.useState(settings.showGaugeCoolant);
 
   const handleGaugeCoolant = () => {
-    changeSetting("showGaugeCoolant", !toggleGaugeCoolant);
-    //settings.set("showGaugeCoolant", !toggleGaugeCoolant);
+    changeSetting('showGaugeCoolant', !toggleGaugeCoolant);
     setGaugeCoolant(!toggleGaugeCoolant);
-    //console.log(settings.get("showGaugeCoolant"));
   };
 
-  //Handle CruiseControl Checkbox
+  /* Checkbox Cruise Control */
   const [toggleCruiseControl, setCruiseControl] = React.useState(settings.activateCC);
 
   const handleCruiseControl = () => {
-    changeSetting("activateCC", !toggleCruiseControl);
-    //settings.set("activateCC", !toggleCruiseControl);
+    changeSetting('activateCC', !toggleCruiseControl);
     setCruiseControl(!toggleCruiseControl);
-    //console.log(settings.get("activateCC"));
   };
 
-  //Handle CAN Checkbox
+  /* Checkbox CAN */
   const [toggleCAN, setCAN] = React.useState(settings.activateCAN);
 
   const handleCAN = () => {
-    changeSetting("activateCAN", !toggleCAN);
-    //settings.set("activateCAN", !toggleCAN);
+    changeSetting('activateCAN', !toggleCAN);
     setCAN(!toggleCAN);
-    //console.log(settings.get("activateCAN"));
   };
 
-  //Handle MMI Checkbox
+  /* Checkbox MMI */
   const [toggleMMI, setMMI] = React.useState(settings.activateMMI);
 
   const handleMMI = () => {
-    changeSetting("activateMMI", !toggleMMI);
-    //settings.set("activateMMI", !toggleMMI);
+    changeSetting('activateMMI', !toggleMMI);
     setMMI(!toggleMMI);
-    //console.log(settings.get("Toggle MMI"));
     reloadApp();
+  };
+
+  /* WiFi */
+  function connectWifi(password) {
+    var _credentials = {
+      ssid: ssidSelected,
+      password: password
+    };
+
+    ipcRenderer.send('connectWifi', _credentials);
   };
 
   const updateWifi = (event, args) => {
@@ -111,20 +107,21 @@ const Settings = ({ settings }) => {
     setWifiStatus(args);
   };
 
+  function resetWifiStatus() {
+    setWifiStatus('');
+  };
+
+  /* App */
   function reloadApp() {
-    ipcRenderer.send("reqReload");
+    ipcRenderer.send('reqReload');
   };
 
   function closeApp() {
-    ipcRenderer.send("reqClose");
-  };
-
-  function clearDTC() {
-    ipcRenderer.send("clearDTC");
+    ipcRenderer.send('reqClose');
   };
 
   function rebootRaspi() {
-    ipcRenderer.send("reqReboot");
+    ipcRenderer.send('reqReboot');
   };
 
   function openDialogue(ssid) {
@@ -132,21 +129,9 @@ const Settings = ({ settings }) => {
     toggle();
   };
 
-  function connectWifi(password) {
-    var _credentials = {
-      ssid: ssidSelected,
-      password: password
-    };
-
-    ipcRenderer.send('connectWifi', _credentials);
-  };
-
-  function resetWifiStatus() {
-    setWifiStatus("");
-  };
-
-  function changeSetting(k, v) {
-    ipcRenderer.send('settingsUpdate', { type: k, value: v })
+  /* Store settins */
+  function changeSetting(setting, value) {
+    ipcRenderer.send('settingsUpdate', { type: setting, value: value });
   }
 
   return (
@@ -160,53 +145,53 @@ const Settings = ({ settings }) => {
         reset={resetWifiStatus}
       />
 
-      <div className="settings__header">
+      <div className='settings__header'>
         <h2>Settings</h2>
       </div>
-      <div className="settings__body">
-        <div className="settings__connections">
-          <div className="settings__connections__wifi">
+      <div className='settings__body'>
+        <div className='settings__connections'>
+          <div className='settings__connections__wifi'>
             <h4>Available Wifi-Networks:</h4>
-            <div className="settings__connections__wifi__list">
+            <div className='settings__connections__wifi__list'>
               {wifiList.map((item, i) => (
-                <div className="settings__connections__wifi__list__item" key={i}>
-                  <button className="app-button" type="button" onClick={() => openDialogue(item.ssid)}>{item.ssid}</button>
+                <div className='settings__connections__wifi__list__item' key={i}>
+                  <button className='app-button' type='button' onClick={() => openDialogue(item.ssid)}>{item.ssid}</button>
                 </div>
               ))}
             </div>
           </div>
-          <div className="settings__connections__bt">
+          <div className='settings__connections__bt'>
             <p><i>Volvo RTVI v1.2.0</i></p>
           </div>
         </div>
-        <div className="settings__general">
-          <div className="settings__general__section">
-            <div className="settings__general__section__column">
+        <div className='settings__general'>
+          <div className='settings__general__section'>
+            <div className='settings__general__section__column'>
               <h4>Choose a color theme:</h4>
             </div>
-            <div className="settings__general__section__column">
+            <div className='settings__general__section__column'>
               <label>
-                <select className="app-button" color="Select a Color" onChange={colorSelect} defaultValue={settings.colorTheme}>
-                  <option color="blue">  Blue  </option>
-                  <option color="green"> Green </option>
-                  <option color="red">   Red   </option>
-                  <option color="white"> White </option>
+                <select className='app-button' color='Select a Color' onChange={colorSelect} defaultValue={settings.colorTheme}>
+                  <option color='blue'>  Blue  </option>
+                  <option color='green'> Green </option>
+                  <option color='red'>   Red   </option>
+                  <option color='white'> White </option>
                 </select>
               </label>
             </div>
           </div>
-          <div className="settings__general__section">
-            <div className="settings__general__section__column">
+          <div className='settings__general__section'>
+            <div className='settings__general__section__column'>
               <div><h4>Gauges:</h4></div>
-              <label><input type="checkbox" onChange={handleGaugeBoost} defaultChecked={settings.showGaugeBoost} /> Boost </label>
-              <label><input type="checkbox" onChange={handleGaugeIntake} defaultChecked={settings.showGaugeIntake} /> Intake </label>
-              <label><input type="checkbox" onChange={handleGaugeCoolant} defaultChecked={settings.showGaugeCoolant} /> Coolant </label>
+              <label><input type='checkbox' onChange={handleGaugeBoost} defaultChecked={settings.showGaugeBoost} /> Boost </label>
+              <label><input type='checkbox' onChange={handleGaugeIntake} defaultChecked={settings.showGaugeIntake} /> Intake </label>
+              <label><input type='checkbox' onChange={handleGaugeCoolant} defaultChecked={settings.showGaugeCoolant} /> Coolant </label>
             </div>
-            <div className="settings__general__section__column">
+            <div className='settings__general__section__column'>
               <div><h4>General:</h4></div>
-              <label><input type="checkbox" onChange={handleCAN} defaultChecked={settings.activateCAN} /> Enable CAN-Stream </label>
-              <label><input type="checkbox" onChange={handleMMI} defaultChecked={settings.activateMMI} /> Enable MMI </label>
-              <label><input type="checkbox" onChange={handleCruiseControl} defaultChecked={settings.activateCC} disabled={true} /> <span>-</span> </label>
+              <label><input type='checkbox' onChange={handleCAN} defaultChecked={settings.activateCAN} /> Enable CAN-Stream </label>
+              <label><input type='checkbox' onChange={handleMMI} defaultChecked={settings.activateMMI} /> Enable MMI </label>
+              <label><input type='checkbox' onChange={handleCruiseControl} defaultChecked={settings.activateCC} disabled={true} /> <span>-</span> </label>
             </div >
           </div>
           <hr
@@ -217,14 +202,14 @@ const Settings = ({ settings }) => {
               border: '0'
             }}
           />
-          <div className="settings__general__system">
-            <div className="settings__general__section__column">
-              <button className="app-button" type="button" onClick={reloadApp}>Relaunch Application</button>
-              <button className="app-button" type="button" onClick={closeApp}>Close Application</button>
+          <div className='settings__general__system'>
+            <div className='settings__general__section__column'>
+              <button className='app-button' type='button' onClick={reloadApp}>Relaunch Application</button>
+              <button className='app-button' type='button' onClick={closeApp}>Close Application</button>
             </div>
-            <div className="settings__general__section__column">
-              <button className="app-button" type="button" onClick={rebootRaspi}>Reboot System</button>
-              <button className="app-button" type="button" onClick={clearDTC} disabled={true}>-</button>
+            <div className='settings__general__section__column'>
+              <button className='app-button' type='button' onClick={rebootRaspi}>Reboot System</button>
+              <button className='app-button' type='button' disabled={true}>-</button>
             </div>
           </div>
         </div>
