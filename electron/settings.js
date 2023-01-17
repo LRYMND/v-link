@@ -35,7 +35,7 @@ class UserSettings {
                 type: 'integer',
                 // maximum: 60,
                 // minimum: 10,
-                default: 30
+                default: 60
             },
             kiosk: {
                 type: 'boolean',

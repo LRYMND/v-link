@@ -1,10 +1,13 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-
-import './carplay.scss';
-import '@fontsource/montserrat';
-import JMuxer from 'jmuxer';
 import { GooSpinner } from 'react-spinners-kit';
+
+import JMuxer from 'jmuxer';
+
+import '@fontsource/montserrat';
+import './carplay.scss';
+import '../../components/themes.scss';
+
+
 
 const customStyles = {
   content: {
@@ -25,18 +28,20 @@ function Carplay({
   status,
   settings,
   touchEvent,
+  streaming,
+  setStreaming,
 }) {
   const [height, setHeight] = useState(480);
   const [width, setWidth] = useState(800);
   const [mouseDown, setMouseDown] = useState(false);
   const [running, setRunning] = useState(false);
-  const [streaming, setStreaming] = useState(false);
+  //const [streaming, setStreaming] = useState(false);
   const [lastX, setLastX] = useState(0);
   const [lastY, setLastY] = useState(0);
   const ref = useRef(null);
 
   useEffect(() => {
-    console.log('creating carplay', settings)
+    console.log('accessing carplay')
     let jmuxer = new JMuxer({
       node: 'player',
       mode: 'video',
@@ -66,10 +71,8 @@ function Carplay({
             if (playPromise !== undefined) {
               setRunning(true)
               playPromise.then(_ => {
-
-              })
-                .catch(error => {
-                });
+              }).catch(error => {
+              });
             }
           }
         }
@@ -87,7 +90,6 @@ function Carplay({
     }
 
     return function cleanup() {
-      console.log('carplay paused');
       ws.onmessage = () => { }
     }
   }, [])
@@ -156,7 +158,7 @@ function Carplay({
   }
 
   return (
-    <div style={{ height: '100%', width: '100%' }} id={'main'}>
+    <div className={`carplayApp ${settings.theme}`} style={{ height: '100%', width: '100%' }} id={'main'}>
       <div ref={ref}
         className='App'
         onTouchStart={handleDown}
@@ -174,10 +176,10 @@ function Carplay({
           }
         }}
         style={{ height: '100%', width: '100%', padding: 0, margin: 0, display: 'flex' }}>
-        <video style={{ height: streaming ? '100%' : '0%' }} autoPlay muted id='player' />
+        <video style={{ height: (streaming && status) ? '100%' : '0%' }} autoPlay muted id='player' />
         {status ? <div className='content'>
           <div>
-            <GooSpinner size={60} color='#7c7c7c' loading={true} />
+            <GooSpinner size={60} color='var(--fillActive)' loading={true} />
           </div>
         </div> : <div className='content'>
           <div>

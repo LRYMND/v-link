@@ -45,8 +45,8 @@ const TopBar = () => {
     ipcRenderer.send('statusReq');
     ipcRenderer.send('updateWifi');
 
-    ipcRenderer.on('wifi_on', wifiOn);
-    ipcRenderer.on('wifi_off', wifiOff);
+    ipcRenderer.on('wifiOn', wifiOn);
+    ipcRenderer.on('wifiOff', wifiOff);
     ipcRenderer.on("plugged", plugged);
     ipcRenderer.on("unplugged", unplugged);
 
@@ -55,12 +55,12 @@ const TopBar = () => {
     return function cleanup() {
       clearInterval(timer1);
 
-      ipcRenderer.removeListener('wifi_on', wifiOn);
-      ipcRenderer.removeListener('wifi_off', wifiOff);
+      ipcRenderer.removeListener('wifiOn', wifiOn);
+      ipcRenderer.removeListener('wifiOff', wifiOff);
       ipcRenderer.removeListener('plugged', plugged);
       ipcRenderer.removeListener('unplugged', unplugged);
     };
-  }, [theme]);
+  }, []);
 
   return (
     <div className={`topbar ${theme}`}>

@@ -1,56 +1,50 @@
-const path = require("path");
-const url = require("url");
+const path = require('path');
+const url = require('url');
 const {
   app,
   BrowserWindow,
   ipcMain,
   ipcRenderer,
   globalShortcut,
-} = require("electron");
+} = require('electron');
 
-app.commandLine.appendSwitch('disable-gpu-vsync');
-app.commandLine.appendSwitch('ignore-gpu-blacklist');
-app.commandLine.appendSwitch('disable-gpu');
+//app.commandLine.appendSwitch('disable-gpu-vsync');
+//app.commandLine.appendSwitch('ignore-gpu-blacklist');
+//app.commandLine.appendSwitch('disable-gpu');
 app.commandLine.appendSwitch('disable-gpu-compositing');
 
-const isDev = require("electron-is-dev");
+const isDev = require('electron-is-dev');
 
 
 // ------------------- Electron Store --------------------
 
-const UserSettings = require('./UserSettings');
+const UserSettings = require('./settings');
 const settings = new UserSettings;
-//settings.initRenderer();
 
-//const ElectronStore = require('electron-store');
-//const store = new ElectronStore({ schema });
-//ElectronStore.initRenderer();
-
-console.log("Current Theme: ", settings.store.get("colorTheme"));
 
 // ------------------- Carplay Setup --------------------
 
-const { Readable } = require("stream");
+const { Readable } = require('stream');
 const mp4Reader = new Readable({
   read(size) { },
 });
-const Carplay = require("node-carplay");
-const bindings = ["n", "v", "b", "m"];
-const keys = require("./bindings.json");
+const Carplay = require('node-carplay');
+const bindings = ['n', 'v', 'b', 'm'];
+const keys = require('./bindings.json');
 
-const WebSocket = require("ws");
+const WebSocket = require('ws');
 let wss = new WebSocket.Server({ port: 3001, perMessageDeflate: false });
 
-wss.on("connection", function connection(ws) {
-  console.log("Socket connected. sending data...");
+wss.on('connection', function connection(ws) {
+  console.log('socket connected - sending data...');
   const wsstream = WebSocket.createWebSocketStream(ws);
     //lets pipe into jmuxer stream, then websocket
     mp4Reader.pipe(wsstream);
     ws.on('error', function error(error) {
-        console.log('WebSocket error');
+        console.log('socket error');
     });
     ws.on('close', function close(msg) {
-        console.log('WebSocket close');
+        console.log('socket closed');
     });
 });
 
@@ -60,43 +54,26 @@ var Wifi = require('rpi-wifi-connection');
 var wifi = new Wifi();
 
 
-const timer = setInterval(setWifiIconState, 5000); //Update status-icon every 5 Seconds
-
-function setWifiIconState() {
-  getWifiStatus();
-
-  /*
-  wifi.getState().then((connected) => {
-    if (connected) {
-      mainWindow.webContents.send('wifi_on');
-    } else {
-      mainWindow.webContents.send('wifi_off');
-    }
-  })
-    .catch((error) => {
-      console.log(error);
-    });
-    */
-}
+const timer = setInterval(getWifiStatus, 5000); //Update status-icon every 5 Seconds
 
 function getWifiStatus() {
   wifi.getStatus().then((status) => {
     if (status.ssid != null && status.ip_address != null) {
-      mainWindow.webContents.send('wifi_on', status);
-      console.log(status);
+      mainWindow.webContents.send('wifiOn', status);
+      //console.log(status);
     } else {
-      mainWindow.webContents.send('wifi_off');
+      mainWindow.webContents.send('wifiOff');
     }
   })
     .catch((error) => {
-      mainWindow.webContents.send('wifi_off');
+      mainWindow.webContents.send('wifiOff');
       console.log(error);
     });
 }
 
 function getWifiNetworks() {
   wifi.scan().then((networks) => {
-    mainWindow.webContents.send('wifi_list', networks);
+    mainWindow.webContents.send('wifiList', networks);
   })
     .catch((error) => {
       console.log(error);
@@ -107,12 +84,12 @@ function connectWifi(data) {
   wifi.connect({ ssid: data.ssid, psk: data.password }).then(() => {
 
     wifi.getStatus().then((status) => {
-      mainWindow.webContents.send('wifi_connected', ("Connected with IP: " + status.ip_address));
+      mainWindow.webContents.send('wifiConnected', ('Connected with IP: ' + status.ip_address));
     })
     console.log('Connected to WiFi network.');
   })
     .catch((error) => {
-      mainWindow.webContents.send('wifi_connected', 'Could not connect.');
+      mainWindow.webContents.send('wifiConnected', 'Could not connect.');
       console.log(error);
     });
 }
@@ -121,79 +98,29 @@ function connectWifi(data) {
 //ToDo...
 
 
-// ------------------- User Setup --------------------
-
-function runScripts() {
-  if (settings.store.get("activateCC")) { script(1); }
-  //if (store.get("activateCAN")) { console.log("ACTIVATE CAN"); }
-  //if (store.get("activateMMI")) { console.log("ACTIVATE MMI"); }
-}
-
-function script(option) {
-  console.log("Option ", option);
-  const { PythonShell } = require('python-shell');
-  const script1 = path.join(process.resourcesPath, '/scripts/cruisecontrol.py');
-  const script2 = path.join(process.resourcesPath, '/scripts/faultcodes.py');
-
-  let pyshell;
-
-  if (option === 1) {
-    console.log("Activating cruise-control.")
-    pyshell = new PythonShell(script1, {
-      pythonPath: 'python',
-      pythonOptions: ['-u'],
-    });
-  }
-
-  if (option === 2) {
-    console.log("Clearing 2-byte DTCs.")
-    pyshell = new PythonShell(script2, {
-      pythonPath: 'python',
-      pythonOptions: ['-u'],
-    });
-  }
-
-
-  pyshell.on('message', function (msg) {
-    console.log("Script Message:", { message: msg });
-  });
-
-  pyshell.on('error', function (error) {
-    console.log("Script Message:", { message: error });
-  });
-
-  pyshell.on('stderr', function (stderr) {
-    console.log("Script Message:", { message: stderr });
-  });
-}
-
-
-
 // ------------------- Main Window --------------------
 
 let mainWindow = null;
 
 function createWindow() {
-  //Run user scripts
-  runScripts();
 
   const startUrl =
     process.env.ELECTRON_START_URL ||
     url.format({
-      pathname: path.join(__dirname, "../index.html"),
-      protocol: "file:",
+      pathname: path.join(__dirname, '../index.html'),
+      protocol: 'file:',
       slashes: true,
     });
 
-  globalShortcut.register("f5", function () {
-    console.log("f5 is pressed");
+  globalShortcut.register('f5', function () {
+    console.log('opening dev tools');
     mainWindow.webContents.openDevTools();
   });
 
   if (isDev) {
     mainWindow = new BrowserWindow({
-      width: 800,
-      height: 480,
+      width: settings.store.get('width'),
+      height: settings.store.get('height'),
       kiosk: false,
       show: false,
       backgroundColor: '#000000',
@@ -201,7 +128,7 @@ function createWindow() {
       webPreferences: {
         nodeIntegration: true,
         //enableRemoteModule: true
-        preload: path.join(__dirname, "preload.js"),
+        preload: path.join(__dirname, 'preload.js'),
         contextIsolation: false,
       },
     });
@@ -215,6 +142,9 @@ function createWindow() {
       height: 480,
       kiosk: false,
       show: false,
+      frame: false,
+      resizable: false,
+
       backgroundColor: '#000000',
 
       webPreferences: {
@@ -229,13 +159,13 @@ function createWindow() {
   mainWindow.loadURL(startUrl);
 
   mainWindow.on('ready-to-show', function () {
-    console.log("Window READY")
+    console.log('window ready')
     if (!isDev) { mainWindow.setKiosk(true); }
     mainWindow.show();
   });
 
   let size = mainWindow.getSize();
-  mainWindow.on("closed", function () {
+  mainWindow.on('closed', function () {
     mainWindow = null;
   });
 
@@ -243,13 +173,13 @@ function createWindow() {
     dpi: 480,
     nightMode: 0,
     hand: 0,
-    boxName: "nodePlay",
+    boxName: 'nodePlay',
     width: size[0],
     height: size[1],
     fps: 60,
   };
 
-  console.log("spawning carplay", config);
+  console.log('spawning carplay: ', config);
   const carplay = new Carplay(config, mp4Reader);
 
 
@@ -259,12 +189,11 @@ function createWindow() {
     } else {
       mainWindow.webContents.send('unplugged');
     }
-    console.log("data received", data);
+    console.log('data received: ', data);
   });
 
   carplay.on('quit', () => {
     mainWindow.webContents.send('quitReq');
-    //console.log("quitReq");
   });
 
 
@@ -280,15 +209,6 @@ function createWindow() {
       mainWindow.webContents.send('unplugged');
     }
   });
-
-  
-  ipcMain.on('closeSocket', () => {
-    console.log("CLOSE SOCKET")
-    wss.clients.forEach((socket) => {
-      socket.terminate();
-    });
-  });
-  
 
   ipcMain.on('reqReload', () => {
     app.relaunch()
@@ -308,27 +228,22 @@ function createWindow() {
     });
   });
 
-  ipcMain.on('updateWifi', () => {
-    setWifiIconState();
+  ipcMain.on('wifiUpdate', () => {
+    getWifiStatus();
     getWifiNetworks();
   });
 
-  ipcMain.on('connectWifi', (event, data) => {
+  ipcMain.on('wifiConnect', (event, data) => {
     connectWifi(data);
-  });
-
-  ipcMain.on('updateBT', () => {
-    setBTState();
-    getBTDevices();
   });
 
   ipcMain.on('getSettings', () => {
     mainWindow.webContents.send('allSettings', settings.store.store)
   })
 
-  ipcMain.on('settingsUpdate', (event, { type, value }) => {
-    console.log("updating settings", type, value)
-    settings.store.set(type, value)
+  ipcMain.on('settingsUpdate', (event, { setting, value }) => {
+    console.log('updating settings', setting, value)
+    settings.store.set(setting, value)
     mainWindow.webContents.send('allSettings', settings.store.store)
   })
 
@@ -339,9 +254,9 @@ function createWindow() {
     }
     globalShortcut.register(key, function () {
       carplay.sendKey(value);
-      if (value === "selectDown") {
+      if (value === 'selectDown') {
         setTimeout(() => {
-          carplay.sendKey("selectUp");
+          carplay.sendKey('selectUp');
         }, 200);
       }
     });
@@ -349,17 +264,17 @@ function createWindow() {
 
 }
 
-app.on("window-all-closed", function () {
-  if (process.platform !== "darwin") {
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') {
     app.quit();
     clearInterval(timer);
   }
 });
 
-app.on("ready", createWindow);
+app.on('ready', createWindow);
 
-app.on("window-all-closed", function () {
-  if (process.platform !== "darwin") {
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') {
     app.quit();
     clearInterval(timer);
   }
@@ -377,25 +292,25 @@ let cache = {
 let hiddenWindow;
 
 // This event listener will listen for request from visible renderer process
-ipcMain.on('START_BACKGROUND_VIA_MAIN', (event, args) => {
+ipcMain.on('startScript', (event, args) => {
 
-  if (settings.store.get("activateCAN")) {
-    console.log("STARTING BACKGROUND WORKER");
-    const backgroundFileURL = ""
+  if (settings.store.get('activateCAN')) {
+    console.log('starting background worker');
+    const backgroundFileURL = ''
 
 
 
     if (isDev) {
       backgroundFileUrl = url.format({
-        pathname: path.join(__dirname, "../public/background.html"),
-        protocol: "file:",
+        pathname: path.join(__dirname, '../public/background.html'),
+        protocol: 'file:',
         slashes: true,
       });
 
       hiddenWindow = new BrowserWindow({
         width: 150,
         height: 150,
-        show: true,
+        show: false,
 
         webPreferences: {
           nodeIntegration: true,
@@ -409,8 +324,8 @@ ipcMain.on('START_BACKGROUND_VIA_MAIN', (event, args) => {
     } else {
 
       backgroundFileUrl = url.format({
-        pathname: path.join(__dirname, "../background.html"),
-        protocol: "file:",
+        pathname: path.join(__dirname, '../background.html'),
+        protocol: 'file:',
         slashes: true,
       });
 
@@ -433,33 +348,33 @@ ipcMain.on('START_BACKGROUND_VIA_MAIN', (event, args) => {
 
     cache.data = args.number;
   } else {
-    console.log("CAN-stream deactivated.")
+    console.log('can-stream deactivated.')
   }
 });
 
 
-// This event listener will start the execution of the background task
-ipcMain.on('BACKGROUND_READY', (event, args) => {
-  event.reply('START_PROCESSING', {
+// This event listener will start the execution of the background task once ready
+ipcMain.on('backgroundReady', (event, args) => {
+  event.reply('startPython', {
     data: cache.data,
   });
 });
 
 // This event will quit the python script when Dashboard page will be unmounted
-ipcMain.on('QUIT_BACKGROUND', (event, args) => {
+ipcMain.on('stopScript', (event, args) => {
   if (hiddenWindow != null) {
-    hiddenWindow.webContents.send("QUIT_PYTHON");
+    hiddenWindow.webContents.send('stopPython');
   }
 });
 
 // This event will quit the python script when Dashboard page will be unmounted
-ipcMain.on('CLOSE_BACKGROUND', (event, args) => {
-  console.log("CLOSING BACKGROUND WORKER");
+ipcMain.on('backgroundClose', (event, args) => {
+  console.log('closing background worker');
   hiddenWindow.close();
 });
 
 // This event listener will listen for data being sent back from the background renderer process
-ipcMain.on('BG_CONSOLE', (event, args) => {
+ipcMain.on('msgToMain', (event, args) => {
   console.log(args.message);
-  mainWindow.webContents.send('MESSAGE_FROM_BACKGROUND_VIA_MAIN', args.message)
+  mainWindow.webContents.send('msgFromBackground', args.message)
 });

@@ -12,20 +12,19 @@ const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
 
-const Settings = ({ settings }) => {
+const Settings = ({ settings, setSettings }) => {
 
   useEffect(() => {
-    ipcRenderer.send('updateWifi');
-    ipcRenderer.on('wifi_list', updateWifi);
-    ipcRenderer.on('wifi_connected', updateWifiStatus);
+    ipcRenderer.on('wifiList', updateWifi);
+    ipcRenderer.on('wifiConnected', updateWifiStatus);
+    ipcRenderer.send('wifiUpdate');
 
     return function cleanup() {
-      ipcRenderer.removeListener('wifi_list', updateWifi);
-      ipcRenderer.removeListener('wifi_connected', updateWifiStatus);
+      ipcRenderer.removeListener('wifiList', updateWifi);
+      ipcRenderer.removeListener('wifiConnected', updateWifiStatus);
     };
   }, []);
 
-  const [theme, setTheme] = useState(settings.colorTheme);
   const [wifiList, setWifiList] = useState([{ id: '', ssid: 'No Networks available' }]);
   const [wifiStatus, setWifiStatus] = useState('');
   const [ssidSelected, setSsidSelected] = useState('127.0.0.1');
@@ -35,8 +34,6 @@ const Settings = ({ settings }) => {
   /* Color Theme */
   const colorSelect = (event) => {
     changeSetting('colorTheme', event.target.value);
-    //settings.set('colorTheme', event.target.value);
-    //setTheme(settings.get('colorTheme'));
     reloadApp();
   };
 
@@ -64,14 +61,6 @@ const Settings = ({ settings }) => {
     setGaugeCoolant(!toggleGaugeCoolant);
   };
 
-  /* Checkbox Cruise Control */
-  const [toggleCruiseControl, setCruiseControl] = React.useState(settings.activateCC);
-
-  const handleCruiseControl = () => {
-    changeSetting('activateCC', !toggleCruiseControl);
-    setCruiseControl(!toggleCruiseControl);
-  };
-
   /* Checkbox CAN */
   const [toggleCAN, setCAN] = React.useState(settings.activateCAN);
 
@@ -88,6 +77,15 @@ const Settings = ({ settings }) => {
     setMMI(!toggleMMI);
     reloadApp();
   };
+
+  /* Checkbox UNDEFINED */
+  //const [toggleCruiseControl, setCruiseControl] = React.useState(settings.activateCC);
+  /*
+  const handleCruiseControl = () => {
+    changeSetting('activateCC', !toggleCruiseControl);
+    setCruiseControl(!toggleCruiseControl);
+  };
+  */
 
   /* WiFi */
   function connectWifi(password) {
@@ -131,17 +129,19 @@ const Settings = ({ settings }) => {
 
   /* Store settins */
   function changeSetting(setting, value) {
-    ipcRenderer.send('settingsUpdate', { type: setting, value: value });
+    ipcRenderer.send('settingsUpdate', { setting: setting, value: value });
+    ipcRenderer.on('allSettings', (event, data) => { setSettings(data) });
   }
 
   return (
-    <div className={`settings ${theme}`}>
+    <div className={`settings ${settings.theme}`}>
 
       <Modal isShowing={isShowing}
         ssid={ssidSelected}
         hide={toggle}
-        connect={connectWifi}
+        
         status={wifiStatus}
+        connect={connectWifi}
         reset={resetWifiStatus}
       />
 
@@ -189,9 +189,9 @@ const Settings = ({ settings }) => {
             </div>
             <div className='settings__general__section__column'>
               <div><h4>General:</h4></div>
-              <label><input type='checkbox' onChange={handleCAN} defaultChecked={settings.activateCAN} /> Enable CAN-Stream </label>
+              <label><input type='checkbox' onChange={handleCAN} defaultChecked={settings.activateCAN} /> Enable CAN </label>
               <label><input type='checkbox' onChange={handleMMI} defaultChecked={settings.activateMMI} /> Enable MMI </label>
-              <label><input type='checkbox' onChange={handleCruiseControl} defaultChecked={settings.activateCC} disabled={true} /> <span>-</span> </label>
+              <label><input type='checkbox' defaultChecked={settings.activateCC} disabled={true} /> <span>-</span> </label>
             </div >
           </div>
           <hr

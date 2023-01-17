@@ -95,14 +95,14 @@ class Dashboard extends Component {
 		gaugeIntake = store.get("showGaugeIntake");
 		gaugeCoolant = store.get("showGaugeCoolant");
 
-		ipcRenderer.on('MESSAGE_FROM_BACKGROUND_VIA_MAIN', this.msgFromBG);
-		ipcRenderer.send('START_BACKGROUND_VIA_MAIN', {});
+		ipcRenderer.on('msgFromBackground', this.msgFromBG);
+		ipcRenderer.send('startScript', {});
 	}
 
 	componentWillUnmount() {
 		this.ismounted = false;
-		ipcRenderer.send('QUIT_BACKGROUND');
-		ipcRenderer.removeListener('MESSAGE_FROM_BACKGROUND_VIA_MAIN', this.msgFromBG);
+		ipcRenderer.send('stopScript');
+		ipcRenderer.removeListener('msgFromBackground', this.msgFromBG);
 	}
 
 	loadTheme() {

@@ -41,6 +41,7 @@ const App = () => {
     socket.addEventListener('open', () => { setConnected(true); console.log('socket connected')});
 
     ipcRenderer.send('getSettings');
+    ipcRenderer.send('wifiUpdate');
     ipcRenderer.on('allSettings', (event, data) => { loadSettings(data) });
 
     return function cleanup() {
@@ -69,6 +70,7 @@ const App = () => {
         />} />
         <Route path='/settings' element={<Settings
           settings={settings}
+          setSettings={setSettings}
         />} />
       </Routes>
     </HashRouter>
