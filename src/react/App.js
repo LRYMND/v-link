@@ -17,6 +17,7 @@ const App = () => {
 
   const [showNav, setShowNav] = useState(true);
   const [settings, setSettings] = useState(null);
+  const [showMMI, setShowMMI] = useState(null);
   const [startedUp, setStartedUp] = useState(false);
   const [connected, setConnected] = useState(false);
 
@@ -30,22 +31,22 @@ const App = () => {
   useEffect(() => {
     if (settings != null) {
       console.log('settings loaded: ', settings);
+      setShowMMI(settings.activateMMI)
       setStartedUp(true);
     }
-
   }, [settings])
 
   useEffect(() => {
     socket = new WebSocket('ws://localhost:3001');
     socket.binaryType = 'arraybuffer';
-    socket.addEventListener('open', () => { setConnected(true); console.log('socket connected')});
+    socket.addEventListener('open', () => { setConnected(true); console.log('socket connected') });
 
     ipcRenderer.send('getSettings');
     ipcRenderer.send('wifiUpdate');
     ipcRenderer.on('allSettings', (event, data) => { loadSettings(data) });
 
     return function cleanup() {
-      socket.removeEventListener('open', () => { setConnected(true); console.log('socket connected')});
+      socket.removeEventListener('open', () => { setConnected(true); console.log('socket connected') });
       ipcRenderer.removeAllListeners('allSettings');
     };
   }, []);
@@ -58,22 +59,36 @@ const App = () => {
           <NavBar />
         </>
       }
-      <Routes>
-        <Route path='/dashboard' element={<Dashboard
-          settings={settings}
-        />} />
-        <Route path='/' element={<CarplayWindow
-          setShowNav={setShowNav}
-          settings={settings}
-          socket={socket}
-          connected={connected}
-        />} />
-        <Route path='/settings' element={<Settings
-          settings={settings}
-          setSettings={setSettings}
-        />} />
-      </Routes>
+      {showMMI ?
+        <Routes>
+          <Route path='/dashboard' element={<Dashboard
+            settings={settings}
+          />} />
+          <Route path='/' element={<CarplayWindow
+            setShowNav={setShowNav}
+            settings={settings}
+            socket={socket}
+            connected={connected}
+          />} />
+          <Route path='/settings' element={<Settings
+            settings={settings}
+            setSettings={setSettings}
+          />} />
+        </Routes>
+        :
+        <Routes>
+          <Route path='/' element={<Dashboard
+            settings={settings}
+          />} />
+          <Route path='/settings' element={<Settings
+            settings={settings}
+            setSettings={setSettings}
+          />} />
+        </Routes>
+      }
+
     </HashRouter>
+
   );
 };
 

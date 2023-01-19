@@ -146,192 +146,192 @@ class Dashboard extends Component {
 			</div>
 			<div className="dashboard__gauges">
 
-			{ gaugeBoost ? 
-				<RadialGauge
-					width={250}
-					height={250}
-					units='bar'
-					title='Boost'
-					value={this.state.boost}
-					minValue={0}
-					maxValue={1.5}
-					majorTicks={['0', '0.3', '0.6', '0.9', '1.2', '1.5']}
-					minorTicks={2}
+				{gaugeBoost ?
+					<RadialGauge
+						width={250}
+						height={250}
+						units='bar'
+						title='Boost'
+						value={this.state.boost}
+						minValue={0}
+						maxValue={1.5}
+						majorTicks={['0', '0.3', '0.6', '0.9', '1.2', '1.5']}
+						minorTicks={2}
 
-					//custom config:
-					valueBox={false}
+						//custom config:
+						valueBox={false}
 
-					colorPlate={this.state.colorPlate}
-					colorPlateEnd={this.state.colorPlateEnd}
+						colorPlate={this.state.colorPlate}
+						colorPlateEnd={this.state.colorPlateEnd}
 
-					colorTitle={this.state.colorTitle}
-					colorUnits={this.state.colorUnits}
-					colorHighlight={this.state.colorHighlight}
+						colorTitle={this.state.colorTitle}
+						colorUnits={this.state.colorUnits}
+						colorHighlight={this.state.colorHighlight}
 
-					colorMinorTicks={this.state.colorMinorTicks}
-					colorMajorTicks={this.state.colorMajorTicks}
-					colorNumbers={this.state.colorNumbers}
+						colorMinorTicks={this.state.colorMinorTicks}
+						colorMajorTicks={this.state.colorMajorTicks}
+						colorNumbers={this.state.colorNumbers}
 
-					colorNeedle={this.state.colorNeedleEnd}
-					colorNeedleEnd={this.state.colorNeedleEnd}
-					colorNeedleShadowUp={this.state.colorNeedleShadowUp}
-					colorNeedleShadowDown={this.state.colorNeedleShadowDown}
-
-
-					needleType='line'
-					needleStart={0}
-					needleCircleSize={13}
-
-					colorNeedleCircleInner={this.state.colorNeedleCircleInner}
-					colorNeedleCircleInnerEnd={this.state.colorNeedleCircleInnerEnd}
-					colorNeedleCircleOuter={this.state.colorNeedleCircleOuter}
-					colorNeedleCircleOuterEnd={this.state.colorNeedleCircleOuterEnd}
+						colorNeedle={this.state.colorNeedleEnd}
+						colorNeedleEnd={this.state.colorNeedleEnd}
+						colorNeedleShadowUp={this.state.colorNeedleShadowUp}
+						colorNeedleShadowDown={this.state.colorNeedleShadowDown}
 
 
-					borderInnerWidth={0}
-					borderMiddleWidth={2}
-					borderOuterWidth={7}
+						needleType='line'
+						needleStart={0}
+						needleCircleSize={13}
 
-					colorBorderOuter={this.state.colorBorderOuter}
-					colorBorderMiddle={this.state.colorBorderMiddle}
-					colorBorderInner={this.state.colorBorderInner}
-
-					colorBorderOuterEnd={this.state.colorBorderOuterEnd}
-					colorBorderMiddleEnd={this.state.colorBorderMiddleEnd}
-					colorBorderInnerEnd={this.state.colorBorderInnerEnd}
-
-					highlights={[{}]}
-				></RadialGauge>
-
-				: <div></div> }
-
-				{ gaugeIntake ? 
-				<RadialGauge
-					width={250}
-					height={250}
-					units='°C'
-					title='Intake'
-					value={this.state.intake}
-					minValue={0}
-					maxValue={90}
-					majorTicks={['0', '30', '60', '90']}
-					minorTicks={3}
-
-					//custom config:
-					valueBox={false}
-
-					colorPlate={this.state.colorPlate}
-					colorPlateEnd={this.state.colorPlateEnd}
-
-					colorTitle={this.state.colorTitle}
-					colorUnits={this.state.colorUnits}
-					colorHighlight={this.state.colorHighlight}
-
-					colorMinorTicks={this.state.colorMinorTicks}
-					colorMajorTicks={this.state.colorMajorTicks}
-					colorNumbers={this.state.colorNumbers}
-
-					colorNeedle={this.state.colorNeedleEnd}
-					colorNeedleEnd={this.state.colorNeedleEnd}
-					colorNeedleShadowUp={this.state.colorNeedleShadowUp}
-					colorNeedleShadowDown={this.state.colorNeedleShadowDown}
+						colorNeedleCircleInner={this.state.colorNeedleCircleInner}
+						colorNeedleCircleInnerEnd={this.state.colorNeedleCircleInnerEnd}
+						colorNeedleCircleOuter={this.state.colorNeedleCircleOuter}
+						colorNeedleCircleOuterEnd={this.state.colorNeedleCircleOuterEnd}
 
 
-					needleType='line'
-					needleStart={0}
-					needleCircleSize={13}
+						borderInnerWidth={0}
+						borderMiddleWidth={2}
+						borderOuterWidth={7}
 
-					colorNeedleCircleInner={this.state.colorNeedleCircleInner}
-					colorNeedleCircleInnerEnd={this.state.colorNeedleCircleInnerEnd}
-					colorNeedleCircleOuter={this.state.colorNeedleCircleOuter}
-					colorNeedleCircleOuterEnd={this.state.colorNeedleCircleOuterEnd}
+						colorBorderOuter={this.state.colorBorderOuter}
+						colorBorderMiddle={this.state.colorBorderMiddle}
+						colorBorderInner={this.state.colorBorderInner}
 
+						colorBorderOuterEnd={this.state.colorBorderOuterEnd}
+						colorBorderMiddleEnd={this.state.colorBorderMiddleEnd}
+						colorBorderInnerEnd={this.state.colorBorderInnerEnd}
 
-					borderInnerWidth={0}
-					borderMiddleWidth={2}
-					borderOuterWidth={7}
+						highlights={[{}]}
+					></RadialGauge>
 
-					colorBorderOuter={this.state.colorBorderOuter}
-					colorBorderMiddle={this.state.colorBorderMiddle}
-					colorBorderInner={this.state.colorBorderInner}
+					: <div></div>}
 
-					colorBorderOuterEnd={this.state.colorBorderOuterEnd}
-					colorBorderMiddleEnd={this.state.colorBorderMiddleEnd}
-					colorBorderInnerEnd={this.state.colorBorderInnerEnd}
+				{gaugeIntake ?
+					<RadialGauge
+						width={250}
+						height={250}
+						units='°C'
+						title='Intake'
+						value={this.state.intake}
+						minValue={0}
+						maxValue={90}
+						majorTicks={['0', '30', '60', '90']}
+						minorTicks={3}
 
-					highlights={[{
-						"from": 60,
-						"to": 90,
-						"color": this.state.colorHighlight
-					}]}
+						//custom config:
+						valueBox={false}
 
-				></RadialGauge>
-				: <div></div> }
+						colorPlate={this.state.colorPlate}
+						colorPlateEnd={this.state.colorPlateEnd}
 
-				{ gaugeCoolant ?
-				<RadialGauge
-					width={250}
-					height={250}
-					units='°C'
-					title='Coolant'
-					value={this.state.coolant}
-					minValue={0}
-					maxValue={150}
-					majorTicks={['0', '50', '100', '150']}
-					minorTicks={5}
+						colorTitle={this.state.colorTitle}
+						colorUnits={this.state.colorUnits}
+						colorHighlight={this.state.colorHighlight}
 
-					//custom config:
-					valueBox={false}
+						colorMinorTicks={this.state.colorMinorTicks}
+						colorMajorTicks={this.state.colorMajorTicks}
+						colorNumbers={this.state.colorNumbers}
 
-					colorPlate={this.state.colorPlate}
-					colorPlateEnd={this.state.colorPlateEnd}
-
-					colorTitle={this.state.colorTitle}
-					colorUnits={this.state.colorUnits}
-					colorHighlight={this.state.colorHighlight}
-
-					colorMinorTicks={this.state.colorMinorTicks}
-					colorMajorTicks={this.state.colorMajorTicks}
-					colorNumbers={this.state.colorNumbers}
-
-					colorNeedle={this.state.colorNeedleEnd}
-					colorNeedleEnd={this.state.colorNeedleEnd}
-					colorNeedleShadowUp={this.state.colorNeedleShadowUp}
-					colorNeedleShadowDown={this.state.colorNeedleShadowDown}
+						colorNeedle={this.state.colorNeedleEnd}
+						colorNeedleEnd={this.state.colorNeedleEnd}
+						colorNeedleShadowUp={this.state.colorNeedleShadowUp}
+						colorNeedleShadowDown={this.state.colorNeedleShadowDown}
 
 
-					needleType='line'
-					needleStart={0}
-					needleCircleSize={13}
+						needleType='line'
+						needleStart={0}
+						needleCircleSize={13}
 
-					colorNeedleCircleInner={this.state.colorNeedleCircleInner}
-					colorNeedleCircleInnerEnd={this.state.colorNeedleCircleInnerEnd}
-					colorNeedleCircleOuter={this.state.colorNeedleCircleOuter}
-					colorNeedleCircleOuterEnd={this.state.colorNeedleCircleOuterEnd}
+						colorNeedleCircleInner={this.state.colorNeedleCircleInner}
+						colorNeedleCircleInnerEnd={this.state.colorNeedleCircleInnerEnd}
+						colorNeedleCircleOuter={this.state.colorNeedleCircleOuter}
+						colorNeedleCircleOuterEnd={this.state.colorNeedleCircleOuterEnd}
 
 
-					borderInnerWidth={0}
-					borderMiddleWidth={2}
-					borderOuterWidth={7}
+						borderInnerWidth={0}
+						borderMiddleWidth={2}
+						borderOuterWidth={7}
 
-					colorBorderOuter={this.state.colorBorderOuter}
-					colorBorderMiddle={this.state.colorBorderMiddle}
-					colorBorderInner={this.state.colorBorderInner}
+						colorBorderOuter={this.state.colorBorderOuter}
+						colorBorderMiddle={this.state.colorBorderMiddle}
+						colorBorderInner={this.state.colorBorderInner}
 
-					colorBorderOuterEnd={this.state.colorBorderOuterEnd}
-					colorBorderMiddleEnd={this.state.colorBorderMiddleEnd}
-					colorBorderInnerEnd={this.state.colorBorderInnerEnd}
+						colorBorderOuterEnd={this.state.colorBorderOuterEnd}
+						colorBorderMiddleEnd={this.state.colorBorderMiddleEnd}
+						colorBorderInnerEnd={this.state.colorBorderInnerEnd}
 
-					highlights={[{
-						"from": 120,
-						"to": 150,
-						"color": this.state.colorHighlight
-					}]}
-				></RadialGauge>
-				: <div></div> }
+						highlights={[{
+							"from": 60,
+							"to": 90,
+							"color": this.state.colorHighlight
+						}]}
+
+					></RadialGauge>
+					: <div></div>}
+
+				{gaugeCoolant ?
+					<RadialGauge
+						width={250}
+						height={250}
+						units='°C'
+						title='Coolant'
+						value={this.state.coolant}
+						minValue={0}
+						maxValue={150}
+						majorTicks={['0', '50', '100', '150']}
+						minorTicks={5}
+
+						//custom config:
+						valueBox={false}
+
+						colorPlate={this.state.colorPlate}
+						colorPlateEnd={this.state.colorPlateEnd}
+
+						colorTitle={this.state.colorTitle}
+						colorUnits={this.state.colorUnits}
+						colorHighlight={this.state.colorHighlight}
+
+						colorMinorTicks={this.state.colorMinorTicks}
+						colorMajorTicks={this.state.colorMajorTicks}
+						colorNumbers={this.state.colorNumbers}
+
+						colorNeedle={this.state.colorNeedleEnd}
+						colorNeedleEnd={this.state.colorNeedleEnd}
+						colorNeedleShadowUp={this.state.colorNeedleShadowUp}
+						colorNeedleShadowDown={this.state.colorNeedleShadowDown}
+
+
+						needleType='line'
+						needleStart={0}
+						needleCircleSize={13}
+
+						colorNeedleCircleInner={this.state.colorNeedleCircleInner}
+						colorNeedleCircleInnerEnd={this.state.colorNeedleCircleInnerEnd}
+						colorNeedleCircleOuter={this.state.colorNeedleCircleOuter}
+						colorNeedleCircleOuterEnd={this.state.colorNeedleCircleOuterEnd}
+
+
+						borderInnerWidth={0}
+						borderMiddleWidth={2}
+						borderOuterWidth={7}
+
+						colorBorderOuter={this.state.colorBorderOuter}
+						colorBorderMiddle={this.state.colorBorderMiddle}
+						colorBorderInner={this.state.colorBorderInner}
+
+						colorBorderOuterEnd={this.state.colorBorderOuterEnd}
+						colorBorderMiddleEnd={this.state.colorBorderMiddleEnd}
+						colorBorderInnerEnd={this.state.colorBorderInnerEnd}
+
+						highlights={[{
+							"from": 120,
+							"to": 150,
+							"color": this.state.colorHighlight
+						}]}
+					></RadialGauge>
+					: <div></div>}
 			</div>
 			<div className="dashboard__footer">
-				{store.get("activateCAN") ? <div><h3>{this.state.voltage}V</h3></div> : <div><i>(CAN-Stream deactivated.)</i></div>}
+				{store.get("activateCAN") ? <div><h3>{this.state.voltage}V</h3></div> : <div><h3><i>(CAN-Stream deactivated.)</i></h3></div>}
 			</div>
 		</div>;
 	}

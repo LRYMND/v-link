@@ -17,9 +17,9 @@ function CarplayWindow({ settings, setShowNav, socket, connected }) {
     const [streaming, setStreaming] = useState(false);
 
     useEffect(() => {
-        ipcRenderer.on('plugged', () =>     { setStatus(true); console.log('phone connected') });
-        ipcRenderer.on('unplugged', () =>   { setStatus(false); /*console.log('disconnected')*/ });
-        ipcRenderer.on('quitReq', () =>     { leaveCarplay() });
+        ipcRenderer.on('plugged', () => { setStatus(true); console.log('phone connected') });
+        ipcRenderer.on('unplugged', () => { setStatus(false); /*console.log('disconnected')*/ });
+        ipcRenderer.on('quitReq', () => { leaveCarplay() });
 
         ipcRenderer.send('statusReq');
         return () => {
@@ -48,21 +48,25 @@ function CarplayWindow({ settings, setShowNav, socket, connected }) {
     }
 
     return (
-        <div className={`carplayWindow ${settings.theme}`} style={{width: '100%', height: '100%'}}>
-	{connected ? <Carplay
-            touchEvent={touchEvent}
-            ws={socket}
-            type={'ws'}
-            settings={settings}
-            status={status}
-            streaming={streaming}
-            setStreaming={setStreaming}
+        <div className={`carplayWindow ${settings.theme}`} style={{ width: '100%', height: '100%' }}>
+            {connected ?
+                <Carplay
+                    touchEvent={touchEvent}
+                    ws={socket}
+                    type={'ws'}
+                    settings={settings}
+                    status={status}
+                    streaming={streaming}
+                    setStreaming={setStreaming}
 
-            /* react-js-carplay dependent */
-            //openModal={false}
-            //changeSetting={changeValue}
-        /> : <div></div>}
-	</div>
+                /* react-js-carplay dependent */
+                //openModal={false}
+                //changeSetting={changeValue}
+                />
+                :
+                <></>
+            }
+        </div>
     );
 }
 

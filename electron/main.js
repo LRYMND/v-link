@@ -10,8 +10,8 @@ const {
 
 //app.commandLine.appendSwitch('disable-gpu-vsync');
 //app.commandLine.appendSwitch('ignore-gpu-blacklist');
-//app.commandLine.appendSwitch('disable-gpu');
-app.commandLine.appendSwitch('disable-gpu-compositing');
+app.commandLine.appendSwitch('disable-gpu');
+//app.commandLine.appendSwitch('disable-gpu-compositing');
 
 const isDev = require('electron-is-dev');
 
@@ -22,37 +22,10 @@ const UserSettings = require('./settings');
 const settings = new UserSettings;
 
 
-// ------------------- Carplay Setup --------------------
-
-const { Readable } = require('stream');
-const mp4Reader = new Readable({
-  read(size) { },
-});
-const Carplay = require('node-carplay');
-const bindings = ['n', 'v', 'b', 'm'];
-const keys = require('./bindings.json');
-
-const WebSocket = require('ws');
-let wss = new WebSocket.Server({ port: 3001, perMessageDeflate: false });
-
-wss.on('connection', function connection(ws) {
-  console.log('socket connected - sending data...');
-  const wsstream = WebSocket.createWebSocketStream(ws);
-    //lets pipe into jmuxer stream, then websocket
-    mp4Reader.pipe(wsstream);
-    ws.on('error', function error(error) {
-        console.log('socket error');
-    });
-    ws.on('close', function close(msg) {
-        console.log('socket closed');
-    });
-});
-
 // ------------------- Wifi Setup --------------------
 
 var Wifi = require('rpi-wifi-connection');
 var wifi = new Wifi();
-
 
 const timer = setInterval(getWifiStatus, 5000); //Update status-icon every 5 Seconds
 
@@ -94,16 +67,54 @@ function connectWifi(data) {
     });
 }
 
+ipcMain.on('wifiUpdate', () => {
+  getWifiStatus();
+  getWifiNetworks();
+});
+
+ipcMain.on('wifiConnect', (event, data) => {
+  connectWifi(data);
+});
+
 // ------------------- Bluetooth Setup --------------------
 //ToDo...
 
 
+// ------------------- Carplay Setup --------------------
+
+const { Readable } = require('stream');
+const Carplay = require('node-carplay');
+const WebSocket = require('ws');
+
+const mp4Reader = new Readable({ read(size) { }, });
+const keys = require('./bindings.json');
+
+let buffers = []
+let wss;
+
+wss = new WebSocket.Server({ port: 3001, perMessageDeflate: false });
+
+wss.on('connection', function connection(ws) {
+  console.log('socket connected - sending data...');
+  const wsstream = WebSocket.createWebSocketStream(ws);
+
+  mp4Reader.on('data', (data) => {
+    ws.send(data)
+  })
+  ws.on('error', function error(error) {
+    console.log('socket error');
+  });
+  ws.on('close', function close(msg) {
+    console.log('socket closed');
+  });
+});
+
+
 // ------------------- Main Window --------------------
 
-let mainWindow = null;
+let mainWindow;
 
 function createWindow() {
-
   const startUrl =
     process.env.ELECTRON_START_URL ||
     url.format({
@@ -117,7 +128,7 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
   });
 
-  if (isDev) {
+  if (isDev || !(settings.store.get('kiosk'))) {
     mainWindow = new BrowserWindow({
       width: settings.store.get('width'),
       height: settings.store.get('height'),
@@ -127,7 +138,6 @@ function createWindow() {
 
       webPreferences: {
         nodeIntegration: true,
-        //enableRemoteModule: true
         preload: path.join(__dirname, 'preload.js'),
         contextIsolation: false,
       },
@@ -170,18 +180,18 @@ function createWindow() {
   });
 
   const config = {
-    dpi: 480,
+    dpi: settings.store.get('dpi'),
     nightMode: 0,
-    hand: 0,
+    hand: settings.store.get('lhd'),
     boxName: 'nodePlay',
     width: size[0],
     height: size[1],
-    fps: 60,
+    fps: settings.store.get('fps'),
   };
 
+  // ------------------- Carplay Setup --------------------
   console.log('spawning carplay: ', config);
   const carplay = new Carplay(config, mp4Reader);
-
 
   carplay.on('status', (data) => {
     if (data.status) {
@@ -196,10 +206,13 @@ function createWindow() {
     mainWindow.webContents.send('quitReq');
   });
 
-
   ipcMain.on('click', (event, data) => {
     carplay.sendTouch(data.type, data.x, data.y);
     console.log(data.type, data.x, data.y);
+  });
+
+  ipcMain.on('fpsReq', (event) => {
+    event.returnValue = settings.store.get('fps')
   });
 
   ipcMain.on('statusReq', (event, data) => {
@@ -208,6 +221,16 @@ function createWindow() {
     } else {
       mainWindow.webContents.send('unplugged');
     }
+  });
+
+  ipcMain.on('getSettings', () => {
+    mainWindow.webContents.send('allSettings', settings.store.store)
+  });
+
+  ipcMain.on('settingsUpdate', (event, { setting, value }) => {
+    console.log('updating settings', setting, value)
+    settings.store.set(setting, value)
+    mainWindow.webContents.send('allSettings', settings.store.store)
   });
 
   ipcMain.on('reqReload', () => {
@@ -228,25 +251,6 @@ function createWindow() {
     });
   });
 
-  ipcMain.on('wifiUpdate', () => {
-    getWifiStatus();
-    getWifiNetworks();
-  });
-
-  ipcMain.on('wifiConnect', (event, data) => {
-    connectWifi(data);
-  });
-
-  ipcMain.on('getSettings', () => {
-    mainWindow.webContents.send('allSettings', settings.store.store)
-  })
-
-  ipcMain.on('settingsUpdate', (event, { setting, value }) => {
-    console.log('updating settings', setting, value)
-    settings.store.set(setting, value)
-    mainWindow.webContents.send('allSettings', settings.store.store)
-  })
-
 
   for (const [key, value] of Object.entries(keys)) {
     if (isDev) {
@@ -264,6 +268,7 @@ function createWindow() {
 
 }
 
+app.on('ready', createWindow);
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
     app.quit();
@@ -271,12 +276,9 @@ app.on('window-all-closed', function () {
   }
 });
 
-app.on('ready', createWindow);
-
-app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') {
-    app.quit();
-    clearInterval(timer);
+app.on('activate', function () {
+  if (mainWindow === null) {
+    createWindow();
   }
 });
 
