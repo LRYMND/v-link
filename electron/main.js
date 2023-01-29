@@ -312,7 +312,7 @@ ipcMain.on('startScript', (event, args) => {
       hiddenWindow = new BrowserWindow({
         width: 150,
         height: 150,
-        show: false,
+        show: true,
 
         webPreferences: {
           nodeIntegration: true,

@@ -94,7 +94,8 @@ const Settings = ({ settings, setSettings }) => {
       password: password
     };
 
-    ipcRenderer.send('connectWifi', _credentials);
+    console.log("Connecting with SSID: ", _credentials.ssid);
+    ipcRenderer.send('wifiConnect', _credentials);
   };
 
   const updateWifi = (event, args) => {
@@ -102,6 +103,7 @@ const Settings = ({ settings, setSettings }) => {
   };
 
   const updateWifiStatus = (event, args) => {
+    console.log(args);
     setWifiStatus(args);
   };
 
