@@ -43,10 +43,12 @@ const App = () => {
 
     ipcRenderer.send('getSettings');
     ipcRenderer.send('wifiUpdate');
+    ipcRenderer.send('startScript', {});
     ipcRenderer.on('allSettings', (event, data) => { loadSettings(data) });
 
     return function cleanup() {
       socket.removeEventListener('open', () => { setConnected(true); console.log('socket connected') });
+      ipcRenderer.send('stopScript');
       ipcRenderer.removeAllListeners('allSettings');
     };
   }, []);

@@ -96,12 +96,10 @@ class Dashboard extends Component {
 		gaugeCoolant = store.get("showGaugeCoolant");
 
 		ipcRenderer.on('msgFromBackground', this.msgFromBG);
-		ipcRenderer.send('startScript', {});
 	}
 
 	componentWillUnmount() {
 		this.ismounted = false;
-		ipcRenderer.send('stopScript');
 		ipcRenderer.removeListener('msgFromBackground', this.msgFromBG);
 	}
 
