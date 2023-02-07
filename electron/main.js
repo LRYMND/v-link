@@ -18,8 +18,8 @@ const isDev = require('electron-is-dev');
 
 // ------------------- Electron Store --------------------
 
-const UserSettings = require('./settings');
-const settings = new UserSettings;
+const Settings = require('./settings');
+const settings = new Settings;
 
 
 // ------------------- Wifi Setup --------------------
@@ -40,7 +40,7 @@ function getWifiStatus() {
   })
     .catch((error) => {
       mainWindow.webContents.send('wifiOff');
-      console.log(error);
+      console.log('error: ', error);
     });
 }
 
@@ -49,7 +49,7 @@ function getWifiNetworks() {
     mainWindow.webContents.send('wifiList', networks);
   })
     .catch((error) => {
-      console.log(error);
+      console.log('error: ', error);
     });
 }
 
@@ -63,7 +63,7 @@ function connectWifi(data) {
   })
     .catch((error) => {
       mainWindow.webContents.send('wifiConnected', 'Could not connect.');
-      console.log(error);
+      console.log('error: ', error);
     });
 }
 
@@ -80,34 +80,13 @@ ipcMain.on('wifiConnect', (event, data) => {
 //ToDo...
 
 
-// ------------------- Carplay Setup --------------------
+// ------------------- Carplay Init --------------------
 
 const { Readable } = require('stream');
 const Carplay = require('node-carplay');
-const WebSocket = require('ws');
 
 const mp4Reader = new Readable({ read(size) { }, });
 const keys = require('./bindings.json');
-
-let buffers = []
-let wss;
-
-wss = new WebSocket.Server({ port: 3001, perMessageDeflate: false });
-
-wss.on('connection', function connection(ws) {
-  console.log('socket connected - sending data...');
-  const wsstream = WebSocket.createWebSocketStream(ws);
-
-  mp4Reader.on('data', (data) => {
-    ws.send(data)
-  })
-  ws.on('error', function error(error) {
-    console.log('socket error');
-  });
-  ws.on('close', function close(msg) {
-    console.log('socket closed');
-  });
-});
 
 
 // ------------------- Main Window --------------------
@@ -190,25 +169,18 @@ function createWindow() {
   };
 
   // ------------------- Carplay Setup --------------------
+ 
   console.log('spawning carplay: ', config);
-  const carplay = new Carplay(config, mp4Reader);
-
-  carplay.on('status', (data) => {
-    if (data.status) {
-      mainWindow.webContents.send('plugged');
-    } else {
-      mainWindow.webContents.send('unplugged');
-    }
-    console.log('data received: ', data);
-  });
+  const carplay = new Carplay(config);
 
   carplay.on('quit', () => {
+    console.log('exiting carplay');
     mainWindow.webContents.send('quitReq');
   });
 
   ipcMain.on('click', (event, data) => {
     carplay.sendTouch(data.type, data.x, data.y);
-    console.log(data.type, data.x, data.y);
+    console.log('click: ', data.type, data.x, data.y);
   });
 
   ipcMain.on('fpsReq', (event) => {
@@ -377,6 +349,6 @@ ipcMain.on('backgroundClose', (event, args) => {
 
 // This event listener will listen for data being sent back from the background renderer process
 ipcMain.on('msgToMain', (event, args) => {
-  console.log(args.message);
-  mainWindow.webContents.send('msgFromBackground', args.message)
+  //console.log('debug: ', args.message);
+  mainWindow.webContents.send('msgFromBackground', args.message);
 });

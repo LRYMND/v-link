@@ -1,96 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import React from 'react';
+import { CarplayAudio } from 'react-js-carplay'
 
-import NavBar from './sidebars/NavBar';
-import TopBar from './sidebars/TopBar';
-
-import Dashboard from './pages/dashboard/Dashboard';
-import CarplayWindow from './pages/carplay/CarplayWindow';
-import Settings from './pages/settings/Settings';
+import Home from './pages/home/Home';
 
 import './App.css';
 
-let socket;
 
 const App = () => {
-  const { ipcRenderer } = window;
-
-  const [showNav, setShowNav] = useState(true);
-  const [settings, setSettings] = useState(null);
-  const [showMMI, setShowMMI] = useState(null);
-  const [startedUp, setStartedUp] = useState(false);
-  const [connected, setConnected] = useState(false);
-
-  function loadSettings(data) {
-    console.log('loading settings...')
-    if (data != null) {
-      setSettings(data);
-    }
-  }
-
-  useEffect(() => {
-    if (settings != null) {
-      console.log('settings loaded: ', settings);
-      setShowMMI(settings.activateMMI)
-      setStartedUp(true);
-    }
-  }, [settings])
-
-  useEffect(() => {
-    socket = new WebSocket('ws://localhost:3001');
-    socket.binaryType = 'arraybuffer';
-    socket.addEventListener('open', () => { setConnected(true); console.log('socket connected') });
-
-    ipcRenderer.send('getSettings');
-    ipcRenderer.send('wifiUpdate');
-    ipcRenderer.send('startScript', {});
-    ipcRenderer.on('allSettings', (event, data) => { loadSettings(data) });
-
-    return function cleanup() {
-      socket.removeEventListener('open', () => { setConnected(true); console.log('socket connected') });
-      ipcRenderer.send('stopScript');
-      ipcRenderer.removeAllListeners('allSettings');
-    };
-  }, []);
 
   return (
-    startedUp && <HashRouter>
-      {
-        showNav && <>
-          <TopBar />
-          <NavBar />
-        </>
-      }
-      {showMMI ?
-        <Routes>
-          <Route path='/dashboard' element={<Dashboard
-            settings={settings}
-          />} />
-          <Route path='/' element={<CarplayWindow
-            setShowNav={setShowNav}
-            settings={settings}
-            socket={socket}
-            connected={connected}
-          />} />
-          <Route path='/settings' element={<Settings
-            settings={settings}
-            setSettings={setSettings}
-          />} />
-        </Routes>
-        :
-        <Routes>
-          <Route path='/' element={<Dashboard
-            settings={settings}
-          />} />
-          <Route path='/settings' element={<Settings
-            settings={settings}
-            setSettings={setSettings}
-          />} />
-        </Routes>
-      }
-
-    </HashRouter>
-
+    <>
+      <CarplayAudio />
+      <Home />
+    </>
   );
 };
 

@@ -4,9 +4,9 @@ import "react-simple-keyboard/build/css/index.css";
 import { GooSpinner } from "react-spinners-kit";
 import React, { useRef, useState, useEffect } from "react";
 
-import './modal.scss';
+import './wifiModal.scss';
 
-const Modal = ({ isShowing, ssid, hide, connect, status, reset }) => {
+const WifiModal = ({ isShowing, ssid, hide, connect, status, reset, settings }) => {
 
     const keyboard = useRef();
 
@@ -72,6 +72,7 @@ const Modal = ({ isShowing, ssid, hide, connect, status, reset }) => {
     return ReactDOM.createPortal(
         <>
             {isShowing ?
+            <div className={`container ${settings.colorTheme}`}>
                 <React.Fragment>
                     <div className="modal-overlay" />
                     <div className="modal-wrapper" aria-modal aria-hidden tabIndex={-1} role="dialog">
@@ -90,9 +91,7 @@ const Modal = ({ isShowing, ssid, hide, connect, status, reset }) => {
                                 <form onSubmit={handleSubmit}>
                                 <div className="modal__form">
                                     <div className="modal__form__inputContainer">
-                                            <label>
                                                 <input onClick={(e) => setInput("")} onChange={onChangeInput} value={input} type="text" name="password" id="password" />
-                                            </label>
                                         
                                     </div>
                                     <div className="modal__form__buttonContainer">
@@ -114,10 +113,11 @@ const Modal = ({ isShowing, ssid, hide, connect, status, reset }) => {
                         </div>
                     </div>
                 </React.Fragment>
+                </div>
                 : null
             }
         </>, document.getElementById("modal")
     );
 };
 
-export default Modal;
+export default WifiModal;

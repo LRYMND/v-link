@@ -1,23 +1,33 @@
 import React from 'react';
-import Modal from './modal/Modal';
+import WifiModal from './modal/wifi/WifiModal';
+import CarplayModal from './modal/carplay/CarplayModal';
 import useModal from './modal/useModal';
 
 import { useState, useEffect } from 'react';
 
 import './settings.scss';
 import '../../components/themes.scss';
-//import 'UserSettings';
 
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
 
 const Settings = ({ settings, setSettings }) => {
+  const [wifiList, setWifiList] = useState([{ id: '', ssid: 'No Networks available' }]);
+  const [wifiStatus, setWifiStatus] = useState('');
+  const [ssidSelected, setSsidSelected] = useState('127.0.0.1');
+
+  const [theme, setTheme] = useState(settings.colorTheme);
+
+  const { carplayModalIsShowing, carplayModalToggle } = useModal();
+  const { wifiModalIsShowing, wifiModalToggle } = useModal();
 
   useEffect(() => {
     ipcRenderer.on('wifiList', updateWifi);
     ipcRenderer.on('wifiConnected', updateWifiStatus);
     ipcRenderer.send('wifiUpdate');
+
+    setTheme(settings.colorTheme);
 
     return function cleanup() {
       ipcRenderer.removeListener('wifiList', updateWifi);
@@ -25,16 +35,18 @@ const Settings = ({ settings, setSettings }) => {
     };
   }, []);
 
-  const [wifiList, setWifiList] = useState([{ id: '', ssid: 'No Networks available' }]);
-  const [wifiStatus, setWifiStatus] = useState('');
-  const [ssidSelected, setSsidSelected] = useState('127.0.0.1');
+  
+  useEffect(() => {
+    if(theme != null)
+      changeSetting('colorTheme', theme);
+  }, [theme]);
 
-  const { isShowing, toggle } = useModal();
 
   /* Color Theme */
   const colorSelect = (event) => {
-    changeSetting('colorTheme', event.target.value);
-    reloadApp();
+    console.log('new theme: ', event.target.value)
+    setTheme(event.target.value)
+    //reloadApp();
   };
 
   /* Checkbox Boost */
@@ -112,6 +124,10 @@ const Settings = ({ settings, setSettings }) => {
   };
 
   /* App */
+  function carplaySettings() {
+    ipcRenderer.send('reqReboot');
+  };
+
   function reloadApp() {
     ipcRenderer.send('reqReload');
   };
@@ -124,24 +140,35 @@ const Settings = ({ settings, setSettings }) => {
     ipcRenderer.send('reqReboot');
   };
 
-  function openDialogue(ssid) {
-    setSsidSelected(ssid);
-    toggle();
+  /* Control Modals */
+  function openCarplayModal() {
+    carplayModalToggle();
   };
 
-  /* Store settins */
+  function openWifiModal(ssid) {
+    setSsidSelected(ssid);
+    wifiModalToggle();
+  };
+
+  /* Store settings */
   function changeSetting(setting, value) {
     ipcRenderer.send('settingsUpdate', { setting: setting, value: value });
     ipcRenderer.on('allSettings', (event, data) => { setSettings(data) });
   }
 
   return (
-    <div className={`settings ${settings.theme}`}>
+    <div className={`settings ${settings.colorTheme}`}>
+      
+      <CarplayModal isShowing={carplayModalIsShowing}
+        hide={carplayModalToggle}
+        settings={settings}
+        changeSetting={changeSetting}
+      />
 
-      <Modal isShowing={isShowing}
+      <WifiModal isShowing={wifiModalIsShowing}
         ssid={ssidSelected}
-        hide={toggle}
-        
+        hide={wifiModalToggle}
+        settings={settings}
         status={wifiStatus}
         connect={connectWifi}
         reset={resetWifiStatus}
@@ -157,7 +184,7 @@ const Settings = ({ settings, setSettings }) => {
             <div className='settings__connections__wifi__list'>
               {wifiList.map((item, i) => (
                 <div className='settings__connections__wifi__list__item' key={i}>
-                  <button className='app-button' type='button' onClick={() => openDialogue(item.ssid)}>{item.ssid}</button>
+                  <button className='app-button' type='button' onClick={() => openWifiModal(item.ssid)}>{item.ssid}</button>
                 </div>
               ))}
             </div>
@@ -193,7 +220,7 @@ const Settings = ({ settings, setSettings }) => {
               <div><h4>General:</h4></div>
               <label><input type='checkbox' onChange={handleCAN} defaultChecked={settings.activateCAN} /> Enable CAN </label>
               <label><input type='checkbox' onChange={handleMMI} defaultChecked={settings.activateMMI} /> Enable MMI </label>
-              <label><input type='checkbox' defaultChecked={settings.activateCC} disabled={true} /> <span>-</span> </label>
+              <label><input type='checkbox' defaultChecked={false} disabled={true} /> <span>-</span> </label>
             </div >
           </div>
           <hr
@@ -211,7 +238,7 @@ const Settings = ({ settings, setSettings }) => {
             </div>
             <div className='settings__general__section__column'>
               <button className='app-button' type='button' onClick={rebootRaspi}>Reboot System</button>
-              <button className='app-button' type='button' disabled={true}>-</button>
+              <button className='app-button' type='button' onClick={openCarplayModal}>Advanced Settings</button>
             </div>
           </div>
         </div>
