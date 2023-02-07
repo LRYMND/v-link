@@ -39,8 +39,6 @@ const Home = () => {
     socket.on('carplay', (data) => {
       if (data != null) {
         setStreaming(true);
-      } else {
-        setStreaming(false);
       }
     });
 
