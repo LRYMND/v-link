@@ -85,11 +85,13 @@ const Home = () => {
       case 'Carplay':
         return (
           <div className='carplay'>
-            <div className='carplay__load' style={{ height: (streaming) ? '0%' : '100%' }}>
-              {/*status ? <GooSpinner size={60} color='var(--fillActive)' loading={!streaming} /> : <h1>Waiting for device.</h1>*/}
-              <GooSpinner size={60} color='var(--fillActive)' loading={!streaming} />
+            {/*
+            <div className='carplay__load' style={{ height: (status && streaming) ? '100%' : '0%' }}>
+              {status ? <GooSpinner size={60} color='var(--fillActive)' loading={!streaming} /> : <h1>Waiting for device.</h1>}
             </div>
-            <div className='carplay__stream' style={{ height: (status && streaming) ? '100%' : '0%' }}>
+            */}
+
+            <div className='carplay__stream'>
               <Carplay
                 settings={settings}
                 status={true}
@@ -98,8 +100,8 @@ const Home = () => {
                 openModalReq={leaveCarplay}
                 closeModalReq={template}
               />
-            </div>
-          </div>
+            </div >
+          </div >
         )
       case 'Dashboard':
         return (
