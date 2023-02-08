@@ -11,12 +11,13 @@ import Settings from '../settings/Settings';
 import Template from '../template/Template';
 
 import './home.scss';
+import { width } from '@mui/system';
 
+const socket = io("ws://localhost:5005")
 const electron = window.require('electron')
 const { ipcRenderer } = electron;
 
 const Home = () => {
-  const socket = io("ws://localhost:5005")
 
   const [socketConnected, setSocketConnected] = React.useState()
   const [time, setTime] = React.useState({ minutes: 0, seconds: 0 })
@@ -33,14 +34,17 @@ const Home = () => {
     ipcRenderer.on('plugged', () => { setStatus(true); console.log('phone connected') });
     ipcRenderer.on('unplugged', () => { setStatus(false); console.log('disconnected') });
 
-    ipcRenderer.send('statusReq');
+    socket.emit('statusReq');
     ipcRenderer.send('getSettings')
 
     socket.on('carplay', (data) => {
-      if (data != null) {
-        setStreaming(true);
-      }
+      setStreaming(true);
     });
+
+    socket.on('status', ({ status }) => {
+      console.log("status@home: ", status)
+      setStatus(status)
+    })
 
     return () => {
       socket.off();
@@ -48,10 +52,17 @@ const Home = () => {
   }, [])
 
   useEffect(() => {
-    if (streaming && view == 'Carplay') {
+    console.log('update navbar')
+    console.log('status: ', status)
+    console.log('streaming: ', streaming)
+    if (streaming && status && (view == 'Carplay')) {
       setShowNav(false);
     } else {
       setShowNav(true);
+    }
+
+    if (status == false) {
+      setStreaming(false)
     }
   }, [streaming, status, view]);
 
@@ -84,13 +95,7 @@ const Home = () => {
     switch (view) {
       case 'Carplay':
         return (
-          <div className='carplay'>
-            {/*
-            <div className='carplay__load' style={{ height: (status && streaming) ? '100%' : '0%' }}>
-              {status ? <GooSpinner size={60} color='var(--fillActive)' loading={!streaming} /> : <h1>Waiting for device.</h1>}
-            </div>
-            */}
-
+          <div className={`carplay ${settings.colorTheme}`}>
             <div className='carplay__stream'>
               <Carplay
                 settings={settings}
@@ -100,7 +105,12 @@ const Home = () => {
                 openModalReq={leaveCarplay}
                 closeModalReq={template}
               />
-            </div >
+              </div >
+
+              <div className='carplay__load' style={{ height: (status && streaming) ? '0%' : '100%'}}>
+                {!status ? <h1>Waiting for device...</h1> : <></>}
+                {(!streaming && status) ? <GooSpinner size={60} color='var(--fillActive)' loading={!streaming} /> : <></>}
+              </div>
           </div >
         )
       case 'Dashboard':
@@ -137,16 +147,22 @@ const Home = () => {
     <>
       {startedUp &&
         <div className='container'>
-          {showNav && <>
-            <TopBar />
+          {showNav &&
+            <TopBar
+              className='topbar'
+              settings={settings}
+            />
+          }
+          {renderView()}
+          {showNav &&
+
             <NavBar
+              className='navbar'
               settings={settings}
               view={view}
               setView={setView}
             />
-          </>
           }
-          {renderView()}
         </div>}
     </>
   );

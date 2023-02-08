@@ -6,11 +6,7 @@ import "./topbar.scss";
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
-const TopBar = () => {
-
-  const Store = window.require('electron-store');
-  const store = new Store();
-  const theme = store.get("colorTheme");
+const TopBar = ({ settings }) => {
 
   const [time, setDate] = useState(new Date());
 
@@ -50,8 +46,6 @@ const TopBar = () => {
     ipcRenderer.on("plugged", plugged);
     ipcRenderer.on("unplugged", unplugged);
 
-    document.body.className = theme;
-
     return function cleanup() {
       clearInterval(timer1);
 
@@ -63,7 +57,7 @@ const TopBar = () => {
   }, []);
 
   return (
-    <div className={`topbar ${theme}`}>
+    <div className={`topbar ${settings.colorTheme}`}>
       <div className="topbar__info">
         <svg className={`topbar__icon topbar__icon--${wifiState}`}>
           <use xlinkHref="./svg/wifi.svg#wifi"></use>
