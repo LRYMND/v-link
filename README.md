@@ -36,7 +36,7 @@ All of the above sources have been altered to my needs and are bundled with a cu
 
 ## 01 | Hardware
 
-In order to get this build running you will need the following hardware. Tools and materials like wires or zipties are not included. The display components are optional but the one I'm proposing has a much better resolution than the original one. If you want to use the original display you can find a way to do so in the repositories from laurynas.
+To get this build running you will need the following hardware. Tools and materials like wires or zip ties are not included. The display components are optional but the one I am proposing has a much better resolution than the original one. If you want to use the original display, you can find a way to do so in the repositories from laurynas.
 
 * [MCP2515 CAN Module](https://www.amazon.de/-/en/Intelligent-Electronics-Receiver-Controller-Development/dp/B07MY2D7TW/ref=sr_1_6?keywords=mcp2515&qid=1662026860&sr=8-6)
 * MCP2004 LIN Transceiver
@@ -52,11 +52,13 @@ In order to get this build running you will need the following hardware. Tools a
 - OEM P1 RTI Display Unit
 - Raspberry Pi
 
-I advise to go with a Raspberry Pi 4. It also works on the Raspberry Pi 3 but the performance will be much worse.
+### > Note:
+
+The app runs on a RPi3 as well as on a RPi4 with OS Buster. Eventually, Carplay will run a little bit worse on a RPi 3 but this wasn't tested throughly yet.
 
 ## 02 | Display Mod
 
-This guide involves adding an aftermarket touchscreen to the 6.5" LCD to enhance the usability. This is optional but I highly recommend it. Don't expect the same responsiveness as your smartphone though.
+This guide involves adding an aftermarket touchscreen to the 6.5" LCD to enhance the usability. This is optional but I highly recommend it. Do not expect the same responsiveness as your smartphone though.
 
 To swap the display, you will have to disassemble your original RTI unit and take all the display components out. Afterwards you will need to mount the touchscreen to your LCD panel and glue the new display/touchscreen unit into the RTI frame. The buck converter as well as the display and touch screen drivers are mounted to the backside of the LCD panel because space is quite limited. More information can also be found in laurynas' repo.
 
@@ -69,23 +71,24 @@ The power supply should fulfill some critical demands and available solutions ar
 
 - Raspi boots when igniton is turned ON
 - Raspi gracefully shuts off when ignition is turned off
-- Little to no power is consumed in the off state so the battery isn't drained
+- Little to no power is consumed in the off state so the battery is not drained
 
-I went through hours of online research until I found an [article](https://dontpressthat.wordpress.com/2017/10/13/in-car-raspberry-pi-psu-controller/) that would end my quest. However, after ordering the PCB and soldering the components I found out that the circuit was not functioning as expected. Once the ignition was off the Raspberry would immediately turn back on again.
+I went through hours of online research until I found an article that would end my quest. However, after ordering the PCB and soldering the components I found out that the circuit was not functioning as expected. Once the ignition was off the Raspberry would immediately turn back on again.
 
 In short, here are the reasons why:
 - Capacitance of the buck converter itself
 - Floating states on Q2/Q3
 
-More infos on the issues and the solution can be found here: [link](https://forum.core-electronics.com.au/t/pi-power-switch-using-car-ignition-logic/6177/7). You can also find an updated and working schematic in the schematics folder of this repository. Basically you only need to add two resistors. As stated in the original article, it is advisable to put a heatsink on the big transistor.
+More info’s on the issues and the solution can be found here: [link](https://forum.core-electronics.com.au/t/pi-power-switch-using-car-ignition-logic/6177/7). You can also find an updated and working schematic in the schematics folder of this repository. Basically, you only need to add two resistors. As stated in the original article, it is advisable to put a heatsink on the big transistor.
 
 
 ## 04 | CAN Implementation
 
-CAN communication with the Raspberry Pi is pretty straightforward. The only thing you will need for this is a MCP2515 module and adjust some settings. In order to connect your Raspi with the module you can follow this [link](https://forums.raspberrypi.com/viewtopic.php?t=296117).
+CAN communication with the Raspberry Pi is pretty straightforward. The only thing you will need for this is a MCP2515 module and adjust some settings. To connect your Raspi with the module you can follow this [link](https://forums.raspberrypi.com/viewtopic.php?t=296117).
+
+### > Note:
 
 Make sure that you also set up the automatic CAN channel activation on boot!
-
 
 ## 05 | RTVI App
 
@@ -93,9 +96,9 @@ This app uses a combination of node.js, Electron and React to set up a custom in
 
 ![CARPLAY IMAGE](repo/carplay.jpg?raw=true "Carplay")
 
-The app is in a usable state and I encourage anyone to help me improve it. In order to use Carplay/Android Auto you will need to have a Carlinkit adapter. In this repository you can find the full source code and altering it to your needs is quite straightforward. For example to change the displayed CAN data, you will only have to make a few changes to python.py and Dashboard.js.
+The app is in a usable state and I encourage anyone to help me improve it. In order to use Carplay/Android Auto you will need to have a Carlinkit adapter. In this repository you can find the full source code and altering it to your needs is quite straightforward. For example, to change the displayed CAN data, you will only have to make a few changes to python.py and Dashboard.js.
 
-### Note:
+### > Note:
 
 You need a working internet connection when you launch the app for the first time because it needs to download some resources for the dongle.
 
@@ -107,8 +110,7 @@ In the installation schematic you can see how you connect everything with each o
 ![PACKAGE2 IMAGE](repo/package2.jpg?raw=true "Package2")
 ![PACKAGE IMAGE](repo/package.jpg?raw=true "Package")
 
-
-I decided to wire the connections to the car directly to the pins of the CEM connectors. This way I'm not destroying any harnesses, it's easy cause the pins are known and you can rebuild everything back to factory if you decide to undo the mod for whatever reason. Soldering in the passengers foot compartment is not the most comfortable thing but it's managable and as a result you have a very clean integration of your electronics with a little additional wire harness to run your setup. One thing to keep in mind though is to choose wires that are not too thick so you can put the pin back into the connector. This is especially an issue with the CAN wiring.
+I decided to wire the connections to the car directly to the pins of the CEM connectors. This way I am not destroying any harnesses, it's easy cause the pins are known and you can rebuild everything back to factory if you decide to undo the mod for whatever reason. Soldering in the passengers’ foot compartment is not the most comfortable thing but it is manageable and as a result you have a clean integration of your electronics with a little additional wire harness to run your setup. One thing to keep in mind though is to choose wires that are not too thick so you can put the pin back into the connector. This is especially an issue with the CAN wiring.
 
 You need to make the following connections.
 
@@ -123,13 +125,15 @@ You need to make the following connections.
 ![EWD SCHEMATIC](repo/ewdschematic.jpeg?raw=true "EWD Schematic")
 (Borrowed from the original Volvo Electronic Wiring Diagrams)
 
-NOTE: Make sure that you stress-relief all your wiring connections with zipties, so the cable doesnt wiggle around and makes more damage in case a connection brakes.
+### > Note:
+
+Make sure that you stress-relief all your wiring connections with zip ties, so the cable does not wiggle around and makes more damage in case a connection brakes.
 
 ![WIRING IMAGE](repo/wiring.jpg?raw=true "Wiring")
 
-## 07 | Set 
+## 07 | Set Up
 
-### Prerequisites:
+### > Prerequisites:
 
 Before you start, install the following packages:
 
@@ -142,7 +146,7 @@ sudo apt-get install python-can
 ```
 
 
-### Running the app:
+### > Running the app:
 
 Download the latest release, navigate to the folder and execute these commands:
 
@@ -153,7 +157,7 @@ chmod +x App.AppImage
 ```
 
 
-### Building the app:
+### > Building the app:
 
 
 1.) Install Node.js:
@@ -175,7 +179,7 @@ npm run build-package
 ```
 
 
-### RasPi setup:
+### > RasPi setup:
 
 
 1.) Add these lines to your "/boot/config.txt"
@@ -212,27 +216,27 @@ bash '/path/to/your/startService.sh'
 5.) To automatically hide the taskbar simply right-click it to activate this setting.
 
 
-### Note:
+### > Note:
 
 The Raspberry is booting without any splash screens now and the app should open right after the login, ready to connect to your phone.
 
 ## 08 | Audio
 
-There are a couple of ways in order to use the raspberry as an audio source for your car speakers now. I propose a [small module](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/) from Lithuania with which you can mod your radio to add an aux port. There's also a bluetooth version available but since the phone is already wirelessly connected to the Carlinkit adapter dongle, an aux-cable seems pretty clean and less prone to failure. 
+There are a couple of ways to use the raspberry as an audio source for your car speakers now. I propose a [small module](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/) from Lithuania with which you can mod your radio to add an aux port. There is also a Bluetooth version available but since the phone is already wirelessly connected to the Carlinkit adapter dongle, an aux-cable seems pretty clean and less prone to failure.
 
 If you already have an aux port in your car, you don't need this input board. Simply connect the raspberry pi directly to the aux port.
 
-### Note:
+### > Note:
 
-##### This is no advertisement, just a clean and simple solution IMO.
+This is no advertisement, just a clean and simple solution IMO.
 
 ## 09 | Extended Functionality:
 
-### Steering Wheel Controls
+### > Steering Wheel Controls
 
-It's possible to connect an Arduino to the LIN Bus so the steering wheel button inputs can be converted to keyboard/mouse HID events. The setup described below implements this and also controls opening/closing of the RTI screen by sending serial events to the RTI screen module.
+It is possible to connect an Arduino to the LIN Bus so the steering wheel button inputs can be converted to keyboard/mouse HID events. The setup described below implements this as well as controls opening/closing of the RTI screen by sending serial events to the RTI screen module.
 
-Suitable Arduinos are Leonardo or Pro Micro. I couldn't get the Pro Micro working reliably though, so I recommend to use a Leonardo.
+Suitable Arduinos are Leonardo or Pro Micro. I recommend option for a Pro Micro because of the limited space. However it can be quiet tricky to get it running so a Leonardo is a suitable fallback solution.
 
 The easiest place to find the LIN Bus is the ICM Connector A behind the waterfall. Either connect a DuPont wire to the associated pin or disassemble the ICM and solder a small wire to it.
 
@@ -240,30 +244,30 @@ The easiest place to find the LIN Bus is the ICM Connector A behind the waterfal
 
 ![ICM_CONNECTION_IMAGE](repo/icm_connection.jpg?raw=true "LIN Connection")
 
-The LIN Bus wire must be connected to pin 6 of the LIN bus transceiver labeled "Lbus"
+The LIN Bus wire must be connected to pin 6 of the LIN bus transceiver labeled "Lbus".
 
 ![MCP2004_PINOUT_IMAGE](repo/MCP2004_pinout.png?raw=true "LIN Transceiver pinout")
 
-Connect RX, TX and CS from the MCP2004 to LIN_RX_PIN, LIN_TX_PIN and CS_PIN respectively. After testing, it turned out that it was not necessary to connect the Fault pin to the Arduino. In Laurynas' volvo_linbus repo, this fault pin is connected in the scheme but there's a typo in the code so it's actually not used.
+Connect RX, TX and CS from the MCP2004 to LIN_RX_PIN, LIN_TX_PIN and CS_PIN respectively. After testing, it turned out that it was not necessary to connect the Fault pin to the Arduino. In Laurynas' volvo_linbus repo, this fault pin is connected in the scheme but there is a typo in the code, so it's not used.
 
-### RTI folding mechanism
+### > RTI folding mechanism
 
-Connect RTI_TX_PIN (see arduino code) to pin 4 of the RTI unit. Since we're only sending serial data, RTI_RX_PIN does not have to be connected. Again, either use a DuPont wire or solder directly to the RTI PCB/connector. Don't forget to also connect pin 7 (GND) to the Arduino, Raspi or another common grounding point.
+Connect RTI_TX_PIN (see Arduino code) to pin 4 of the RTI unit. Since we are only sending serial data, RTI_RX_PIN does not have to be connected. Again, either use a DuPont wire or solder directly to the RTI PCB/connector. Don't forget to also connect pin 7 (GND) to the Arduino, Raspi or another common grounding point.
 
 ![RTI_CONNECTOR_IMAGE](repo/rti_connector.png?raw=true "RTI Connector")
 
-When ignition is turned on, the RTI screen automatically pops up and you can use the joystick on the back of the steering wheel to navigate through CarPlay. When clicking on the 'enter' rti button on the back of the steering wheel, the Arduino sends an ASCII 'space' event (spacebar) to navigate the app, since CarPlay requires this instead of a leftclick or a return/enter.
+When ignition is turned on, the RTI screen automatically pops up and you can use the joystick on the back of the steering wheel to navigate through CarPlay. When clicking on the 'enter' rti button on the back of the steering wheel, the Arduino sends an ASCII 'space' event (spacebar) to navigate the app, since CarPlay requires this instead of a left click or a return/enter.
 
-### Using the SW Module
+### > Using the SW Module
 
-- Holding down 'prev' button for 2 secons toggles between normal and mouse mode.
-- When in mouse-mode, the 'enter' button acts as a left mouseclick instead of a spacebar.
+- Holding down 'prev' button for 2 seconds toggles between normal and mouse mode.
+- When in mouse-mode, the 'enter' button acts as a left mouse click instead of a spacebar.
 - Long-pressing the 'back' button will close the RTI screen.
 - Clicking on 'enter' will open the screen again.
 
-##### The button mappings, timeouts etc can all be changed in the Arduino code. 
+(The button mappings, timeouts etc can all be changed in the Arduino code.)
 
-### Adding Peripherals
+### > Adding Peripherals
 
 To make life a bit easier I connected an USB extension cable to the Raspi which ends up in the tray behind the waterfall console so I can directly connect peripherals to it. This also works as a charging port for a phone. It's not fast but it works.
 
@@ -273,21 +277,21 @@ To make life a bit easier I connected an USB extension cable to the Raspi which 
 
 ![DEMOGIF](repo/demo.gif?raw=true "Demo")
 
-(NOTE: Gif is lagging due to the screen recorder. In normal use all animations are smooth!)
+(Gif is lagging due to the screen recorder. In normal use all animations are smooth!)
 
-The setup is installed in my car since several months now. I drove on the highway, over bumpy gravel roads, at 35°C in the sun and -10°C in the winter and so far it didn't let me down. It can happen that the Carplay interface freezes occasionally. In that case you can simply reconnect the phone or restart/reboot from the settings page. However, this rarely happens.
+I’m using the setup since several months now. I drove on the highway, over bumpy gravel roads, at 35°C in the sun and -10°C in the winter and so far, it did not let me down. It can happen that the Carplay interface freezes occasionally. In that case you can simply reconnect the phone or restart/reboot from the settings page. However, this rarely happens.
 
-### ToDo
+### > ToDo
 
 The app is in a very usable state and already has some useful functionality. With the setup described above, the raspberry also has full access to the CAN- as well as the LIN-Bus of the car.
 
-A next step could be to start mapping the CAN signals of different buttons in the car and associate them with functions in the app, like turning on cruise-control on igniton or building an AC interface.
+A next step could be to start mapping the CAN signals of different buttons in the car and associate them with functions in the app, like turning on cruise-control on ignition or building an AC interface.
 
 I'd be happy if anybody who has tips for improvement can chime in. Check out the [Swedespeed Thread](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/) and share your ideas, findings or issues.
 
 
-### Disclaimer
+### > Disclaimer
 
-I'm not a software developer, electrical engineer or automotive technician and doing stuff like this is just a hobby for me. I'm distancing myself from any damage that you might do to your car in case you want to follow this guide. The setup I described above is the way I fitted things to my V50. Eventually you will need to find other places to mount your components and different paths to route your cables, after all it's a DIY mod.
+I am not a software developer, electrical engineer or automotive technician and doing stuff like this is just a hobby for me. I am distancing myself from any damage that you might do to your car in case you want to follow this guide. The setup I described above is the way I fitted things to my V50. Eventually you will need to find other places to mount your components and different paths to route your cables, after all it's a DIY mod.
 
-Last but not least, thanks again to the people who shared their code and insights and Yosh for helping me to stitch together this app.
+Finally, thanks again to the people who shared their code and insights and Yosh for helping me to stitch together this app.
