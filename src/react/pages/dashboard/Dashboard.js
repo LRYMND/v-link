@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { RadialGauge } from "react-canvas-gauges";
 import { useState, useEffect } from 'react';
 
@@ -7,11 +7,6 @@ import '../../components/themes.scss';
 
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
-
-const Store = window.require('electron-store');
-const store = new Store();
-const theme = store.get("colorTheme");
-
 
 const Dashboard = ({ settings }) => {
 
@@ -27,7 +22,7 @@ const Dashboard = ({ settings }) => {
 	}, []);
 
 	const msgFromBackground = (args) => {
-		if(args !=null)
+		if (args != null)
 			console.log("Debug: ", args);
 
 		if (args.includes("map:")) {
@@ -54,11 +49,6 @@ const Dashboard = ({ settings }) => {
 	const [intake, setIntake] = useState(0);
 	const [coolant, setCoolant] = useState(0);
 	const [voltage, setVoltage] = useState(0);
-
-	const [gaugeBoost, setGaugeBoost] = useState(settings.showGaugeBoost);
-	const [gaugeIntake, setGaugeIntake] = useState(settings.showGaugeIntake);
-	const [gaugeCoolant, setGaugeCoolant] = useState(settings.showGaugeCoolant);
-
 
 	const [colorPlate, setColorPlate] = useState(null);
 	const [colorPlateEnd, setColorPlateEnd] = useState(null);
@@ -112,7 +102,6 @@ const Dashboard = ({ settings }) => {
 		setColorNeedleCircleOuter(style.getPropertyValue("--colorNeedleCircleOuter"));
 		setColorNeedleCircleOuterEnd(style.getPropertyValue("--colorNeedleCircleOuterEnd"));
 
-
 		setColorBorderOuter(style.getPropertyValue("--colorBorderOuter"));
 		setColorBorderMiddle(style.getPropertyValue("--colorBorderMiddle"));
 		setColorBorderInner(style.getPropertyValue("--colorBorderInner"));
@@ -123,206 +112,201 @@ const Dashboard = ({ settings }) => {
 		setLoaded(true);
 	}
 
-
-
 	return (
 		<div className={`dashboard ${settings.colorTheme}`}>
 			<div className="dashboard__header">
 			</div>
 			{loaded ?
-			<div className="dashboard__gauges">
-				{gaugeBoost ?
-					<RadialGauge
-						width={250}
-						height={250}
-						units='bar'
-						title='Boost'
-						value={boost}
-						minValue={0}
-						maxValue={1.5}
-						majorTicks={['0', '0.3', '0.6', '0.9', '1.2', '1.5']}
-						minorTicks={2}
+				<div className="dashboard__gauges">
+					{settings.showGaugeBoost ?
+						<RadialGauge
+							width={250}
+							height={250}
+							units='bar'
+							title='Boost'
+							value={boost}
+							minValue={0}
+							maxValue={1.5}
+							majorTicks={['0', '0.3', '0.6', '0.9', '1.2', '1.5']}
+							minorTicks={2}
 
-						//custom config:
+							//custom config:
 
-						needleType='line'
-						needleStart={0}
-						needleCircleSize={13}
+							needleType='line'
+							needleStart={0}
+							needleCircleSize={13}
 
-						borderInnerWidth={0}
-						borderMiddleWidth={2}
-						borderOuterWidth={7}
+							borderInnerWidth={0}
+							borderMiddleWidth={2}
+							borderOuterWidth={7}
 
-						valueBox={false}
+							valueBox={false}
 
-						
-						colorPlate={colorPlate}
-						colorPlateEnd={colorPlateEnd}
 
-						colorTitle={colorTitle}
-						colorUnits={colorUnits}
-						colorHighlight={colorHighlight}
+							colorPlate={colorPlate}
+							colorPlateEnd={colorPlateEnd}
 
-						
-						colorMinorTicks={colorMinorTicks}
-						colorMajorTicks={colorMajorTicks}
-						colorNumbers={colorNumbers}
+							colorTitle={colorTitle}
+							colorUnits={colorUnits}
+							colorHighlight={colorHighlight}
 
-						colorNeedle={colorNeedle}
-						colorNeedleEnd={colorNeedleEnd}
-						colorNeedleShadowUp={colorNeedleShadowUp}
-						colorNeedleShadowDown={colorNeedleShadowDown}
 
-						
-						colorNeedleCircleInner={colorNeedleCircleInner}
-						colorNeedleCircleInnerEnd={colorNeedleCircleInnerEnd}
-						colorNeedleCircleOuter={colorNeedleCircleOuter}
-						colorNeedleCircleOuterEnd={colorNeedleCircleOuterEnd}
+							colorMinorTicks={colorMinorTicks}
+							colorMajorTicks={colorMajorTicks}
+							colorNumbers={colorNumbers}
 
-						
-						colorBorderOuter={colorBorderOuter}
-						colorBorderMiddle={colorBorderMiddle}
-						colorBorderInner={colorBorderInner}
+							colorNeedle={colorNeedle}
+							colorNeedleEnd={colorNeedleEnd}
+							colorNeedleShadowUp={colorNeedleShadowUp}
+							colorNeedleShadowDown={colorNeedleShadowDown}
 
-						
-						colorBorderOuterEnd={colorBorderOuterEnd}
-						colorBorderMiddleEnd={colorBorderMiddleEnd}
-						colorBorderInnerEnd={colorBorderInnerEnd}
-						
 
-						highlights={[{}]}
-					></RadialGauge>
+							colorNeedleCircleInner={colorNeedleCircleInner}
+							colorNeedleCircleInnerEnd={colorNeedleCircleInnerEnd}
+							colorNeedleCircleOuter={colorNeedleCircleOuter}
+							colorNeedleCircleOuterEnd={colorNeedleCircleOuterEnd}
 
-					: <div></div>}
 
-				{gaugeIntake ?
-					<RadialGauge
-						width={250}
-						height={250}
-						units='°C'
-						title='Intake'
-						value={intake}
-						minValue={0}
-						maxValue={90}
-						majorTicks={['0', '30', '60', '90']}
-						minorTicks={3}
+							colorBorderOuter={colorBorderOuter}
+							colorBorderMiddle={colorBorderMiddle}
+							colorBorderInner={colorBorderInner}
 
-						//custom config:
 
-						needleType='line'
-						needleStart={0}
-						needleCircleSize={13}
+							colorBorderOuterEnd={colorBorderOuterEnd}
+							colorBorderMiddleEnd={colorBorderMiddleEnd}
+							colorBorderInnerEnd={colorBorderInnerEnd}
 
-						borderInnerWidth={0}
-						borderMiddleWidth={2}
-						borderOuterWidth={7}
 
-						valueBox={false}
+							highlights={[{}]}
+						></RadialGauge>
+						: <div></div>}
+					{settings.showGaugeIntake ?
+						<RadialGauge
+							width={250}
+							height={250}
+							units='°C'
+							title='Intake'
+							value={intake}
+							minValue={0}
+							maxValue={90}
+							majorTicks={['0', '30', '60', '90']}
+							minorTicks={3}
 
-						
-						colorPlate={colorPlate}
-						colorPlateEnd={colorPlateEnd}
+							//custom config:
 
-						colorTitle={colorTitle}
-						colorUnits={colorUnits}
-						colorHighlight={colorHighlight}
+							needleType='line'
+							needleStart={0}
+							needleCircleSize={13}
 
-						colorMinorTicks={colorMinorTicks}
-						colorMajorTicks={colorMajorTicks}
-						colorNumbers={colorNumbers}
+							borderInnerWidth={0}
+							borderMiddleWidth={2}
+							borderOuterWidth={7}
 
-						
-						colorNeedle={colorNeedle}
-						colorNeedleEnd={colorNeedleEnd}
-						colorNeedleShadowUp={colorNeedleShadowUp}
-						colorNeedleShadowDown={colorNeedleShadowDown}
+							valueBox={false}
 
-						colorNeedleCircleInner={colorNeedleCircleInner}
-						colorNeedleCircleInnerEnd={colorNeedleCircleInnerEnd}
-						colorNeedleCircleOuter={colorNeedleCircleOuter}
-						colorNeedleCircleOuterEnd={colorNeedleCircleOuterEnd}
 
-						colorBorderOuter={colorBorderOuter}
-						colorBorderMiddle={colorBorderMiddle}
-						colorBorderInner={colorBorderInner}
+							colorPlate={colorPlate}
+							colorPlateEnd={colorPlateEnd}
 
-						colorBorderOuterEnd={colorBorderOuterEnd}
-						colorBorderMiddleEnd={colorBorderMiddleEnd}
-						colorBorderInnerEnd={colorBorderInnerEnd}
-						
+							colorTitle={colorTitle}
+							colorUnits={colorUnits}
+							colorHighlight={colorHighlight}
 
-						highlights={[{
-							"from": 60,
-							"to": 90,
-							"color": colorHighlight
-						}]}
+							colorMinorTicks={colorMinorTicks}
+							colorMajorTicks={colorMajorTicks}
+							colorNumbers={colorNumbers}
 
-					></RadialGauge>
-					: <div></div>}
 
-				{gaugeCoolant ?
-					<RadialGauge
-						width={250}
-						height={250}
-						units='°C'
-						title='Coolant'
-						value={coolant}
-						minValue={0}
-						maxValue={150}
-						majorTicks={['0', '50', '100', '150']}
-						minorTicks={5}
+							colorNeedle={colorNeedle}
+							colorNeedleEnd={colorNeedleEnd}
+							colorNeedleShadowUp={colorNeedleShadowUp}
+							colorNeedleShadowDown={colorNeedleShadowDown}
 
-						//custom config:
+							colorNeedleCircleInner={colorNeedleCircleInner}
+							colorNeedleCircleInnerEnd={colorNeedleCircleInnerEnd}
+							colorNeedleCircleOuter={colorNeedleCircleOuter}
+							colorNeedleCircleOuterEnd={colorNeedleCircleOuterEnd}
 
-						needleType='line'
-						needleStart={0}
-						needleCircleSize={13}
+							colorBorderOuter={colorBorderOuter}
+							colorBorderMiddle={colorBorderMiddle}
+							colorBorderInner={colorBorderInner}
 
-						borderInnerWidth={0}
-						borderMiddleWidth={2}
-						borderOuterWidth={7}
+							colorBorderOuterEnd={colorBorderOuterEnd}
+							colorBorderMiddleEnd={colorBorderMiddleEnd}
+							colorBorderInnerEnd={colorBorderInnerEnd}
 
-						valueBox={false}
 
-						
-						colorPlate={colorPlate}
-						colorPlateEnd={colorPlateEnd}
+							highlights={[{
+								"from": 60,
+								"to": 90,
+								"color": colorHighlight
+							}]}
 
-						colorTitle={colorTitle}
-						colorUnits={colorUnits}
-						colorHighlight={colorHighlight}
+						></RadialGauge>
+						: <div></div>}
+					{settings.showGaugeCoolant ?
+						<RadialGauge
+							width={250}
+							height={250}
+							units='°C'
+							title='Coolant'
+							value={coolant}
+							minValue={0}
+							maxValue={150}
+							majorTicks={['0', '50', '100', '150']}
+							minorTicks={5}
 
-						colorMinorTicks={colorMinorTicks}
-						colorMajorTicks={colorMajorTicks}
-						colorNumbers={colorNumbers}
+							//custom config:
 
-						colorNeedle={colorNeedle}
-						colorNeedleEnd={colorNeedleEnd}
-						colorNeedleShadowUp={colorNeedleShadowUp}
-						colorNeedleShadowDown={colorNeedleShadowDown}
+							needleType='line'
+							needleStart={0}
+							needleCircleSize={13}
 
-						colorNeedleCircleInner={colorNeedleCircleInner}
-						colorNeedleCircleInnerEnd={colorNeedleCircleInnerEnd}
-						colorNeedleCircleOuter={colorNeedleCircleOuter}
-						colorNeedleCircleOuterEnd={colorNeedleCircleOuterEnd}
+							borderInnerWidth={0}
+							borderMiddleWidth={2}
+							borderOuterWidth={7}
 
-						colorBorderOuter={colorBorderOuter}
-						colorBorderMiddle={colorBorderMiddle}
-						colorBorderInner={colorBorderInner}
+							valueBox={false}
 
-						colorBorderOuterEnd={colorBorderOuterEnd}
-						colorBorderMiddleEnd={colorBorderMiddleEnd}
-						colorBorderInnerEnd={colorBorderInnerEnd}
-						
 
-						highlights={[{
-							"from": 120,
-							"to": 150,
-							"color": colorHighlight
-						}]}
-					></RadialGauge>
-					: <div></div>}
-			</div> : <></> }
+							colorPlate={colorPlate}
+							colorPlateEnd={colorPlateEnd}
+
+							colorTitle={colorTitle}
+							colorUnits={colorUnits}
+							colorHighlight={colorHighlight}
+
+							colorMinorTicks={colorMinorTicks}
+							colorMajorTicks={colorMajorTicks}
+							colorNumbers={colorNumbers}
+
+							colorNeedle={colorNeedle}
+							colorNeedleEnd={colorNeedleEnd}
+							colorNeedleShadowUp={colorNeedleShadowUp}
+							colorNeedleShadowDown={colorNeedleShadowDown}
+
+							colorNeedleCircleInner={colorNeedleCircleInner}
+							colorNeedleCircleInnerEnd={colorNeedleCircleInnerEnd}
+							colorNeedleCircleOuter={colorNeedleCircleOuter}
+							colorNeedleCircleOuterEnd={colorNeedleCircleOuterEnd}
+
+							colorBorderOuter={colorBorderOuter}
+							colorBorderMiddle={colorBorderMiddle}
+							colorBorderInner={colorBorderInner}
+
+							colorBorderOuterEnd={colorBorderOuterEnd}
+							colorBorderMiddleEnd={colorBorderMiddleEnd}
+							colorBorderInnerEnd={colorBorderInnerEnd}
+
+
+							highlights={[{
+								"from": 120,
+								"to": 150,
+								"color": colorHighlight
+							}]}
+						></RadialGauge>
+						: <div></div>}
+				</div> : <></>}
 			<div className="dashboard__footer">
 				{settings.activateCAN ? <div><h3>{voltage}V</h3></div> : <div><h3><i>(CAN-Stream deactivated.)</i></h3></div>}
 			</div>

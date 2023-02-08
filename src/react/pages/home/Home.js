@@ -11,7 +11,6 @@ import Settings from '../settings/Settings';
 import Template from '../template/Template';
 
 import './home.scss';
-import { width } from '@mui/system';
 
 const socket = io("ws://localhost:5005")
 const electron = window.require('electron')
@@ -19,8 +18,6 @@ const { ipcRenderer } = electron;
 
 const Home = () => {
 
-  const [socketConnected, setSocketConnected] = React.useState()
-  const [time, setTime] = React.useState({ minutes: 0, seconds: 0 })
   const [streaming, setStreaming] = React.useState(false)
   const [settings, setSettings] = useState(null);
   const [startedUp, setStartedUp] = useState(false);
@@ -55,13 +52,13 @@ const Home = () => {
     console.log('update navbar')
     console.log('status: ', status)
     console.log('streaming: ', streaming)
-    if (streaming && status && (view == 'Carplay')) {
+    if (streaming && status && (view === 'Carplay')) {
       setShowNav(false);
     } else {
       setShowNav(true);
     }
 
-    if (status == false) {
+    if (status === false) {
       setStreaming(false)
     }
   }, [streaming, status, view]);
@@ -108,7 +105,7 @@ const Home = () => {
               </div >
 
               <div className='carplay__load' style={{ height: (status && streaming) ? '0%' : '100%'}}>
-                {!status ? <><div>WAITING FOR DEVICE</div><div class='loading'>...</div></> : <></>}
+                {!status ? <><div>WAITING FOR DEVICE</div><div className='loading'>...</div></> : <></>}
                 {(!streaming && status) ? <GooSpinner size={60} color='var(--fillActive)' loading={!streaming} /> : <></>}
               </div>
           </div >

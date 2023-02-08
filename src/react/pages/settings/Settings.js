@@ -27,8 +27,6 @@ const Settings = ({ settings, setSettings }) => {
     ipcRenderer.on('wifiConnected', updateWifiStatus);
     ipcRenderer.send('wifiUpdate');
 
-    setTheme(settings.colorTheme);
-
     return function cleanup() {
       ipcRenderer.removeListener('wifiList', updateWifi);
       ipcRenderer.removeListener('wifiConnected', updateWifiStatus);
