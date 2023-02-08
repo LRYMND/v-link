@@ -29,7 +29,6 @@ All of the above sources have been altered to my needs and are bundled with a cu
     <li><a>| Set Up</a></li>
     <li><a>| Audio</a></li>
     <li><a>| Extended Functionality</a></li>
-    <li><a>| Additional Information</a></li>
     <li><a>| Final Words</a></li>
   </ol>
 </details>
