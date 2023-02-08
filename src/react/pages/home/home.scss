@@ -3,8 +3,9 @@
 
     width: 100%;
     height: 100%;
-}
 
+    font-family: 'Helvetica',
+}
 
 .navbar {
     position: absolute;
@@ -26,14 +27,15 @@
     justify-content: center;
 
     &__load {
+        width: 100%;
+        font-size: 30px;
+
         background: var(--backgroundColor);
 
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
         justify-content: center;
-
-        width: 100%;
 
         position: absolute;
     }
@@ -43,5 +45,20 @@
         width: 100%;
 
         position: relative;
+    }
+}
+
+.loading {
+    margin-top: .7rem;
+    display: inline-block;
+    font-family: monospace;
+    font-size: 20px;
+    clip-path: inset(0 3ch 0 0);
+    animation: dots 3s steps(4) infinite;
+}
+
+@keyframes dots {
+    to {
+        clip-path: inset(0 -1ch 0 0)
     }
 }

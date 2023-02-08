@@ -9,10 +9,10 @@ import './App.css';
 const App = () => {
 
   return (
-    <>
+    <div className='container'>
       <CarplayAudio />
       <Home />
-    </>
+    </div>
   );
 };
 

@@ -31,11 +31,16 @@ body,
 }
 
 body {
-  font-family: "Montserrat";
-
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+
+  font-family: 'Helvetica',
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -72,3 +77,5 @@ body {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+

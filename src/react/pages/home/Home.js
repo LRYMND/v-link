@@ -108,7 +108,7 @@ const Home = () => {
               </div >
 
               <div className='carplay__load' style={{ height: (status && streaming) ? '0%' : '100%'}}>
-                {!status ? <h1>Waiting for device...</h1> : <></>}
+                {!status ? <><div>WAITING FOR DEVICE</div><div class='loading'>...</div></> : <></>}
                 {(!streaming && status) ? <GooSpinner size={60} color='var(--fillActive)' loading={!streaming} /> : <></>}
               </div>
           </div >

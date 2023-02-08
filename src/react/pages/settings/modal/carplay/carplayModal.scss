@@ -52,27 +52,25 @@
         display: flex;
         align-items: center;
         flex-direction: column;
-        justify-content: center;
+        justify-content: space-between;
 
         margin-top: 1rem;
-        
+
 
         width: 100%;
         height: 8rem;
 
         &__inputContainer {
             margin-right: -1rem;
-            margin-top:-.5rem;
-            margin-bottom: .5rem;
             width: 100%;
-            height: 100%;
+            height: 70%;
             overflow-y: auto;
             overflow-x: hidden;
         }
 
         &__inputContainer::-webkit-scrollbar {
             width: 1.2rem;
-                cursor: auto;
+            cursor: auto;
         }
 
         &__inputContainer::-webkit-scrollbar-track {
@@ -89,12 +87,19 @@
             }
         }
 
-
+        &__buttons {
+            margin-bottom: .5rem;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
+        }
     }
 }
 
 .row {
-    width:70%;
+    width: 30rem;
+    
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -103,26 +108,19 @@
     margin-top: .5rem;
 
     &__title {
-        margin-left: 5rem;
-        width: 45%
+        //margin-left: 5rem;
+        width: 10rem;
     }
-    &__setting {
-        width: 45%
-    }
-    &__buttons {
-        width:100%;
-        display: flex;
-        flex-direction: row;
-        gap: 1rem;
-        margin-left: 5rem;
 
+    &__setting {
+        //margin-right: 3rem;
+        width: 20rem;
     }
 }
 
 .dropdown {
-    width: 20rem;
     height: 2rem;
-
+    width: 100%;
     color: var(--textColor);
     background-color: var(--buttonBackground);
 
@@ -135,9 +133,8 @@
 }
 
 .input {
-    width: 5rem;
     height: 2rem;
-
+    width: 100%;
     color: var(--textColor);
     background-color: var(--buttonBackground);
 
