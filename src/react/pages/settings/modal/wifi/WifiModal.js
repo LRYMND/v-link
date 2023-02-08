@@ -78,7 +78,7 @@ const WifiModal = ({ isShowing, ssid, hide, connect, status, reset, settings }) 
                     <div className="modal-wrapper" aria-modal aria-hidden tabIndex={-1} role="dialog">
                         <div className="modal">
                             <div className="modal__body">
-                                <div className="modal__header">
+                                <div className="modal__body__title">
                                     {isConnecting ?
                                         <div className="spinner">
                                             <h3>Connecting...</h3>
@@ -89,17 +89,15 @@ const WifiModal = ({ isShowing, ssid, hide, connect, status, reset, settings }) 
                                         </div>}
                                 </div>
                                 <form onSubmit={handleSubmit}>
-                                <div className="modal__form">
-                                    <div className="modal__form__inputContainer">
+                                    <div className="modal__body__input">
                                                 <input onClick={(e) => setInput("")} onChange={onChangeInput} value={input} type="text" name="password" id="password" />
                                         
                                     </div>
-                                    <div className="modal__form__buttonContainer">
+                                    <div className="modal__body__buttons">
                                         <input type="submit" value="Connect" className="button" />
                                         <input type="button" value="Close" className="button" onClick={close} />
                                     </div>
 
-                                </div>
                                 </form>
                             </div>
                         </div>

@@ -27,8 +27,6 @@ const Settings = ({ settings, setSettings }) => {
     ipcRenderer.on('wifiConnected', updateWifiStatus);
     ipcRenderer.send('wifiUpdate');
 
-    setTheme(settings.colorTheme);
-
     return function cleanup() {
       ipcRenderer.removeListener('wifiList', updateWifi);
       ipcRenderer.removeListener('wifiConnected', updateWifiStatus);
@@ -190,7 +188,7 @@ const Settings = ({ settings, setSettings }) => {
             </div>
           </div>
           <div className='settings__connections__bt'>
-            <p><i>Volvo RTVI v1.2.0</i></p>
+            <p><i>Volvo RTVI v1.2.1</i></p>
           </div>
         </div>
         <div className='settings__general'>
