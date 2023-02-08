@@ -1,7 +1,7 @@
 {
   "name": "volvo-rtvi",
-  "version": "1.1.0",
-  "private": true,
+  "version": "1.2.0",
+  "private": false,
   "author": {
     "name": "Louis Raymond",
     "email": "Louis.Raymond@live.at"
@@ -10,47 +10,67 @@
   "productName": "Volvo_RTVI",
   "main": "electron/main.js",
   "dependencies": {
+    "@electron/rebuild": "^3.2.10",
     "@fontsource/montserrat": "^4.5.0",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "@mui/material": "^5.11.3",
+    "buffer": "^6.0.3",
     "canvas-gauges": "^2.1.7",
     "electron-is-dev": "^2.0.0",
     "electron-store": "^8.1.0",
-    "jmuxer": "^2.0.3",
-    "node-carplay": "^2.0.8",
+    "jmuxer": "^2.0.5",
+    "node-carplay": "^3.0.4",
     "node-pty": "^0.10.1",
+    "path-browserify": "^1.0.1",
     "python-shell": "^3.0.1",
-    "react": "^17.0.2",
+    "react": "^18.2.0",
+    "react-app-rewired": "^2.2.1",
     "react-canvas-gauges": "^1.2.1",
-    "react-dom": "^17.0.2",
+    "react-dom": "^18.2.0",
+    "react-js-carplay": "^3.0.18",
     "react-native-animated-pagination-dot": "^0.3.2",
     "react-player": "^2.9.0",
     "react-router-dom": "^6.3.0",
-    "react-scripts": "4.0.3",
+    "react-scripts": "^5.0.1",
+    "react-simple-keyboard": "^3.5.3",
     "react-spinners-kit": "^1.9.1",
     "rpi-wifi-connection": "^1.0.17",
     "sass": "^1.52.3",
+    "socket.io": "^4.5.4",
+    "socket.io-client": "^4.5.4",
+    "stream-browserify": "^3.0.0",
+    "usb": "^1.7.1",
     "versiony": "^2.0.1",
-    "web-vitals": "^1.1.2"
+    "web-vitals": "^1.1.2",
+    "webpack": "^5.75.0",
+    "ws": "^8.11.0"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-react"
+    ]
   },
   "scripts": {
     "dev": "concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && export ELECTRON_START_URL=http://localhost:3000 && nodemon --watch main.js --exec electron .\"",
-    "start": "export BROWSER=none && react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "rebuild": "electron-rebuild -f",
+    "start": "export BROWSER=none && react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-app-rewired eject",
+    "rebuild": "electron-rebuild",
     "start-electron": "export ELECTRON_START_URL=http://localhost:3000 && electron . --no-sandbox",
     "build-electron": "mkdir build/src && cp -r electron/. build/electron && cp -r src/shared/. build/src/shared",
     "package-deb": "USE_SYSTEM_FPM=true electron-builder build --linux deb --armv7l -c.extraMetadata.main=build/electron/main.js --publish never",
     "package": "electron-builder build --linux AppImage --armv7l -c.extraMetadata.main=build/electron/main.js --publish never",
     "package-x64": "electron-builder build --linux AppImage --x64 -c.extraMetadata.main=build/electron/main.js --publish never",
     "increment-version": "versiony package.json --patch && git add . && git commit -m 'new version' && git push",
+    "rebuild-package": "npm run rebuild && npm run build && npm run build-electron && npm run package",
     "build-package": "npm run build && npm run build-electron && npm run package",
     "build-packagex64": "npm run build && npm run build-electron && npm run package-x64"
   },
   "build": {
+    "npmRebuild": false,
     "files": [
       "build/**/*",
       "node_modules/**/*"
@@ -82,12 +102,16 @@
     ]
   },
   "devDependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/preset-react": "^7.16.7",
     "concurrently": "^7.2.2",
     "cross-env": "^7.0.3",
-    "electron": "^13.1.8",
-    "electron-builder": "^22.11.7",
-    "electron-rebuild": "^3.2.7",
+    "electron": "^22.0.0",
+    "electron-builder": "^23.6.0",
+    "electron-rebuild": "^3.2.9",
+    "node-abi": "^3.30.0",
     "nodemon": "^2.0.16",
+    "process": "^0.11.10",
     "wait-on": "^6.0.1"
   }
 }

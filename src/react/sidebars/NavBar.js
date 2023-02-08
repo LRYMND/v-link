@@ -1,37 +1,62 @@
-import React from "react";
-import "./navbar.scss";
+import React, { useState, useEffect } from 'react';
+
+import IconButton from "@mui/material/IconButton";
+
+import NavBarBackground from "./images/navbar.png"
 import "../components/themes.scss"
-//import NavBarBackground from "./images/navbar.png"
+import "./navbar.scss";
 
-import { NavLink } from "react-router-dom";
+const electron = window.require('electron')
+const { ipcRenderer } = electron;
 
-const NavBar = ({navbar}) => {
+const NavBar = ({ settings, view, setView }) => {
 
-  const Store = window.require('electron-store');
-  const store = new Store();
-  const theme = store.get("colorTheme");
+  const [showMMI, setShowMMI] = useState(true);
+  const [theme, setTheme] = useState(null);
+
+  useEffect(() => {
+    ipcRenderer.send('getSettings');
+    ipcRenderer.send('wifiUpdate');
+
+    return function cleanup() {
+      ipcRenderer.removeAllListeners();
+    };
+  }, []);
+
+  useEffect(() => {
+    setShowMMI(settings.activateMMI);
+    setTheme(settings.colorTheme);
+  }, [settings]);
+  
+
+  function changeView(page) {
+    setView(page)
+  }
 
   return (
-    <div className={`navbar ${theme}`}>
-      {/* <div className={`navbar ${theme}`} style={{ backgroundImage: `url(${NavBarBackground})` }}> */ }
-      <NavLink to={"/dashboard"}>
-        <svg className="navbar__icon">
-          <use xlinkHref="./svg/gauge.svg#gauge"></use>
-        </svg>
-      </NavLink>
+    <div>
+        <div className={`navbar ${theme}`} style={{ backgroundImage: `url(${NavBarBackground})` }}>
+          <IconButton onClick={() => changeView('Dashboard')}>
+            <svg className="navbar__icon">
+              <use xlinkHref="./svg/gauge.svg#gauge"></use>
+            </svg>
+          </IconButton>
 
-      <NavLink to={"/"}>
-        <svg className="navbar__icon">
-          <use xlinkHref="./svg/carplay.svg#carplay"></use>
-        </svg>
-      </NavLink>
+          {showMMI ?
+            <IconButton onClick={() => changeView('Carplay')}>
+              <svg className="navbar__icon">
+                <use xlinkHref="./svg/carplay.svg#carplay"></use>
+              </svg>
+            </IconButton>
+          : <></>}
 
-      <NavLink to={"/settings"}>
-        <svg className="navbar__icon">
-          <use xlinkHref="./svg/settings.svg#settings"></use>
-        </svg>
-      </NavLink>
-    </div>
+          <IconButton onClick={() => changeView('Settings')}>
+            <svg className="navbar__icon">
+              <use xlinkHref="./svg/settings.svg#settings"></use>
+            </svg>
+          </IconButton>
+        </div >
+    </div >
   );
 };
 

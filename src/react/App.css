@@ -26,6 +26,8 @@ body,
 #root {
   display: flex;
   overflow: hidden;
+
+  animation: fadein 5s;
 }
 
 body {
@@ -64,4 +66,9 @@ body {
   to {
     transform: rotate(360deg);
   }
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

@@ -1,22 +1,17 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, } from "react";
 import "../components/themes.scss"
 import "./topbar.scss";
-import TopBarBackground from "./images/topbar.png";
 
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
-const TopBar = () => {
-
-  const Store = window.require('electron-store');
-  const store = new Store();
-  const theme = store.get("colorTheme");
+const TopBar = ({ settings }) => {
 
   const [time, setDate] = useState(new Date());
 
   const [wifiState, setWifiState] = useState("disconnected");
-  const [phoneState, setPhoneState] = useState("unplugged");
+  const [phoneState, setPhoneState] = useState("disconnected");
 
 
   const wifiOn = () => {
@@ -28,11 +23,11 @@ const TopBar = () => {
   }
 
   const plugged = () => {
-    setPhoneState("plugged");
+    setPhoneState("connected");
   }
 
   const unplugged = () => {
-    setPhoneState("unplugged");
+    setPhoneState("disconnected");
   }
 
   function updateTime() {
@@ -46,40 +41,45 @@ const TopBar = () => {
     ipcRenderer.send('statusReq');
     ipcRenderer.send('updateWifi');
 
-    ipcRenderer.on('wifi_on', wifiOn);
-    ipcRenderer.on('wifi_off', wifiOff);
+    ipcRenderer.on('wifiOn', wifiOn);
+    ipcRenderer.on('wifiOff', wifiOff);
     ipcRenderer.on("plugged", plugged);
     ipcRenderer.on("unplugged", unplugged);
-
-    document.body.className = theme;
 
     return function cleanup() {
       clearInterval(timer1);
 
-      ipcRenderer.removeListener('wifi_on', wifiOn);
-      ipcRenderer.removeListener('wifi_off', wifiOff);
+      ipcRenderer.removeListener('wifiOn', wifiOn);
+      ipcRenderer.removeListener('wifiOff', wifiOff);
       ipcRenderer.removeListener('plugged', plugged);
       ipcRenderer.removeListener('unplugged', unplugged);
     };
-  }, [theme]);
+  }, []);
 
   return (
-    <div className={`topbar ${theme}`} style={{ backgroundImage: `url(${TopBarBackground})` }}>
-      <div className={"topbar__info"}>
-          <svg className={`topbar__icon__wifi topbar__icon__wifi--${wifiState}`}>
-            <use xlinkHref="./svg/wifi.svg#wifi"></use>
-          </svg>
-          <svg className={`topbar__icon__bluetooth`}>
-            <use xlinkHref="./svg/bluetooth.svg#bluetooth" color={"7c7c7c"}></use>
-          </svg>
-          <svg className={`topbar__icon__phone topbar__icon__phone--${phoneState}`}>
-            <use xlinkHref="./svg/phone.svg#phone"></use>
-          </svg>
+    <div className={`topbar ${settings.colorTheme}`}>
+      <div className="topbar__info">
+        <svg className={`topbar__icon topbar__icon--${wifiState}`}>
+          <use xlinkHref="./svg/wifi.svg#wifi"></use>
+        </svg>
+        <svg className={`topbar__icon topbar__icon--${'disconnected'}`}>
+          <use xlinkHref="./svg/bluetooth.svg#bluetooth"></use>
+        </svg>
+        <svg className={`topbar__icon topbar__icon--${phoneState}`}>
+          <use xlinkHref="./svg/phone.svg#phone"></use>
+        </svg>
       </div>
-      <div className="topbar__page">
+      <div>
+        <div className="topbar__banner">
+          <svg className="topbar__banner__graphic">
+            <use xlinkHref="./svg/banner.svg#banner"></use>
+          </svg>
+        </div>
       </div>
       <div className="topbar__time">
-        <h2>{time.toLocaleTimeString('sv-SV', { hour: '2-digit', minute: '2-digit' })} </h2>
+        <div className="topbar__time__container">
+          <h2>{time.toLocaleTimeString('sv-SV', { hour: '2-digit', minute: '2-digit' })} </h2>
+        </div>
       </div>
     </div>
 
