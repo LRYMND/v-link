@@ -1,7 +1,7 @@
 # Volvo RTVI System
 Road Traffic and Vehicle Information
 
-![TITLE IMAGE](repo/title.jpg?raw=true "Title")
+![TITLE IMAGE](repo/title2.jpg?raw=true "Title")
 
 Infotainment system based on a Raspberry Pi for the Volvo P1 platform. Combines Apple Carplay/Android Auto with a dashboard for CAN data. This project is based on the following Git-Repositories and internet articles:
 
@@ -13,6 +13,10 @@ Infotainment system based on a Raspberry Pi for the Volvo P1 platform. Combines 
 * [In-Car Raspberry PSU Controller](https://dontpressthat.wordpress.com/2017/10/13/in-car-raspberry-pi-psu-controller/)
 
 All of the above sources have been altered to my needs and are bundled with a custom app in this repository.
+
+The app is intended to work with Volvo P1 T5 models but basically you can alter it for any make and model. Just keep in mind that the Dashboard won't work unless you make the necessary changes in the python script as well as Dashboard.js.
+
+> You can find a demo gif at the end of the readme.
 
 ## Content
 
@@ -95,7 +99,7 @@ This app uses a combination of node.js, Electron and React to set up a custom in
 
 ![CARPLAY IMAGE](repo/carplay.jpg?raw=true "Carplay")
 
-The app is in a usable state and I encourage anyone to help me improve it. In order to use Carplay/Android Auto you will need to have a Carlinkit adapter. In this repository you can find the full source code and altering it to your needs is quite straightforward. For example, to change the displayed CAN data, you will only have to make a few changes to python.py and Dashboard.js.
+The app is in a usable state and I encourage anyone to help me improve it. In order to use Carplay/Android Auto you will need to have a Carlinkit adapter. In this repository you can find the full source code and altering it to your needs is quite straightforward.
 
 ### > Note:
 
@@ -212,7 +216,19 @@ logo.nologo vt.global_cursor_default=0
 bash '/path/to/your/startService.sh'
 ```
 
-5.) To automatically hide the taskbar simply right-click it to activate this setting.
+5.) To automatically hide the mouse curser you will need to install unclutter and add another line to your "/boot/config.txt"
+
+```
+sudo apt-get install unclutter
+```
+
+This command will hide the cursor automatically after 2 seconds:
+
+```
+@unclutter -idle 2
+```
+
+6.) To automatically hide the taskbar simply right-click it to activate this setting.
 
 
 ### > Note:
@@ -268,15 +284,13 @@ When ignition is turned on, the RTI screen automatically pops up and you can use
 
 ### > Adding Peripherals
 
-To make life a bit easier I connected an USB extension cable to the Raspi which ends up in the tray behind the waterfall console so I can directly connect peripherals to it. This also works as a charging port for a phone. It's not fast but it works.
-
 ![USB IMAGE](repo/usb.jpg?raw=true "USB")
+
+To make life a bit easier I connected an USB extension cable to the Raspi which ends up in the tray behind the waterfall console so I can directly connect peripherals to it. This also works as a charging port for a phone. It's not fast but it works.
 
 ## 10 | Final Words
 
 ![DEMOGIF](repo/demo.gif?raw=true "Demo")
-
-(Gif is lagging due to the screen recorder. In normal use all animations are smooth!)
 
 I’m using the setup since several months now. I drove on the highway, over bumpy gravel roads, at 35°C in the sun and -10°C in the winter and so far, it did not let me down. It can happen that the Carplay interface freezes occasionally. In that case you can simply reconnect the phone or restart/reboot from the settings page. However, this rarely happens.
 
@@ -288,9 +302,6 @@ A next step could be to start mapping the CAN signals of different buttons in th
 
 I'd be happy if anybody who has tips for improvement can chime in. Check out the [Swedespeed Thread](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/) and share your ideas, findings or issues.
 
-
 ### > Disclaimer
 
 I am not a software developer, electrical engineer or automotive technician and doing stuff like this is just a hobby for me. I am distancing myself from any damage that you might do to your car in case you want to follow this guide. The setup I described above is the way I fitted things to my V50. Eventually you will need to find other places to mount your components and different paths to route your cables, after all it's a DIY mod.
-
-Finally, thanks again to the people who shared their code and insights and Yosh for helping me to stitch together this app.
