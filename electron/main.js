@@ -109,8 +109,8 @@ function createWindow() {
 
   if (isDev || !(settings.store.get('kiosk'))) {
     mainWindow = new BrowserWindow({
-      width: settings.store.get('width'),
-      height: settings.store.get('height'),
+      width: settings.store.get('windowWidth'),
+      height: settings.store.get('windowHeight'),
       kiosk: false,
       show: false,
       backgroundColor: '#000000',
@@ -127,8 +127,8 @@ function createWindow() {
   } else {
 
     mainWindow = new BrowserWindow({
-      width: 800,
-      height: 480,
+      width: settings.store.get('windowWidth'),
+      height: settings.store.get('windowHeight'),
       kiosk: false,
       show: false,
       frame: false,
@@ -163,8 +163,8 @@ function createWindow() {
     nightMode: 0,
     hand: settings.store.get('lhd'),
     boxName: 'nodePlay',
-    width: size[0],
-    height: size[1],
+    width: settings.store.get('width'),
+    height: settings.store.get('height'),
     fps: settings.store.get('fps'),
   };
 

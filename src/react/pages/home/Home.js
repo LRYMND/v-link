@@ -5,6 +5,7 @@ import { io } from "socket.io-client";
 
 import NavBar from '../../sidebars/NavBar';
 import TopBar from '../../sidebars/TopBar';
+import DashBar from '../../sidebars/DashBar';
 
 import Dashboard from '../dashboard/Dashboard';
 import Settings from '../settings/Settings';
@@ -18,12 +19,14 @@ const { ipcRenderer } = electron;
 
 const Home = () => {
 
-  const [streaming, setStreaming] = React.useState(false)
+  const [streaming, setStreaming] = useState(false)
   const [settings, setSettings] = useState(null);
   const [startedUp, setStartedUp] = useState(false);
+  const [showTop, setShowTop] = useState(true);
   const [showNav, setShowNav] = useState(true);
+  const [showOsd, setShowOsd] = useState(true);
   const [status, setStatus] = useState(false);
-  const [view, setView] = React.useState('Carplay')
+  const [view, setView] = useState('Carplay')
 
 
   useEffect(() => {
@@ -31,8 +34,11 @@ const Home = () => {
     ipcRenderer.on('plugged', () => { setStatus(true); console.log('phone connected') });
     ipcRenderer.on('unplugged', () => { setStatus(false); console.log('disconnected') });
 
+    ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
+
     socket.emit('statusReq');
     ipcRenderer.send('getSettings')
+    ipcRenderer.send('startScript', {});
 
     socket.on('carplay', (data) => {
       setStreaming(true);
@@ -45,6 +51,8 @@ const Home = () => {
 
     return () => {
       socket.off();
+      ipcRenderer.send('stopScript', {});
+      ipcRenderer.removeAllListeners();
     };
   }, [])
 
@@ -53,9 +61,14 @@ const Home = () => {
     console.log('status: ', status)
     console.log('streaming: ', streaming)
     if (streaming && status && (view === 'Carplay')) {
+      setShowTop(false);
       setShowNav(false);
+      if (settings.activateOSD)
+        setShowOsd(true);
     } else {
+      setShowTop(true);
       setShowNav(true);
+      setShowOsd(false);
     }
 
     if (status === false) {
@@ -71,6 +84,7 @@ const Home = () => {
 
   function loadSettings(data) {
     console.log('loading settings...')
+    console.log('settings loaded: ', settings)
     if (data != null) {
       setSettings(data);
     }
@@ -88,32 +102,75 @@ const Home = () => {
     console.log('hello world')
   }
 
+  const msgFromBackground = (args) => {
+		if (args != null)
+			console.log("Debug: ", args);
+
+		if (args.includes("map:")) {
+			args = args.replace("map:", "")
+			setBoost(args);
+		}
+		if (args.includes("iat:")) {
+			args = args.replace("iat:", "")
+			setIntake(args);
+		}
+		if (args.includes("col:")) {
+			args = args.replace("col:", "")
+			setCoolant(args);
+		}
+		if (args.includes("vol:")) {
+			args = args.replace("vol:", "")
+			setVoltage(args);
+		}
+	}
+
+  const [boost, setBoost] = useState(0);
+	const [intake, setIntake] = useState(0);
+	const [coolant, setCoolant] = useState(0);
+	const [voltage, setVoltage] = useState(0);
+
   const renderView = () => {
     switch (view) {
       case 'Carplay':
         return (
-          <div className={`carplay ${settings.colorTheme}`}>
-            <div className='carplay__stream'>
-              <Carplay
+          <div className='container'>
+            {showOsd &&
+              <DashBar
+                className='dashbar'
                 settings={settings}
-                status={true}
-                openModal={false}
-                touchEvent={touchEvent}
-                openModalReq={leaveCarplay}
-                closeModalReq={template}
+                boost={boost}
+                intake={intake}
+                coolant={coolant}
+                voltage={voltage}
               />
+            }
+            <div className={`carplay ${settings.colorTheme}`} style={{height: settings.height, width: settings.width}}>
+              <div className='carplay__stream'>
+                <Carplay
+                  settings={settings}
+                  status={true}
+                  openModal={false}
+                  touchEvent={touchEvent}
+                  openModalReq={leaveCarplay}
+                  closeModalReq={template}
+                />
               </div >
 
-              <div className='carplay__load' style={{ height: (status && streaming) ? '0%' : '100%'}}>
+              <div className='carplay__load' style={{ height: (status && streaming) ? '0%' : '100%' }}>
                 {!status ? <><div>WAITING FOR DEVICE</div><div className='loading'>...</div></> : <></>}
                 {(!streaming && status) ? <GooSpinner size={60} color='var(--fillActive)' loading={!streaming} /> : <></>}
               </div>
+            </div >
           </div >
         )
       case 'Dashboard':
         return (
           <Dashboard
             settings={settings}
+            boost={boost}
+            intake={intake}
+            coolant={coolant}
+            voltage={voltage}
           />
         )
 
@@ -144,7 +201,7 @@ const Home = () => {
     <>
       {startedUp &&
         <div className='container'>
-          {showNav &&
+          {showTop &&
             <TopBar
               className='topbar'
               settings={settings}

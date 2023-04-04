@@ -80,7 +80,7 @@ def can_rx_task():
         #Catch Voltage
         if (message.arbitration_id == REP_ID and message.data[4] == VOL_DATA):
             voltage = message.data[5]
-            voltage = voltage * 0.07
+            voltage = voltage * 0.0983
 
             print("vol:"+str(float(voltage)))
             sys.stdout.flush()

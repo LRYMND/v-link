@@ -8,47 +8,24 @@ import '../../components/themes.scss';
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
-const Dashboard = ({ settings }) => {
+const Dashboard = ({ settings , boost, intake, coolant, voltage}) => {
 
 	useEffect(() => {
-		ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
-		ipcRenderer.send('startScript', {});
+		//ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
+
+		//Load script when accessing dashboard
+		//ipcRenderer.send('startScript', {});
+		
 		loadTheme();
 
 		return function cleanup() {
-			ipcRenderer.send('stopScript', {});
-			ipcRenderer.removeAllListeners();
+			//Stop script when leaving dashboard
+			//ipcRenderer.send('stopScript', {});
+			//ipcRenderer.removeAllListeners();
 		};
 	}, []);
 
-	const msgFromBackground = (args) => {
-		if (args != null)
-			console.log("Debug: ", args);
-
-		if (args.includes("map:")) {
-			args = args.replace("map:", "")
-			setBoost(args);
-		}
-		if (args.includes("iat:")) {
-			args = args.replace("iat:", "")
-			setIntake(args);
-		}
-		if (args.includes("col:")) {
-			args = args.replace("col:", "")
-			setCoolant(args);
-		}
-		if (args.includes("vol:")) {
-			args = args.replace("vol:", "")
-			setVoltage(args);
-		}
-	}
-
 	const [loaded, setLoaded] = useState(false);
-
-	const [boost, setBoost] = useState(0);
-	const [intake, setIntake] = useState(0);
-	const [coolant, setCoolant] = useState(0);
-	const [voltage, setVoltage] = useState(0);
 
 	const [colorPlate, setColorPlate] = useState(null);
 	const [colorPlateEnd, setColorPlateEnd] = useState(null);
