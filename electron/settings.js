@@ -20,7 +20,7 @@ class UserSettings {
             },
             activateOSD: {
                 type: 'boolean',
-                default: false,
+                default: true,
             },
             activateCAN: {
                 type: 'boolean',

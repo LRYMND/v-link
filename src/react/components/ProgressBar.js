@@ -1,19 +1,22 @@
 import "../components/themes.scss"
 import { useState, useEffect, } from "react";
 
-const ProgressBar = (props) => {
-    const { currentValue, maxValue, unit, warning, theme } = props;
+const ProgressBar = ({ currentValue, maxValue, unit, warning, theme }) => {
 
     const [background, setBackground] = useState('var(--fillInactive)');
     const [text, setText] = useState('var(--textColorActive)');
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
+
+        console.log(currentValue)
         
-        setProgress((maxValue / 100) * currentValue);
+        setProgress((currentValue / maxValue) * 100);
+
+        console.log(progress);
 
         if (currentValue < warning) {
-            setBackground('var(--fillInactive)')
+            setBackground('var(--textColorInactive)')
             setText('var(--textColorActive)')
         } else {
             setBackground('var(--fillActive)')
@@ -39,7 +42,7 @@ const ProgressBar = (props) => {
         width: `${progress}%`,
         backgroundColor: background,
         borderRadius: 'inherit',
-        textAlign: 'right'
+        textAlign: 'left'
     }
 
     const labelStyles = {
@@ -50,8 +53,8 @@ const ProgressBar = (props) => {
 
     return (
         <div className={`progressBar ${theme}`} style={containerStyles}>
-            <span style={labelStyles}>{`${currentValue}`}{`${unit}`}</span>
-            <div style={fillerStyles} />
+           
+            <div style={fillerStyles}> <span style={labelStyles}>{`${currentValue}`}{`${unit}`}</span></div>
         </div>
     );
 };

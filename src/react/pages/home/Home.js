@@ -29,12 +29,11 @@ const Home = () => {
   const [view, setView] = useState('Carplay')
 
 
+
   useEffect(() => {
     ipcRenderer.on('allSettings', (event, data) => { loadSettings(data); });
     ipcRenderer.on('plugged', () => { setStatus(true); console.log('phone connected') });
     ipcRenderer.on('unplugged', () => { setStatus(false); console.log('disconnected') });
-
-    ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
 
     socket.emit('statusReq');
     ipcRenderer.send('getSettings')
@@ -51,7 +50,7 @@ const Home = () => {
 
     return () => {
       socket.off();
-      ipcRenderer.send('stopScript', {});
+      //ipcRenderer.send('stopScript', {});
       ipcRenderer.removeAllListeners();
     };
   }, [])
@@ -102,33 +101,6 @@ const Home = () => {
     console.log('hello world')
   }
 
-  const msgFromBackground = (args) => {
-		if (args != null)
-			console.log("Debug: ", args);
-
-		if (args.includes("map:")) {
-			args = args.replace("map:", "")
-			setBoost(args);
-		}
-		if (args.includes("iat:")) {
-			args = args.replace("iat:", "")
-			setIntake(args);
-		}
-		if (args.includes("col:")) {
-			args = args.replace("col:", "")
-			setCoolant(args);
-		}
-		if (args.includes("vol:")) {
-			args = args.replace("vol:", "")
-			setVoltage(args);
-		}
-	}
-
-  const [boost, setBoost] = useState(0);
-	const [intake, setIntake] = useState(0);
-	const [coolant, setCoolant] = useState(0);
-	const [voltage, setVoltage] = useState(0);
-
   const renderView = () => {
     switch (view) {
       case 'Carplay':
@@ -138,10 +110,6 @@ const Home = () => {
               <DashBar
                 className='dashbar'
                 settings={settings}
-                boost={boost}
-                intake={intake}
-                coolant={coolant}
-                voltage={voltage}
               />
             }
             <div className={`carplay ${settings.colorTheme}`} style={{height: settings.height, width: settings.width}}>
@@ -167,10 +135,6 @@ const Home = () => {
         return (
           <Dashboard
             settings={settings}
-            boost={boost}
-            intake={intake}
-            coolant={coolant}
-            voltage={voltage}
           />
         )
 

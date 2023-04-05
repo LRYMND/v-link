@@ -18,7 +18,7 @@
 }
 
 .dashbar {
-    position: relative;
+    position: absolute;
 }
 
 .carplay {
@@ -47,8 +47,9 @@
     &__stream {
         height: 100%;
         width: 100%;
-
+        
         position: relative;
+
     }
 }
 

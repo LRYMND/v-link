@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect, } from "react";
 
-import ProgressBar from "./ProgressBar";
+import ProgressBar from "../components/ProgressBar";
 
 import "../components/themes.scss"
 import "./dashbar.scss";
@@ -35,27 +35,49 @@ const DashBar = ({ settings }) => {
         ipcRenderer.on("plugged", plugged);
         ipcRenderer.on("unplugged", unplugged);
 
-        return function cleanup() {
+        ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args)});
 
-            ipcRenderer.removeListener('wifiOn', wifiOn);
-            ipcRenderer.removeListener('wifiOff', wifiOff);
-            ipcRenderer.removeListener('plugged', plugged);
-            ipcRenderer.removeListener('unplugged', unplugged);
+        return function cleanup() {
+            ipcRenderer.removeAllListeners();
         };
     }, []);
+
+	  const msgFromBackground = (args) => {
+		if (args != null)
+			//console.log("Debug: ", args);
+
+		if (args.includes("map:")) {
+			args = args.replace("map:", "")
+			setBoost(Number(args).toFixed(2));
+		}
+		if (args.includes("iat:")) {
+			args = args.replace("iat:", "")
+			setIntake(Number(args).toFixed(2));
+		}
+		if (args.includes("col:")) {
+			args = args.replace("col:", "")
+			setCoolant(Number(args).toFixed(2));
+		}
+		if (args.includes("vol:")) {
+			args = args.replace("vol:", "")
+			setVoltage(Number(args).toFixed(2));
+		}
+	}
 
     const [wifiState, setWifiState] = useState("disconnected");
     const [phoneState, setPhoneState] = useState("disconnected");
 
-    const [boost, setBoost] = useState(0.0);
-    const [intake, setIntake] = useState(0.0);
-    const [coolant, setCoolant] = useState(0.0);
+    const [boost, setBoost] = useState(0);
+	const [intake, setIntake] = useState(0);
+	const [coolant, setCoolant] = useState(0);
+	const [voltage, setVoltage] = useState(0);
+
 
     return (
         <div className={`dashbar ${settings.colorTheme}`}>
             <div className="dashbar__dash">
                 <div className="dashbar__dash__bar">
-                    <ProgressBar currentValue={boost} maxValue={1.5} unit={'bar'} warning={1.5} theme={settings.colorTheme}/>
+                    <ProgressBar currentValue={boost} maxValue={1.5} unit={'bar'} warning={0.6} theme={settings.colorTheme}/>
                 </div>
                 <div className="dashbar__dash__bar">
                     <ProgressBar currentValue={intake} maxValue={90} unit={'°C'} warning={60} theme={settings.colorTheme}/>
