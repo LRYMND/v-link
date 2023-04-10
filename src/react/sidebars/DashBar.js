@@ -9,70 +9,7 @@ import "./dashbar.scss";
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
-const DashBar = ({ settings }) => {
-    const wifiOn = () => {
-        setWifiState("connected");
-    }
-
-    const wifiOff = () => {
-        setWifiState("disconnected");
-    }
-
-    const plugged = () => {
-        setPhoneState("connected");
-    }
-
-    const unplugged = () => {
-        setPhoneState("disconnected");
-    }
-
-    useEffect(() => {
-        ipcRenderer.send('statusReq');
-        ipcRenderer.send('updateWifi');
-
-        ipcRenderer.on('wifiOn', wifiOn);
-        ipcRenderer.on('wifiOff', wifiOff);
-        ipcRenderer.on("plugged", plugged);
-        ipcRenderer.on("unplugged", unplugged);
-
-        ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args)});
-
-        return function cleanup() {
-            ipcRenderer.removeAllListeners();
-        };
-    }, []);
-
-	  const msgFromBackground = (args) => {
-		if (args != null)
-			//console.log("Debug: ", args);
-
-		if (args.includes("map:")) {
-			args = args.replace("map:", "")
-			setBoost(Number(args).toFixed(2));
-		}
-		if (args.includes("iat:")) {
-			args = args.replace("iat:", "")
-			setIntake(Number(args).toFixed(2));
-		}
-		if (args.includes("col:")) {
-			args = args.replace("col:", "")
-			setCoolant(Number(args).toFixed(2));
-		}
-		if (args.includes("vol:")) {
-			args = args.replace("vol:", "")
-			setVoltage(Number(args).toFixed(2));
-		}
-	}
-
-    const [wifiState, setWifiState] = useState("disconnected");
-    const [phoneState, setPhoneState] = useState("disconnected");
-
-    const [boost, setBoost] = useState(0);
-	const [intake, setIntake] = useState(0);
-	const [coolant, setCoolant] = useState(0);
-	const [voltage, setVoltage] = useState(0);
-
-
+const DashBar = ({ settings, boost, coolant, intake, voltage, wifiState, phoneState }) => {
     return (
         <div className={`dashbar ${settings.colorTheme}`}>
             <div className="dashbar__dash">

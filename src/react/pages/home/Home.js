@@ -18,48 +18,64 @@ const electron = window.require('electron')
 const { ipcRenderer } = electron;
 
 const Home = () => {
-
-  const [streaming, setStreaming] = useState(false)
+  const [view, setView] = useState('Carplay')
   const [settings, setSettings] = useState(null);
+
+  const [streaming, setStreaming] = useState(false);
   const [startedUp, setStartedUp] = useState(false);
+
   const [showTop, setShowTop] = useState(true);
   const [showNav, setShowNav] = useState(true);
   const [showOsd, setShowOsd] = useState(true);
-  const [status, setStatus] = useState(false);
-  const [view, setView] = useState('Carplay')
 
+  const [boost, setBoost] = useState(0);
+  const [intake, setIntake] = useState(0);
+  const [coolant, setCoolant] = useState(0);
+  const [voltage, setVoltage] = useState(0);
 
+  const [wifiState, setWifiState] = useState("disconnected");
+  const [phoneState, setPhoneState] = useState("disconnected");
+
+  useEffect(() => {
+    ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
+    ipcRenderer.on('wifiOn', () => { setWifiState("connected")});
+    ipcRenderer.on('wifiOff', () => { setWifiState("disconnected")});
+    ipcRenderer.on("plugged", () => { setPhoneState("connected")});
+    ipcRenderer.on("unplugged", () => { setPhoneState("disconnected")});
+
+    return () => {
+      ipcRenderer.removeAllListeners();
+    };
+  })
 
   useEffect(() => {
     ipcRenderer.on('allSettings', (event, data) => { loadSettings(data); });
-    ipcRenderer.on('plugged', () => { setStatus(true); console.log('phone connected') });
-    ipcRenderer.on('unplugged', () => { setStatus(false); console.log('disconnected') });
+
+    ipcRenderer.send('statusReq');
+    ipcRenderer.send('updateWifi');
+    ipcRenderer.send('getSettings')
 
     socket.emit('statusReq');
-    ipcRenderer.send('getSettings')
-    ipcRenderer.send('startScript', {});
 
     socket.on('carplay', (data) => {
       setStreaming(true);
     });
 
-    socket.on('status', ({ status }) => {
-      console.log("status@home: ", status)
-      setStatus(status)
+    socket.on('status', ({ args }) => {
+      setPhoneState(args)
     })
 
     return () => {
       socket.off();
-      //ipcRenderer.send('stopScript', {});
       ipcRenderer.removeAllListeners();
     };
   }, [])
 
   useEffect(() => {
     console.log('update navbar')
-    console.log('status: ', status)
+    console.log('status: ', phoneState)
     console.log('streaming: ', streaming)
-    if (streaming && status && (view === 'Carplay')) {
+    if (streaming && phoneState && (view === 'Carplay')) {
       setShowTop(false);
       setShowNav(false);
       if (settings.activateOSD)
@@ -70,10 +86,10 @@ const Home = () => {
       setShowOsd(false);
     }
 
-    if (status === false) {
+    if (phoneState === false) {
       setStreaming(false)
     }
-  }, [streaming, status, view]);
+  }, [streaming, phoneState, view]);
 
   useEffect(() => {
     if (settings != null) {
@@ -83,8 +99,8 @@ const Home = () => {
 
   function loadSettings(data) {
     console.log('loading settings...')
-    console.log('settings loaded: ', settings)
     if (data != null) {
+      console.log('settings loaded: ', settings)
       setSettings(data);
     }
   }
@@ -101,6 +117,28 @@ const Home = () => {
     console.log('hello world')
   }
 
+  const msgFromBackground = (args) => {
+    if (args != null)
+      //console.log("Debug: ", args);
+
+      if (args.includes("map:")) {
+        args = args.replace("map:", "")
+        setBoost(Number(args).toFixed(2));
+      }
+    if (args.includes("iat:")) {
+      args = args.replace("iat:", "")
+      setIntake(Number(args).toFixed(2));
+    }
+    if (args.includes("col:")) {
+      args = args.replace("col:", "")
+      setCoolant(Number(args).toFixed(2));
+    }
+    if (args.includes("vol:")) {
+      args = args.replace("vol:", "")
+      setVoltage(Number(args).toFixed(2));
+    }
+  }
+
   const renderView = () => {
     switch (view) {
       case 'Carplay':
@@ -110,9 +148,15 @@ const Home = () => {
               <DashBar
                 className='dashbar'
                 settings={settings}
+                boost={boost}
+                intake={intake}
+                coolant={coolant}
+                voltage={voltage}
+                phoneState={phoneState}
+                wifiState={wifiState}
               />
             }
-            <div className={`carplay ${settings.colorTheme}`} style={{height: settings.height, width: settings.width}}>
+            <div className={`carplay ${settings.colorTheme}`} style={{ height: settings.height, width: settings.width }}>
               <div className='carplay__stream'>
                 <Carplay
                   settings={settings}
@@ -124,9 +168,9 @@ const Home = () => {
                 />
               </div >
 
-              <div className='carplay__load' style={{ height: (status && streaming) ? '0%' : '100%' }}>
-                {!status ? <><div>WAITING FOR DEVICE</div><div className='loading'>...</div></> : <></>}
-                {(!streaming && status) ? <GooSpinner size={60} color='var(--fillActive)' loading={!streaming} /> : <></>}
+              <div className='carplay__load' style={{ height: (phoneState && streaming) ? '0%' : '100%' }}>
+                {!phoneState ? <><div>WAITING FOR DEVICE</div><div className='loading'>...</div></> : <></>}
+                {(!streaming && phoneState) ? <GooSpinner size={60} color='var(--fillActive)' loading={!streaming} /> : <></>}
               </div>
             </div >
           </div >
@@ -135,6 +179,10 @@ const Home = () => {
         return (
           <Dashboard
             settings={settings}
+            boost={boost}
+            intake={intake}
+            coolant={coolant}
+            voltage={voltage}
           />
         )
 
@@ -169,6 +217,8 @@ const Home = () => {
             <TopBar
               className='topbar'
               settings={settings}
+              wifiState={wifiState}
+              phoneState={phoneState}
             />
           }
           {renderView()}

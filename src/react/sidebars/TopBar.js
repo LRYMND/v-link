@@ -3,56 +3,18 @@ import { useState, useEffect, } from "react";
 import "../components/themes.scss"
 import "./topbar.scss";
 
-const electron = window.require('electron');
-const { ipcRenderer } = electron;
-
-const TopBar = ({ settings }) => {
-
+const TopBar = ({ settings, phoneState, wifiState }) => {
   const [time, setDate] = useState(new Date());
-
-  const [wifiState, setWifiState] = useState("disconnected");
-  const [phoneState, setPhoneState] = useState("disconnected");
-
-
-  const wifiOn = () => {
-    setWifiState("connected");
-  }
-
-  const wifiOff = () => {
-    setWifiState("disconnected");
-  }
-
-  const plugged = () => {
-    setPhoneState("connected");
-  }
-
-  const unplugged = () => {
-    setPhoneState("disconnected");
-  }
 
   function updateTime() {
     setDate(new Date());
   }
 
-
   useEffect(() => {
     const timer1 = setInterval(updateTime, 10000);
 
-    ipcRenderer.send('statusReq');
-    ipcRenderer.send('updateWifi');
-
-    ipcRenderer.on('wifiOn', wifiOn);
-    ipcRenderer.on('wifiOff', wifiOff);
-    ipcRenderer.on("plugged", plugged);
-    ipcRenderer.on("unplugged", unplugged);
-
     return function cleanup() {
       clearInterval(timer1);
-
-      ipcRenderer.removeListener('wifiOn', wifiOn);
-      ipcRenderer.removeListener('wifiOff', wifiOff);
-      ipcRenderer.removeListener('plugged', plugged);
-      ipcRenderer.removeListener('unplugged', unplugged);
     };
   }, []);
 

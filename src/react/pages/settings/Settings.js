@@ -77,6 +77,7 @@ const Settings = ({ settings, setSettings }) => {
   const handleCAN = () => {
     changeSetting('activateCAN', !toggleCAN);
     setCAN(!toggleCAN);
+    reloadApp();
   };
 
   /* Checkbox MMI */
@@ -203,7 +204,7 @@ const Settings = ({ settings, setSettings }) => {
             </div>
           </div>
           <div className='settings__connections__bt'>
-            <p><i>Volvo RTVI v1.2.1</i></p>
+            <p><i>Volvo RTVI v1.2.2</i></p>
           </div>
         </div>
         <div className='settings__general'>
