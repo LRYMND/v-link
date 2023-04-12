@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { useState, useEffect } from 'react';
 
-import '../../components/themes.scss';
+import "../../themes.scss";
 
 const electron = window.require('electron');
 const { ipcRenderer } = electron;

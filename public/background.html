@@ -8,8 +8,8 @@
 
 	ipcRenderer.on('startPython', (event, args) => {
 		
-		//const scriptPath = path.join(process.resourcesPath, '/scripts/dashboard.py')
-		const scriptPath = path.join(process.resourcesPath, '/scripts/test2.py')
+		const scriptPath = path.join(process.resourcesPath, '/scripts/dashboard.py')
+		//const scriptPath = path.join(process.resourcesPath, '/scripts/test2.py')
 		ipcRenderer.send('msgToMain', { message: scriptPath });
 
 		const { data } = args;

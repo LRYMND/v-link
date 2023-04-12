@@ -5,8 +5,8 @@ import useModal from './modal/useModal';
 
 import { useState, useEffect } from 'react';
 
+import "../../themes.scss";
 import './settings.scss';
-import '../../components/themes.scss';
 
 const electron = window.require('electron');
 const { ipcRenderer } = electron;

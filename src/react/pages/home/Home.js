@@ -11,6 +11,7 @@ import Dashboard from '../dashboard/Dashboard';
 import Settings from '../settings/Settings';
 import Template from '../template/Template';
 
+import "../../themes.scss"
 import './home.scss';
 
 const socket = io("ws://localhost:5005")
@@ -21,7 +22,7 @@ const Home = () => {
   const [view, setView] = useState('Carplay')
   const [settings, setSettings] = useState(null);
 
-  const [streaming, setStreaming] = useState(false);
+  const [streaming, setStreaming] = useState(true);
   const [startedUp, setStartedUp] = useState(false);
 
   const [showTop, setShowTop] = useState(true);
@@ -33,15 +34,15 @@ const Home = () => {
   const [coolant, setCoolant] = useState(0);
   const [voltage, setVoltage] = useState(0);
 
-  const [wifiState, setWifiState] = useState("disconnected");
-  const [phoneState, setPhoneState] = useState("disconnected");
+  const [wifiState, setWifiState] = useState(false);
+  const [phoneState, setPhoneState] = useState(false);
 
   useEffect(() => {
     ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
-    ipcRenderer.on('wifiOn', () => { setWifiState("connected")});
-    ipcRenderer.on('wifiOff', () => { setWifiState("disconnected")});
-    ipcRenderer.on("plugged", () => { setPhoneState("connected")});
-    ipcRenderer.on("unplugged", () => { setPhoneState("disconnected")});
+    ipcRenderer.on('wifiOn', () => { setWifiState(true)});
+    ipcRenderer.on('wifiOff', () => { setWifiState(false)});
+    ipcRenderer.on("plugged", () => { setPhoneState(true)});
+    ipcRenderer.on("unplugged", () => { setPhoneState(false)});
 
     return () => {
       ipcRenderer.removeAllListeners();
@@ -61,8 +62,9 @@ const Home = () => {
       setStreaming(true);
     });
 
-    socket.on('status', ({ args }) => {
-      setPhoneState(args)
+    socket.on('status', ({ status  }) => {
+      console.log("status@home: ", status)
+      setPhoneState(status)
     })
 
     return () => {

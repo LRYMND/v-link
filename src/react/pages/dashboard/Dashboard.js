@@ -1,8 +1,10 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 
+import RadialGauge from '../../components/RadialGauge'
+
+import "../../themes.scss";
 import './dashboard.scss';
-import '../../components/themes.scss';
 
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
@@ -20,12 +22,15 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage }) => {
 	const [textColorActive, setTextColorActive] = useState(null);
 
 	const [fillActive, setFillActive] = useState(null);
-	const [fillInctive, setFillInactive] = useState(null);
+	const [fillInactive, setFillInactive] = useState(null);
+
+	const [sectionColor, setSectionColor] = useState(null);
 
 
 	function loadTheme() {
 		let style = getComputedStyle(document.querySelector(".dashboard"));
 
+		setSectionColor(style.getPropertyValue("--sectionColor"));
 		setColorNeedle(style.getPropertyValue("--colorNeedle"));
 		setTextColor(style.getPropertyValue("--textColor"));
 		setTextColorActive(style.getPropertyValue("--textColorActive"));
@@ -41,116 +46,96 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage }) => {
 			</div>
 			{loaded ?
 				<div className="dashboard__gauges">
-					{settings.showGaugeBoost ?
-						<rockiot-ui
-							id="radial_1"
-							serial="radial_1"
-							type="gauge"
-							variation="radial"
-							orientation="vertical"
-							name="Boost"
-							value={boost}
-							units="Bar"
-							min="0"
-							max="2"
-							precision="2"
-							animation="500"
-							svgwidth="250"
-							svgheight="250"
-							text-color={textColor}
-							value-color={textColor}
-							value-bg="transparent"
-							value-border="0px solid #000000"
-							control-bg="none"
-							startangle="45"
-							endangle="135"
-							radius="lg"
-							size="md"
-							scale="1"
-							smallscale="1"
-							ticks="2"
-							needle="1"
-							bar-color={fillInctive}
-							progress-color={fillActive}
-							scale-color={textColorActive}
-							scale-text-color={textColorActive}
-							needle-color={colorNeedle}
-							needle-stroke={colorNeedle}
-						></rockiot-ui>
-						: <div></div>}
 					{settings.showGaugeIntake ?
-						<rockiot-ui
-							id="radial_1"
-							serial="radial_1"
-							type="gauge"
-							variation="radial"
-							orientation="vertical"
-							name="Intake"
-							value={intake}
-							units="°C"
-							min="0"
-							max="90"
-							precision="2"
-							animation="500"
-							svgwidth="250"
-							svgheight="250"
-							text-color={textColor}
-							value-color={textColor}
-							value-bg="transparent"
-							value-border="0px solid #000000"
-							control-bg="none"
-							startangle="45"
-							endangle="135"
-							radius="lg"
-							size="md"
-							scale="1"
-							smallscale="1"
-							ticks="2"
-							needle="1"
-							bar-color={fillInctive}
-							progress-color={fillActive}
-							scale-color={textColorActive}
-							scale-text-color={textColorActive}
-							needle-color={colorNeedle}
-							needle-stroke={colorNeedle}
-						></rockiot-ui>
+						<RadialGauge
+							globalRotation={90}
+							currentValue={intake}
+							maxValue={90}
+							size={120}
+							progressRadius={70}
+							progressWidth={5}
+							limitRadius={80}
+							limitWidth={2}
+							limitStart={60}
+							tickWidth={1}
+							bigTicks={3}
+							smallTicks={4}
+							heightBigTicks={10}
+							heightSmallTicks={2}
+							needleLength={65}
+							needleWidth={2}
+							title="Intake"
+							unit="°C"
+							progressBackgroundColor={fillInactive}
+							progressFillerColor={fillActive}
+							tickColor={fillInactive}
+							limitColor={colorNeedle}
+							needleColor={colorNeedle}
+							textColor1={fillInactive}
+							textColor2={textColorActive}
+							pivotColor={fillInactive}
+						/>
+						: <div></div>}
+					{settings.showGaugeBoost ?
+
+						<RadialGauge
+							globalRotation={90}
+							currentValue={boost}
+							maxValue={1.6}
+							size={120}
+							progressRadius={90}
+							progressWidth={5}
+							limitRadius={100}
+							limitWidth={2}
+							limitStart={1.0}
+							tickWidth={1}
+							bigTicks={2}
+							smallTicks={9}
+							heightBigTicks={10}
+							heightSmallTicks={2}
+							needleLength={80}
+							needleWidth={2}
+							title="Boost"
+							unit="Bar"
+							progressBackgroundColor={fillInactive}
+							progressFillerColor={fillActive}
+							tickColor={fillInactive}
+							limitColor={colorNeedle}
+							needleColor={colorNeedle}
+							textColor1={fillInactive}
+							textColor2={textColorActive}
+							pivotColor={fillInactive}
+						/>
 						: <div></div>}
 					{settings.showGaugeCoolant ?
-						<rockiot-ui
-							id="radial_1"
-							serial="radial_1"
-							type="gauge"
-							variation="radial"
-							orientation="vertical"
-							name="Coolant"
-							value={coolant}
-							units="°C"
-							min="0"
-							max="150"
-							precision="2"
-							animation="500"
-							svgwidth="250"
-							svgheight="250"
-							text-color={textColor}
-							value-color={textColor}
-							value-bg="transparent"
-							value-border="0px solid #000000"
-							control-bg="none"
-							startangle="45"
-							endangle="135"
-							radius="lg"
-							size="md"
-							scale="1"
-							smallscale="1"
-							ticks="2"
-							needle="1"
-							bar-color={fillInctive}
-							progress-color={fillActive}
-							scale-color={textColorActive}
-							scale-text-color={textColorActive}
-							needle-color={colorNeedle}
-							needle-stroke={colorNeedle}
-						></rockiot-ui>
+						<RadialGauge
+							globalRotation={90}
+							currentValue={coolant}
+							maxValue={150}
+							size={120}
+							progressRadius={70}
+							progressWidth={5}
+							limitRadius={80}
+							limitWidth={2}
+							limitStart={100}
+							tickWidth={1}
+							bigTicks={3}
+							smallTicks={4}
+							heightBigTicks={10}
+							heightSmallTicks={2}
+							needleLength={65}
+							needleWidth={2}
+							title="Coolant"
+							unit="°C"
+							progressBackgroundColor={fillInactive}
+							progressFillerColor={fillActive}
+							tickColor={fillInactive}
+							limitColor={colorNeedle}
+							needleColor={colorNeedle}
+							textColor1={fillInactive}
+							textColor2={textColorActive}
+							pivotColor={fillInactive}
+						/>
 						: <div></div>}
 				</div> : <></>}
 			<div className="dashboard__footer">
