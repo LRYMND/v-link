@@ -28,10 +28,11 @@ export const RadialGauge = ({
     smallTicks = 4,
     heightBigTicks = 10,
     heightSmallTicks = 2,
+    tickWidth = 1,
 
     needleLength = 80,
     needleWidth = 2,
-    pivotSize = 10,
+    pivotSize = 15,
 
     limitRadius = 80,
     limitWidth = 2,
@@ -61,7 +62,6 @@ export const RadialGauge = ({
     let percent2 = (limitStart / maxValue) * 100;
 
     smallTicks = (bigTicks) * (smallTicks + 1)
-    let tickWidth = 1 //Userdefined
 
     let cx = size                                               //Center
     let cy = cx

@@ -51,17 +51,17 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage }) => {
 							globalRotation={90}
 							currentValue={intake}
 							maxValue={90}
-							size={120}
+							size={110}
 							progressRadius={70}
 							progressWidth={5}
 							limitRadius={80}
 							limitWidth={2}
 							limitStart={60}
-							tickWidth={1}
+							tickWidth={2}
 							bigTicks={3}
 							smallTicks={4}
 							heightBigTicks={10}
-							heightSmallTicks={2}
+							heightSmallTicks={3}
 							needleLength={65}
 							needleWidth={2}
 							title="Intake"
@@ -73,7 +73,10 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage }) => {
 							needleColor={colorNeedle}
 							textColor1={fillInactive}
 							textColor2={textColorActive}
-							pivotColor={fillInactive}
+							pivotColor={sectionColor}
+							borderSize={1}
+    						borderGap={5}
+							borderColor={sectionColor}
 						/>
 						: <div></div>}
 					{settings.showGaugeBoost ?
@@ -88,11 +91,11 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage }) => {
 							limitRadius={100}
 							limitWidth={2}
 							limitStart={1.0}
-							tickWidth={1}
-							bigTicks={2}
-							smallTicks={9}
+							tickWidth={2}
+							bigTicks={3}
+							smallTicks={4}
 							heightBigTicks={10}
-							heightSmallTicks={2}
+							heightSmallTicks={3}
 							needleLength={80}
 							needleWidth={2}
 							title="Boost"
@@ -104,7 +107,10 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage }) => {
 							needleColor={colorNeedle}
 							textColor1={fillInactive}
 							textColor2={textColorActive}
-							pivotColor={fillInactive}
+							pivotColor={sectionColor}
+							borderSize={1}
+    						borderGap={5}
+							borderColor={sectionColor}
 						/>
 						: <div></div>}
 					{settings.showGaugeCoolant ?
@@ -112,17 +118,17 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage }) => {
 							globalRotation={90}
 							currentValue={coolant}
 							maxValue={150}
-							size={120}
+							size={110}
 							progressRadius={70}
 							progressWidth={5}
 							limitRadius={80}
 							limitWidth={2}
 							limitStart={100}
-							tickWidth={1}
+							tickWidth={2}
 							bigTicks={3}
 							smallTicks={4}
 							heightBigTicks={10}
-							heightSmallTicks={2}
+							heightSmallTicks={3}
 							needleLength={65}
 							needleWidth={2}
 							title="Coolant"
@@ -134,7 +140,10 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage }) => {
 							needleColor={colorNeedle}
 							textColor1={fillInactive}
 							textColor2={textColorActive}
-							pivotColor={fillInactive}
+							pivotColor={sectionColor}
+							borderSize={1}
+    						borderGap={5}
+							borderColor={sectionColor}
 						/>
 						: <div></div>}
 				</div> : <></>}
