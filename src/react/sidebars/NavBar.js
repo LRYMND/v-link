@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import IconButton from "@mui/material/IconButton";
 
 import NavBarBackground from "./images/navbar.png"
-import "../components/themes.scss"
+import "../themes.scss";
 import "./navbar.scss";
 
 const electron = window.require('electron')

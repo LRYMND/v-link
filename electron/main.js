@@ -109,8 +109,8 @@ function createWindow() {
 
   if (isDev || !(settings.store.get('kiosk'))) {
     mainWindow = new BrowserWindow({
-      width: settings.store.get('width'),
-      height: settings.store.get('height'),
+      width: settings.store.get('windowWidth'),
+      height: settings.store.get('windowHeight'),
       kiosk: false,
       show: false,
       backgroundColor: '#000000',
@@ -127,8 +127,8 @@ function createWindow() {
   } else {
 
     mainWindow = new BrowserWindow({
-      width: 800,
-      height: 480,
+      width: settings.store.get('windowWidth'),
+      height: settings.store.get('windowHeight'),
       kiosk: false,
       show: false,
       frame: false,
@@ -163,8 +163,8 @@ function createWindow() {
     nightMode: 0,
     hand: settings.store.get('lhd'),
     boxName: 'nodePlay',
-    width: size[0],
-    height: size[1],
+    width: settings.store.get('width'),
+    height: settings.store.get('height'),
     fps: settings.store.get('fps'),
   };
 
@@ -240,7 +240,15 @@ function createWindow() {
 
 }
 
-app.on('ready', createWindow);
+function startUp () {
+  createWindow();
+  createBackgroundWorker();
+}
+
+app.on('ready', function() {
+  //createWindow();
+  startUp();
+});
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
     app.quit();
@@ -248,25 +256,29 @@ app.on('window-all-closed', function () {
   }
 });
 
+/*
 app.on('activate', function () {
   if (mainWindow === null) {
+    //startUp();
     createWindow();
   }
 });
+*/
 
 
 // ------------------- Background Worker --------------------
 
-// temporary variable to store data while background process is ready to start processing
 let cache = {
   data: undefined,
 };
 
-// a window object outside the function scope prevents the object from being garbage collected
 let hiddenWindow;
 
-// This event listener will listen for request from visible renderer process
-ipcMain.on('startScript', (event, args) => {
+function createBackgroundWorker() {
+
+  let cache = {
+    data: undefined,
+  };
 
   if (settings.store.get('activateCAN')) {
     console.log('starting background worker');
@@ -320,34 +332,31 @@ ipcMain.on('startScript', (event, args) => {
       hiddenWindow = null;
     });
 
-    cache.data = args.number;
+    //cache.data = args.number;
   } else {
     console.log('can-stream deactivated.')
   }
-});
+}
 
 
-// This event listener will start the execution of the background task once ready
+// Script Setup
 ipcMain.on('backgroundReady', (event, args) => {
   event.reply('startPython', {
     data: cache.data,
   });
 });
 
-// This event will quit the python script when Dashboard page will be unmounted
 ipcMain.on('stopScript', (event, args) => {
   if (hiddenWindow != null) {
     hiddenWindow.webContents.send('stopPython');
   }
 });
 
-// This event will quit the python script when Dashboard page will be unmounted
 ipcMain.on('backgroundClose', (event, args) => {
   console.log('closing background worker');
   hiddenWindow.close();
 });
 
-// This event listener will listen for data being sent back from the background renderer process
 ipcMain.on('msgToMain', (event, args) => {
   //console.log('debug: ', args.message);
   mainWindow.webContents.send('msgFromBackground', args.message);

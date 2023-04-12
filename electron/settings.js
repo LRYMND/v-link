@@ -18,9 +18,9 @@ class UserSettings {
                 type: 'boolean',
                 default: true,
             },
-            activateCC: {
+            activateOSD: {
                 type: 'boolean',
-                default: false,
+                default: true,
             },
             activateCAN: {
                 type: 'boolean',
@@ -30,7 +30,6 @@ class UserSettings {
                 type: 'boolean',
                 default: true,
             },
-
             fps: {
                 type: 'integer',
                 // maximum: 60,
@@ -43,9 +42,17 @@ class UserSettings {
             },
             height: {
                 type: 'integer',
-                default: 480
+                default: 440
             },
             width: {
+                type: 'integer',
+                default: 800
+            },
+            windowHeight: {
+                type: 'integer',
+                default: 480
+            },
+            windowWidth: {
                 type: 'integer',
                 default: 800
             },
@@ -59,7 +66,7 @@ class UserSettings {
                 type: 'integer',
                 // maximum: 800,
                 // minimum: 80,
-                default: 240
+                default: 140
             }
         }
 

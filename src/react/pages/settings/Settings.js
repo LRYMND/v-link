@@ -5,8 +5,8 @@ import useModal from './modal/useModal';
 
 import { useState, useEffect } from 'react';
 
+import "../../themes.scss";
 import './settings.scss';
-import '../../components/themes.scss';
 
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
@@ -77,6 +77,7 @@ const Settings = ({ settings, setSettings }) => {
   const handleCAN = () => {
     changeSetting('activateCAN', !toggleCAN);
     setCAN(!toggleCAN);
+    reloadApp();
   };
 
   /* Checkbox MMI */
@@ -87,6 +88,21 @@ const Settings = ({ settings, setSettings }) => {
     setMMI(!toggleMMI);
     reloadApp();
   };
+
+    /* Checkbox OSD */
+    const [toggleOSD, setOSD] = React.useState(settings.activateOSD);
+
+    const handleOSD = () => {
+      changeSetting('activateOSD', !toggleOSD);
+      setOSD(!toggleOSD);
+
+      if(toggleOSD) {
+        changeSetting('height', settings.windowHeight);
+      } else {
+        changeSetting('height', settings.windowHeight - 40);
+      }
+      reloadApp();
+    };
 
   /* Checkbox UNDEFINED */
   //const [toggleCruiseControl, setCruiseControl] = React.useState(settings.activateCC);
@@ -188,7 +204,7 @@ const Settings = ({ settings, setSettings }) => {
             </div>
           </div>
           <div className='settings__connections__bt'>
-            <p><i>Volvo RTVI v1.2.1</i></p>
+            <p><i>Volvo RTVI v1.2.2</i></p>
           </div>
         </div>
         <div className='settings__general'>
@@ -218,7 +234,7 @@ const Settings = ({ settings, setSettings }) => {
               <div><h4>General:</h4></div>
               <label><input type='checkbox' onChange={handleCAN} defaultChecked={settings.activateCAN} /> Enable CAN </label>
               <label><input type='checkbox' onChange={handleMMI} defaultChecked={settings.activateMMI} /> Enable MMI </label>
-              <label><input type='checkbox' defaultChecked={false} disabled={true} /> <span>-</span> </label>
+              <label><input type='checkbox' onChange={handleOSD} defaultChecked={settings.activateOSD} /> Enable OSD </label>
             </div >
           </div>
           <hr
