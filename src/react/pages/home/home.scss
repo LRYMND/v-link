@@ -7,6 +7,29 @@
     font-family: 'Helvetica',
 }
 
+.refresh {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+    color: #000000;
+    fill: #ffffff;
+
+    &__icon{
+        
+        width: 7rem;
+        height: 7rem;
+    }
+
+    &__button{
+        background-color: #000000;
+        border: none;
+    }
+}
+
 .navbar {
     position: absolute;
     z-index: 10;
@@ -19,6 +42,7 @@
 
 .dashbar {
     //position: absolute;
+    width: 100%;
 }
 
 .carplay {

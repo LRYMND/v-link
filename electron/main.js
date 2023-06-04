@@ -196,6 +196,7 @@ function createWindow() {
   });
 
   ipcMain.on('getSettings', () => {
+    console.log(settings.store.store)
     mainWindow.webContents.send('allSettings', settings.store.store)
   });
 
@@ -206,8 +207,8 @@ function createWindow() {
   });
 
   ipcMain.on('reqReload', () => {
-    app.relaunch()
-    app.quit();
+    app.relaunch();
+    app.exit();
   });
 
   ipcMain.on('reqClose', () => {

@@ -204,7 +204,7 @@ const Settings = ({ settings, setSettings }) => {
             </div>
           </div>
           <div className='settings__connections__bt'>
-            <p><i>Volvo RTVI v1.2.2</i></p>
+            <p><i>Volvo RTVI v1.2.3</i></p>
           </div>
         </div>
         <div className='settings__general'>

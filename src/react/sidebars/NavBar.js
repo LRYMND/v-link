@@ -36,21 +36,21 @@ const NavBar = ({ settings, view, setView }) => {
   return (
     <div>
         <div className={`navbar ${theme}`} style={{ backgroundImage: `url(${NavBarBackground})` }}>
-          <IconButton onClick={() => changeView('Dashboard')}>
+          <IconButton onClick={() => changeView('Dashboard')} style={{ fill: (view === 'Dashboard') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
             <svg className="navbar__icon">
               <use xlinkHref="./svg/gauge.svg#gauge"></use>
             </svg>
           </IconButton>
 
           {showMMI ?
-            <IconButton onClick={() => changeView('Carplay')}>
+            <IconButton onClick={() => changeView('Carplay')} style={{ fill: (view === 'Carplay') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
               <svg className="navbar__icon">
                 <use xlinkHref="./svg/carplay.svg#carplay"></use>
               </svg>
             </IconButton>
           : <></>}
 
-          <IconButton onClick={() => changeView('Settings')}>
+          <IconButton onClick={() => changeView('Settings')} style={{ fill: (view === 'Settings') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
             <svg className="navbar__icon">
               <use xlinkHref="./svg/settings.svg#settings"></use>
             </svg>

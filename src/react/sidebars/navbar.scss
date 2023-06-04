@@ -19,17 +19,11 @@
 
     margin-top: 1rem;
 
-    fill: var(--fillInactive);
+    //fill: var(--fillInactive);
     transition: fill 0.3s;
 
     &:hover {
       fill: var(--fillHover);
     }
-  }
-}
-
-.active {
-  .navbar__icon {
-    fill: var(--fillActive);
   }
 }

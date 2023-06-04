@@ -22,7 +22,7 @@ const Home = () => {
   const [view, setView] = useState('Carplay')
   const [settings, setSettings] = useState(null);
 
-  const [streaming, setStreaming] = useState(true);
+  const [streaming, setStreaming] = useState(false);
   const [startedUp, setStartedUp] = useState(false);
 
   const [showTop, setShowTop] = useState(true);
@@ -38,6 +38,7 @@ const Home = () => {
   const [phoneState, setPhoneState] = useState(false);
 
   useEffect(() => {
+    ipcRenderer.on('allSettings', (event, data) => { loadSettings(data);});
     ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
     ipcRenderer.on('wifiOn', () => { setWifiState(true)});
     ipcRenderer.on('wifiOff', () => { setWifiState(false)});
@@ -50,14 +51,6 @@ const Home = () => {
   })
 
   useEffect(() => {
-    ipcRenderer.on('allSettings', (event, data) => { loadSettings(data); });
-
-    ipcRenderer.send('statusReq');
-    ipcRenderer.send('updateWifi');
-    ipcRenderer.send('getSettings')
-
-    socket.emit('statusReq');
-
     socket.on('carplay', (data) => {
       setStreaming(true);
     });
@@ -66,6 +59,12 @@ const Home = () => {
       console.log("status@home: ", status)
       setPhoneState(status)
     })
+
+    socket.emit('statusReq');
+
+    ipcRenderer.send('statusReq');
+    ipcRenderer.send('updateWifi');
+    ipcRenderer.send('getSettings');
 
     return () => {
       socket.off();
@@ -100,12 +99,16 @@ const Home = () => {
   }, [settings])
 
   function loadSettings(data) {
-    console.log('loading settings...')
     if (data != null) {
-      console.log('settings loaded: ', settings)
       setSettings(data);
+      console.log('settings loaded: ', data)
     }
   }
+
+  function reloadApp() {
+    ipcRenderer.send('getSettings');
+    //ipcRenderer.send('reqReload');
+  };
 
   const touchEvent = (type, x, y) => {
     ipcRenderer.send('click', { type: type, x: x, y: y })
@@ -213,7 +216,7 @@ const Home = () => {
 
   return (
     <>
-      {startedUp &&
+      {startedUp ?
         <div className='container'>
           {showTop &&
             <TopBar
@@ -233,7 +236,15 @@ const Home = () => {
               setView={setView}
             />
           }
-        </div>}
+        </div>
+        :
+        <div className='refresh'>
+          <button className='refresh__button' type='button' onClick={reloadApp}>
+          <svg className="refresh__icon">
+            <use xlinkHref="./svg/volvologo.svg#volvologo"></use>
+          </svg>
+        </button>
+          </div>}
     </>
   );
 };
