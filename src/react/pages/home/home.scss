@@ -12,11 +12,13 @@
     height: 100%;
 
     display: flex;
-
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #000000;
+    color: #ffffff;
     fill: #ffffff;
+    margin-top: 3rem;
+    gap: 5rem;
 
     &__icon{
         
@@ -26,6 +28,8 @@
 
     &__button{
         background-color: #000000;
+        color: #ffffff;
+        font-size: 3rem;
         border: none;
     }
 }

@@ -25,12 +25,15 @@ const Settings = ({ settings, setSettings }) => {
   useEffect(() => {
     ipcRenderer.on('wifiList', updateWifi);
     ipcRenderer.on('wifiConnected', updateWifiStatus);
-    ipcRenderer.send('wifiUpdate');
 
     return function cleanup() {
       ipcRenderer.removeListener('wifiList', updateWifi);
       ipcRenderer.removeListener('wifiConnected', updateWifiStatus);
     };
+  })
+
+  useEffect(() => {
+    ipcRenderer.send('wifiUpdate');
   }, []);
 
   
@@ -189,7 +192,7 @@ const Settings = ({ settings, setSettings }) => {
       />
 
       <div className='settings__header'>
-        <h2>Settings</h2>
+        <h2>RTVI Settings</h2>
       </div>
       <div className='settings__body'>
         <div className='settings__connections'>
@@ -204,7 +207,7 @@ const Settings = ({ settings, setSettings }) => {
             </div>
           </div>
           <div className='settings__connections__bt'>
-            <p><i>Volvo RTVI v1.2.3</i></p>
+            <p><i>RTVI v1.2.3</i></p>
           </div>
         </div>
         <div className='settings__general'>

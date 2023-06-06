@@ -182,7 +182,7 @@ export const RadialGauge = ({
                 <text
                     className="gauge_titleLabel"
                     fill={(textColor1)}
-                    fontSize="10px"
+                    fontSize="12px"
                     x="50%"
                     y="30%"
                     dy="20px"
@@ -194,7 +194,7 @@ export const RadialGauge = ({
                 <text
                     className="gauge_unitLabel"
                     fill={(textColor1)}
-                    fontSize="10px"
+                    fontSize="12px"
                     x="50%"
                     y="78%"
                     dy="20px"

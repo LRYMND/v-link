@@ -74,11 +74,11 @@ const WifiModal = ({ isShowing, ssid, hide, connect, status, reset, settings }) 
             {isShowing ?
             <div className={`container ${settings.colorTheme}`}>
                 <React.Fragment>
-                    <div className="modal-overlay" />
-                    <div className="modal-wrapper" aria-modal aria-hidden tabIndex={-1} role="dialog">
-                        <div className="modal">
-                            <div className="modal__body">
-                                <div className="modal__body__title">
+                    <div className="wifi-modal-overlay" />
+                    <div className="wifi-modal-wrapper" aria-modal aria-hidden tabIndex={-1} role="dialog">
+                        <div className="wifi-modal">
+                            <div className="wifi-modal__body">
+                                <div className="wifi-modal__body__title">
                                     {isConnecting ?
                                         <div className="spinner">
                                             <h3>Connecting...</h3>
@@ -89,11 +89,11 @@ const WifiModal = ({ isShowing, ssid, hide, connect, status, reset, settings }) 
                                         </div>}
                                 </div>
                                 <form onSubmit={handleSubmit}>
-                                    <div className="modal__body__input">
+                                    <div className="wifi-modal__body__input">
                                                 <input onClick={(e) => setInput("")} onChange={onChangeInput} value={input} type="text" name="password" id="password" />
                                         
                                     </div>
-                                    <div className="modal__body__buttons">
+                                    <div className="wifi-modal__body__buttons">
                                         <input type="submit" value="Connect" className="button" />
                                         <input type="button" value="Close" className="button" onClick={close} />
                                     </div>

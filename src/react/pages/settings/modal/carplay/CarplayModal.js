@@ -7,10 +7,6 @@ import './carplayModal.scss';
 
 const CarplayModal = ({ isShowing, hide, settings, changeSetting }) => {
 
-    const keyboard = useRef();
-    const [layout, setLayout] = useState('default');
-    const [input, setInput] = useState('');
-
     const [fps, setFps] = useState(settings.fps)
     const [kiosk, setKiosk] = useState(settings.kiosk)
     const [height, setHeight] = useState(settings.height)
@@ -33,22 +29,6 @@ const CarplayModal = ({ isShowing, hide, settings, changeSetting }) => {
         changeSetting('lhd', parseInt(lhd));
         changeSetting('dpi', parseInt(dpi));
     }
-
-    const handleShift = () => {
-        const newLayoutName = layout === 'default' ? 'shift' : 'default';
-        setLayout(newLayoutName);
-    };
-
-    const onKeyPress = button => {
-        console.log('Button pressed', button);
-        //If you want to handle the shift and caps lock buttons
-        if (button === '{shift}' || button === '{lock}') handleShift();
-    };
-
-    const onChange = input => {
-        setInput(input);
-        console.log('Input changed', input);
-    };
 
     const handleSubmit = (e) => {
         save();
@@ -86,7 +66,6 @@ const CarplayModal = ({ isShowing, hide, settings, changeSetting }) => {
     };
 
     const handleChangeDpi = event => {
-        onChangeInput(event.target.value)
         const min = 80;
         const max = 800;
         const value = Math.max(min, Math.min(max, Number(event.target.value)));
@@ -94,23 +73,17 @@ const CarplayModal = ({ isShowing, hide, settings, changeSetting }) => {
         console.log(dpi)
     };
 
-    const onChangeInput = event => {
-        const input = event.target.value;
-        setInput(input);
-        keyboard.current.setInput(input);
-    };
-
     return ReactDOM.createPortal(
         <>
             {isShowing ?
                 <div className={`container ${settings.colorTheme}`}>
                     <React.Fragment>
-                        <div className='modal-overlay' />
-                        <div className='modal-wrapper' aria-modal aria-hidden tabIndex={-1} role='dialog'>
-                            <div className='modal'>
-                                <div className='modal__body'>
-                                    <div className='modal__form'>
-                                        <div className='modal__form__inputContainer'>
+                        <div className='carplay-modal-overlay' />
+                        <div className='carplay-modal-wrapper' aria-modal aria-hidden tabIndex={-1} role='dialog'>
+                            <div className='carplay-modal'>
+                                <div className='carplay-modal__body'>
+                                    <div className='carplay-modal__form'>
+                                        <div className='carplay-modal__form__inputContainer'>
                                             <form onSubmit={handleSubmit}>
                                                 <div className='row'> <div className='row__title'>FPS:</div>
                                                     <div className='row__setting'>
@@ -147,7 +120,6 @@ const CarplayModal = ({ isShowing, hide, settings, changeSetting }) => {
                                                             placeholder={height}
                                                             value={height}
                                                             onChange={handleChangeHeight}
-                                                            onClick={(e) => setKeyboardTarget("Height")}
                                                         />
                                                     </div>
                                                 </div>
@@ -160,7 +132,6 @@ const CarplayModal = ({ isShowing, hide, settings, changeSetting }) => {
                                                             placeholder={width}
                                                             value={width}
                                                             onChange={handleChangeWidth}
-                                                            onClick={(e) => setKeyboardTarget("Width")}
                                                         />
                                                     </div>
                                                 </div>
@@ -173,27 +144,20 @@ const CarplayModal = ({ isShowing, hide, settings, changeSetting }) => {
                                                             placeholder={dpi}
                                                             value={dpi}
                                                             onChange={handleChangeDpi}
-                                                            onClick={(e) => setKeyboardTarget("DPI")}
                                                         />
                                                     </div>
                                                 </div>
                                             </form>
                                         </div>
 
-                                        <div className='modal__form__buttons'>
+
+                                    </div>
+
+                                    <div className='carplay-modal__buttons'>
                                             <input type='submit' value='Save' className='button' onClick={save} />
                                             <input type='button' value='Close' className='button' onClick={close} />
-                                        </div>                                    </div>
-                                    
+                                        </div>
                                 </div>
-                            </div>
-                            <div className='keyboard'>
-                                <Keyboard
-                                    keyboardRef={r => (keyboard.current = r)}
-                                    layoutName={layout}
-                                    onChange={onChange}
-                                    onKeyPress={onKeyPress}
-                                />
                             </div>
                         </div>
                     </React.Fragment>

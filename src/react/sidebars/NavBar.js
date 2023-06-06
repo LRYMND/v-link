@@ -55,6 +55,12 @@ const NavBar = ({ settings, view, setView }) => {
               <use xlinkHref="./svg/settings.svg#settings"></use>
             </svg>
           </IconButton>
+
+          <IconButton onClick={() => changeView('Volvo')} style={{ fill: (view === 'Volvo') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
+            <svg className="navbar__icon">
+              <use xlinkHref="./svg/car.svg#car"></use>
+            </svg>
+          </IconButton>
         </div >
     </div >
   );

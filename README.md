@@ -136,9 +136,19 @@ Make sure that you stress-relief all your wiring connections with zip ties, so t
 
 ## 07 | Set Up
 
-### > Prerequisites:
+### > Running the app:
 
-Before you start, install the following packages:
+Download 'RTVI-Installer.sh' from the latest Release and execute it:
+
+```
+sh RTVI-Installer.sh
+```
+
+The setup will download and install everything as needed.
+
+### > Building the app:
+
+0.) Install Prerequisites
 
 ```
 sudo apt-get update
@@ -147,20 +157,6 @@ sudo apt-get install ffmpeg
 sudo apt-get install libudev-dev
 sudo apt-get install python-can
 ```
-
-
-### > Running the app:
-
-Download the latest release, navigate to the folder and execute these commands:
-
-```
-sh setup-permissions.sh
-chmod +x App.AppImage
-./App.AppImage --no-sandbox
-```
-
-
-### > Building the app:
 
 
 1.) Install Node.js:
@@ -182,7 +178,7 @@ npm run build-package
 ```
 
 
-### > RasPi setup:
+### > RasPi setup & clean boot:
 
 
 1.) Add these lines to your "/boot/config.txt"
@@ -229,11 +225,6 @@ This command will hide the cursor automatically after 2 seconds:
 ```
 
 6.) To automatically hide the taskbar simply right-click it to activate this setting.
-
-
-### > Note:
-
-The Raspberry is booting without any splash screens now and the app should open right after the login, ready to connect to your phone.
 
 ## 08 | Audio
 

@@ -1,4 +1,4 @@
-.modal-overlay {
+.carplay-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -15,9 +15,9 @@
     animation-duration: .5s;
 }
 
-.modal-wrapper {
+.carplay-modal-wrapper {
     position: fixed;
-    top: 3rem;
+    top: 1rem;
     left: 0;
     z-index: 1050;
     width: 100%;
@@ -29,41 +29,51 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
+    justify-content: center;
+    gap: .5rem;
 }
 
-.modal {
-    display: flex;
+.carplay-modal {
     background: var(--sectionColor);
 
     position: relative;
-    width: 72%;
-    height: 5rem;
+    width: 80%;
+    height: 70%;
 
-    animation-name: blend_modal;
+    margin-top: -5rem;
+
+    animation-name: blend_carplay-modal;
     animation-duration: .2s;
+
+    border-radius: 10px;
+
 
     &__body {
         height: 100%;
         width: 100%;
+
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+
+        gap: 1rem;
     }
 
     &__form {
         display: flex;
         align-items: center;
         flex-direction: column;
-        justify-content: space-between;
+        
+        margin-top: -1rem;
 
-        margin-top: 1rem;
-
-
-        width: 100%;
-        height: 8rem;
+        width: 90%;
+        height: 65%;
 
         &__inputContainer {
             margin-right: -1rem;
             width: 100%;
-            height: 70%;
+            height: 100%;
             overflow-y: auto;
             overflow-x: hidden;
         }
@@ -86,14 +96,14 @@
                 background-color: var(--fillHover);
             }
         }
+    }
 
-        &__buttons {
-            margin-bottom: .5rem;
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            gap: 1rem;
-        }
+    &__buttons {
+        width: 90%;
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        margin-bottom: -1rem;
     }
 }
 
@@ -150,7 +160,7 @@
     width: 100%;
     height: 3rem;
 
-    margin-top: 1rem;
+    //margin-top: 1rem;
 
     color: var(--textColor);
     background-color: var(--buttonBackground);
@@ -175,49 +185,6 @@
     }
 }
 
-.keyboard {
-    width: 80%;
-    height: 100%;
-
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-
-    overflow-x: hidden;
-    overflow-y: hidden;
-}
-
-.simple-keyboard {
-    max-width: 100%;
-
-    color: var(--textColor);
-    background-color: var(--sectionColor);
-
-    //border-radius: 10px;
-
-    position: relative;
-
-    animation-name: blend_keyboard;
-    animation-duration: .2s;
-}
-
-.simple-keyboard .hg-button {
-    color: var(--textColor);
-    background-color: var(--buttonBackground);
-    border-color: var(--buttonBackgroundActive);
-
-
-    &:hover {
-        color: var(--textColorHover);
-        background-color: var(--buttonBackgroundHover);
-    }
-
-    &:active {
-        color: var(--textColorActive);
-        background-color: var(--buttonBackgroundActive);
-    }
-}
-
 .spinner {
     display: flex;
     flex-direction: row;
@@ -238,7 +205,7 @@
     }
 }
 
-@keyframes blend_modal {
+@keyframes blend_carplay-modal {
     0% {
         top: 3rem;
         opacity: 0%;

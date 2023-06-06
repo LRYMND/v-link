@@ -9,7 +9,8 @@ import DashBar from '../../sidebars/DashBar';
 
 import Dashboard from '../dashboard/Dashboard';
 import Settings from '../settings/Settings';
-import Template from '../template/Template';
+import Volvo from '../volvo/Volvo';
+import Template from '../_template/Template';
 
 import "../../themes.scss"
 import './home.scss';
@@ -19,7 +20,7 @@ const electron = window.require('electron')
 const { ipcRenderer } = electron;
 
 const Home = () => {
-  const [view, setView] = useState('Carplay')
+  const [view, setView] = useState('Dashboard')
   const [settings, setSettings] = useState(null);
 
   const [streaming, setStreaming] = useState(false);
@@ -38,13 +39,12 @@ const Home = () => {
   const [phoneState, setPhoneState] = useState(false);
 
   useEffect(() => {
-    ipcRenderer.on('allSettings', (event, data) => { loadSettings(data);});
-    ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
+    ipcRenderer.on('allSettings', (event, args) => { loadSettings(args)});
+    ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args)});
     ipcRenderer.on('wifiOn', () => { setWifiState(true)});
     ipcRenderer.on('wifiOff', () => { setWifiState(false)});
     ipcRenderer.on("plugged", () => { setPhoneState(true)});
     ipcRenderer.on("unplugged", () => { setPhoneState(false)});
-
     return () => {
       ipcRenderer.removeAllListeners();
     };
@@ -198,12 +198,21 @@ const Home = () => {
             setSettings={setSettings}
           />
         )
+
+      case 'Volvo':
+        return (
+          <Volvo
+            settings={settings}
+          />
+        )
+
       case 'Template':
         return (
           <Template
             settings={settings}
           />
         )
+
       default:
         return (
           <Dashboard
@@ -240,10 +249,10 @@ const Home = () => {
         :
         <div className='refresh'>
           <button className='refresh__button' type='button' onClick={reloadApp}>
-          <svg className="refresh__icon">
-            <use xlinkHref="./svg/volvologo.svg#volvologo"></use>
-          </svg>
+          <h1>RTVI</h1>
         </button>
+
+        <span className='refresh__version'>v1.2.3</span>
           </div>}
     </>
   );

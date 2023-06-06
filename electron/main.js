@@ -33,7 +33,7 @@ function getWifiStatus() {
   wifi.getStatus().then((status) => {
     if (status.ssid != null && status.ip_address != null) {
       mainWindow.webContents.send('wifiOn', status);
-      //console.log(status);
+      //if(isDev)console.log(status);
     } else {
       mainWindow.webContents.send('wifiOff');
     }
@@ -47,6 +47,7 @@ function getWifiStatus() {
 function getWifiNetworks() {
   wifi.scan().then((networks) => {
     mainWindow.webContents.send('wifiList', networks);
+    //if(isDev)console.log(networks);
   })
     .catch((error) => {
       console.log('error: ', error);
@@ -68,6 +69,7 @@ function connectWifi(data) {
 }
 
 ipcMain.on('wifiUpdate', () => {
+  //if(isDev)console.log('Updating Wifi');
   getWifiStatus();
   getWifiNetworks();
 });
@@ -170,17 +172,17 @@ function createWindow() {
 
   // ------------------- Carplay Setup --------------------
  
-  console.log('spawning carplay: ', config);
+  if(isDev) console.log('spawning carplay: ', config);
   const carplay = new Carplay(config);
 
   carplay.on('quit', () => {
-    console.log('exiting carplay');
+    if(isDev) console.log('exiting carplay');
     mainWindow.webContents.send('quitReq');
   });
 
   ipcMain.on('click', (event, data) => {
     carplay.sendTouch(data.type, data.x, data.y);
-    console.log('click: ', data.type, data.x, data.y);
+    if(isDev) console.log('click: ', data.type, data.x, data.y);
   });
 
   ipcMain.on('fpsReq', (event) => {
@@ -196,12 +198,12 @@ function createWindow() {
   });
 
   ipcMain.on('getSettings', () => {
-    console.log(settings.store.store)
+    if(isDev) console.log(settings.store.store)
     mainWindow.webContents.send('allSettings', settings.store.store)
   });
 
   ipcMain.on('settingsUpdate', (event, { setting, value }) => {
-    console.log('updating settings', setting, value)
+    //if(isDev) console.log('updating settings', setting, value)
     settings.store.set(setting, value)
     mainWindow.webContents.send('allSettings', settings.store.store)
   });
@@ -282,7 +284,7 @@ function createBackgroundWorker() {
   };
 
   if (settings.store.get('activateCAN')) {
-    console.log('starting background worker');
+    if(isDev) console.log('starting background worker');
     const backgroundFileURL = ''
 
 
@@ -335,7 +337,7 @@ function createBackgroundWorker() {
 
     //cache.data = args.number;
   } else {
-    console.log('can-stream deactivated.')
+    if(isDev) console.log('can-stream deactivated.')
   }
 }
 
@@ -354,11 +356,11 @@ ipcMain.on('stopScript', (event, args) => {
 });
 
 ipcMain.on('backgroundClose', (event, args) => {
-  console.log('closing background worker');
+  if(isDev) console.log('closing background worker');
   hiddenWindow.close();
 });
 
 ipcMain.on('msgToMain', (event, args) => {
-  //console.log('debug: ', args.message);
+  //if(isDev)console.log('debug: ', args.message);
   mainWindow.webContents.send('msgFromBackground', args.message);
 });
