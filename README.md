@@ -155,7 +155,7 @@ The setup will download and install everything as needed. To run the application
 
 ### > Building the app:
 
-0.) Install Prerequisites
+1.) Install Prerequisites
 
 ```
 sudo apt-get update
@@ -166,7 +166,7 @@ sudo apt-get install python-can
 ```
 
 
-1.) Install Node.js:
+2.) Install Node.js:
 
 ```
 sudo apt-get install npm
@@ -175,7 +175,7 @@ sudo n 18.12.1
 sudo npm install -g npm@8.19.2
 ```
 
-2.) Clone the repository and build it:
+3.) Clone the repository and build it:
 
 ```
 git clone https://github.com/LRYMND/volvo-rtvi/
@@ -205,21 +205,7 @@ disable_splash=1
 logo.nologo vt.global_cursor_default=0
 ```
 
-3.) Create a "startService.sh" file and add this line
-
-```
-#Execute app
-/path/to/your/AppImage.AppImage --no-sandbox
-```
-
-4.) Add this line to your "/etc/xdg/lxsession/LXDE-pi/autostart"
-
-```
-#Run script after boot
-bash '/path/to/your/startService.sh'
-```
-
-5.) To automatically hide the mouse curser you will need to install unclutter and add another line to your "/boot/config.txt"
+3.) To automatically hide the mouse curser you will need to install unclutter and add another line to your "/boot/config.txt"
 
 ```
 sudo apt-get install unclutter
@@ -231,7 +217,7 @@ This command will hide the cursor automatically after 2 seconds:
 @unclutter -idle 2
 ```
 
-6.) To automatically hide the taskbar simply right-click it to activate this setting.
+4.) To automatically hide the taskbar simply right-click it to activate this setting.
 
 ## 08 | Audio
 
