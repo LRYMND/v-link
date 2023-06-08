@@ -18,6 +18,10 @@ The app is intended to work with Volvo P1 T5 models but basically you can alter 
 
 > You can find a demo gif at the end of the readme.
 
+### > Note:
+
+Due to some differencies in the communication, Android Auto is not working properly as of now. Hopefully that can be fixed in the future.
+
 ## Content
 
 <!-- TABLE OF CONTENTS -->
