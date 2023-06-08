@@ -147,8 +147,11 @@ Download 'RTVI-Installer.sh' from the latest Release and execute it:
 ```
 sh RTVI-Installer.sh
 ```
+The setup will download and install everything as needed. To run the application, navigate to the AppImage and execute it:
 
-The setup will download and install everything as needed.
+```
+./RTVI.AppImage --no-sandbox
+```
 
 ### > Building the app:
 
