@@ -14,6 +14,8 @@ MAP_DATA = 0x9D
 IAT_DATA = 0xCE
 COL_DATA = 0xD8
 VOL_DATA = 0x0A
+λ1_DATA  = 0x34
+λ2_DATA  = 0x2C
 
 REFRESH_RATE = 0.03
 INTERVAL = 1
@@ -84,6 +86,21 @@ def can_rx_task():
 
             print("vol:"+str(float(voltage)))
             sys.stdout.flush()
+
+        #Catch Lambda1
+        if (message.arbitration_id == REP_ID and message.data[4] == λ1_DATA):
+            lambda1 = message.data[5]
+
+            print("ld1:"+str(float(lambda1)))
+            sys.stdout.flush()
+
+        #Catch Lambda2
+        if (message.arbitration_id == REP_ID and message.data[4] == λ2_DATA):
+            lambda2 = message.data[5]
+            lambda2 = lambda2 * 0.07 # Check scaling?
+
+            print("ld2:"+str(float(lambda2)))
+            sys.stdout.flush()
         
 
 t = Thread(target = can_rx_task)
@@ -95,6 +112,7 @@ try:
     while (True):
         x += REFRESH_RATE
 
+        # Slow requests go here
         if(x > INTERVAL):
             # Sent an intake temperature request
             msg = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x10,0xCE,0x01,0x00,0x00],is_extended_id=True)
@@ -122,10 +140,15 @@ try:
 
             x = 0
 
-        # Sent a boost pressure request
-        msg = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x12,0x9D,0x01,0x00,0x00],is_extended_id=True)
+        # Fast requests go here
+        # Sent a boost pressure and lambda requests
+        msg1 = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x12,0x9D,0x01,0x00,0x00],is_extended_id=True) #boost
+        msg2 = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x10,0x34,0x01,0x00,0x00],is_extended_id=True) #lambda 1
+        msg3 = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x10,0x2C,0x01,0x00,0x00],is_extended_id=True) #lambda 2
         try:
-            bus.send(msg)
+            bus.send(msg1)
+            bus.send(msg2)
+            bus.send(msg3)
             time.sleep(REFRESH_RATE)
         except can.CanError:
             print("Nothing sent")

@@ -9,7 +9,7 @@ import './dashboard.scss';
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
-const Dashboard = ({ settings, boost, intake, coolant, voltage }) => {
+const Dashboard = ({ settings, boost, intake, coolant, voltage, lambda1, lambda2 }) => {
 
 	useEffect(() => {
 		loadTheme();
@@ -147,9 +147,13 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage }) => {
 						/>
 						: <div></div>}
 				</div> : <></>}
-			<div className="dashboard__footer">
-				{settings.activateCAN ? <div><h3>{voltage}V</h3></div> : <div><h3><i>(CAN-Stream deactivated.)</i></h3></div>}
-			</div>
+			<>
+				{settings.activateCAN ? <div className="dashboard__footer">
+											<div className="dashboard__footer__element"><h3>λ1: {lambda1}</h3></div>
+											<div className="dashboard__footer__element"><h3>λ2: {lambda2}V</h3></div>
+											<div className="dashboard__footer__element"><h3>Bat: {voltage}V</h3></div>
+										</div> : <div className="dashboard__footer"><h3><i>(CAN-Stream deactivated.)</i></h3></div>}
+			</>
 		</div>
 	)
 };

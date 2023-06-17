@@ -34,6 +34,8 @@ const Home = () => {
   const [intake, setIntake] = useState(0);
   const [coolant, setCoolant] = useState(0);
   const [voltage, setVoltage] = useState(0);
+  const [lambda1, setLambda1] = useState(0);
+  const [lambda2, setLambda2] = useState(0);
 
   const [wifiState, setWifiState] = useState(false);
   const [phoneState, setPhoneState] = useState(false);
@@ -142,6 +144,14 @@ const Home = () => {
       args = args.replace("vol:", "")
       setVoltage(Number(args).toFixed(2));
     }
+    if (args.includes("ld1:")) {
+      args = args.replace("ld1:", "")
+      setLambda1(Number(args).toFixed(2));
+    }
+    if (args.includes("ld2:")) {
+      args = args.replace("ld2:", "")
+      setLambda2(Number(args).toFixed(2));
+    }
   }
 
   const renderView = () => {
@@ -188,6 +198,8 @@ const Home = () => {
             intake={intake}
             coolant={coolant}
             voltage={voltage}
+            lambda1={lambda1}
+            lambda2={lambda2}
           />
         )
 
