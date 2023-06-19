@@ -146,7 +146,10 @@ const Home = () => {
     }
     if (args.includes("ld1:")) {
       args = args.replace("ld1:", "")
-      setLambda1(Number(args).toFixed(2));
+      if(Number(args).toFixed(2) > 2)
+        setLambda1("Coast")
+      else
+        setLambda1(Number(args).toFixed(2));
     }
     if (args.includes("ld2:")) {
       args = args.replace("ld2:", "")

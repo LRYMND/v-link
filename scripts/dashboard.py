@@ -2,6 +2,7 @@ import can
 import time
 import os
 import sys
+import math
 
 from threading import Thread
 
@@ -14,8 +15,8 @@ MAP_DATA = 0x9D
 IAT_DATA = 0xCE
 COL_DATA = 0xD8
 VOL_DATA = 0x0A
-λ1_DATA  = 0x34
-λ2_DATA  = 0x2C
+LD1_DATA  = 0x34
+LD2_DATA  = 0x2C
 
 REFRESH_RATE = 0.03
 INTERVAL = 1
@@ -88,20 +89,19 @@ def can_rx_task():
             sys.stdout.flush()
 
         #Catch Lambda1
-        if (message.arbitration_id == REP_ID and message.data[4] == λ1_DATA):
-            lambda1 = message.data[5]
-
+        if (message.arbitration_id == REP_ID and message.data[4] == LD1_DATA):
+            lambda1 = (message.data[5] << 8) | message.data[6]
+            lambda1 = float(lambda1) * 16.0 / 65536.0
             print("ld1:"+str(float(lambda1)))
             sys.stdout.flush()
 
         #Catch Lambda2
-        if (message.arbitration_id == REP_ID and message.data[4] == λ2_DATA):
+        if (message.arbitration_id == REP_ID and message.data[4] == LD2_DATA):
             lambda2 = message.data[5]
-            lambda2 = lambda2 * 0.07 # Check scaling?
+            lambda2 = lambda2 * (1.33/255) - 0.2
 
             print("ld2:"+str(float(lambda2)))
             sys.stdout.flush()
-        
 
 t = Thread(target = can_rx_task)
 t.daemon = True
@@ -138,17 +138,23 @@ try:
             except can.CanError:
                 print("Nothing sent")
 
+            # Send rear lambda request
+            msg = can.Message(arbitration_id=REQ_ID, data=[0xCD, 0x7A, 0xA6, 0x10, 0x2C, 0x01, 0x00, 0x00],is_extended_id=True)
+            try:
+                bus.send(msg)
+                time.sleep(REFRESG_RATE)
+            except:
+                print("Nothing sent.")
+
             x = 0
 
         # Fast requests go here
         # Sent a boost pressure and lambda requests
         msg1 = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x12,0x9D,0x01,0x00,0x00],is_extended_id=True) #boost
         msg2 = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x10,0x34,0x01,0x00,0x00],is_extended_id=True) #lambda 1
-        msg3 = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x7A,0xA6,0x10,0x2C,0x01,0x00,0x00],is_extended_id=True) #lambda 2
         try:
             bus.send(msg1)
             bus.send(msg2)
-            bus.send(msg3)
             time.sleep(REFRESH_RATE)
         except can.CanError:
             print("Nothing sent")

@@ -1,6 +1,7 @@
 import can
 import os
 import sys
+import time
 
 #DEFINE CAN DATA
 REQ_ID = 0x000FFFFE
@@ -15,8 +16,10 @@ msg = can.Message(arbitration_id=REQ_ID, data=[0xCF,0x50,0xB1,0x8C,0x10,0x01,0x0
 #msg = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x50,0xB1,0x8C,0x10,0x00,0x00,0x00],is_extended_id=True)
 #msg = can.Message(arbitration_id=REQ_ID, data=[0xCD,0x50,0xB1,0x8C,0x10,0x00,0x00,0x00],is_extended_id=True)
 
-try:
-	bus.send(msg)
-	print("Message sent to CAN Bus.")
-except can.CanError:
-	print("Nothing sent")
+while True:
+	try:
+		bus.send(msg)
+		print("Message sent to CAN Bus.")
+		time.sleep(10)
+	except can.CanError:
+		print("Nothing sent")
