@@ -7,7 +7,7 @@ import NavBar from '../../sidebars/NavBar';
 import TopBar from '../../sidebars/TopBar';
 import DashBar from '../../sidebars/DashBar';
 
-import Dashboard from '../dashboard/Dashboard';
+import Swiper from '../swiper/Swiper';
 import Settings from '../settings/Settings';
 import Volvo from '../volvo/Volvo';
 import Template from '../_template/Template';
@@ -195,7 +195,7 @@ const Home = () => {
         )
       case 'Dashboard':
         return (
-          <Dashboard
+          <Swiper
             settings={settings}
             boost={boost}
             intake={intake}
