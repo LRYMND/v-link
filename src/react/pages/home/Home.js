@@ -7,7 +7,7 @@ import NavBar from '../../sidebars/NavBar';
 import TopBar from '../../sidebars/TopBar';
 import DashBar from '../../sidebars/DashBar';
 
-import Dashboard from '../dashboard/Dashboard';
+import Swiper from '../swiper/Swiper';
 import Settings from '../settings/Settings';
 import Volvo from '../volvo/Volvo';
 import Template from '../_template/Template';
@@ -41,12 +41,12 @@ const Home = () => {
   const [phoneState, setPhoneState] = useState(false);
 
   useEffect(() => {
-    ipcRenderer.on('allSettings', (event, args) => { loadSettings(args)});
-    ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args)});
-    ipcRenderer.on('wifiOn', () => { setWifiState(true)});
-    ipcRenderer.on('wifiOff', () => { setWifiState(false)});
-    ipcRenderer.on("plugged", () => { setPhoneState(true)});
-    ipcRenderer.on("unplugged", () => { setPhoneState(false)});
+    ipcRenderer.on('allSettings', (event, args) => { loadSettings(args) });
+    ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
+    ipcRenderer.on('wifiOn', () => { setWifiState(true) });
+    ipcRenderer.on('wifiOff', () => { setWifiState(false) });
+    ipcRenderer.on("plugged", () => { setPhoneState(true) });
+    ipcRenderer.on("unplugged", () => { setPhoneState(false) });
     return () => {
       ipcRenderer.removeAllListeners();
     };
@@ -57,7 +57,7 @@ const Home = () => {
       setStreaming(true);
     });
 
-    socket.on('status', ({ status  }) => {
+    socket.on('status', ({ status }) => {
       console.log("status@home: ", status)
       setPhoneState(status)
     })
@@ -146,7 +146,8 @@ const Home = () => {
     }
     if (args.includes("ld1:")) {
       args = args.replace("ld1:", "")
-      if(Number(args).toFixed(2) > 2)
+
+      if (Number(args).toFixed(2) > 2)
         setLambda1("Coast")
       else
         setLambda1(Number(args).toFixed(2));
@@ -195,7 +196,7 @@ const Home = () => {
         )
       case 'Dashboard':
         return (
-          <Dashboard
+          <Swiper
             settings={settings}
             boost={boost}
             intake={intake}
@@ -230,8 +231,14 @@ const Home = () => {
 
       default:
         return (
-          <Dashboard
+          <Swiper
             settings={settings}
+            boost={boost}
+            intake={intake}
+            coolant={coolant}
+            voltage={voltage}
+            lambda1={lambda1}
+            lambda2={lambda2}
           />
         )
 
@@ -264,11 +271,11 @@ const Home = () => {
         :
         <div className='refresh'>
           <button className='refresh__button' type='button' onClick={reloadApp}>
-          <h1>RTVI</h1>
-        </button>
+            <h1>RTVI</h1>
+          </button>
 
-        <span className='refresh__version'>v1.2.3</span>
-          </div>}
+          <span className='refresh__version'>v1.2.3</span>
+        </div>}
     </>
   );
 };
