@@ -207,7 +207,7 @@ const Settings = ({ settings, setSettings }) => {
             </div>
           </div>
           <div className='settings__connections__bt'>
-            <p><i>RTVI v1.2.3</i></p>
+            <p><i>RTVI v1.2.4</i></p>
           </div>
         </div>
         <div className='settings__general'>

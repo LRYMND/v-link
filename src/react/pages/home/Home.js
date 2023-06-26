@@ -274,7 +274,7 @@ const Home = () => {
             <h1>RTVI</h1>
           </button>
 
-          <span className='refresh__version'>v1.2.3</span>
+          <span className='refresh__version'>v1.2.4</span>
         </div>}
     </>
   );
