@@ -1,3 +1,13 @@
+##################################################
+## VOLVO RTVI CAN SCRIPT
+##################################################
+## Author: LRYMND
+## Version: 0.2.0
+## Git: https://github.com/LRYMND/volvo-rtvi
+##################################################
+
+
+#IMPORTS
 import can
 import time
 import os
@@ -5,12 +15,11 @@ import sys
 
 from threading import Thread
 
-#DEFINE BUS
-bus = can.interface.Bus(channel='can0', bustype='socketcan', bitrate=500000)
 
 #DEFINE TIMING
 REFRESH_RATE = 0.03     #HIGHSPEED (SECONDS)
 INTERVAL = 3            #LOWSPEED  (REFRESH_RATE * INTERVAL)
+
 
 #DEFINE CAN DATA
 REQ_ID = 0x000FFFFE
@@ -18,12 +27,15 @@ REP_ID = 0x00400021
 
 REQ_MSG = [0xCD,0x7A,0xA6,0x10,0x00,0x01,0x00,0x00]
 
+
 #[MSG_ID, RTVI_ID, 16Bit]
+#HIGH REFRESH RATE
 MSG_ID_HS = [
     [0x9D, "map:", False],  #BOOST
     [0x34, "ld1:", True],   #LAMBDA1
 ]
 
+#LOW REFRESH RATE
 MSG_ID_LS = [
      [0xCE, "iat:", False], #INTAKE
      [0xD8, "col:", False], #COOLANT
@@ -32,95 +44,89 @@ MSG_ID_LS = [
 ]
 
 
-#CONVERSION METHOD
-def conversion(id, value):
-    match id:
-        case 0x9D:  #BOOST
-            value -= 101.0
-            value *= 0.01
-            if (boost < 0):
-                boost = 0
-            return value
-        
-        case 0xCE:  #INTAKE
-            value *= 0.75
-            value -= 47.0
-            return value
-        
-        case 0xD8:  #COOLANT
-            value *= 0.75
-            value -= 47.0
-            return value
-        
-        case 0x0A:  #VOLTAGE
-            value *= 0.07
-            return value
-        
-        case 0x34:  #LAMBDA1
-            value *= 16.0 / 65536.0
-            return value
-        
-        case 0x2C:  #LAMBDA2
-            value *= (1.33/255)
-            value -= 0.2
-            return value
+#DEFINE BUS
+FILTER = [{"can_id":REP_ID, "can_mask": 0xFFFFFFFF, "extended": True}]
+CAN_BUS = can.interface.Bus(channel='can0', interface='socketcan', bitrate=500000, can_filters=FILTER)
 
-        case _:     #DEFAULT
+
+#DEFINE CONVERSION METHOD
+def conversion(msg_id, data):
+        if(msg_id == 0x9D):    #BOOST
+            data -= 101.0
+            data *= 0.01
+            if (data < 0):
+                data = 0
+            return data
+        
+        elif(msg_id == 0xCE):  #INTAKE
+            data *= 0.75
+            data -= 47.0
+            return data
+
+        elif(msg_id == 0xD8):  #COOLANT
+            data *= 0.75
+            data -= 47.0
+            return data
+
+        elif(msg_id == 0x0A):  #VOLTAGE
+            data *= 0.07
+            return data
+
+        elif(msg_id == 0x34):  #LAMBDA1
+            data *= 16.0 / 65536.0
+            return data
+
+        elif(msg_id == 0x2C):  #LAMBDA2
+            data *= (1.33/255)
+            data -= 0.2
+            return data
+
+        else:              #DEFAULT
             return 0
 
 
-#HIGHSPEED TASK
-def hs_task():
-    x = 0
+#DEFINE MESSAGE FILTER
+def filter(msg_id, msg):
+    i = 0
+    while (i < len(msg_id)):
+        if(msg.data[4] == msg_id[i][0]):
+            value = 0
+            if(msg_id[i][2] == True):
+                value = (msg.data[5] << 8) | msg.data[6]
+            else:
+                value = msg.data[5]
+            print(msg_id[i][1]+str(conversion(msg_id[i][0], float(value))))
+            sys.stdout.flush()
+        i += 1
 
+
+#DEFINE REQUEST MESSAGE
+def request(msg_id):
+    i = 0
+    while (i < len(msg_id)):
+        REQ_MSG[4] = msg_id[i][0]
+        msg = can.Message(arbitration_id=REQ_ID, data=REQ_MSG,is_extended_id=True)
+
+        try:
+            CAN_BUS.send(msg)
+        except can.CanError:
+            print("Error")
+        i += 1
+
+
+#DEFINE THREAD
+def can_task():
     while (True):
-        message = bus.recv()
-        value = 0
+        MSG = CAN_BUS.recv()
 
-        while (x < len(MSG_ID_HS)):
-            if(message.arbitration_id == REP_ID and message.data[4] == MSG_ID_HS[x][0]):
-                if(MSG_ID_HS[x][2] == True):
-                    value = (message.data[5] << 8) | message.data[6]
-                else:
-                    value = message.data[5]
-                print(MSG_ID_HS[x][1]+str(float(conversion(MSG_ID_HS[x][0], float(value)))))
-                sys.stdout.flush()
-                x += 1
-        
-        if(x == len(MSG_ID_HS) - 1):
-            x = 0
-            
-
-#LOWSPEED TASK
-def ls_task():
-    x = 0
-
-    while (True):
-        message = bus.recv()
-        value = 0
-
-        while (x < len(MSG_ID_LS)):
-            if(message.arbitration_id == REP_ID and message.data[4] == MSG_ID_LS[x][0]):
-                if(MSG_ID_LS[x][2] == True):
-                    value = (message.data[5] << 8) | message.data[6]
-                else:
-                    value = message.data[5]
-                print(MSG_ID_LS[x][1]+str(float(conversion(MSG_ID_LS[x][0], float(value)))))
-                sys.stdout.flush()
-                x += 1
-        
-        if(x == len(MSG_ID_HS) - 1):
-            x = 0
+        filter(MSG_ID_HS, MSG)
+        filter(MSG_ID_LS, MSG)
 
 
 #START THREAD
-t1 = Thread(target = hs_task)
+t1 = Thread(target = can_task)
 t1.daemon = True
 t1.start()
-
-t2 = Thread(target = ls_task)
-t2.daemon = True
-t2.start()
 
 
 #MAIN LOOP
@@ -129,34 +135,15 @@ try:
     while (True):
         #HIGHSPEED
         if(x <= INTERVAL):
-            y = 0
-            while (y < len(MSG_ID_HS)):
-                REQ_MSG[4] = MSG_ID_HS[y][0]
-                msg = can.Message(arbitration_id=REQ_ID, data=REQ_MSG,is_extended_id=True)
-
-                try:
-                    bus.send(msg)
-                except can.CanError:
-                    print("Nothing sent")
-                y += 1
+            request(MSG_ID_HS)
             time.sleep(REFRESH_RATE)
         x += 1
 
         #LOWSPEED
         if(x == INTERVAL):
-            y = 0
-            while (y < len(MSG_ID_LS)):
-                REQ_MSG[4] = MSG_ID_LS[y][0]
-                msg = can.Message(arbitration_id=REQ_ID, data=REQ_MSG,is_extended_id=True)
-
-                try:
-                    bus.send(msg)
-                except can.CanError:
-                    print("Nothing sent")
-                y += 1
+            request(MSG_ID_LS)
             x = 0
 
-#CATCH INTERRUPT
 except (KeyboardInterrupt, SystemExit):
 	#Catch keyboard interrupt
 	sys.exit()
