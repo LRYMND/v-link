@@ -23,12 +23,12 @@ const Settings = ({ settings, setSettings }) => {
   const { wifiModalIsShowing, wifiModalToggle } = useModal();
 
   useEffect(() => {
+    ipcRenderer.on('allSettings', (event, data) => { setSettings(data) });
     ipcRenderer.on('wifiList', updateWifi);
     ipcRenderer.on('wifiConnected', updateWifiStatus);
 
     return function cleanup() {
-      ipcRenderer.removeListener('wifiList', updateWifi);
-      ipcRenderer.removeListener('wifiConnected', updateWifiStatus);
+      ipcRenderer.removeAllListeners();
     };
   })
 
@@ -36,10 +36,10 @@ const Settings = ({ settings, setSettings }) => {
     ipcRenderer.send('wifiUpdate');
   }, []);
 
-  
+
   useEffect(() => {
-    if(theme != null)
-      changeSetting('colorTheme', theme);
+    if (theme != null)
+      ipcRenderer.send('settingsUpdate', { setting: 'colorTheme', value: theme });
   }, [theme]);
 
 
@@ -47,7 +47,6 @@ const Settings = ({ settings, setSettings }) => {
   const colorSelect = (event) => {
     console.log('new theme: ', event.target.value)
     setTheme(event.target.value)
-    //reloadApp();
   };
 
   /* Checkbox Boost */
@@ -92,29 +91,20 @@ const Settings = ({ settings, setSettings }) => {
     reloadApp();
   };
 
-    /* Checkbox OSD */
-    const [toggleOSD, setOSD] = React.useState(settings.activateOSD);
+  /* Checkbox OSD */
+  const [toggleOSD, setOSD] = React.useState(settings.activateOSD);
 
-    const handleOSD = () => {
-      changeSetting('activateOSD', !toggleOSD);
-      setOSD(!toggleOSD);
+  const handleOSD = () => {
+    changeSetting('activateOSD', !toggleOSD);
+    setOSD(!toggleOSD);
 
-      if(toggleOSD) {
-        changeSetting('height', settings.windowHeight);
-      } else {
-        changeSetting('height', settings.windowHeight - 40);
-      }
-      reloadApp();
-    };
-
-  /* Checkbox UNDEFINED */
-  //const [toggleCruiseControl, setCruiseControl] = React.useState(settings.activateCC);
-  /*
-  const handleCruiseControl = () => {
-    changeSetting('activateCC', !toggleCruiseControl);
-    setCruiseControl(!toggleCruiseControl);
+    if (toggleOSD) {
+      changeSetting('height', settings.windowHeight);
+    } else {
+      changeSetting('height', settings.windowHeight - 40);
+    }
+    reloadApp();
   };
-  */
 
   /* WiFi */
   function connectWifi(password) {
@@ -141,10 +131,6 @@ const Settings = ({ settings, setSettings }) => {
   };
 
   /* App */
-  function carplaySettings() {
-    ipcRenderer.send('reqReboot');
-  };
-
   function reloadApp() {
     ipcRenderer.send('reqReload');
   };
@@ -170,12 +156,11 @@ const Settings = ({ settings, setSettings }) => {
   /* Store settings */
   function changeSetting(setting, value) {
     ipcRenderer.send('settingsUpdate', { setting: setting, value: value });
-    ipcRenderer.on('allSettings', (event, data) => { setSettings(data) });
   }
 
   return (
     <div className={`settings ${settings.colorTheme}`}>
-      
+
       <CarplayModal isShowing={carplayModalIsShowing}
         hide={carplayModalToggle}
         settings={settings}

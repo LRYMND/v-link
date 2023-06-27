@@ -1,3 +1,4 @@
+/*
 import React, { Component } from 'react';
 import { useState, useEffect } from 'react';
 
@@ -28,3 +29,4 @@ const Template = ({ settings }) => {
 };
 
 export default Template;
+*/

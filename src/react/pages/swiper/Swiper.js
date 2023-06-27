@@ -4,7 +4,7 @@ import './swiper.scss';
 import Dashboard from '../dashboard/Dashboard';
 import Chartboard from '../chartboard/Chartboard';
 
-function Swiper({ settings, boost, intake, coolant, voltage, lambda1, lambda2, timeStamps, valueArray }) {
+function Swiper({ settings, carData, boost, intake, coolant, voltage, lambda1, lambda2, valueArray }) {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const swipeContainerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -71,6 +71,7 @@ function Swiper({ settings, boost, intake, coolant, voltage, lambda1, lambda2, t
         <div className="page1">
           <Dashboard
             settings={settings}
+            carData={carData}
             boost={boost}
             intake={intake}
             coolant={coolant}
@@ -82,14 +83,8 @@ function Swiper({ settings, boost, intake, coolant, voltage, lambda1, lambda2, t
         <div className="page2">
           <Chartboard
             settings={settings}
-            boost={boost}
-            intake={intake}
-            coolant={coolant}
-            voltage={voltage}
-            lambda1={lambda1}
-            lambda2={lambda2}
-            timeStamps={timeStamps}
-            valueArray={valueArray}
+            carData={carData}
+            length={100}
           />
         </div>
       </div>

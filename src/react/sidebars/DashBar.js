@@ -6,19 +6,17 @@ import { useState, useEffect, } from "react";
 import "../themes.scss";
 import "./dashbar.scss";
 
-const electron = window.require('electron');
 
-const DashBar = ({ settings, boost, coolant, intake, voltage, wifiState, phoneState }) => {
+const DashBar = ({ settings, carData, wifiState, phoneState }) => {
 
     useEffect(() => {
 		loadTheme();
 	}, []);
 
-	const [loaded, setLoaded] = useState(false);
-	const [colorNeedle, setColorNeedle] = useState(null);
+	//const [colorNeedle, setColorNeedle] = useState(null);
 
 	const [textColor, setTextColor] = useState(null);
-	const [textColorActive, setTextColorActive] = useState(null);
+	//const [textColorActive, setTextColorActive] = useState(null);
 
 	const [fillActive, setFillActive] = useState(null);
 	const [fillInactive, setFillInactive] = useState(null);
@@ -30,13 +28,11 @@ const DashBar = ({ settings, boost, coolant, intake, voltage, wifiState, phoneSt
 		let style = getComputedStyle(document.querySelector(".dashbar"));
 
         setSectionColor(style.getPropertyValue("--sectionColor"));
-		setColorNeedle(style.getPropertyValue("--colorNeedle"));
+		//setColorNeedle(style.getPropertyValue("--colorNeedle"));
 		setTextColor(style.getPropertyValue("--textColor"));
-		setTextColorActive(style.getPropertyValue("--textColorActive"));
+		//setTextColorActive(style.getPropertyValue("--textColorActive"));
 		setFillActive(style.getPropertyValue("--fillActive"));
 		setFillInactive(style.getPropertyValue("--fillInactive"));
-
-		setLoaded(true);
 	}
 
     return (
@@ -44,7 +40,7 @@ const DashBar = ({ settings, boost, coolant, intake, voltage, wifiState, phoneSt
             <div className="dashbar__dash">
                 <div className="dashbar__dash__bar">
                     <ProgressBar
-                    currentValue={boost}
+                    currentValue={carData.boost}
                     maxValue={1.6}
                     unit={'Bar'}
                     warning={0.6}
@@ -57,7 +53,7 @@ const DashBar = ({ settings, boost, coolant, intake, voltage, wifiState, phoneSt
 
                 <div className="dashbar__dash__bar">
                     <ProgressBar
-                    currentValue={intake}
+                    currentValue={carData.intake}
                     maxValue={90}
                     unit={'°C'}
                     warning={60}
@@ -70,7 +66,7 @@ const DashBar = ({ settings, boost, coolant, intake, voltage, wifiState, phoneSt
 
                 <div className="dashbar__dash__bar">
                     <ProgressBar
-                    currentValue={coolant}
+                    currentValue={carData.coolant}
                     maxValue={150}
                     unit={'°C'}
                     warning={120}

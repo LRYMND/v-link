@@ -11,12 +11,13 @@ from threading import Thread
 REQ_ID = 0x000FFFFE
 REP_ID = 0x00400021
 
-MAP_DATA = 0x9D
-IAT_DATA = 0xCE
-COL_DATA = 0xD8
-VOL_DATA = 0x0A
-LD1_DATA  = 0x34
-LD2_DATA  = 0x2C
+MAP_ID = 0x9D
+IAT_ID = 0xCE
+COL_ID = 0xD8
+VOL_ID = 0x0A
+LD1_ID  = 0x34
+LD2_ID  = 0x2C
+
 
 REFRESH_RATE = 0.03
 INTERVAL = 1
@@ -25,15 +26,12 @@ x = 1
 bus = can.interface.Bus(channel='can0', bustype='socketcan', bitrate=500000)
 
 def can_rx_task():
-    #boostOld = 0
-    #boostNew = 0
-    #difference = 0
 
     while (True):
         message = bus.recv()
 
 		#Catch Boost
-        if (message.arbitration_id == REP_ID and message.data[4] == MAP_DATA):
+        if (message.arbitration_id == REP_ID and message.data[4] == MAP_ID):
             boost = message.data[5]
             boost = boost - 101
             boost = boost * 0.01
@@ -41,29 +39,11 @@ def can_rx_task():
             if (boost < 0):
                 boost = 0
 
-#            boostNew = boost
-#            difference = abs(boostNew - boostOld)
-#            i = 0.01
-#
-#            #Simulate analogue feeling by iterating more on big value gaps
-#            if (difference >= 0.1):
-#		        boost = boostOld
-#               while(i <= difference):
-#		            if (boost < boostNew):
-#                       boost = boost + 0.01
-#                   if (boost > boostNew):
-#                       boost = boost - 0.01
-#                   print("map:"+str(float(boost)))
-#                   i = i + 0.01
-#               else:
-#                   print("map:"+str(float(boost)))
-#               boostOld = boost
-
             print("map:"+str(float(boost)))
             sys.stdout.flush()
 
 		#Catch Intake
-        if (message.arbitration_id == REP_ID and message.data[4] == IAT_DATA):
+        if (message.arbitration_id == REP_ID and message.data[4] == IAT_ID):
             intake = message.data[5]
             intake = intake * 0.75
             intake = intake - 47
@@ -72,7 +52,7 @@ def can_rx_task():
             sys.stdout.flush()
 
 		#Catch Coolant
-        if (message.arbitration_id == REP_ID and message.data[4] == COL_DATA):
+        if (message.arbitration_id == REP_ID and message.data[4] == COL_ID):
             coolant = message.data[5]
             coolant = coolant * 0.75
             coolant = coolant - 47
@@ -81,22 +61,23 @@ def can_rx_task():
             sys.stdout.flush()
 
         #Catch Voltage
-        if (message.arbitration_id == REP_ID and message.data[4] == VOL_DATA):
+        if (message.arbitration_id == REP_ID and message.data[4] == VOL_ID):
             voltage = message.data[5]
-            voltage = voltage * 0.0983
+            voltage = voltage * 0.07
 
             print("vol:"+str(float(voltage)))
             sys.stdout.flush()
 
         #Catch Lambda1
-        if (message.arbitration_id == REP_ID and message.data[4] == LD1_DATA):
+        if (message.arbitration_id == REP_ID and message.data[4] == LD1_ID):
             lambda1 = (message.data[5] << 8) | message.data[6]
             lambda1 = float(lambda1) * 16.0 / 65536.0
+
             print("ld1:"+str(float(lambda1)))
             sys.stdout.flush()
 
         #Catch Lambda2
-        if (message.arbitration_id == REP_ID and message.data[4] == LD2_DATA):
+        if (message.arbitration_id == REP_ID and message.data[4] == LD2_ID):
             lambda2 = message.data[5]
             lambda2 = lambda2 * (1.33/255) - 0.2
 
@@ -142,7 +123,7 @@ try:
             msg = can.Message(arbitration_id=REQ_ID, data=[0xCD, 0x7A, 0xA6, 0x10, 0x2C, 0x01, 0x00, 0x00],is_extended_id=True)
             try:
                 bus.send(msg)
-                time.sleep(REFRESG_RATE)
+                time.sleep(REFRESH_RATE)
             except:
                 print("Nothing sent.")
 
@@ -158,8 +139,8 @@ try:
             time.sleep(REFRESH_RATE)
         except can.CanError:
             print("Nothing sent")
-
-        time.sleep(REFRESH_RATE)
+            time.sleep(REFRESH_RATE)
+        
 
 except (KeyboardInterrupt, SystemExit):
 	#Catch keyboard interrupt

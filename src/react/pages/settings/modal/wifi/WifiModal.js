@@ -20,7 +20,8 @@ const WifiModal = ({ isShowing, ssid, hide, connect, status, reset, settings }) 
     }, [ssid]);
 
     useEffect(() => {
-        changeStatus();
+        setMessage(status);
+        setIsConnecting(false);
     }, [status]);
 
 
@@ -50,11 +51,6 @@ const WifiModal = ({ isShowing, ssid, hide, connect, status, reset, settings }) 
         e.preventDefault()
         connect(input);
         setIsConnecting(true);
-    }
-
-    function changeStatus() {
-        setMessage(status);
-        setIsConnecting(false);
     }
 
     function clear() {

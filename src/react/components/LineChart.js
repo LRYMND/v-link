@@ -1,42 +1,44 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
 
 const LineChart = ({
-    xData = Array.from({ length: 50 }, (_, index) => index + 1),
-    yData = [],
-    tickCountX = 10,
-    tickCountY = 2,
     label,
+    width,
+    height,
+    padding,
+    yMin,
+    yMax,
+    tickCountX,
+    tickCountY,
     settings,
+    carData,
+    length
 }) => {
 
-    const width = 450;
-    const height = 170;
-    const padding = 30;
+    const [dataStream, setDataStream] = useState(Array.from({ length: length }, (_, index) => yMin));
 
-    // find the minimum and maximum values for the x and y data
+    useEffect(() => {
+        let value = carData;
+        if (value > yMax) value = yMax;
+        if (value < yMin) value = yMin;
+        setDataStream((prevDataStream1) => [value, ...prevDataStream1.slice(0, length - 1)]);
+    }, [carData, length, yMax, yMin]);
+
+
+    const xData = Array.from({ length: length }, (_, index) => index + 1)
+
+    // find the minimum and maximum values for the x data
     const xMin = Math.min(...xData);
     const xMax = Math.max(...xData);
-    //const yMin = Math.min(...yData);
-    //const yMax = Math.max(...yData);
-
-    const yMin = 0;
-    const yMax = 2;
 
     // calculate the x and y scales
     const xScale = (width - padding * 2) / (xMax - xMin);
     const yScale = (height - padding * 2) / (yMax - yMin);
 
     // create the data points for the line chart
-    /*
     const dataPoints = xData.map((value, index) => ({
-        x: (xData[index] - xMin) * xScale + padding,
-        y: (yMax - yData[index]) * yScale + padding
-    }));
-    */
-
-    const dataPoints = xData.map((value, index) => ({
-        x: (xData[index] - xMin) * xScale + padding,
-        y: (yMax - yMin - yData[index]) * yScale + padding
+        x: (value - xMin) * xScale + padding,
+        y: (yMax - dataStream[index]) * yScale + padding
     }));
 
 
@@ -46,6 +48,10 @@ const LineChart = ({
             index === 0 ? `M ${point.x} ${point.y}` : `${acc} L ${point.x} ${point.y}`,
         ''
     );
+
+    // create the path string for the y axis
+    const yAxis = `M ${padding} ${height - padding} L ${padding} ${padding}`;
+
 
     // create the path string and labels for the x axis ticks
     const xTicks = [];
@@ -104,18 +110,14 @@ const LineChart = ({
         );
     }
 
-    // create the path string for the y axis
-    const yAxis = `M ${padding} ${height - padding} L ${padding} ${padding}`;
-
-
     return (
-        <div className={`swiper ${settings.colorTheme}`} style={{ display:"flex", alignItems:"flex-start", gap:"1rem"}}>
+        <div className={`swiper ${settings.colorTheme}`} style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
             <div className="values">
-                <div className="values__label" style={{ color:"var(--textColorHover)"}}>
+                <div className="values__label" style={{ color: "var(--textColorHover)" }}>
                     <h4>{label}:</h4>
                 </div>
-                <div className="values__data"  style={{ color:"var(--fillActive)", marginTop:"-1rem"}}>
-                    <h3>{parseFloat(yData[0]).toFixed(2)}</h3>
+                <div className="values__data" style={{ color: "var(--fillActive)", marginTop: "-1rem" }}>
+                    <h3>{parseFloat(dataStream[0]).toFixed(2)}</h3>
                 </div>
             </div>
             <div className="chart">

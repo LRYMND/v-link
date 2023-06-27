@@ -6,10 +6,7 @@ import RadialGauge from '../../components/RadialGauge'
 import "../../themes.scss";
 import './dashboard.scss';
 
-const electron = window.require('electron');
-const { ipcRenderer } = electron;
-
-const Dashboard = ({ settings, boost, intake, coolant, voltage, lambda1, lambda2 }) => {
+const Dashboard = ({ settings, carData}) => {
 
 	useEffect(() => {
 		loadTheme();
@@ -18,7 +15,7 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage, lambda1, lambda2
 	const [loaded, setLoaded] = useState(false);
 	const [colorNeedle, setColorNeedle] = useState(null);
 
-	const [textColor, setTextColor] = useState(null);
+	//const [textColor, setTextColor] = useState(null);
 	const [textColorActive, setTextColorActive] = useState(null);
 
 	const [fillActive, setFillActive] = useState(null);
@@ -32,7 +29,7 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage, lambda1, lambda2
 
 		setSectionColor(style.getPropertyValue("--sectionColor"));
 		setColorNeedle(style.getPropertyValue("--colorNeedle"));
-		setTextColor(style.getPropertyValue("--textColor"));
+		//setTextColor(style.getPropertyValue("--textColor"));
 		setTextColorActive(style.getPropertyValue("--textColorActive"));
 		setFillActive(style.getPropertyValue("--fillActive"));
 		setFillInactive(style.getPropertyValue("--fillInactive"));
@@ -49,7 +46,7 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage, lambda1, lambda2
 					{settings.showGaugeIntake ?
 						<RadialGauge
 							globalRotation={90}
-							currentValue={intake}
+							currentValue={carData.intake}
 							maxValue={90}
 							size={110}
 							progressRadius={70}
@@ -83,7 +80,7 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage, lambda1, lambda2
 
 						<RadialGauge
 							globalRotation={90}
-							currentValue={boost}
+							currentValue={carData.boost}
 							maxValue={1.6}
 							size={120}
 							progressRadius={90}
@@ -116,7 +113,7 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage, lambda1, lambda2
 					{settings.showGaugeCoolant ?
 						<RadialGauge
 							globalRotation={90}
-							currentValue={coolant}
+							currentValue={carData.coolant}
 							maxValue={150}
 							size={110}
 							progressRadius={70}
@@ -149,9 +146,9 @@ const Dashboard = ({ settings, boost, intake, coolant, voltage, lambda1, lambda2
 				</div> : <></>}
 			<>
 				{settings.activateCAN ? <div className="dashboard__footer">
-											<div className="dashboard__footer__element"><h3>λ1: {lambda1}</h3></div>
-											<div className="dashboard__footer__element"><h3>λ2: {lambda2}V</h3></div>
-											<div className="dashboard__footer__element"><h3>Bat: {voltage}V</h3></div>
+											<div className="dashboard__footer__element"><h3>λ1: {carData.lambda1}</h3></div>
+											<div className="dashboard__footer__element"><h3>λ2: {carData.lambda2}V</h3></div>
+											<div className="dashboard__footer__element"><h3>Bat: {carData.voltage}V</h3></div>
 										</div> : <div className="dashboard__footer"><h3><i>(CAN-Stream deactivated.)</i></h3></div>}
 			</>
 		</div>

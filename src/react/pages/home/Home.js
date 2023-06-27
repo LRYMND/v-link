@@ -30,15 +30,17 @@ const Home = () => {
   const [showNav, setShowNav] = useState(true);
   const [showOsd, setShowOsd] = useState(true);
 
-  const [boost, setBoost] = useState(0);
-  const [intake, setIntake] = useState(0);
-  const [coolant, setCoolant] = useState(0);
-  const [voltage, setVoltage] = useState(0);
-  const [lambda1, setLambda1] = useState(0);
-  const [lambda2, setLambda2] = useState(0);
-
   const [wifiState, setWifiState] = useState(false);
   const [phoneState, setPhoneState] = useState(false);
+
+  const [carData, setCarData] = useState({
+    boost: 0,
+    intake: 0,
+    coolant: 0,
+    voltage: 0,
+    lambda1: 0,
+    lambda2: 0,
+  })
 
   useEffect(() => {
     ipcRenderer.on('allSettings', (event, args) => { loadSettings(args) });
@@ -92,7 +94,7 @@ const Home = () => {
     if (phoneState === false) {
       setStreaming(false)
     }
-  }, [streaming, phoneState, view]);
+  }, [streaming, phoneState, view, settings]);
 
   useEffect(() => {
     if (settings != null) {
@@ -108,8 +110,7 @@ const Home = () => {
   }
 
   function reloadApp() {
-    ipcRenderer.send('getSettings');
-    //ipcRenderer.send('reqReload');
+    ipcRenderer.send('reqReload');
   };
 
   const touchEvent = (type, x, y) => {
@@ -126,35 +127,33 @@ const Home = () => {
 
   const msgFromBackground = (args) => {
     if (args != null)
-      //console.log("Debug: ", args);
-
       if (args.includes("map:")) {
         args = args.replace("map:", "")
-        setBoost(Number(args).toFixed(2));
+        setCarData((prevState) => ({ ...prevState, boost: Number(args).toFixed(2) }));
       }
     if (args.includes("iat:")) {
       args = args.replace("iat:", "")
-      setIntake(Number(args).toFixed(2));
+      setCarData((prevState) => ({ ...prevState, intake: Number(args).toFixed(2) }));
     }
     if (args.includes("col:")) {
       args = args.replace("col:", "")
-      setCoolant(Number(args).toFixed(2));
+      setCarData((prevState) => ({ ...prevState, coolant: Number(args).toFixed(2) }));
     }
     if (args.includes("vol:")) {
       args = args.replace("vol:", "")
-      setVoltage(Number(args).toFixed(2));
+      setCarData((prevState) => ({ ...prevState, voltage: Number(args).toFixed(2) }));
     }
     if (args.includes("ld1:")) {
       args = args.replace("ld1:", "")
 
       if (Number(args).toFixed(2) > 2)
-        setLambda1("Coast")
+        setCarData((prevState) => ({ ...prevState, lambda1: 2.0 }));
       else
-        setLambda1(Number(args).toFixed(2));
+        setCarData((prevState) => ({ ...prevState, lambda1: Number(args).toFixed(2) }));
     }
     if (args.includes("ld2:")) {
       args = args.replace("ld2:", "")
-      setLambda2(Number(args).toFixed(2));
+      setCarData((prevState) => ({ ...prevState, lambda2: Number(args).toFixed(2) }));
     }
   }
 
@@ -167,10 +166,7 @@ const Home = () => {
               <DashBar
                 className='dashbar'
                 settings={settings}
-                boost={boost}
-                intake={intake}
-                coolant={coolant}
-                voltage={voltage}
+                carData={carData}
                 phoneState={phoneState}
                 wifiState={wifiState}
               />
@@ -198,12 +194,7 @@ const Home = () => {
         return (
           <Swiper
             settings={settings}
-            boost={boost}
-            intake={intake}
-            coolant={coolant}
-            voltage={voltage}
-            lambda1={lambda1}
-            lambda2={lambda2}
+            carData={carData}
           />
         )
 
@@ -214,7 +205,7 @@ const Home = () => {
             setSettings={setSettings}
           />
         )
-
+      
       case 'Volvo':
         return (
           <Volvo
@@ -233,12 +224,7 @@ const Home = () => {
         return (
           <Swiper
             settings={settings}
-            boost={boost}
-            intake={intake}
-            coolant={coolant}
-            voltage={voltage}
-            lambda1={lambda1}
-            lambda2={lambda2}
+            carData={carData}
           />
         )
 

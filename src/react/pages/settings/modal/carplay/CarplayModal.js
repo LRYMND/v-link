@@ -1,7 +1,5 @@
 import ReactDOM from 'react-dom';
-import Keyboard from 'react-simple-keyboard';
-import 'react-simple-keyboard/build/css/index.css';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import './carplayModal.scss';
 
@@ -13,7 +11,6 @@ const CarplayModal = ({ isShowing, hide, settings, changeSetting }) => {
     const [width, setWidth] = useState(settings.width)
     const [lhd, setLhd] = useState(settings.lhd)
     const [dpi, setDpi] = useState(settings.dpi)
-    const [keyboardTarget, setKeyboardTarget] = useState('Height')
 
     function close() {
         hide();

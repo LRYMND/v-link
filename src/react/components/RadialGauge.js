@@ -132,7 +132,7 @@ export const RadialGauge = ({
 
     //Annotation 
     const interval = maxValue / (bigTicks)
-    let values = new Array();
+    let values = [];
 
     for (let i = 0; i < bigTicks; i++) {
         values[i] = interval * i;

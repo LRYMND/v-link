@@ -1,13 +1,8 @@
-import React, { Component } from 'react';
-import { useState, useEffect } from 'react';
+import React from 'react';
+import { useEffect } from 'react';
 
 import "../../themes.scss"
 import './volvo.scss';
-
-const electron = window.require('electron');
-const { ipcRenderer } = electron;
-
-
 
 const Volvo = ({ settings }) => {
 
@@ -18,7 +13,7 @@ const Volvo = ({ settings }) => {
 		return function cleanup() {
 
 		};
-	}, []);
+	}, [settings]);
 
 
 	return (

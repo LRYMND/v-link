@@ -3,9 +3,9 @@ import "../themes.scss";
 const ProgressBar = ({ currentValue, maxValue, unit, warning, theme, textColor, progressColor, fillColor, backgroundColor }) => {
     let height = 20;
     let width = 70;
-    let strokeWidth = width - height;
+    //let strokeWidth = width - height;
 
-    let cx1 = width / 2;
+    //let cx1 = width / 2;
     let cy1 = height / 2;
 
     let sx1 = height / 2;
@@ -16,7 +16,7 @@ const ProgressBar = ({ currentValue, maxValue, unit, warning, theme, textColor, 
 
     let borderRadius = 2;
     let bgHeight = height - borderRadius * 2;
-    let bgWidth = strokeWidth - borderRadius * 2;
+    //let bgWidth = strokeWidth - borderRadius * 2;
 
     let sx2 = height / 2 + borderRadius / 2
     let sy2 = cy1
