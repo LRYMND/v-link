@@ -69,46 +69,63 @@ def conversion(id, value):
             return 0
 
 
-#RECEIVER TASK
-def can_rx_task():
+#HIGHSPEED TASK
+def hs_task():
+    x = 0
+
     while (True):
         message = bus.recv()
-
-        #HIGHSPEED
-        x = 0
         value = 0
+
         while (x < len(MSG_ID_HS)):
             if(message.arbitration_id == REP_ID and message.data[4] == MSG_ID_HS[x][0]):
                 if(MSG_ID_HS[x][2] == True):
                     value = (message.data[5] << 8) | message.data[6]
                 else:
                     value = message.data[5]
-                print(MSG_ID_HS[x][1]+str(float(conversion[MSG_ID_HS[x][0], float(value)])))
+                print(MSG_ID_HS[x][1]+str(float(conversion(MSG_ID_HS[x][0], float(value)))))
                 sys.stdout.flush()
-            x += 1
+                x += 1
+        
+        if(x == len(MSG_ID_HS) - 1):
+            x = 0
+            
 
-        #LOWSPEED
-        x = 0
+#LOWSPEED TASK
+def ls_task():
+    x = 0
+
+    while (True):
+        message = bus.recv()
         value = 0
+
         while (x < len(MSG_ID_LS)):
             if(message.arbitration_id == REP_ID and message.data[4] == MSG_ID_LS[x][0]):
                 if(MSG_ID_LS[x][2] == True):
                     value = (message.data[5] << 8) | message.data[6]
                 else:
                     value = message.data[5]
-                print(MSG_ID_LS[x][1]+str(float(conversion[MSG_ID_LS[x][0], float(value)])))
-                sys.st
-            x += 1
+                print(MSG_ID_LS[x][1]+str(float(conversion(MSG_ID_LS[x][0], float(value)))))
+                sys.stdout.flush()
+                x += 1
+        
+        if(x == len(MSG_ID_HS) - 1):
+            x = 0
 
 
 #START THREAD
-t = Thread(target = can_rx_task)
-t.daemon = True
-t.start()
+t1 = Thread(target = hs_task)
+t1.daemon = True
+t1.start()
+
+t2 = Thread(target = ls_task)
+t2.daemon = True
+t2.start()
 
 
 #MAIN LOOP
 try:
+    x = 0
     while (True):
         #HIGHSPEED
         if(x <= INTERVAL):
