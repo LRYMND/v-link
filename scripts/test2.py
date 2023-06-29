@@ -45,8 +45,8 @@ MSG_ID_LS = [
 
 
 #DEFINE BUS
-FILTER = [{"can_id":REP_ID, "can_mask": 0xFFFFFFFF, "extended": True}]
-CAN_BUS = can.interface.Bus(channel='can0', interface='socketcan', bitrate=500000, can_filters=FILTER)
+#FILTER = [{"can_id":REP_ID, "can_mask": 0xFFFFFFFF, "extended": True}]
+CAN_BUS = can.interface.Bus(channel='can0', bustype='socketcan', bitrate=500000)
 
 
 #DEFINE CONVERSION METHOD
@@ -57,7 +57,7 @@ def conversion(msg_id, data):
             if (data < 0):
                 data = 0
             return data
-        
+
         elif(msg_id == 0xCE):  #INTAKE
             data *= 0.75
             data -= 47.0
@@ -77,7 +77,7 @@ def conversion(msg_id, data):
             return data
 
         elif(msg_id == 0x2C):  #LAMBDA2
-            data *= (1.33/255)
+            data *= (1.33 / 255)
             data -= 0.2
             return data
 
@@ -86,21 +86,21 @@ def conversion(msg_id, data):
 
 
 #DEFINE MESSAGE FILTER
-def filter(msg_id, msg):
-    i = 0
-    while (i < len(msg_id)):
-        if(msg.data[4] == msg_id[i][0]):
-            value = 0
-            if(msg_id[i][2] == True):
-                value = (msg.data[5] << 8) | msg.data[6]
-            else:
-                value = msg.data[5]
-            print(msg_id[i][1]+str(conversion(msg_id[i][0], float(value))))
-            sys.stdout.flush()
-        i += 1
+def filter(msg, msg_id, is_extended):
+    if(msg.arbitration_id == REP_ID and msg.data[4] == msg_id):
+        value = 0
+        if(is_extended == True):
+            value = (msg.data[5] << 8) | msg.data[6]
+        else:
+            value = msg.data[5]
+        print(msg_id+str(conversion(msg_id, float(value))))
+        sys.stdout.flush()
+	return True
+    else:
+	return False
 
 
-#DEFINE REQUEST MESSAGE
+#DEFINE MESSAGE REQUEST
 def request(msg_id):
     i = 0
     while (i < len(msg_id)):
@@ -108,25 +108,19 @@ def request(msg_id):
         msg = can.Message(arbitration_id=REQ_ID, data=REQ_MSG,is_extended_id=True)
 
         try:
+	    received = False
             CAN_BUS.send(msg)
+
+	    retries = 500
+
+	    while not received == True or retries == 0
+		msg = CAN_BUS.recv()
+		received = filter(msg, msg_id[i][0], msg_id[i][2])
+		retries -= 1
+
         except can.CanError:
             print("Error")
         i += 1
-
-
-#DEFINE THREAD
-def can_task():
-    while (True):
-        MSG = CAN_BUS.recv()
-
-        filter(MSG_ID_HS, MSG)
-        filter(MSG_ID_LS, MSG)
-
-
-#START THREAD
-t1 = Thread(target = can_task)
-t1.daemon = True
-t1.start()
 
 
 #MAIN LOOP
