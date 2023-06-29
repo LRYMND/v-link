@@ -50,8 +50,8 @@ const Chartboard = ({ settings, carData, length }) => {
                             settings={settings}
                             carData={carData.lambda1}
                             length={length}
-                            yMin={.9}
-                            yMax={1.1}
+                            yMin={.8}
+                            yMax={1.2}
                             tickCountX={5}
                             tickCountY={2}
                          />
@@ -64,7 +64,7 @@ const Chartboard = ({ settings, carData, length }) => {
                             settings={settings}
                             carData={carData.lambda2}
                             length={length}
-                            yMin={1}
+                            yMin={0}
                             yMax={2}
                             tickCountX={5}
                             tickCountY={2}

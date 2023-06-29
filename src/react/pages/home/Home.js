@@ -145,11 +145,7 @@ const Home = () => {
     }
     if (args.includes("ld1:")) {
       args = args.replace("ld1:", "")
-
-      if (Number(args).toFixed(2) > 2)
-        setCarData((prevState) => ({ ...prevState, lambda1: 2.0 }));
-      else
-        setCarData((prevState) => ({ ...prevState, lambda1: Number(args).toFixed(2) }));
+      setCarData((prevState) => ({ ...prevState, lambda1: Number(args).toFixed(2) }));
     }
     if (args.includes("ld2:")) {
       args = args.replace("ld2:", "")
