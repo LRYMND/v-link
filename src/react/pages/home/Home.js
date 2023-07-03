@@ -23,6 +23,8 @@ const Home = () => {
   const [view, setView] = useState('Dashboard')
   const [settings, setSettings] = useState(null);
 
+  const [testSettings, setTestSettings] = useState(null);
+
   const [streaming, setStreaming] = useState(false);
   const [startedUp, setStartedUp] = useState(false);
 
@@ -44,6 +46,7 @@ const Home = () => {
 
   useEffect(() => {
     ipcRenderer.on('allSettings', (event, args) => { loadSettings(args) });
+    ipcRenderer.on('testSettings', (event, args) => { loadTestSettings(args) });
     ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
     ipcRenderer.on('wifiOn', () => { setWifiState(true) });
     ipcRenderer.on('wifiOff', () => { setWifiState(false) });
@@ -106,6 +109,13 @@ const Home = () => {
     if (data != null) {
       setSettings(data);
       console.log('settings loaded: ', data)
+    }
+  }
+
+  function loadTestSettings(data) {
+    if (data != null) {
+      setTestSettings(data);
+      console.log('all settings loaded: ', data)
     }
   }
 
@@ -199,6 +209,7 @@ const Home = () => {
           <Settings
             settings={settings}
             setSettings={setSettings}
+            allSettings={testSettings}
           />
         )
       

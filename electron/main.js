@@ -198,14 +198,23 @@ function createWindow() {
   });
 
   ipcMain.on('getSettings', () => {
-    if(isDev) console.log(settings.store.store)
+    if(isDev) {
+      console.log(settings.getAllSettings())
+      console.log(settings.getMajorKeys())
+      console.log(settings.getSubKey('app'))
+    }
+
+
     mainWindow.webContents.send('allSettings', settings.store.store)
+    mainWindow.webContents.send('testSettings', settings.getAllSettings());
   });
 
   ipcMain.on('settingsUpdate', (event, { setting, value }) => {
     //if(isDev) console.log('updating settings', setting, value)
+
     settings.store.set(setting, value)
     mainWindow.webContents.send('allSettings', settings.store.store)
+    mainWindow.webContents.send('testSettings', settings.getAllSettings());
   });
 
   ipcMain.on('reqReload', () => {

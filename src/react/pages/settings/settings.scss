@@ -107,13 +107,12 @@ body {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
+        justify-content: space-around;
 
         gap: .5rem;
 
         &__section {
             width: 90%;
-            margin-top: .5rem;
 
             line-height: .2rem;
 
@@ -129,13 +128,56 @@ body {
             }
         }
 
+        &__application {
+            width: 90%;
+            height: 60%;
+            display: flex;
+            flex-direction: column;
+
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
         &__system {
             width: 90%;
             display: flex;
             flex-direction: row;
             justify-content: center;
         }
+
+        &__application::-webkit-scrollbar {
+            width: 1.2rem;
+                cursor: auto;
+        }
+
+        &__application::-webkit-scrollbar-track {
+            background-color: var(--scrollBarBackground);
+            border-radius: 10px;
+        }
+
+        &__application::-webkit-scrollbar-thumb {
+            background-color: var(--fillActive);
+            border-radius: 10px;
+
+            &:active {
+                background-color: var(--fillHover);
+            }
+        }
     }
+}
+
+.dropdown {
+    height: 2rem;
+    width: 100%;
+    color: var(--textColor);
+    background-color: var(--buttonBackground);
+
+    border: none;
+    border-radius: 10px;
+
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .app-button {

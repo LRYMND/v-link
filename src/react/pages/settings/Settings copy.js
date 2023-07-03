@@ -12,7 +12,7 @@ const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
 
-const Settings = ({ settings, setSettings, allSettings }) => {
+const Settings = ({ settings, setSettings }) => {
   const [wifiList, setWifiList] = useState([{ id: '', ssid: 'No Networks available' }]);
   const [wifiStatus, setWifiStatus] = useState('');
   const [ssidSelected, setSsidSelected] = useState('127.0.0.1');
@@ -196,72 +196,43 @@ const Settings = ({ settings, setSettings, allSettings }) => {
           </div>
         </div>
         <div className='settings__general'>
-          <div className='settings__general__application'>
-            <div className='settings__general__section'>
-              <div className='settings__general__section__column'>
-                <h4>Choose a color theme:</h4>
-              </div>
-              <div className='settings__general__section__column'>
-                <label>
-                  <select className='app-button' color='Select a Color' onChange={colorSelect} defaultValue={settings.colorTheme}>
-                    <option color='blue'>  Blue  </option>
-                    <option color='green'> Green </option>
-                    <option color='red'>   Red   </option>
-                    <option color='white'> White </option>
-                  </select>
-                </label>
-              </div>
+          <div className='settings__general__section'>
+            <div className='settings__general__section__column'>
+              <h4>Choose a color theme:</h4>
             </div>
-            <div className='settings__general__section'>
-              <div className='settings__general__section__column'>
-                <div><h4>Gauges:</h4></div>
-                <label><input type='checkbox' onChange={handleGaugeBoost} defaultChecked={settings.showGaugeBoost} /> Boost </label>
-                <label><input type='checkbox' onChange={handleGaugeIntake} defaultChecked={settings.showGaugeIntake} /> Intake </label>
-                <label><input type='checkbox' onChange={handleGaugeCoolant} defaultChecked={settings.showGaugeCoolant} /> Coolant </label>
-              </div>
-              <div className='settings__general__section__column'>
-                <div><h4>General:</h4></div>
-                <label><input type='checkbox' onChange={handleCAN} defaultChecked={settings.activateCAN} /> Enable CAN </label>
-                <label><input type='checkbox' onChange={handleMMI} defaultChecked={settings.activateMMI} /> Enable MMI </label>
-                <label><input type='checkbox' onChange={handleOSD} defaultChecked={settings.activateOSD} /> Enable OSD </label>
-              </div >
-            </div>
-            <div className='settings__general__section'>
-              <div className='settings__general__section__column'>
-
-
-
-                <div className='row'> <div className='row__title'>Kiosk:</div>
-                  <div className='row__setting'>
-                    <select className='dropdown' name='kiosk' defaultValue={false} onChange={console.log("Hello")}>
-                      <option value={true}>Fullscreen</option>
-                      <option value={false}>Window</option>
-                    </select>
-                  </div>
-                </div>
-
-
-
-                {
-                  Object.entries(allSettings).map(([key, value]) => (
-                    <div key={key}>
-                      <h3>{key}</h3>
-                      {typeof value === 'object' ? (
-                        Object.entries(value).map(([subKey, subValue]) => (
-                          <div key={subKey}>
-                            <p>{subKey}:</p> {typeof subValue === 'object' ? JSON.stringify(subValue) : subValue}
-                          </div>
-                        ))
-                      ) : (
-                        <div>{value}</div>
-                      )}
-                    </div>
-                  ))
-                }
-              </div>
+            <div className='settings__general__section__column'>
+              <label>
+                <select className='app-button' color='Select a Color' onChange={colorSelect} defaultValue={settings.colorTheme}>
+                  <option color='blue'>  Blue  </option>
+                  <option color='green'> Green </option>
+                  <option color='red'>   Red   </option>
+                  <option color='white'> White </option>
+                </select>
+              </label>
             </div>
           </div>
-
+          <div className='settings__general__section'>
+            <div className='settings__general__section__column'>
+              <div><h4>Gauges:</h4></div>
+              <label><input type='checkbox' onChange={handleGaugeBoost} defaultChecked={settings.showGaugeBoost} /> Boost </label>
+              <label><input type='checkbox' onChange={handleGaugeIntake} defaultChecked={settings.showGaugeIntake} /> Intake </label>
+              <label><input type='checkbox' onChange={handleGaugeCoolant} defaultChecked={settings.showGaugeCoolant} /> Coolant </label>
+            </div>
+            <div className='settings__general__section__column'>
+              <div><h4>General:</h4></div>
+              <label><input type='checkbox' onChange={handleCAN} defaultChecked={settings.activateCAN} /> Enable CAN </label>
+              <label><input type='checkbox' onChange={handleMMI} defaultChecked={settings.activateMMI} /> Enable MMI </label>
+              <label><input type='checkbox' onChange={handleOSD} defaultChecked={settings.activateOSD} /> Enable OSD </label>
+            </div >
+          </div>
+          <hr
+            style={{
+              background: 'var(--fillInactive)',
+              height: '1px',
+              width: '90%',
+              border: '0'
+            }}
+          />
           <div className='settings__general__system'>
             <div className='settings__general__section__column'>
               <button className='app-button' type='button' onClick={reloadApp}>Relaunch Application</button>
