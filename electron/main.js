@@ -200,8 +200,6 @@ function createWindow() {
   ipcMain.on('getSettings', () => {
     if(isDev) {
       console.log(settings.getAllSettings())
-      console.log(settings.getMajorKeys())
-      console.log(settings.getSubKey('app'))
     }
 
 

@@ -1,20 +1,13 @@
 const Store = require('electron-store')
 const themeOptions = ["Green", "Red", "Blue", "White"]
-const valueOptions = ["Intake", "Boost", "Coolant", "Voltage", "Lambda1", "Lambda2"]
+const valueOptions = ["Intake", "Boost", "Lambda1"]
 
 const optionMap = {
     colorTheme: themeOptions,
-
-    gauge_1: valueOptions,
-    gauge_2: valueOptions,
-    gauge_3: valueOptions,
-
-    chart_1: valueOptions,
-    chart_2: valueOptions,
-
-    value_1: valueOptions,
-    value_2: valueOptions,
-    value_3: valueOptions,
+    windowHeight: [],
+    gaugeLeft: valueOptions,
+    gaugeRight: valueOptions,
+    valueMiddle: valueOptions,
 };
 
 
@@ -118,7 +111,7 @@ class UserSettings {
                         default: 'Dashboard Page 1'
                     },
 
-                    gauge_1: {
+                    gaugeLeft: {
                         type: 'object',
                         properties: {
                             value: {
@@ -132,7 +125,7 @@ class UserSettings {
                         },
                     },
 
-                    gauge_2: {
+                    gaugeMiddle: {
                         type: 'object',
                         properties: {
                             value: {
@@ -141,12 +134,12 @@ class UserSettings {
                             },
                             label: {
                                 type: 'string',
-                                default: 'Gauge Middle',
+                                default: 'Gauge Left',
                             },
                         },
                     },
 
-                    gauge_3: {
+                    gaugeRight: {
                         type: 'object',
                         properties: {
                             value: {
@@ -155,12 +148,12 @@ class UserSettings {
                             },
                             label: {
                                 type: 'string',
-                                default: 'Gauge Right',
+                                default: 'Gauge Left',
                             },
                         },
                     },
 
-                    value_1: {
+                    valueLeft: {
                         type: 'object',
                         properties: {
                             value: {
@@ -174,7 +167,7 @@ class UserSettings {
                         },
                     },
 
-                    value_2: {
+                    valueMiddle: {
                         type: 'object',
                         properties: {
                             value: {
@@ -188,7 +181,7 @@ class UserSettings {
                         },
                     },
 
-                    value_3: {
+                    valueRight: {
                         type: 'object',
                         properties: {
                             value: {
@@ -211,7 +204,7 @@ class UserSettings {
                         default: 'Dashboard Page 2'
                     },
 
-                    chart_1: {
+                    chartTop: {
                         type: 'object',
                         properties: {
                             value: {
@@ -220,12 +213,12 @@ class UserSettings {
                             },
                             label: {
                                 type: 'string',
-                                default: 'Chart Top',
+                                default: 'Gauge Left',
                             },
                         },
                     },
 
-                    chart_2: {
+                    chartBottom: {
                         type: 'object',
                         properties: {
                             value: {
@@ -234,12 +227,12 @@ class UserSettings {
                             },
                             label: {
                                 type: 'string',
-                                default: 'Chart Bottom',
+                                default: 'Gauge Left',
                             },
                         },
                     },
 
-                    value_1: {
+                    valueTop: {
                         type: 'object',
                         properties: {
                             value: {
@@ -253,7 +246,7 @@ class UserSettings {
                         },
                     },
 
-                    value_2: {
+                    valueMiddle: {
                         type: 'object',
                         properties: {
                             value: {
@@ -267,7 +260,7 @@ class UserSettings {
                         },
                     },
 
-                    value_3: {
+                    valueBottom: {
                         type: 'object',
                         properties: {
                             value: {
@@ -283,57 +276,6 @@ class UserSettings {
                 }
             },
 
-            dash_bar: {
-                type: 'object',
-                properties: {
-                    label: {
-                        default: 'DashBar'
-                    },
-
-                    value_1: {
-                        type: 'object',
-                        properties: {
-                            value: {
-                                type: 'string',
-                                default: 'Boost',
-                            },
-                            label: {
-                                type: 'string',
-                                default: 'Value Left',
-                            },
-                        },
-                    },
-
-                    value_2: {
-                        type: 'object',
-                        properties: {
-                            value: {
-                                type: 'string',
-                                default: 'Intake',
-                            },
-                            label: {
-                                type: 'string',
-                                default: 'Value Middle',
-                            },
-                        },
-                    },
-
-                    value_3: {
-                        type: 'object',
-                        properties: {
-                            value: {
-                                type: 'string',
-                                default: 'Coolant',
-                            },
-                            label: {
-                                type: 'string',
-                                default: 'Value Right',
-                            },
-                        },
-                    },
-                }
-            },
-
             visibility: {
                 type: 'object',
                 properties: {
@@ -341,7 +283,7 @@ class UserSettings {
                         default: 'Show/Hide Elements'
                     },
 
-                    showGauge_1: {
+                    showGaugeIntake: {
                         type: 'object',
                         properties: {
                             value: {
@@ -355,7 +297,7 @@ class UserSettings {
                         },
                     },
 
-                    showGauge_2: {
+                    showGaugeBoost: {
                         type: 'object',
                         properties: {
                             value: {
@@ -369,7 +311,7 @@ class UserSettings {
                         },
                     },
 
-                    showGauge_3: {
+                    showGaugeCoolant: {
                         type: 'object',
                         properties: {
                             value: {
@@ -392,7 +334,7 @@ class UserSettings {
                             },
                             label: {
                                 type: 'string',
-                                default: 'Activate DashBar',
+                                default: 'Activate OSD',
                             },
                         },
                     },
@@ -435,179 +377,46 @@ class UserSettings {
                     },
                 }
             },
-
-
-
-
-            //OLD
-            //APP SETTINGS
-            fps: {
-                type: 'integer', //min.10-max.60
-                default: 60,
-            },
-            kiosk: {
-                type: 'boolean',
-                default: true,
-            },
-            height: {
-                type: 'integer',
-                default: 440,
-            },
-            width: {
-                type: 'integer',
-                default: 800,
-            },
-            dpi: {
-                type: 'integer',
-                // maximum: 800,
-                // minimum: 80,
-                default: 140,
-            },
-            windowHeight: {
-                type: 'integer',
-                default: 480,
-            },
-            windowWidth: {
-                type: 'integer',
-                default: 800,
-            },
-            lhd: {
-                type: 'integer',
-                // maximum: 1,
-                // minimum: 0,
-                default: 0,
-            },
-
-            //COLOR SETTINGS
-            colorTheme: {
-                default: 'Green',
-            },
-
-            //GAUGE VALUES
-            gaugeLeft: {
-                type: 'string',
-                default: 'Intake',
-            },
-            gaugeMiddle: {
-                type: 'string',
-                default: 'Boost',
-            },
-            gaugeRight: {
-                type: 'string',
-                default: 'Coolant',
-            },
-
-            //CHART VALUES
-            chartTop: {
-                type: 'string',
-                default: 'Lambda1',
-            },
-            chartBottom: {
-                type: 'string',
-                default: 'Lambda2',
-            },
-
-            //LABEL VALUES
-            valueLeft_1: {
-                type: 'string',
-                default: 'Lambda1',
-            },
-            valueMiddle_1: {
-                type: 'string',
-                default: 'Lambda2',
-            },
-            valueRight_1: {
-                type: 'string',
-                default: 'Voltage',
-            },
-            valueTop_2: {
-                type: 'string',
-                default: 'Intake',
-            },
-            valueMiddle_2: {
-                type: 'string',
-                default: 'Boost',
-            },
-            valueBottom_2: {
-                type: 'string',
-                default: 'Coolant',
-            },
-
-            //TOGGLE ELEMENTS
-            showGaugeBoost: {
-                type: 'boolean',
-                default: true,
-            },
-            showGaugeIntake: {
-                type: 'boolean',
-                default: true,
-            },
-            showGaugeCoolant: {
-                type: 'boolean',
-                default: true,
-            },
-            activateOSD: {
-                type: 'boolean',
-                default: true,
-            },
-
-            //INTERFACE SETTINGS
-            activateCAN: {
-                type: 'boolean',
-                default: true,
-            },
-            activateMMI: {
-                type: 'boolean',
-                default: true,
-            },
-
         };
 
         this.store = new Store({ schema: this.schema })
+
         this.getAllSettings = () => {
             const allSettings = {};
           
             function copyObject(obj, newObj) {
-              for (const [key, value] of Object.entries(obj)) {
-                if (value && typeof value === 'object' && !Array.isArray(value)) {
-                  newObj[key] = {};
-                  if ('properties' in value) {
-                    newObj[key].properties = {};
-                    copyObject(value.properties, newObj[key].properties);
+                for (const [key, value] of Object.entries(obj)) {
+                  if (value && typeof value === 'object' && !Array.isArray(value)) {
+                    newObj[key] = {};
+                    if ('properties' in value) {
+                      newObj[key].properties = {};
+                      copyObject(value.properties, newObj[key].properties);
+                    }
+                    if ('default' in value) {
+                      newObj[key].default = value.default;
+                    }
+                  } else {
+                    newObj[key] = value;
                   }
-                  if ('default' in value) {
-                    newObj[key].default = value.default;
-                  }
-                } else {
-                  newObj[key] = value;
                 }
               }
-            }
           
             copyObject(this.schema, allSettings);
           
             // Add options to the allSettings object
             function addOptions(obj, optionMap) {
-              for (const [key, options] of Object.entries(optionMap)) {
-                if (key in obj && Array.isArray(options)) {
-                  if (!('properties' in obj[key])) {
-                    obj[key] = { properties: {} };
-                  }
-                  obj[key].properties.options = options;
-                }
-              }
-          
-              for (const [, value] of Object.entries(obj)) {
-                if (value && typeof value === 'object' && !Array.isArray(value) && 'properties' in value) {
-                  addOptions(value.properties, optionMap);
+              for (const key of Object.keys(optionMap)) {
+                if (key in obj && Array.isArray(optionMap[key])) {
+                  obj[key].properties.options = optionMap[key];
                 }
               }
             }
-          
-            addOptions(allSettings, optionMap);
+            
+            addOptions(allSettings.app.properties, optionMap);
           
             return allSettings;
           };
+
     }
 }
 

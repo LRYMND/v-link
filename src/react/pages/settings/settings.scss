@@ -15,7 +15,7 @@ body {
     justify-content: space-between;
 
     &__header {
-	height: 3rem;
+        height: 3rem;
     }
 
     &__body {
@@ -66,7 +66,7 @@ body {
 
             &__list::-webkit-scrollbar {
                 width: 1.2rem;
-					cursor: auto;
+                cursor: auto;
             }
 
             &__list::-webkit-scrollbar-track {
@@ -117,8 +117,8 @@ body {
             line-height: .2rem;
 
             display: flex;
-            flex-direction: row;
-            justify-content: center;
+            flex-direction: column;
+            //justify-content: center;
 
             &__column {
                 display: flex;
@@ -147,7 +147,7 @@ body {
 
         &__application::-webkit-scrollbar {
             width: 1.2rem;
-                cursor: auto;
+            cursor: auto;
         }
 
         &__application::-webkit-scrollbar-track {
@@ -166,9 +166,48 @@ body {
     }
 }
 
+.tab {
+    margin-top: .5rem;
+    width: 100%;
+
+    line-height: .2rem;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.setting {
+    margin-top: .5rem;
+    width: 90%;
+    margin-left: 1rem;
+
+    line-height: .2rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    &__element {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 2rem;
+    }
+
+    &__divider {
+        flex-grow: 1;
+        border-bottom: 1px solid var(--fillInactive);
+        margin-left: .5rem;
+        margin-right: .5rem;
+        margin-top: .5rem;
+    }
+}
+
 .dropdown {
     height: 2rem;
-    width: 100%;
+    width: 6rem;
     color: var(--textColor);
     background-color: var(--buttonBackground);
 
@@ -192,7 +231,7 @@ body {
 
     text-align: center;
     font-size: .8rem;
-	
+
 
     &:hover {
         color: var(--textColorHover);
@@ -212,6 +251,20 @@ body {
     }
 }
 
+.input {
+    height: 2rem;
+    width: 5.7rem;
+    color: var(--textColor);
+    background-color: var(--buttonBackground);
+
+    border: none;
+    border-radius: 10px;
+
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
 //Custom Checkboxes:
 input[type=checkbox] {
     -webkit-appearance: none;
@@ -229,8 +282,8 @@ input[type=checkbox] {
     border: .1rem solid var(--textColor);
     border-radius: 5px;
     background-color: var(--sectionColor);
-    margin-left: 2rem;
-    margin-right: .5rem;
+    //margin-left: 2rem;
+    margin-right: 2rem;
 
     color: #ffffff;
 
@@ -238,19 +291,21 @@ input[type=checkbox] {
         cursor: pointer;
     }
 
-    &:checked{
+    &:checked {
         background-color: var(--fillActive);
     }
 
-    &:focus{
+    &:focus {
         outline: none !important;
     }
+
     &:disabled {
         background-color: var(--buttonBackgroundInactive);
         cursor: default;
 
     }
-    &:disabled + span{
+
+    &:disabled+span {
         color: var(--textColorInactive);
     }
 }

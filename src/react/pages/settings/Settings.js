@@ -1,9 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import WifiModal from './modal/wifi/WifiModal';
 import CarplayModal from './modal/carplay/CarplayModal';
 import useModal from './modal/useModal';
-
-import { useState, useEffect } from 'react';
 
 import "../../themes.scss";
 import './settings.scss';
@@ -11,12 +9,22 @@ import './settings.scss';
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
-
 const Settings = ({ settings, setSettings, allSettings }) => {
+
+  console.log("#1", allSettings)
+  console.log("#2", allSettings.activateCAN)
+  console.log("#3", allSettings.app.properties)
+  console.log("#4", allSettings.app.properties.colorTheme.properties)
+  console.log("#5", allSettings.app.properties.colorTheme.properties.options)
+  console.log("#6", allSettings.app.properties.colorTheme.properties.options[1])
+  console.log("#7", allSettings.app.properties.colorTheme.properties.value.default);
+  console.log("#8", allSettings.app.properties.colorTheme.properties.label.default);
+
+
+
   const [wifiList, setWifiList] = useState([{ id: '', ssid: 'No Networks available' }]);
   const [wifiStatus, setWifiStatus] = useState('');
   const [ssidSelected, setSsidSelected] = useState('127.0.0.1');
-
   const [theme, setTheme] = useState(settings.colorTheme);
 
   const { carplayModalIsShowing, carplayModalToggle } = useModal();
@@ -30,17 +38,95 @@ const Settings = ({ settings, setSettings, allSettings }) => {
     return function cleanup() {
       ipcRenderer.removeAllListeners();
     };
-  })
+  }, []);
 
   useEffect(() => {
     ipcRenderer.send('wifiUpdate');
   }, []);
 
-
   useEffect(() => {
-    if (theme != null)
+    if (theme !== null)
       ipcRenderer.send('settingsUpdate', { setting: 'colorTheme', value: theme });
   }, [theme]);
+
+
+
+
+
+
+  function renderSetting(key) {
+    const { label, ...nestedObjects } = allSettings[key].properties;
+
+    const labelParagraph = <h3>{label.default}</h3>;
+
+    const nestedElements = Object.entries(nestedObjects).map(([nestedKey, nestedObj]) => {
+      if (nestedKey === "label") return null;
+
+      const { label, value, options } = nestedObj.properties;
+      const isBoolean = typeof value.default === 'boolean';
+
+      return (
+        <div className='setting'>
+          <div className='setting__element' key={nestedKey}>
+            <span>{label.default}</span>
+            <span className='setting__divider'></span>
+            <span>
+              {options ? (
+                <select className='dropdown' name={nestedKey} defaultValue={value.default} onChange={console.log("Hello")}>
+                  {options.map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
+                </select>
+              ) : (
+                isBoolean ? (
+                  <label className='toggle'>
+                    <input type='checkbox' name={nestedKey} defaultChecked={value.default} onChange={console.log("Hello")} />
+                    <span className='toggle__slider'></span>
+                  </label>
+                ) : (
+                  <input className='input' type='number' name={nestedKey} defaultValue={value.default} onChange={console.log("Hello")} />
+                )
+              )}
+            </span>
+          </div>
+        </div>
+      );
+    });
+
+    return (
+      <div>
+        {labelParagraph}
+        {nestedElements}
+      </div>
+    );
+  }
+
+
+  <div className='volvo__container__section__element'>
+    <span>Enable Haldex</span>
+
+    <span className='volvo__container__section__divider'></span>
+
+    <span>
+      <input type='checkbox' onChange={console.log('Checked')} defaultChecked={false} />
+    </span>
+  </div>
+
+
+
+
+
+
+
+  const [activeTab, setActiveTab] = useState(1);
+
+  const handleTabChange = (tabIndex) => {
+    setActiveTab(tabIndex);
+  };
+
+
+
+
 
 
   /* Color Theme */
@@ -226,39 +312,29 @@ const Settings = ({ settings, setSettings, allSettings }) => {
                 <label><input type='checkbox' onChange={handleOSD} defaultChecked={settings.activateOSD} /> Enable OSD </label>
               </div >
             </div>
+
+            <div className="tab">
+                    <button className='app-button' active type='button' onClick={() => handleTabChange(1)}>Application</button>
+                    <button className='app-button' type='button' onClick={() => handleTabChange(2)}>Customization</button>
+            </div>
+
             <div className='settings__general__section'>
-              <div className='settings__general__section__column'>
-
-
-
-                <div className='row'> <div className='row__title'>Kiosk:</div>
-                  <div className='row__setting'>
-                    <select className='dropdown' name='kiosk' defaultValue={false} onChange={console.log("Hello")}>
-                      <option value={true}>Fullscreen</option>
-                      <option value={false}>Window</option>
-                    </select>
+              {activeTab === 1 &&
+                  <div>
+                    {renderSetting("app")}
+                    {renderSetting("interface")}
                   </div>
-                </div>
+              }
 
+              {activeTab === 2 &&
+                  <div>
+                  {renderSetting("dash_bar")}
+                  {renderSetting("dash_1")}
+                  {renderSetting("dash_2")}
+                  {renderSetting("visibility")}
+                  </div>
+              }
 
-
-                {
-                  Object.entries(allSettings).map(([key, value]) => (
-                    <div key={key}>
-                      <h3>{key}</h3>
-                      {typeof value === 'object' ? (
-                        Object.entries(value).map(([subKey, subValue]) => (
-                          <div key={subKey}>
-                            <p>{subKey}:</p> {typeof subValue === 'object' ? JSON.stringify(subValue) : subValue}
-                          </div>
-                        ))
-                      ) : (
-                        <div>{value}</div>
-                      )}
-                    </div>
-                  ))
-                }
-              </div>
             </div>
           </div>
 
