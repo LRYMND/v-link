@@ -193,7 +193,7 @@ class UserSettings {
                         properties: {
                             value: {
                                 type: 'string',
-                                default: 'voltage',
+                                default: 'Voltage',
                             },
                             label: {
                                 type: 'string',
@@ -382,6 +382,15 @@ class UserSettings {
                             },
                         },
                     },
+                }
+            },
+
+            interface: {
+                type: 'object',
+                properties: {
+                    label: {
+                        default: 'Interface Options'
+                    },
 
                     activateOSD: {
                         type: 'object',
@@ -395,15 +404,6 @@ class UserSettings {
                                 default: 'Activate DashBar',
                             },
                         },
-                    },
-                }
-            },
-
-            interface: {
-                type: 'object',
-                properties: {
-                    label: {
-                        default: 'Interface Options'
                     },
 
                     activateCAN: {

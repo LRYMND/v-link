@@ -262,90 +262,125 @@ const Settings = ({ settings, setSettings, allSettings }) => {
         reset={resetWifiStatus}
       />
 
+
       <div className='settings__header'>
         <h2>RTVI Settings</h2>
       </div>
       <div className='settings__body'>
-        <div className='settings__connections'>
-          <div className='settings__connections__wifi'>
-            <h4>Available Wifi-Networks:</h4>
-            <div className='settings__connections__wifi__list'>
-              {wifiList.map((item, i) => (
-                <div className='settings__connections__wifi__list__item' key={i}>
-                  <button className='app-button' type='button' onClick={() => openWifiModal(item.ssid)}>{item.ssid}</button>
+
+        <div className='section'>
+
+          <div className='section__1'>
+            <div className='section__frame'>
+              <div className='section__frame__title'>
+                <h3>WiFi Networks:</h3>
+              </div>
+
+              <div className='section__frame__content'>
+
+
+                <div className='scroller__container'>
+                  <div className='scroller__container__content'>
+                    {wifiList.map((item, i) => (
+                      <div className='list' key={i}>
+                        <button className='app-button' type='button' onClick={() => openWifiModal(item.ssid)}>{item.ssid}</button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div className='settings__connections__bt'>
-            <p><i>RTVI v1.2.4</i></p>
-          </div>
-        </div>
-        <div className='settings__general'>
-          <div className='settings__general__application'>
-            <div className='settings__general__section'>
-              <div className='settings__general__section__column'>
-                <h4>Choose a color theme:</h4>
               </div>
-              <div className='settings__general__section__column'>
-                <label>
-                  <select className='app-button' color='Select a Color' onChange={colorSelect} defaultValue={settings.colorTheme}>
-                    <option color='blue'>  Blue  </option>
-                    <option color='green'> Green </option>
-                    <option color='red'>   Red   </option>
-                    <option color='white'> White </option>
-                  </select>
-                </label>
-              </div>
-            </div>
-            <div className='settings__general__section'>
-              <div className='settings__general__section__column'>
-                <div><h4>Gauges:</h4></div>
-                <label><input type='checkbox' onChange={handleGaugeBoost} defaultChecked={settings.showGaugeBoost} /> Boost </label>
-                <label><input type='checkbox' onChange={handleGaugeIntake} defaultChecked={settings.showGaugeIntake} /> Intake </label>
-                <label><input type='checkbox' onChange={handleGaugeCoolant} defaultChecked={settings.showGaugeCoolant} /> Coolant </label>
-              </div>
-              <div className='settings__general__section__column'>
-                <div><h4>General:</h4></div>
-                <label><input type='checkbox' onChange={handleCAN} defaultChecked={settings.activateCAN} /> Enable CAN </label>
-                <label><input type='checkbox' onChange={handleMMI} defaultChecked={settings.activateMMI} /> Enable MMI </label>
-                <label><input type='checkbox' onChange={handleOSD} defaultChecked={settings.activateOSD} /> Enable OSD </label>
-              </div >
             </div>
 
-            <div className="tab">
-                    <button className='app-button' active type='button' onClick={() => handleTabChange(1)}>Application</button>
-                    <button className='app-button' type='button' onClick={() => handleTabChange(2)}>Customization</button>
-            </div>
+            <div className='section__frame'>
 
-            <div className='settings__general__section'>
-              {activeTab === 1 &&
-                  <div>
-                    {renderSetting("app")}
-                    {renderSetting("interface")}
+              <div className='section__frame__title'>
+                <h3>I/O:</h3>
+              </div>
+
+              <div className='section__frame__content'>
+                <div className='section__frame__content__column'>
+                  <button className='app-button' type='button' onClick={reloadApp}>Restart</button>
+                  <button className='app-button' type='button' onClick={closeApp}>Quit</button>
+                </div>
+                <div className='section__frame__content__column'>
+                  <button className='app-button' type='button' onClick={rebootRaspi}>Reboot</button>
+                  <button className='app-button' type='button' onClick={openCarplayModal}>Advanced</button>
+                </div>
+              </div>
+
+              <div className='section__frame__title'>
+                <h4><i>v1.3.0</i></h4>
+              </div>
+            </div>
+          </div>
+
+
+          <div className='section__2'>
+            <div className='section__frame'>
+              <div className='section__frame__title'>
+                <h3>Application Settings:</h3>
+              </div>
+
+              <div className='scroller__container'>
+                <div className='scroller__container__content'>
+                  <div className='settings__general__application'>
+                    <div className="tab">
+                      <button className='tab-button' active type='button' onClick={() => handleTabChange(1)}>Application</button>
+                      <button className='tab-button' type='button' onClick={() => handleTabChange(2)}>Customization</button>
+                      <button className='tab-button' type='button' onClick={() => handleTabChange(3)}>Old</button>
+                    </div>
+                    <div className='settings__general__section'>
+                      {activeTab === 1 &&
+                        <div>
+                          {renderSetting("app")}
+                          {renderSetting("interface")}
+                        </div>
+                      }
+
+                      {activeTab === 2 &&
+                        <div>
+                          {renderSetting("dash_bar")}
+                          {renderSetting("dash_1")}
+                          {renderSetting("dash_2")}
+                          {renderSetting("visibility")}
+                        </div>
+                      }
+
+                      {activeTab === 3 &&
+                        <div>
+                          <div className='settings__general__section__column'>
+                            <h4>Choose a color theme:</h4>
+                          </div>
+                          <div className='settings__general__section__column'>
+                            <label>
+                              <select className='app-button' color='Select a Color' onChange={colorSelect} defaultValue={settings.colorTheme}>
+                                <option color='blue'>  Blue  </option>
+                                <option color='green'> Green </option>
+                                <option color='red'>   Red   </option>
+                                <option color='white'> White </option>
+                              </select>
+                            </label>
+                          </div>
+
+                          <div className='settings__general__section__column'>
+                            <div><h4>Gauges:</h4></div>
+                            <label><input type='checkbox' onChange={handleGaugeBoost} defaultChecked={settings.showGaugeBoost} /> Boost </label>
+                            <label><input type='checkbox' onChange={handleGaugeIntake} defaultChecked={settings.showGaugeIntake} /> Intake </label>
+                            <label><input type='checkbox' onChange={handleGaugeCoolant} defaultChecked={settings.showGaugeCoolant} /> Coolant </label>
+                          </div>
+                          <div className='settings__general__section__column'>
+                            <div><h4>General:</h4></div>
+                            <label><input type='checkbox' onChange={handleCAN} defaultChecked={settings.activateCAN} /> Enable CAN </label>
+                            <label><input type='checkbox' onChange={handleMMI} defaultChecked={settings.activateMMI} /> Enable MMI </label>
+                            <label><input type='checkbox' onChange={handleOSD} defaultChecked={settings.activateOSD} /> Enable OSD </label>
+                          </div >
+                        </div>
+                      }
+                    </div>
                   </div>
-              }
-
-              {activeTab === 2 &&
-                  <div>
-                  {renderSetting("dash_bar")}
-                  {renderSetting("dash_1")}
-                  {renderSetting("dash_2")}
-                  {renderSetting("visibility")}
-                  </div>
-              }
-
-            </div>
-          </div>
-
-          <div className='settings__general__system'>
-            <div className='settings__general__section__column'>
-              <button className='app-button' type='button' onClick={reloadApp}>Relaunch Application</button>
-              <button className='app-button' type='button' onClick={closeApp}>Close Application</button>
-            </div>
-            <div className='settings__general__section__column'>
-              <button className='app-button' type='button' onClick={rebootRaspi}>Reboot System</button>
-              <button className='app-button' type='button' onClick={openCarplayModal}>Advanced Settings</button>
+                  <div />
+                </div>
+              </div>
             </div>
           </div>
         </div>
