@@ -75,8 +75,8 @@ def conversion(msg_id, data):
 
         elif(msg_id == 0x34):  #LAMBDA1
             data *= 16.0 / 65536.0
-	    if data > 2:
-		data = 2
+            if data > 2:
+                data = 2
             return data
 
         elif(msg_id == 0x2C):  #LAMBDA2
@@ -98,36 +98,36 @@ def filter(msg, msg_id, rtvi_id, is_extended):
             value = msg.data[5]
         print(rtvi_id+str(float(conversion(msg_id, value))))
         sys.stdout.flush()
-	return True
+        return True
     else:
-	return False
+        return False
 
 
 #DEFINE MESSAGE REQUEST
 def request(msg_id):
     i = 0
     while (i < len(msg_id)):
-	REQ_MSG[3] = msg_id[i][0]
+        REQ_MSG[3] = msg_id[i][0]
         REQ_MSG[4] = msg_id[i][1]
         msg = can.Message(arbitration_id=REQ_ID, data=REQ_MSG,is_extended_id=True)
 
         try:
-	    received = False
+            received = False
             CAN_BUS.send(msg)
 
-	    retries = 500
+            retries = 500
 
-	    while not received == True or retries == 0:
-		msg = CAN_BUS.recv()
-		received = filter(msg, msg_id[i][1], msg_id[i][2], msg_id[i][3])
-		retries -= 1
+            while not received == True or retries == 0:
+                msg = CAN_BUS.recv()
+                received = filter(msg, msg_id[i][1], msg_id[i][2], msg_id[i][3])
+                retries -= 1
 
         except can.CanError:
             print("Error")
         i += 1
 
 
-#MAIN LOOP
+#MAIN LOOP  
 try:
     x = 0
     while (True):
