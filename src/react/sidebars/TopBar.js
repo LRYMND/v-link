@@ -20,7 +20,7 @@ const TopBar = ({ settings, phoneState, wifiState }) => {
   }, []);
 
   return (
-    <div className={`topbar ${settings.colorTheme}`}>
+    <div className={`topbar ${settings.app.colorTheme.value}`}>
       <div className="topbar__info">
         <svg className={`topbar__icon topbar__icon--${(wifiState ? "connected" : "disconnected")}`}>
           <use xlinkHref="./svg/wifi.svg#wifi"></use>

@@ -1,6 +1,6 @@
 {
   "name": "volvo-rtvi",
-  "version": "1.2.4",
+  "version": "1.3.0",
   "private": false,
   "author": {
     "name": "Louis Raymond",
@@ -16,7 +16,7 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "electron-is-dev": "^2.0.0",
-    "electron-store": "^8.1.0",
+    "electron-json-storage": "^4.6.0",
     "jmuxer": "^2.0.5",
     "node-carplay": "^3.0.6",
     "python-shell": "^3.0.1",
@@ -86,8 +86,8 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.17.6",
-    "@babel/preset-react": "^7.16.7",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/preset-react": "^7.16.7",
     "concurrently": "^7.2.2",
     "electron": "^22.0.0",
     "electron-builder": "^23.6.0",

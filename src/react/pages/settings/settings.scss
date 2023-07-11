@@ -6,7 +6,13 @@ body {
     user-select: none;
 }
 
+.spacer {
+    height: 4rem;
+    margin: 0;
+}
+
 .section {
+    height: calc(100vh - 10rem);
     flex: 1;
     display: flex;
     flex-direction: row;
@@ -19,8 +25,6 @@ body {
         width: 40%;
         display: flex;
         flex-direction: column;
-        flex-grow: 0;
-
     }
 
     &__2 {
@@ -42,30 +46,35 @@ body {
         border-radius: 10px;
 
         margin: .5rem;
-        overflow-y: auto;
-        overflow-x: hidden;
+        padding: 1rem;
+        overflow: hidden;
 
-        &__title {
+
+
+        &__banner {
             display: flex;
             justify-content: center;
-            width: 100%;
+            align-items: center;
+            width: 95%;
             height: 2rem;
-
-            margin: .5rem;
         }
+
         &__content {
             width: 100%;
-            height: calc(100% - 1.5rem);
-
+            height: calc(100% - 2rem);
             display: flex;
-            justify-content: center;
-            overflow: hidden;
+            justify-content: flex-start;
+
+
+
 
             &__column {
+                flex: 1;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                width: 45%;
+                align-items: center;
+                margin: .5rem;
             }
         }
     }
@@ -73,26 +82,36 @@ body {
 
 
 .list {
-    width: 100%;
-    flex-direction: row;
+    width: 95%;
+
+    padding: 1rem;
+
+    display: flex;
     justify-content: center;
-    align-items: center;
+    flex-direction: column;
+
+
+    &__content {
+        width: 95%;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 }
 
 .scroller {
 
-    background-color: var(--sectionColor);
-    border-radius: 10px;
-
-    margin: .5rem;
+    margin: 1rem;
 
     &__container {
+        flex: 1;
         width: 100%;
-        margin: .5rem;
+        margin-bottom: 1rem;
+        min-height: 0;
 
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
 
         overflow: hidden;
@@ -103,14 +122,17 @@ body {
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
 
             overflow-y: auto;
             overflow-x: hidden;
 
+            border-radius: 12px;
+            background-color: var(--scrollContentBackground);
         }
 
         &__content::-webkit-scrollbar {
-            width: 1.2rem;
+            width: 1.4rem;
             cursor: auto;
         }
 
@@ -135,184 +157,30 @@ body {
 
 .settings {
     width: 100vw;
-    height: calc(100vh - 10rem); //Window Height minus Top- and NavBar Height
+    height: calc(100vh - 8rem);
+
+
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-
-    margin-top: 4.5rem; //Spacing for TopBar
-
 
 
     &__header {
+        width: 100%;
+        height: 2rem;
+
         display: flex;
-        flex-direction: row;
-        height: 3rem;
+        justify-content: center;
+        align-items: center;
     }
 
     &__body {
+        flex: 1;
         width: 100%;
         height: 100%;
-        display: flex;
-        flex-grow: 1;
-    }
-
-    &__connections {
-        width: 38%;
-        height: 100%;
-
-        margin-right: .5rem;
 
         display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-
-        &__wifi {
-            display: flex;
-            justify-content: center;
-            flex-direction: column;
-            align-items: center;
-            background-color: var(--sectionColor);
-            border-radius: 10px;
-            height: 50%;
-
-
-            &__list {
-                margin-top: -.5rem;
-                margin-bottom: 1rem;
-                width: 90%;
-                height: 70%;
-                overflow-y: auto;
-                overflow-x: hidden;
-
-                &__item {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 95%;
-
-                }
-            }
-
-            &__list::-webkit-scrollbar {
-                width: 1.2rem;
-                cursor: auto;
-            }
-
-            &__list::-webkit-scrollbar-track {
-                background-color: var(--scrollBarBackground);
-                border-radius: 10px;
-            }
-
-            &__list::-webkit-scrollbar-thumb {
-                background-color: var(--fillActive);
-                border-radius: 10px;
-
-                &:active {
-                    background-color: var(--fillHover);
-                }
-            }
-        }
-
-        &__bt {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            background-color: var(--sectionColor);
-            border-radius: 10px;
-            height: 45%;
-            text-align: left;
-
-            &__section {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-direction: row;
-                width: 100%;
-                margin-top: 1rem;
-            }
-
-            &__column {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-around;
-                width: 45%;
-            }
-        }
-    }
-
-    &__general {
-        width: 55%;
-        height: 100%;
-
-        margin-left: .5rem;
-        border-radius: 10px;
-        background-color: var(--sectionColor);
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-
-        gap: .5rem;
-
-        &__section {
-
-            overflow-y: auto;
-            overflow-x: hidden;
-
-            margin-top: .5rem;
-
-            &__column {
-                display: flex;
-                flex-direction: column;
-                justify-content: space-around;
-                width: 50%;
-                margin-top: -1.5rem;
-            }
-        }
-
-        &__application {
-            width: 90%;
-            height: 85%;
-            display: flex;
-            flex-direction: column;
-
-            overflow-y: auto;
-            overflow-x: hidden;
-
-            background-color: var(--sectionColor1);
-        }
-
-        &__system {
-            margin-top: 4rem;
-            width: 90%;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-        }
-
-        &__section::-webkit-scrollbar {
-            width: 1.2rem;
-            cursor: auto;
-        }
-
-        &__section::-webkit-scrollbar-track {
-            background-color: var(--scrollBarBackground);
-            border-radius: 10px;
-        }
-
-        &__section::-webkit-scrollbar-thumb {
-            background-color: var(--fillActive);
-            border-radius: 10px;
-
-            &:active {
-                background-color: var(--fillHover);
-            }
-        }
     }
 }
 
@@ -320,7 +188,7 @@ body {
 
 .tab {
     align-self: flex-start;
-    //width: 50%;
+    margin-left: 2.5rem;
 
     line-height: .2rem;
 
@@ -330,29 +198,39 @@ body {
 }
 
 .setting {
-    margin-top: .5rem;
-    width: 80%;
+    width: 90%;
+    //margin: 1rem;
+    margin-bottom: 2rem;
 
-    line-height: .2rem;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    &__element {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-left: 2rem;
-    }
-
-    &__divider {
-        flex-grow: 1;
-        border-bottom: 1px solid var(--fillInactive);
-        margin-left: .5rem;
-        margin-right: .5rem;
+    &__row {
+        flex: 1;
+        flex-grow: 0;
+        width: 90%;
         margin-top: .5rem;
+        margin-right: 3rem;
+
+
+        line-height: .2rem;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        &__element {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 2rem;
+        }
+
+        &__divider {
+            flex-grow: 1;
+            border-bottom: 1px solid var(--fillInactive);
+            margin-left: .5rem;
+            margin-right: .5rem;
+            margin-top: .5rem;
+        }
     }
 }
 
@@ -371,13 +249,15 @@ body {
 }
 
 .app-button {
+    flex: 1;
     color: var(--textColor);
     background-color: var(--buttonBackground);
     border: none;
     border-radius: 10px;
 
-    width: 95%;
-    height: 2.2rem;
+    width: 100%;
+    height: 2rem;
+
     margin: .2rem;
 
     text-align: center;

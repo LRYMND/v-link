@@ -6,7 +6,7 @@ import RadialGauge from '../../components/RadialGauge'
 import "../../themes.scss";
 import './dashboard.scss';
 
-const Dashboard = ({ settings, carData}) => {
+const Dashboard = ({ settings, carData }) => {
 
 	useEffect(() => {
 		loadTheme();
@@ -38,12 +38,12 @@ const Dashboard = ({ settings, carData}) => {
 	}
 
 	return (
-		<div className={`dashboard ${settings.colorTheme}`}>
+		<div className={`dashboard ${settings.app.colorTheme.value}`}>
 			<div className="dashboard__header">
 			</div>
 			{loaded ?
 				<div className="dashboard__gauges">
-					{settings.showGaugeIntake ?
+					{settings.visibility.showGauge_1.value ?
 						<RadialGauge
 							globalRotation={90}
 							currentValue={carData.intake}
@@ -72,11 +72,11 @@ const Dashboard = ({ settings, carData}) => {
 							textColor2={textColorActive}
 							pivotColor={sectionColor}
 							borderSize={1}
-    						borderGap={5}
+							borderGap={5}
 							borderColor={sectionColor}
 						/>
 						: <div></div>}
-					{settings.showGaugeBoost ?
+					{settings.visibility.showGauge_2.value ?
 
 						<RadialGauge
 							globalRotation={90}
@@ -106,11 +106,11 @@ const Dashboard = ({ settings, carData}) => {
 							textColor2={textColorActive}
 							pivotColor={sectionColor}
 							borderSize={1}
-    						borderGap={5}
+							borderGap={5}
 							borderColor={sectionColor}
 						/>
 						: <div></div>}
-					{settings.showGaugeCoolant ?
+					{settings.visibility.showGauge_3.value ?
 						<RadialGauge
 							globalRotation={90}
 							currentValue={carData.coolant}
@@ -139,17 +139,17 @@ const Dashboard = ({ settings, carData}) => {
 							textColor2={textColorActive}
 							pivotColor={sectionColor}
 							borderSize={1}
-    						borderGap={5}
+							borderGap={5}
 							borderColor={sectionColor}
 						/>
 						: <div></div>}
 				</div> : <></>}
 			<>
-				{settings.activateCAN ? <div className="dashboard__footer">
-											<div className="dashboard__footer__element"><h3>λ1: {carData.lambda1}</h3></div>
-											<div className="dashboard__footer__element"><h3>λ2: {carData.lambda2}V</h3></div>
-											<div className="dashboard__footer__element"><h3>Bat: {carData.voltage}V</h3></div>
-										</div> : <div className="dashboard__footer"><h3><i>(CAN-Stream deactivated.)</i></h3></div>}
+				{settings.interface.activateCAN.value ? <div className="dashboard__footer">
+					<div className="dashboard__footer__element"><h3>λ1: {carData.lambda1}</h3></div>
+					<div className="dashboard__footer__element"><h3>λ2: {carData.lambda2}V</h3></div>
+					<div className="dashboard__footer__element"><h3>Bat: {carData.voltage}V</h3></div>
+				</div> : <div className="dashboard__footer"><h3><i>(CAN-Stream deactivated.)</i></h3></div>}
 			</>
 		</div>
 	)

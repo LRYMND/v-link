@@ -18,6 +18,7 @@ import './home.scss';
 const socket = io("ws://localhost:5005")
 const electron = window.require('electron')
 const { ipcRenderer } = electron;
+const versionNumber = process.env.PACKAGE_VERSION;
 
 const Home = () => {
   const [view, setView] = useState('Dashboard')
@@ -45,8 +46,8 @@ const Home = () => {
   })
 
   useEffect(() => {
-    ipcRenderer.on('allSettings', (event, args) => { loadSettings(args) });
-    ipcRenderer.on('testSettings', (event, args) => { loadTestSettings(args) });
+    ipcRenderer.on('allSettings', (event, args) => { loadTestSettings(args)  });
+    ipcRenderer.on('testSettings2', (event, args) => { loadTestSettings(args) });
     ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
     ipcRenderer.on('wifiOn', () => { setWifiState(true) });
     ipcRenderer.on('wifiOff', () => { setWifiState(false) });
@@ -63,7 +64,7 @@ const Home = () => {
     });
 
     socket.on('status', ({ status }) => {
-      console.log("status@home: ", status)
+      console.log("socket status: ", status)
       setPhoneState(status)
     })
 
@@ -80,13 +81,15 @@ const Home = () => {
   }, [])
 
   useEffect(() => {
-    console.log('update navbar')
-    console.log('status: ', phoneState)
-    console.log('streaming: ', streaming)
+    console.log("streaming: ", streaming)
+    console.log("phoneState: ", phoneState)
+    console.log("view: ", view)
+    //console.log("settings: ", settings)
+
     if (streaming && phoneState && (view === 'Carplay')) {
       setShowTop(false);
       setShowNav(false);
-      if (settings.activateOSD)
+      if (settings.interface.activateOSD)
         setShowOsd(true);
     } else {
       setShowTop(true);
@@ -100,22 +103,14 @@ const Home = () => {
   }, [streaming, phoneState, view, settings]);
 
   useEffect(() => {
-    if (settings != null) {
+    if (testSettings != null) {
       setStartedUp(true);
     }
-  }, [settings])
-
-  function loadSettings(data) {
-    if (data != null) {
-      setSettings(data);
-      console.log('settings loaded: ', data)
-    }
-  }
+  }, [settings, testSettings])
 
   function loadTestSettings(data) {
     if (data != null) {
       setTestSettings(data);
-      console.log('all settings loaded: ', data)
     }
   }
 
@@ -171,16 +166,16 @@ const Home = () => {
             {showOsd &&
               <DashBar
                 className='dashbar'
-                settings={settings}
+                settings={testSettings}
                 carData={carData}
                 phoneState={phoneState}
                 wifiState={wifiState}
               />
             }
-            <div className={`carplay ${settings.colorTheme}`} style={{ height: settings.height, width: settings.width }}>
+            <div className={`carplay ${testSettings.app.colorTheme}`} style={{ height: testSettings.carplay.height, width: testSettings.carplay.width }}>
               <div className='carplay__stream'>
                 <Carplay
-                  settings={settings}
+                  settings={testSettings.carplay}
                   status={true}
                   openModal={false}
                   touchEvent={touchEvent}
@@ -199,7 +194,7 @@ const Home = () => {
       case 'Dashboard':
         return (
           <Swiper
-            settings={settings}
+            settings={testSettings}
             carData={carData}
           />
         )
@@ -210,9 +205,11 @@ const Home = () => {
             settings={settings}
             setSettings={setSettings}
             allSettings={testSettings}
+            setAllSettings={setTestSettings}
+            versionNumber={versionNumber}
           />
         )
-      
+
       case 'Volvo':
         return (
           <Volvo
@@ -230,7 +227,7 @@ const Home = () => {
       default:
         return (
           <Swiper
-            settings={settings}
+            settings={testSettings}
             carData={carData}
           />
         )
@@ -245,7 +242,7 @@ const Home = () => {
           {showTop &&
             <TopBar
               className='topbar'
-              settings={settings}
+              settings={testSettings}
               wifiState={wifiState}
               phoneState={phoneState}
             />
@@ -255,7 +252,7 @@ const Home = () => {
 
             <NavBar
               className='navbar'
-              settings={settings}
+              settings={testSettings}
               view={view}
               setView={setView}
             />
@@ -267,7 +264,7 @@ const Home = () => {
             <h1>RTVI</h1>
           </button>
 
-          <span className='refresh__version'>v1.2.4</span>
+          <span className='refresh__version'>{versionNumber}</span>
         </div>}
     </>
   );

@@ -1,4 +1,5 @@
-const Store = require('electron-store')
+const storage = require('electron-json-storage');
+
 const themeOptions = ["Green", "Red", "Blue", "White"]
 const valueOptions = ["Intake", "Boost", "Coolant", "Voltage", "Lambda1", "Lambda2"]
 
@@ -28,6 +29,9 @@ class UserSettings {
             carplay: {
                 type: 'object',
                 properties: {
+                    label: {
+                        default: 'Advanced Settings'
+                    },
                     fps: {
                         type: 'integer', //min.10-max.60
                         default: 60,
@@ -36,11 +40,6 @@ class UserSettings {
                     dpi: {
                         type: 'integer', //min.80-max.800
                         default: 140,
-                    },
-
-                    kiosk: {
-                        type: 'boolean',
-                        default: true,
                     },
 
                     height: {
@@ -60,6 +59,12 @@ class UserSettings {
                         // minimum: 0,
                         default: 0,
                     },
+                    
+                    kiosk: {
+                        type: 'boolean',
+                        default: true,
+                    },
+
                 }
             },
 
@@ -67,7 +72,7 @@ class UserSettings {
                 type: 'object',
                 properties: {
                     label: {
-                        default: 'Application Settings'
+                        default: 'Application'
                     },
 
                     colorTheme: {
@@ -389,7 +394,7 @@ class UserSettings {
                 type: 'object',
                 properties: {
                     label: {
-                        default: 'Interface Options'
+                        default: 'Interface'
                     },
 
                     activateOSD: {
@@ -436,178 +441,108 @@ class UserSettings {
                 }
             },
 
+            dev: {
+                type: 'object',
+                properties: {
+                    label: {
+                        default: 'Interface'
+                    },
 
-
-
-            //OLD
-            //APP SETTINGS
-            fps: {
-                type: 'integer', //min.10-max.60
-                default: 60,
-            },
-            kiosk: {
-                type: 'boolean',
-                default: true,
-            },
-            height: {
-                type: 'integer',
-                default: 440,
-            },
-            width: {
-                type: 'integer',
-                default: 800,
-            },
-            dpi: {
-                type: 'integer',
-                // maximum: 800,
-                // minimum: 80,
-                default: 140,
-            },
-            windowHeight: {
-                type: 'integer',
-                default: 480,
-            },
-            windowWidth: {
-                type: 'integer',
-                default: 800,
-            },
-            lhd: {
-                type: 'integer',
-                // maximum: 1,
-                // minimum: 0,
-                default: 0,
+                    versionNumber: {
+                        type: 'object',
+                        properties: {
+                            value: {
+                                type: 'string',
+                                default: '1.3.0',
+                            },
+                            label: {
+                                type: 'string',
+                                default: 'Activate DashBar',
+                            },
+                        },
+                    },
+                }
             },
 
-            //COLOR SETTINGS
-            colorTheme: {
-                default: 'Green',
-            },
-
-            //GAUGE VALUES
-            gaugeLeft: {
-                type: 'string',
-                default: 'Intake',
-            },
-            gaugeMiddle: {
-                type: 'string',
-                default: 'Boost',
-            },
-            gaugeRight: {
-                type: 'string',
-                default: 'Coolant',
-            },
-
-            //CHART VALUES
-            chartTop: {
-                type: 'string',
-                default: 'Lambda1',
-            },
-            chartBottom: {
-                type: 'string',
-                default: 'Lambda2',
-            },
-
-            //LABEL VALUES
-            valueLeft_1: {
-                type: 'string',
-                default: 'Lambda1',
-            },
-            valueMiddle_1: {
-                type: 'string',
-                default: 'Lambda2',
-            },
-            valueRight_1: {
-                type: 'string',
-                default: 'Voltage',
-            },
-            valueTop_2: {
-                type: 'string',
-                default: 'Intake',
-            },
-            valueMiddle_2: {
-                type: 'string',
-                default: 'Boost',
-            },
-            valueBottom_2: {
-                type: 'string',
-                default: 'Coolant',
-            },
-
-            //TOGGLE ELEMENTS
-            showGaugeBoost: {
-                type: 'boolean',
-                default: true,
-            },
-            showGaugeIntake: {
-                type: 'boolean',
-                default: true,
-            },
-            showGaugeCoolant: {
-                type: 'boolean',
-                default: true,
-            },
-            activateOSD: {
-                type: 'boolean',
-                default: true,
-            },
-
-            //INTERFACE SETTINGS
-            activateCAN: {
-                type: 'boolean',
-                default: true,
-            },
-            activateMMI: {
-                type: 'boolean',
-                default: true,
-            },
 
         };
 
-        this.store = new Store({ schema: this.schema })
-        this.getAllSettings = () => {
-            const allSettings = {};
+        this.saveSettingsToFile = () => {
+            storage.set('settings', this.schema, (error) => {
+                if (error) {
+                    console.error('Error saving settings:', error);
+                } else {
+                    console.log('Settings saved successfully.');
+                }
+            });
+        }
+
+
+        this.getDefaultSettings = () => {
+            const defaultSettings = {};
           
-            function copyObject(obj, newObj) {
-              for (const [key, value] of Object.entries(obj)) {
-                if (value && typeof value === 'object' && !Array.isArray(value)) {
-                  newObj[key] = {};
-                  if ('properties' in value) {
-                    newObj[key].properties = {};
-                    copyObject(value.properties, newObj[key].properties);
-                  }
-                  if ('default' in value) {
-                    newObj[key].default = value.default;
+            const traverseSchema = (schema, settings) => {
+              for (const key in schema) {
+                if (schema[key].type === 'object') {
+                  settings[key] = {};
+                  traverseSchema(schema[key].properties, settings[key]);
+                  if (optionMap.hasOwnProperty(key)) {
+                    settings[key].options = optionMap[key];
                   }
                 } else {
-                  newObj[key] = value;
+                  settings[key] = schema[key].default;
                 }
               }
-            }
+            };
           
-            copyObject(this.schema, allSettings);
+            traverseSchema(this.schema, defaultSettings);
           
-            // Add options to the allSettings object
-            function addOptions(obj, optionMap) {
-              for (const [key, options] of Object.entries(optionMap)) {
-                if (key in obj && Array.isArray(options)) {
-                  if (!('properties' in obj[key])) {
-                    obj[key] = { properties: {} };
-                  }
-                  obj[key].properties.options = options;
-                }
-              }
-          
-              for (const [, value] of Object.entries(obj)) {
-                if (value && typeof value === 'object' && !Array.isArray(value) && 'properties' in value) {
-                  addOptions(value.properties, optionMap);
-                }
-              }
-            }
-          
-            addOptions(allSettings, optionMap);
-          
-            return allSettings;
+            return defaultSettings;
           };
+
+
+        this.getTestSettings = () => {
+            return new Promise((resolve, reject) => {
+              // Check if a storage file exists
+              storage.has('settings', (error, hasKey) => {
+                if (error) {
+                  reject(error);
+                  return;
+                }
+          
+                // If the storage file doesn't exist, create one with default values
+                if (!hasKey) {
+                  const defaultSettings = this.getDefaultSettings();
+                  storage.set('settings', defaultSettings, (error) => {
+                    if (error) {
+                      reject(error);
+                    } else {
+                      resolve(defaultSettings);
+                    }
+                  });
+                } else {
+                  // If the storage file exists, read its contents and return them
+                  storage.get('settings', (error, settings) => {
+                    if (error) {
+                      reject(error);
+                    } else {
+                      resolve(settings);
+                    }
+                  });
+                }
+              });
+            });
+          };
+
+        this.saveTestSettings = (newSettings) => {
+            storage.set('settings', newSettings, (error) => {
+                if (error) {
+                    console.error('Error saving settings:', error);
+                } else {
+                    console.log('Settings saved successfully.');
+                }
+            });
+        };
     }
 }
 

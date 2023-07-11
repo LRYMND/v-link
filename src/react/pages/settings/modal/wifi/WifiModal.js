@@ -16,7 +16,7 @@ const WifiModal = ({ isShowing, ssid, hide, connect, status, reset, settings }) 
     const [layout, setLayout] = useState("default");
 
     useEffect(() => {
-            setMessage(ssid);
+        setMessage(ssid);
     }, [ssid]);
 
     useEffect(() => {
@@ -68,45 +68,50 @@ const WifiModal = ({ isShowing, ssid, hide, connect, status, reset, settings }) 
     return ReactDOM.createPortal(
         <>
             {isShowing ?
-            <div className={`container ${settings.colorTheme}`}>
-                <React.Fragment>
-                    <div className="wifi-modal-overlay" />
-                    <div className="wifi-modal-wrapper" aria-modal aria-hidden tabIndex={-1} role="dialog">
-                        <div className="wifi-modal">
-                            <div className="wifi-modal__body">
-                                <div className="wifi-modal__body__title">
-                                    {isConnecting ?
-                                        <div className="spinner">
-                                            <h3>Connecting...</h3>
-                                            <GooSpinner size={20} color="var(--textColor)" />
-                                        </div> :
-                                        <div>
-                                            <h3>{message}</h3>
-                                        </div>}
-                                </div>
-                                <form onSubmit={handleSubmit}>
-                                    <div className="wifi-modal__body__input">
+                <div className={`container ${settings.app.colorTheme.value}`}>
+                    <React.Fragment>
+                        <div className="wifi-modal-overlay" />
+                        <div className="wifi-modal-wrapper" aria-modal aria-hidden tabIndex={-1} role="dialog">
+                            <div className="wifi-modal-container">
+                                <div className="wifi-modal">
+                                    <div className="wifi-modal__body">
+                                        <div className="wifi-modal__body__element">
+                                            <div className="wifi-modal__body__title"><h3>SSID:</h3></div>
+                                            {isConnecting ?
+                                                <div className="wifi-modal__body__title">
+                                                    <h3>Connecting...</h3>
+                                                    <GooSpinner size={20} color="var(--textColor)" />
+                                                </div> :
+                                                <div>
+                                                    <h3>{message}</h3>
+                                                </div>}
+                                        </div>
+                                        <div className="wifi-modal__body__element">
+                                        <form onSubmit={handleSubmit}>
+                                            <div className="wifi-modal__body__input">
                                                 <input onClick={(e) => setInput("")} onChange={onChangeInput} value={input} type="text" name="password" id="password" />
-                                        
-                                    </div>
-                                    <div className="wifi-modal__body__buttons">
-                                        <input type="submit" value="Connect" className="button" />
-                                        <input type="button" value="Close" className="button" onClick={close} />
-                                    </div>
 
-                                </form>
+                                            </div>
+                                            <div className="wifi-modal__body__buttons">
+                                                <input type="submit" value="Connect" className="button" />
+                                                <input type="button" value="Close" className="button" onClick={close} />
+                                            </div>
+
+                                        </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="keyboard">
+                                    <Keyboard
+                                        keyboardRef={r => (keyboard.current = r)}
+                                        layoutName={layout}
+                                        onChange={onChange}
+                                        onKeyPress={onKeyPress}
+                                    />
+                                </div>
                             </div>
                         </div>
-                        <div className="keyboard">
-                            <Keyboard
-                                keyboardRef={r => (keyboard.current = r)}
-                                layoutName={layout}
-                                onChange={onChange}
-                                onKeyPress={onKeyPress}
-                            />
-                        </div>
-                    </div>
-                </React.Fragment>
+                    </React.Fragment>
                 </div>
                 : null
             }

@@ -1,3 +1,4 @@
+const isDev = require('electron-is-dev');
 const path = require('path');
 const url = require('url');
 const {
@@ -8,32 +9,33 @@ const {
   globalShortcut,
 } = require('electron');
 
+
+// ----------------------- WEBPACK STUFF ------------------------
 //app.commandLine.appendSwitch('disable-gpu-vsync');
 //app.commandLine.appendSwitch('ignore-gpu-blacklist');
 app.commandLine.appendSwitch('disable-gpu');
 //app.commandLine.appendSwitch('disable-gpu-compositing');
 
-const isDev = require('electron-is-dev');
 
-
-// ------------------- Electron Store --------------------
-
-const Settings = require('./settings');
-const settings = new Settings;
+// ------------------- Electron JSON Storage --------------------
+const UserSettings = require('./settings');
+const settings = new UserSettings;
 
 
 // ------------------- Wifi Setup --------------------
-
 var Wifi = require('rpi-wifi-connection');
 var wifi = new Wifi();
 
-const timer = setInterval(getWifiStatus, 5000); //Update status-icon every 5 Seconds
+
+ //Update status-icon every 5 Seconds
+const timer = setInterval(getWifiStatus, 5000);
+
 
 function getWifiStatus() {
   wifi.getStatus().then((status) => {
     if (status.ssid != null && status.ip_address != null) {
       mainWindow.webContents.send('wifiOn', status);
-      //if(isDev)console.log(status);
+      if(isDev)console.log(status);
     } else {
       mainWindow.webContents.send('wifiOff');
     }
@@ -47,12 +49,13 @@ function getWifiStatus() {
 function getWifiNetworks() {
   wifi.scan().then((networks) => {
     mainWindow.webContents.send('wifiList', networks);
-    //if(isDev)console.log(networks);
+    if(isDev)console.log(networks);
   })
     .catch((error) => {
       console.log('error: ', error);
     });
 }
+
 
 function connectWifi(data) {
   wifi.connect({ ssid: data.ssid, psk: data.password }).then(() => {
@@ -79,11 +82,15 @@ ipcMain.on('wifiConnect', (event, data) => {
 });
 
 // ------------------- Bluetooth Setup --------------------
-//ToDo...
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
 
 // ------------------- Carplay Init --------------------
-
 const { Readable } = require('stream');
 const Carplay = require('node-carplay');
 
@@ -92,10 +99,9 @@ const keys = require('./bindings.json');
 
 
 // ------------------- Main Window --------------------
-
 let mainWindow;
 
-function createWindow() {
+function createWindow(data) {
   const startUrl =
     process.env.ELECTRON_START_URL ||
     url.format({
@@ -104,19 +110,20 @@ function createWindow() {
       slashes: true,
     });
 
+
   globalShortcut.register('f5', function () {
     console.log('opening dev tools');
     mainWindow.webContents.openDevTools();
   });
 
-  if (isDev || !(settings.store.get('kiosk'))) {
+
+  if (isDev || !(data.carplay.kiosk)) {
     mainWindow = new BrowserWindow({
-      width: settings.store.get('windowWidth'),
-      height: settings.store.get('windowHeight'),
+      width: data.app.windowWidth,
+      height: data.app.windowHeight,
       kiosk: false,
       show: false,
       backgroundColor: '#000000',
-
       webPreferences: {
         nodeIntegration: true,
         preload: path.join(__dirname, 'preload.js'),
@@ -125,12 +132,10 @@ function createWindow() {
     });
 
     mainWindow.webContents.openDevTools();
-
   } else {
-
     mainWindow = new BrowserWindow({
-      width: settings.store.get('windowWidth'),
-      height: settings.store.get('windowHeight'),
+      width: data.app.windowWidth,
+      height: data.app.windowHeight,
       kiosk: false,
       show: false,
       frame: false,
@@ -146,6 +151,7 @@ function createWindow() {
     });
   }
 
+
   mainWindow.removeMenu();
   mainWindow.loadURL(startUrl);
 
@@ -155,38 +161,43 @@ function createWindow() {
     mainWindow.show();
   });
 
+
   let size = mainWindow.getSize();
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
 
+
   const config = {
-    dpi: settings.store.get('dpi'),
+    dpi: data.carplay.dpi,
     nightMode: 0,
-    hand: settings.store.get('lhd'),
+    hand: data.carplay.lhd,
     boxName: 'nodePlay',
-    width: settings.store.get('width'),
-    height: settings.store.get('height'),
-    fps: settings.store.get('fps'),
+    width: data.carplay.width,
+    height: data.carplay.height,
+    fps: data.carplay.fps,
   };
 
   // ------------------- Carplay Setup --------------------
- 
-  if(isDev) console.log('spawning carplay: ', config);
+
+  if (isDev) console.log('spawning carplay: ', config);
   const carplay = new Carplay(config);
 
+
   carplay.on('quit', () => {
-    if(isDev) console.log('exiting carplay');
+    if (isDev) console.log('exiting carplay');
     mainWindow.webContents.send('quitReq');
   });
 
+
   ipcMain.on('click', (event, data) => {
     carplay.sendTouch(data.type, data.x, data.y);
-    if(isDev) console.log('click: ', data.type, data.x, data.y);
+    if (isDev) console.log('click: ', data.type, data.x, data.y);
   });
 
+
   ipcMain.on('fpsReq', (event) => {
-    event.returnValue = settings.store.get('fps')
+    event.returnValue = data.carplay.fps
   });
 
   ipcMain.on('statusReq', (event, data) => {
@@ -197,32 +208,56 @@ function createWindow() {
     }
   });
 
+
+  ipcMain.on('testSetting', (event, { key, subkey, value }) => {
+    settings.testSettingChange(key, subkey, value)
+      .then(() => {
+        console.log('Setting updated successfully.');
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  })
+
+
   ipcMain.on('getSettings', () => {
-    if(isDev) {
-      console.log(settings.getAllSettings())
-    }
-
-
-    mainWindow.webContents.send('allSettings', settings.store.store)
-    mainWindow.webContents.send('testSettings', settings.getAllSettings());
+    settings.getTestSettings()
+      .then((data) => {
+        mainWindow.webContents.send('allSettings', data);
+      })
+      .catch((error) => {
+        console.error('Error retrieving settings:', error);
+      });
   });
+
+
+  ipcMain.on('saveSettings', (event, newSettings) => {
+    if (isDev) console.log('Saving settings...')
+    settings.saveTestSettings(newSettings)
+  });
+
 
   ipcMain.on('settingsUpdate', (event, { setting, value }) => {
-    //if(isDev) console.log('updating settings', setting, value)
-
-    settings.store.set(setting, value)
-    mainWindow.webContents.send('allSettings', settings.store.store)
-    mainWindow.webContents.send('testSettings', settings.getAllSettings());
+    settings.getTestSettings()
+      .then((data) => {
+        mainWindow.webContents.send('allSettings', data);
+      })
+      .catch((error) => {
+        console.error('Error retrieving settings:', error);
+      });
   });
+
 
   ipcMain.on('reqReload', () => {
     app.relaunch();
     app.exit();
   });
 
+
   ipcMain.on('reqClose', () => {
     app.quit();
   });
+
 
   ipcMain.on('reqReboot', () => {
     const exec = require('child_process').exec;
@@ -250,12 +285,21 @@ function createWindow() {
 
 }
 
-function startUp () {
-  createWindow();
-  createBackgroundWorker();
+
+function startUp() {
+  settings.getTestSettings()
+    .then((data) => {
+      createWindow(data);
+      createBackgroundWorker(data);
+      console.log('Result from getTestSettings: ', data);
+    })
+    .catch((error) => {
+      console.error('Error retrieving settings:', error);
+    });
 }
 
-app.on('ready', function() {
+
+app.on('ready', function () {
   //createWindow();
   startUp();
 });
@@ -266,15 +310,6 @@ app.on('window-all-closed', function () {
   }
 });
 
-/*
-app.on('activate', function () {
-  if (mainWindow === null) {
-    //startUp();
-    createWindow();
-  }
-});
-*/
-
 
 // ------------------- Background Worker --------------------
 
@@ -284,16 +319,15 @@ let cache = {
 
 let hiddenWindow;
 
-function createBackgroundWorker() {
-
+function createBackgroundWorker(data) {
   let cache = {
     data: undefined,
   };
 
-  if (settings.store.get('activateCAN')) {
-    if(isDev) console.log('starting background worker');
-    const backgroundFileURL = ''
 
+  if (data.interface.activateCAN.value) {
+    if (isDev) console.log('starting background worker');
+    const backgroundFileURL = ''
 
 
     if (isDev) {
@@ -303,31 +337,27 @@ function createBackgroundWorker() {
         slashes: true,
       });
 
+
       hiddenWindow = new BrowserWindow({
         width: 150,
         height: 150,
         show: true,
-
         webPreferences: {
           nodeIntegration: true,
           enableRemoteModule: true,
           contextIsolation: false,
         },
       });
-
-      //hiddenWindow.webContents.openDevTools();
-
     } else {
-
       backgroundFileUrl = url.format({
         pathname: path.join(__dirname, '../background.html'),
         protocol: 'file:',
         slashes: true,
       });
 
+
       hiddenWindow = new BrowserWindow({
         show: false,
-
         webPreferences: {
           nodeIntegration: true,
           enableRemoteModule: true,
@@ -342,9 +372,8 @@ function createBackgroundWorker() {
       hiddenWindow = null;
     });
 
-    //cache.data = args.number;
   } else {
-    if(isDev) console.log('can-stream deactivated.')
+    if (isDev) console.log('can-stream deactivated.')
   }
 }
 
@@ -363,11 +392,10 @@ ipcMain.on('stopScript', (event, args) => {
 });
 
 ipcMain.on('backgroundClose', (event, args) => {
-  if(isDev) console.log('closing background worker');
+  if (isDev) console.log('closing background worker');
   hiddenWindow.close();
 });
 
 ipcMain.on('msgToMain', (event, args) => {
-  //if(isDev)console.log('debug: ', args.message);
   mainWindow.webContents.send('msgFromBackground', args.message);
 });

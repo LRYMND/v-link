@@ -10,71 +10,70 @@ import "./dashbar.scss";
 const DashBar = ({ settings, carData, wifiState, phoneState }) => {
 
     useEffect(() => {
-		loadTheme();
-	}, []);
+        loadTheme();
+    }, []);
 
-	//const [colorNeedle, setColorNeedle] = useState(null);
+    //const [colorNeedle, setColorNeedle] = useState(null);
+    //const [textColorActive, setTextColorActive] = useState(null);
 
-	const [textColor, setTextColor] = useState(null);
-	//const [textColorActive, setTextColorActive] = useState(null);
-
-	const [fillActive, setFillActive] = useState(null);
-	const [fillInactive, setFillInactive] = useState(null);
-
+    const [textColor, setTextColor] = useState(null);
+    const [fillActive, setFillActive] = useState(null);
+    const [fillInactive, setFillInactive] = useState(null);
     const [sectionColor, setSectionColor] = useState(null);
 
 
-	function loadTheme() {
-		let style = getComputedStyle(document.querySelector(".dashbar"));
+    function loadTheme() {
+        let style = getComputedStyle(document.querySelector(".dashbar"));
+
+        //setColorNeedle(style.getPropertyValue("--colorNeedle"));
+        //setTextColorActive(style.getPropertyValue("--textColorActive"));
 
         setSectionColor(style.getPropertyValue("--sectionColor"));
-		//setColorNeedle(style.getPropertyValue("--colorNeedle"));
-		setTextColor(style.getPropertyValue("--textColor"));
-		//setTextColorActive(style.getPropertyValue("--textColorActive"));
-		setFillActive(style.getPropertyValue("--fillActive"));
-		setFillInactive(style.getPropertyValue("--fillInactive"));
-	}
+        setTextColor(style.getPropertyValue("--textColor"));
+        setFillActive(style.getPropertyValue("--fillActive"));
+        setFillInactive(style.getPropertyValue("--fillInactive"));
+    }
 
     return (
-        <div className={`dashbar ${settings.colorTheme}`}>
+        <div className={`dashbar ${settings.app.colorTheme.value}`}>
             <div className="dashbar__dash">
                 <div className="dashbar__dash__bar">
                     <ProgressBar
-                    currentValue={carData.boost}
-                    maxValue={1.6}
-                    unit={'Bar'}
-                    warning={0.6}
-                    progressColor={fillActive}
-                    fillColor={sectionColor}
-                    backgroundColor={fillInactive}
-                    textColor={textColor}
-                    theme={settings.colorTheme} />
+                        currentValue={carData.boost}
+                        maxValue={1.6}
+                        unit={'Bar'}
+                        warning={0.6}
+                        progressColor={fillActive}
+                        fillColor={sectionColor}
+                        backgroundColor={fillInactive}
+                        textColor={textColor}
+                        theme={settings.app.colorTheme.value} />
                 </div>
 
                 <div className="dashbar__dash__bar">
                     <ProgressBar
-                    currentValue={carData.intake}
-                    maxValue={90}
-                    unit={'°C'}
-                    warning={60}
-                    progressColor={fillActive}
-                    fillColor={sectionColor}
-                    backgroundColor={fillInactive}
-                    textColor={textColor}
-                    theme={settings.colorTheme} />
+                        currentValue={carData.intake}
+                        maxValue={90}
+                        unit={'°C'}
+                        warning={60}
+                        progressColor={fillActive}
+                        fillColor={sectionColor}
+                        backgroundColor={fillInactive}
+                        textColor={textColor}
+                        theme={settings.app.colorTheme.value} />
                 </div>
 
                 <div className="dashbar__dash__bar">
                     <ProgressBar
-                    currentValue={carData.coolant}
-                    maxValue={150}
-                    unit={'°C'}
-                    warning={120}
-                    progressColor={fillActive}
-                    fillColor={sectionColor}
-                    backgroundColor={fillInactive}
-                    textColor={textColor}
-                    theme={settings.colorTheme} />
+                        currentValue={carData.coolant}
+                        maxValue={150}
+                        unit={'°C'}
+                        warning={120}
+                        progressColor={fillActive}
+                        fillColor={sectionColor}
+                        backgroundColor={fillInactive}
+                        textColor={textColor}
+                        theme={settings.app.colorTheme.value} />
                 </div>
             </div>
             <div className="dashbar__banner">

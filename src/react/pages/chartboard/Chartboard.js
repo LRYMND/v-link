@@ -7,7 +7,7 @@ import './chartboard.scss';
 const Chartboard = ({ settings, carData, length }) => {
     
     return (
-        <div className={`chartboard ${settings.colorTheme}`}>
+        <div className={`chartboard ${settings.app.colorTheme.value}`}>
             <div className="chartboard__header">
             </div>
 
@@ -72,7 +72,7 @@ const Chartboard = ({ settings, carData, length }) => {
                     </div>
                 </div>
             <div className="chartboard__footer">
-                {settings.activateCAN ? <></> : <div><h3><i>(CAN-Stream deactivated.)</i></h3></div>}
+                {settings.interface.activateCAN.value ? <></> : <div><h3><i>(CAN-Stream deactivated.)</i></h3></div>}
             </div>
         </div >
     )

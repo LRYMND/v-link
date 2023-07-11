@@ -1,23 +1,12 @@
 import React from 'react';
-import { useEffect } from 'react';
 
 import "../../themes.scss"
 import './volvo.scss';
 
 const Volvo = ({ settings }) => {
 
-	useEffect(() => {
-
-        console.log("Settings: ", settings)
-
-		return function cleanup() {
-
-		};
-	}, [settings]);
-
-
 	return (
-	<div className={`volvo ${settings.colorTheme}`}>
+	<div className={`volvo ${settings.app.colorTheme.value}`}>
 	  <div className='volvo__header'>
         <h2>Car Settings</h2>
       </div>

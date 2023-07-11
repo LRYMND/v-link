@@ -111,7 +111,7 @@ const LineChart = ({
     }
 
     return (
-        <div className={`swiper ${settings.colorTheme}`} style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
+        <div className={`swiper ${settings.app.colorTheme.value}`} style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
             <div className="values">
                 <div className="values__label" style={{ color: "var(--textColorHover)" }}>
                     <h4>{label}:</h4>

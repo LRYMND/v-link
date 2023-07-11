@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 import IconButton from "@mui/material/IconButton";
 
@@ -6,28 +6,7 @@ import NavBarBackground from "./images/navbar.png"
 import "../themes.scss";
 import "./navbar.scss";
 
-const electron = window.require('electron')
-const { ipcRenderer } = electron;
-
 const NavBar = ({ settings, view, setView }) => {
-
-  const [showMMI, setShowMMI] = useState(true);
-  const [theme, setTheme] = useState(null);
-
-  useEffect(() => {
-    ipcRenderer.send('getSettings');
-    ipcRenderer.send('wifiUpdate');
-
-    return function cleanup() {
-      ipcRenderer.removeAllListeners();
-    };
-  }, []);
-
-  useEffect(() => {
-    setShowMMI(settings.activateMMI);
-    setTheme(settings.colorTheme);
-  }, [settings]);
-  
 
   function changeView(page) {
     setView(page)
@@ -35,14 +14,14 @@ const NavBar = ({ settings, view, setView }) => {
 
   return (
     <div>
-        <div className={`navbar ${theme}`} style={{ backgroundImage: `url(${NavBarBackground})` }}>
+        <div className={`navbar ${settings.app.colorTheme.value}`} style={{ backgroundImage: `url(${NavBarBackground})` }}>
           <IconButton onClick={() => changeView('Dashboard')} style={{ fill: (view === 'Dashboard') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
             <svg className="navbar__icon">
               <use xlinkHref="./svg/gauge.svg#gauge"></use>
             </svg>
           </IconButton>
 
-          {showMMI ?
+          {settings.interface.activateMMI.value ?
             <IconButton onClick={() => changeView('Carplay')} style={{ fill: (view === 'Carplay') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
               <svg className="navbar__icon">
                 <use xlinkHref="./svg/carplay.svg#carplay"></use>
@@ -58,8 +37,6 @@ const NavBar = ({ settings, view, setView }) => {
 
 
           {/*
-          //HIDDEN UNTIL FEATURES ARE IMPLEMENTED
-          
           <IconButton onClick={() => changeView('Volvo')} style={{ fill: (view === 'Volvo') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
             <svg className="navbar__icon">
               <use xlinkHref="./svg/car.svg#car"></use>

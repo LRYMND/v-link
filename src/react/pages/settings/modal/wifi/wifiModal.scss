@@ -13,6 +13,8 @@
 
     animation-name: blend_bg;
     animation-duration: .5s;
+
+
 }
 
 .wifi-modal-wrapper {
@@ -34,13 +36,23 @@
 
 }
 
+.wifi-modal-container {
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 .wifi-modal {
     background: var(--sectionColor);
 
-    margin-top: 1.5rem;
     position: relative;
-    width: 80%;
-    height: 35%;
+    width: 40rem;
+    height: 12rem;
 
     border-radius: 10px;
 
@@ -57,10 +69,18 @@
         justify-content: center;
 
         gap: 1rem;
-
+        
         &__title {
+            height: 2rem;
+            gap: .5rem;
+        }
+
+        &__element {
+            width: 80%;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
             margin-top: -1rem;
-            margin-bottom: -1rem;
         }
 
         & form {
@@ -119,7 +139,7 @@
 }
 
 .keyboard {
-    width: 100%;
+    width: 40rem;
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -129,7 +149,7 @@
 }
 
 .simple-keyboard {
-    max-width: 80%;
+    max-width: 100%;
 
     color: var(--textColor);
     background-color: var(--sectionColor);
@@ -159,13 +179,6 @@
     }
 }
 
-.spinner {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: .5rem;
-}
 
 @keyframes blend_keyboard {
     0% {
