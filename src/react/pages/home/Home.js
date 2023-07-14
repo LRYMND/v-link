@@ -20,11 +20,12 @@ const electron = window.require('electron')
 const { ipcRenderer } = electron;
 const versionNumber = process.env.PACKAGE_VERSION;
 
+
 const Home = () => {
   const [view, setView] = useState('Dashboard')
-  const [settings, setSettings] = useState(null);
 
-  const [testSettings, setTestSettings] = useState(null);
+  const [userSettings, setUserSettings] = useState(null);
+  const [canbusSettings, setCanbusSettings] = useState(null);
 
   const [streaming, setStreaming] = useState(false);
   const [startedUp, setStartedUp] = useState(false);
@@ -45,18 +46,22 @@ const Home = () => {
     lambda2: 0,
   })
 
+
   useEffect(() => {
-    ipcRenderer.on('allSettings', (event, args) => { loadTestSettings(args)  });
-    ipcRenderer.on('testSettings2', (event, args) => { loadTestSettings(args) });
+    ipcRenderer.on('userSettings', (event, args) => { loadSettings(args, 'user') });
+    ipcRenderer.on('canbusSettings', (event, args) => { loadSettings(args, 'canbus') });
+
     ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
     ipcRenderer.on('wifiOn', () => { setWifiState(true) });
     ipcRenderer.on('wifiOff', () => { setWifiState(false) });
     ipcRenderer.on("plugged", () => { setPhoneState(true) });
     ipcRenderer.on("unplugged", () => { setPhoneState(false) });
+
     return () => {
       ipcRenderer.removeAllListeners();
     };
   })
+
 
   useEffect(() => {
     socket.on('carplay', (data) => {
@@ -80,16 +85,16 @@ const Home = () => {
     };
   }, [])
 
+
   useEffect(() => {
     console.log("streaming: ", streaming)
     console.log("phoneState: ", phoneState)
     console.log("view: ", view)
-    //console.log("settings: ", settings)
 
     if (streaming && phoneState && (view === 'Carplay')) {
       setShowTop(false);
       setShowNav(false);
-      if (settings.interface.activateOSD)
+      if (userSettings.interface.activateOSD)
         setShowOsd(true);
     } else {
       setShowTop(true);
@@ -100,35 +105,49 @@ const Home = () => {
     if (phoneState === false) {
       setStreaming(false)
     }
-  }, [streaming, phoneState, view, settings]);
+  }, [streaming, phoneState, view, userSettings]);
+
 
   useEffect(() => {
-    if (testSettings != null) {
+    if (userSettings != null) {
       setStartedUp(true);
     }
-  }, [settings, testSettings])
+  }, [userSettings])
 
-  function loadTestSettings(data) {
+
+  function loadSettings(data, obj) {
     if (data != null) {
-      setTestSettings(data);
+      if (obj === 'user') {
+        setUserSettings(data);
+        console.log('user: ', data);
+      }
+      else {
+        setCanbusSettings(data);
+        console.log('canbus: ', data)
+      }
     }
   }
+
 
   function reloadApp() {
     ipcRenderer.send('reqReload');
   };
 
+
   const touchEvent = (type, x, y) => {
     ipcRenderer.send('click', { type: type, x: x, y: y })
   }
+
 
   function leaveCarplay() {
     setView('Dashboard')
   }
 
+
   const template = () => {
     console.log('hello world')
   }
+
 
   const msgFromBackground = (args) => {
     if (args != null)
@@ -158,6 +177,7 @@ const Home = () => {
     }
   }
 
+
   const renderView = () => {
     switch (view) {
       case 'Carplay':
@@ -166,16 +186,17 @@ const Home = () => {
             {showOsd &&
               <DashBar
                 className='dashbar'
-                settings={testSettings}
+                canbusSettings={canbusSettings}
+                userSettings={userSettings}
                 carData={carData}
                 phoneState={phoneState}
                 wifiState={wifiState}
               />
             }
-            <div className={`carplay ${testSettings.app.colorTheme}`} style={{ height: testSettings.carplay.height, width: testSettings.carplay.width }}>
+            <div className={`carplay ${userSettings.app.colorTheme}`} style={{ height: userSettings.carplay.height, width: userSettings.carplay.width }}>
               <div className='carplay__stream'>
                 <Carplay
-                  settings={testSettings.carplay}
+                  settings={userSettings.carplay}
                   status={true}
                   openModal={false}
                   touchEvent={touchEvent}
@@ -194,7 +215,8 @@ const Home = () => {
       case 'Dashboard':
         return (
           <Swiper
-            settings={testSettings}
+            canbusSettings={canbusSettings}
+            userSettings={userSettings}
             carData={carData}
           />
         )
@@ -202,10 +224,9 @@ const Home = () => {
       case 'Settings':
         return (
           <Settings
-            settings={settings}
-            setSettings={setSettings}
-            allSettings={testSettings}
-            setAllSettings={setTestSettings}
+            canbusSettings={canbusSettings}
+            userSettings={userSettings}
+            setUserSettings={setUserSettings}
             versionNumber={versionNumber}
           />
         )
@@ -213,21 +234,22 @@ const Home = () => {
       case 'Volvo':
         return (
           <Volvo
-            settings={settings}
+            userSettings={userSettings}
           />
         )
 
       case 'Template':
         return (
           <Template
-            settings={settings}
+            userSettings={userSettings}
           />
         )
 
       default:
         return (
           <Swiper
-            settings={testSettings}
+            canbusSettings={canbusSettings}
+            userSettings={userSettings}
             carData={carData}
           />
         )
@@ -242,17 +264,20 @@ const Home = () => {
           {showTop &&
             <TopBar
               className='topbar'
-              settings={testSettings}
+              userSettings={userSettings}
               wifiState={wifiState}
               phoneState={phoneState}
             />
           }
-          {renderView()}
-          {showNav &&
 
+
+          {renderView()}
+
+
+          {showNav &&
             <NavBar
               className='navbar'
-              settings={testSettings}
+              userSettings={userSettings}
               view={view}
               setView={setView}
             />
@@ -263,8 +288,7 @@ const Home = () => {
           <button className='refresh__button' type='button' onClick={reloadApp}>
             <h1>RTVI</h1>
           </button>
-
-          <span className='refresh__version'>{versionNumber}</span>
+          <span className='refresh__version'>v{versionNumber}</span>
         </div>}
     </>
   );

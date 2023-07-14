@@ -10,8 +10,9 @@ const LineChart = ({
     yMax,
     tickCountX,
     tickCountY,
-    settings,
+    userSettings,
     carData,
+    unit,
     length
 }) => {
 
@@ -111,13 +112,13 @@ const LineChart = ({
     }
 
     return (
-        <div className={`swiper ${settings.app.colorTheme.value}`} style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
+        <div className={`swiper ${userSettings.app.colorTheme.value}`} style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
             <div className="values">
                 <div className="values__label" style={{ color: "var(--textColorHover)" }}>
                     <h4>{label}:</h4>
                 </div>
                 <div className="values__data" style={{ color: "var(--fillActive)", marginTop: "-1rem" }}>
-                    <h3>{parseFloat(dataStream[0]).toFixed(2)}</h3>
+                    <h3>{parseFloat(carData).toFixed(2)}{unit}</h3>
                 </div>
             </div>
             <div className="chart">

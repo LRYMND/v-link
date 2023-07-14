@@ -6,9 +6,11 @@ import RadialGauge from '../../components/RadialGauge'
 import "../../themes.scss";
 import './dashboard.scss';
 
-const Dashboard = ({ settings, carData }) => {
+const Dashboard = ({ canbusSettings, userSettings, carData }) => {
 
 	useEffect(() => {
+		console.log(userSettings.dash_1.value_1.value)
+
 		loadTheme();
 	}, []);
 
@@ -38,22 +40,22 @@ const Dashboard = ({ settings, carData }) => {
 	}
 
 	return (
-		<div className={`dashboard ${settings.app.colorTheme.value}`}>
+		<div className={`dashboard ${userSettings.app.colorTheme.value}`}>
 			<div className="dashboard__header">
 			</div>
-			{loaded ?
+			{loaded && canbusSettings && userSettings ?
 				<div className="dashboard__gauges">
-					{settings.visibility.showGauge_1.value ?
+					{userSettings.visibility.showGauge_1.value ?
 						<RadialGauge
 							globalRotation={90}
-							currentValue={carData.intake}
-							maxValue={90}
+							currentValue={carData[userSettings.dash_1.gauge_1.value]}
+							maxValue={canbusSettings.messages[userSettings.dash_1.gauge_1.value].max_value}
 							size={110}
 							progressRadius={70}
 							progressWidth={5}
 							limitRadius={80}
 							limitWidth={2}
-							limitStart={60}
+							limitStart={canbusSettings.messages[userSettings.dash_1.gauge_1.value].limit_start}
 							tickWidth={2}
 							bigTicks={3}
 							smallTicks={4}
@@ -61,8 +63,8 @@ const Dashboard = ({ settings, carData }) => {
 							heightSmallTicks={3}
 							needleLength={65}
 							needleWidth={2}
-							title="Intake"
-							unit="°C"
+							title={canbusSettings.messages[userSettings.dash_1.gauge_1.value].label}
+							unit={canbusSettings.messages[userSettings.dash_1.gauge_1.value].unit}
 							progressBackgroundColor={fillInactive}
 							progressFillerColor={fillActive}
 							tickColor={fillInactive}
@@ -76,7 +78,7 @@ const Dashboard = ({ settings, carData }) => {
 							borderColor={sectionColor}
 						/>
 						: <div></div>}
-					{settings.visibility.showGauge_2.value ?
+					{userSettings.visibility.showGauge_2.value ?
 
 						<RadialGauge
 							globalRotation={90}
@@ -110,7 +112,7 @@ const Dashboard = ({ settings, carData }) => {
 							borderColor={sectionColor}
 						/>
 						: <div></div>}
-					{settings.visibility.showGauge_3.value ?
+					{userSettings.visibility.showGauge_3.value ?
 						<RadialGauge
 							globalRotation={90}
 							currentValue={carData.coolant}
@@ -145,11 +147,11 @@ const Dashboard = ({ settings, carData }) => {
 						: <div></div>}
 				</div> : <></>}
 			<>
-				{settings.interface.activateCAN.value ? <div className="dashboard__footer">
-					<div className="dashboard__footer__element"><h3>λ1: {carData.lambda1}</h3></div>
-					<div className="dashboard__footer__element"><h3>λ2: {carData.lambda2}V</h3></div>
-					<div className="dashboard__footer__element"><h3>Bat: {carData.voltage}V</h3></div>
-				</div> : <div className="dashboard__footer"><h3><i>(CAN-Stream deactivated.)</i></h3></div>}
+				{loaded && userSettings && canbusSettings ? <div className="dashboard__footer">
+					<div className="dashboard__footer__element"><h3>{canbusSettings.messages[userSettings.dash_1.value_1.value].label}: {carData[userSettings.dash_1.value_1.value]}</h3></div>
+					<div className="dashboard__footer__element"><h3>{canbusSettings.messages[userSettings.dash_1.value_2.value].label}: {carData[userSettings.dash_1.value_2.value]}</h3></div>
+					<div className="dashboard__footer__element"><h3>{canbusSettings.messages[userSettings.dash_1.value_3.value].label}: {carData[userSettings.dash_1.value_3.value]}</h3></div>
+					</div> : <div className="dashboard__footer"><h3><i>(CAN-Stream deactivated.)</i></h3></div>}
 			</>
 		</div>
 	)

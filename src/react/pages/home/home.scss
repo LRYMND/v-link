@@ -7,6 +7,8 @@
     font-family: 'Helvetica';
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .refresh {
@@ -56,9 +58,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
-    width: 100%;
-    height: 100%;
 
     &__load {
         width: 100%;

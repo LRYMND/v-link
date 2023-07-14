@@ -4,7 +4,7 @@ import { useState, useEffect, } from "react";
 import "../themes.scss";
 import "./topbar.scss";
 
-const TopBar = ({ settings, phoneState, wifiState }) => {
+const TopBar = ({ userSettings, phoneState, wifiState }) => {
   const [time, setDate] = useState(new Date());
 
   function updateTime() {
@@ -20,7 +20,7 @@ const TopBar = ({ settings, phoneState, wifiState }) => {
   }, []);
 
   return (
-    <div className={`topbar ${settings.app.colorTheme.value}`}>
+    <div className={`topbar ${userSettings.app.colorTheme.value}`}>
       <div className="topbar__info">
         <svg className={`topbar__icon topbar__icon--${(wifiState ? "connected" : "disconnected")}`}>
           <use xlinkHref="./svg/wifi.svg#wifi"></use>

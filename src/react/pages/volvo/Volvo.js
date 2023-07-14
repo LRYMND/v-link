@@ -3,10 +3,10 @@ import React from 'react';
 import "../../themes.scss"
 import './volvo.scss';
 
-const Volvo = ({ settings }) => {
+const Volvo = ({ userSettings }) => {
 
 	return (
-	<div className={`volvo ${settings.app.colorTheme.value}`}>
+	<div className={`volvo ${userSettings.app.colorTheme.value}`}>
 	  <div className='volvo__header'>
         <h2>Car Settings</h2>
       </div>

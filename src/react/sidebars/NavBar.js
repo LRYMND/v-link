@@ -6,22 +6,21 @@ import NavBarBackground from "./images/navbar.png"
 import "../themes.scss";
 import "./navbar.scss";
 
-const NavBar = ({ settings, view, setView }) => {
+const NavBar = ({ userSettings, view, setView }) => {
 
   function changeView(page) {
     setView(page)
   }
 
   return (
-    <div>
-        <div className={`navbar ${settings.app.colorTheme.value}`} style={{ backgroundImage: `url(${NavBarBackground})` }}>
+        <div className={`navbar ${userSettings.app.colorTheme.value}`} style={{ backgroundImage: `url(${NavBarBackground})` }}>
           <IconButton onClick={() => changeView('Dashboard')} style={{ fill: (view === 'Dashboard') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
             <svg className="navbar__icon">
               <use xlinkHref="./svg/gauge.svg#gauge"></use>
             </svg>
           </IconButton>
 
-          {settings.interface.activateMMI.value ?
+          {userSettings.interface.activateMMI.value ?
             <IconButton onClick={() => changeView('Carplay')} style={{ fill: (view === 'Carplay') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
               <svg className="navbar__icon">
                 <use xlinkHref="./svg/carplay.svg#carplay"></use>
@@ -43,9 +42,7 @@ const NavBar = ({ settings, view, setView }) => {
             </svg>
           </IconButton>
           */}
-
         </div >
-    </div >
   );
 };
 

@@ -4,7 +4,10 @@ import './swiper.scss';
 import Dashboard from '../dashboard/Dashboard';
 import Chartboard from '../chartboard/Chartboard';
 
-function Swiper({ settings, carData }) {
+function Swiper({ canbusSettings, userSettings, carData }) {
+
+  console.log(canbusSettings)
+
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const swipeContainerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -70,13 +73,15 @@ function Swiper({ settings, carData }) {
       >
         <div className="page1">
           <Dashboard
-            settings={settings}
+            canbusSettings={canbusSettings}
+            userSettings={userSettings}
             carData={carData}
           />
         </div>
         <div className="page2">
           <Chartboard
-            settings={settings}
+            canbusSettings={canbusSettings}
+            userSettings={userSettings}
             carData={carData}
             length={100}
           />

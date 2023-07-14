@@ -7,14 +7,11 @@ import "../themes.scss";
 import "./dashbar.scss";
 
 
-const DashBar = ({ settings, carData, wifiState, phoneState }) => {
+const DashBar = ({ canbusSettings, userSettings, carData, wifiState, phoneState }) => {
 
     useEffect(() => {
         loadTheme();
     }, []);
-
-    //const [colorNeedle, setColorNeedle] = useState(null);
-    //const [textColorActive, setTextColorActive] = useState(null);
 
     const [textColor, setTextColor] = useState(null);
     const [fillActive, setFillActive] = useState(null);
@@ -25,9 +22,6 @@ const DashBar = ({ settings, carData, wifiState, phoneState }) => {
     function loadTheme() {
         let style = getComputedStyle(document.querySelector(".dashbar"));
 
-        //setColorNeedle(style.getPropertyValue("--colorNeedle"));
-        //setTextColorActive(style.getPropertyValue("--textColorActive"));
-
         setSectionColor(style.getPropertyValue("--sectionColor"));
         setTextColor(style.getPropertyValue("--textColor"));
         setFillActive(style.getPropertyValue("--fillActive"));
@@ -35,45 +29,45 @@ const DashBar = ({ settings, carData, wifiState, phoneState }) => {
     }
 
     return (
-        <div className={`dashbar ${settings.app.colorTheme.value}`}>
+        <div className={`dashbar ${userSettings.app.colorTheme.value}`}>
             <div className="dashbar__dash">
                 <div className="dashbar__dash__bar">
                     <ProgressBar
-                        currentValue={carData.boost}
-                        maxValue={1.6}
-                        unit={'Bar'}
-                        warning={0.6}
+                        currentValue={carData[userSettings.dash_bar.value_1.value]}
+                        maxValue={canbusSettings.messages[userSettings.dash_bar.value_1.value].max_value}
+                        unit={canbusSettings.messages[userSettings.dash_bar.value_1.value].unit}
+                        warning={canbusSettings.messages[userSettings.dash_bar.value_1.value].limit_start}
                         progressColor={fillActive}
                         fillColor={sectionColor}
                         backgroundColor={fillInactive}
                         textColor={textColor}
-                        theme={settings.app.colorTheme.value} />
+                        theme={userSettings.app.colorTheme.value} />
                 </div>
 
                 <div className="dashbar__dash__bar">
                     <ProgressBar
-                        currentValue={carData.intake}
-                        maxValue={90}
-                        unit={'°C'}
-                        warning={60}
+                        currentValue={carData[userSettings.dash_bar.value_2.value]}
+                        maxValue={canbusSettings.messages[userSettings.dash_bar.value_2.value].max_value}
+                        unit={canbusSettings.messages[userSettings.dash_bar.value_2.value].unit}
+                        warning={canbusSettings.messages[userSettings.dash_bar.value_2.value].limit_start}
                         progressColor={fillActive}
                         fillColor={sectionColor}
                         backgroundColor={fillInactive}
                         textColor={textColor}
-                        theme={settings.app.colorTheme.value} />
+                        theme={userSettings.app.colorTheme.value} />
                 </div>
 
                 <div className="dashbar__dash__bar">
                     <ProgressBar
-                        currentValue={carData.coolant}
-                        maxValue={150}
-                        unit={'°C'}
-                        warning={120}
+                        currentValue={carData[userSettings.dash_bar.value_3.value]}
+                        maxValue={canbusSettings.messages[userSettings.dash_bar.value_3.value].max_value}
+                        unit={canbusSettings.messages[userSettings.dash_bar.value_3.value].unit}
+                        warning={canbusSettings.messages[userSettings.dash_bar.value_3.value].limit_start}
                         progressColor={fillActive}
                         fillColor={sectionColor}
                         backgroundColor={fillInactive}
                         textColor={textColor}
-                        theme={settings.app.colorTheme.value} />
+                        theme={userSettings.app.colorTheme.value} />
                 </div>
             </div>
             <div className="dashbar__banner">

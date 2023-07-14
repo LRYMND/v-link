@@ -8,24 +8,24 @@ import './settings.scss';
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
-const Settings = ({ settings, setSettings, allSettings, setAllSettings, versionNumber }) => {
+const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber }) => {
 
+  /* State Variables */
   const [wifiList, setWifiList] = useState([{ id: '', ssid: 'No Networks available' }]);
   const [wifiStatus, setWifiStatus] = useState('');
   const [ssidSelected, setSsidSelected] = useState('127.0.0.1');
-
   const { wifiModalIsShowing, wifiModalToggle } = useModal();
+  const [newSettings, setNewSettings] = useState(structuredClone(userSettings));
 
-  const [newSettings, setNewSettings] = useState(JSON.parse(JSON.stringify(allSettings)));
-
+  /* Use Effects */
   useEffect(() => {
-    ipcRenderer.on('allSettings', (event, data) => { setSettings(data) });
+    console.log(canbusSettings)
     ipcRenderer.on('wifiList', updateWifi);
     ipcRenderer.on('wifiConnected', updateWifiStatus);
 
     return function cleanup() {
-      setNewSettings(allSettings);
-      console.log("allSettings:", allSettings.app.colorTheme.value)
+      setNewSettings(userSettings);
+      console.log("settings:", userSettings.app.colorTheme.value)
       ipcRenderer.removeAllListeners();
     };
   }, []);
@@ -43,29 +43,43 @@ const Settings = ({ settings, setSettings, allSettings, setAllSettings, versionN
   };
 
 
+
+
   /* Change Settings */
   const handleSettingChange = (key, name, newValue, newSettings) => {
+    let update = structuredClone(newSettings);
 
-    let update = { ...newSettings };
-    update[key][name].value = newValue;
+    // Search for the key based on the label
+    const convertedValue = Object.keys(canbusSettings.messages).find(
+      (messageKey) => canbusSettings.messages[messageKey].label === newValue
+    );
 
-    setNewSettings(update);
+    if (key === 'carplay') {
+      update[key][name] = newValue;
+    } else {
+      update[key][name].value = convertedValue || newValue;
+    }
+
+
+
+    setNewSettings(structuredClone(update));
+
+    console.log("Settings: ", userSettings.app.colorTheme.value)
+    console.log("NewSettings: ", newSettings.app.colorTheme.value)
   };
 
 
   /* Save Settings */
   function saveSettings() {
     ipcRenderer.send('saveSettings', newSettings);
-    setAllSettings(newSettings)
-    console.log('Settings have been saved.');
+    setUserSettings(newSettings)
   };
 
 
   /* Render Settings */
-  function renderSetting(key, handleSettingChange, newSettings) {
-
-    if (!newSettings) return null;
-    const { label, ...nestedObjects } = newSettings[key];
+  function renderSetting(key, handleSettingChange, settingsObj) {
+    if (!settingsObj) return null;
+    const { label, ...nestedObjects } = settingsObj[key];
     const labelParagraph = <h3>{label}</h3>;
 
     const nestedElements = Object.entries(nestedObjects).map(([nestedKey, nestedObj]) => {
@@ -79,9 +93,12 @@ const Settings = ({ settings, setSettings, allSettings, setAllSettings, versionN
         isBoolean = typeof nestedObj === 'boolean';
       } else {
         label = nestedObj.label;
-        value = nestedObj.value;
-        options = nestedObj.options;
-        isBoolean = typeof value === 'boolean';
+        try {
+          value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' ? nestedObj.value : canbusSettings.messages[nestedObj.value].label;
+        } catch { console.log('ERROR: Reading settings.') }
+
+        options = typeof value === 'number' || typeof value === 'boolean' ? null : nestedObj.options || Object.keys(canbusSettings.messages).map(messageKey => canbusSettings.messages[messageKey].label);
+        isBoolean = typeof value === 'boolean'; isBoolean = typeof value === 'boolean';
       }
 
       const handleChange = (event) => {
@@ -89,9 +106,9 @@ const Settings = ({ settings, setSettings, allSettings, setAllSettings, versionN
         const newValue = type === 'checkbox' ? checked : type === 'number' ? Number(value) : value;
 
         if (isBoolean) {
-          handleSettingChange(key, name, checked, newSettings);
+          handleSettingChange(key, name, checked, settingsObj);
         } else {
-          handleSettingChange(key, name, newValue, newSettings);
+          handleSettingChange(key, name, newValue, settingsObj);
         }
       };
 
@@ -123,6 +140,7 @@ const Settings = ({ settings, setSettings, allSettings, setAllSettings, versionN
       );
     });
 
+
     return (
       <div className='setting'>
         {labelParagraph}
@@ -132,7 +150,7 @@ const Settings = ({ settings, setSettings, allSettings, setAllSettings, versionN
   }
 
 
-  /* WiFi */
+  /* WiFi Functionality */
   function connectWifi(password) {
     var _credentials = {
       ssid: ssidSelected,
@@ -167,7 +185,7 @@ const Settings = ({ settings, setSettings, allSettings, setAllSettings, versionN
   };
 
 
-  /* I/O */
+  /* I/O Functionality */
   function handleIO(request) {
     return function () {
       ipcRenderer.send(request);
@@ -178,34 +196,30 @@ const Settings = ({ settings, setSettings, allSettings, setAllSettings, versionN
   return (
     <>
       <div className='spacer' />
-      <div className={`settings ${allSettings.app.colorTheme.value}`}>
+      <div className={`settings ${userSettings.app.colorTheme.value}`}>
 
         <WifiModal isShowing={wifiModalIsShowing}
           ssid={ssidSelected}
           hide={wifiModalToggle}
-          settings={allSettings}
+          settings={userSettings}
           status={wifiStatus}
           connect={connectWifi}
           reset={resetWifiStatus}
         />
 
-
         <div className='settings__header'>
           <h2>RTVI Settings</h2>
         </div>
         <div className='settings__body'>
-
           <div className='section'>
-
             <div className='section__1'>
               <div className='section__frame'>
-                <div className='section__frame__banner'>
+                <div className='section__frame__row'>
                   <h3>WiFi Networks:</h3>
                 </div>
 
+
                 <div className='section__frame__content'>
-
-
                   <div className='scroller__container'>
                     <div className='scroller__container__content'>
                       <div className='list'>
@@ -220,25 +234,26 @@ const Settings = ({ settings, setSettings, allSettings, setAllSettings, versionN
                 </div>
               </div>
 
+
               <div className='section__frame'>
-
-                <div className='section__frame__banner'>
-                  <h3>I/O:</h3>
-                </div>
-
                 <div className='section__frame__content'>
-                  <div className='section__frame__content__column'>
-                    <button className='app-button' type='button' onClick={handleIO('reqReboot')}>Reboot</button>
+                  <div className='section__frame__row'>
+                    <h3>I/O:</h3>
+                  </div>
+                  <div className='section__frame__row'>
+                    <div className='section__frame__column'>
+                      <button className='app-button' type='button' onClick={handleIO('reqReboot')}>Reboot</button>
+                    </div>
+                    <div className='section__frame__column'>
+                      <button className='app-button' type='button' onClick={handleIO('reqReload')}>Restart</button>
+                    </div>
+                  </div>
+                  <div className='section__frame__row'>
                     <button className='app-button' type='button' onClick={handleIO('reqClose')}>Quit</button>
                   </div>
-                  <div className='section__frame__content__column'>
-                    <button className='app-button' type='button' onClick={handleIO('reqReload')}>Restart</button>
-
+                  <div className='section__frame__row'>
+                    <h4><i>v{versionNumber}</i></h4>
                   </div>
-                </div>
-
-                <div className='section__frame__banner'>
-                  <h4><i>v{versionNumber}</i></h4>
                 </div>
               </div>
             </div>
@@ -248,9 +263,10 @@ const Settings = ({ settings, setSettings, allSettings, setAllSettings, versionN
               <div className='section__frame'>
                 <div className='scroller__container'>
                   <div className="tab">
-                    <button className='tab-button' active type='button' onClick={() => handleTabChange(1)}>Application</button>
-                    <button className='tab-button' type='button' onClick={() => handleTabChange(2)}>Customization</button>
-                    <button className='tab-button' type='button' onClick={() => handleTabChange(3)}>Advanced</button>
+                    <button className={`tab-button ${activeTab === 1 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(1)}> General </button>
+                    <button className={`tab-button ${activeTab === 2 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(2)}> Customization </button>
+                    {/* <button className={`tab-button ${activeTab === 3 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(3)}> Vehicle </button> */}
+                    { userSettings.dev.advancedSettings.value ? <button className={`tab-button ${activeTab === 4 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(4)}> Advanced </button> : <></> }
                   </div>
 
 
@@ -258,26 +274,37 @@ const Settings = ({ settings, setSettings, allSettings, setAllSettings, versionN
                     <div className='scroller__container__content'>
                       {renderSetting("app", handleSettingChange, newSettings)}
                       {renderSetting("interface", handleSettingChange, newSettings)}
+                      {renderSetting("dev", handleSettingChange, newSettings)}
                     </div>
                   }
 
                   {activeTab === 2 &&
                     <div className='scroller__container__content'>
+                      {renderSetting("visibility", handleSettingChange, newSettings)}
                       {renderSetting("dash_bar", handleSettingChange, newSettings)}
                       {renderSetting("dash_1", handleSettingChange, newSettings)}
                       {renderSetting("dash_2", handleSettingChange, newSettings)}
-                      {renderSetting("visibility", handleSettingChange, newSettings)}
+                      {renderSetting("charts", handleSettingChange, newSettings)}
                     </div>
                   }
 
                   {activeTab === 3 &&
+                    <div className='scroller__container__content'>
+                      {renderSetting("comfort", handleSettingChange, newSettings)}
+                      {renderSetting("lights", handleSettingChange, newSettings)}
+                    </div>
+                  }
+
+
+                  {activeTab === 4 &&
                     <div className='scroller__container__content'>
                       {renderSetting("carplay", handleSettingChange, newSettings)}
                     </div>
                   }
                 </div>
 
-                <div className='section__frame__banner'>
+
+                <div className='section__frame__row'>
                   <button className='app-button' type='button' onClick={saveSettings}>Save</button>
                 </div>
               </div>

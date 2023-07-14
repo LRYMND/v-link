@@ -18,8 +18,10 @@ app.commandLine.appendSwitch('disable-gpu');
 
 
 // ------------------- Electron JSON Storage --------------------
-const UserSettings = require('./settings');
-const settings = new UserSettings;
+const {
+  getSettings,
+  saveSettings
+} = require('./settings');
 
 
 // ------------------- Wifi Setup --------------------
@@ -27,7 +29,7 @@ var Wifi = require('rpi-wifi-connection');
 var wifi = new Wifi();
 
 
- //Update status-icon every 5 Seconds
+//Update status-icon every 5 Seconds
 const timer = setInterval(getWifiStatus, 5000);
 
 
@@ -35,7 +37,7 @@ function getWifiStatus() {
   wifi.getStatus().then((status) => {
     if (status.ssid != null && status.ip_address != null) {
       mainWindow.webContents.send('wifiOn', status);
-      if(isDev)console.log(status);
+      if (isDev) console.log(status);
     } else {
       mainWindow.webContents.send('wifiOff');
     }
@@ -49,7 +51,7 @@ function getWifiStatus() {
 function getWifiNetworks() {
   wifi.scan().then((networks) => {
     mainWindow.webContents.send('wifiList', networks);
-    if(isDev)console.log(networks);
+    if (isDev) console.log(networks);
   })
     .catch((error) => {
       console.log('error: ', error);
@@ -117,10 +119,21 @@ function createWindow(data) {
   });
 
 
+  // Adjust minimum window height to topbars and frames.
+  let minWinHeight = 0
+  if (isDev) minWinHeight = 25;
+  if (data.interface.activateOSD.value === true)
+    minWinHeight += data.carplay.height + 40;
+  else
+    minWinHeight += data.carplay.height;
+
+
   if (isDev || !(data.carplay.kiosk)) {
     mainWindow = new BrowserWindow({
-      width: data.app.windowWidth,
-      height: data.app.windowHeight,
+      width: data.app.windowWidth.value,
+      height: data.app.windowHeight.value,
+      minHeight: minWinHeight,
+      minWidth: data.carplay.width,
       kiosk: false,
       show: false,
       backgroundColor: '#000000',
@@ -134,8 +147,10 @@ function createWindow(data) {
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow = new BrowserWindow({
-      width: data.app.windowWidth,
-      height: data.app.windowHeight,
+      width: data.app.windowWidth.value,
+      height: data.app.windowHeight.value,
+      minHeight: minWinHeight,
+      minWidth: data.carplay.width,
       kiosk: false,
       show: false,
       frame: false,
@@ -209,38 +224,32 @@ function createWindow(data) {
   });
 
 
-  ipcMain.on('testSetting', (event, { key, subkey, value }) => {
-    settings.testSettingChange(key, subkey, value)
-      .then(() => {
-        console.log('Setting updated successfully.');
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  })
-
-
   ipcMain.on('getSettings', () => {
-    settings.getTestSettings()
-      .then((data) => {
-        mainWindow.webContents.send('allSettings', data);
-      })
-      .catch((error) => {
-        console.error('Error retrieving settings:', error);
-      });
+    const retrieveSettings = (settingsType) => {
+      return getSettings(settingsType)
+        .then((data) => {
+          mainWindow.webContents.send(`${settingsType}Settings`, data);
+        })
+        .catch((error) => {
+          console.error('Error retrieving settings:', error);
+        });
+    };
+    
+    retrieveSettings('user');
+    retrieveSettings('canbus');
   });
 
 
   ipcMain.on('saveSettings', (event, newSettings) => {
     if (isDev) console.log('Saving settings...')
-    settings.saveTestSettings(newSettings)
+    saveSettings(newSettings)
   });
 
 
   ipcMain.on('settingsUpdate', (event, { setting, value }) => {
-    settings.getTestSettings()
+    getSettings()
       .then((data) => {
-        mainWindow.webContents.send('allSettings', data);
+        mainWindow.webContents.send('userSettings', data);
       })
       .catch((error) => {
         console.error('Error retrieving settings:', error);
@@ -287,11 +296,10 @@ function createWindow(data) {
 
 
 function startUp() {
-  settings.getTestSettings()
+  getSettings('user')
     .then((data) => {
       createWindow(data);
       createBackgroundWorker(data);
-      console.log('Result from getTestSettings: ', data);
     })
     .catch((error) => {
       console.error('Error retrieving settings:', error);
