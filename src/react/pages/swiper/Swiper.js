@@ -14,22 +14,22 @@ function Swiper({ canbusSettings, userSettings, carData }) {
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
 
+
   function swipeLeft() {
-    //console.log('swiping left')
     if (currentPageIndex < 1) {
       setCurrentPageIndex(currentPageIndex + 1);
     }
   }
 
+
   function swipeRight() {
-    //console.log('swiping right')
     if (currentPageIndex > 0) {
       setCurrentPageIndex(currentPageIndex - 1);
     }
   }
 
+
   function handleMouseDown(event) {
-    //console.log('current page:', currentPageIndex);
     setIsDragging(true);
     setStartX(event.clientX);
   }
@@ -39,6 +39,7 @@ function Swiper({ canbusSettings, userSettings, carData }) {
       setCurrentX(event.clientX);
     }
   }
+
 
   function handleMouseUp() {
     if (isDragging) {
@@ -51,6 +52,7 @@ function Swiper({ canbusSettings, userSettings, carData }) {
       setCurrentX(startX);
     }
   }
+
 
   return (
     <div className="swipe-wrapper">
@@ -90,5 +92,6 @@ function Swiper({ canbusSettings, userSettings, carData }) {
     </div>
   );
 }
+
 
 export default Swiper;

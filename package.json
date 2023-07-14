@@ -1,6 +1,7 @@
 {
   "name": "volvo-rtvi",
   "version": "1.3.0",
+  "description": "Media and CAN-Bus interface for the Volvo P1 platform",
   "private": false,
   "author": {
     "name": "Louis Raymond",
@@ -64,6 +65,11 @@
       "provider": "github",
       "repo": "volvo-rtvi",
       "owner": "LRYMND"
+    },
+    "linux": {
+      "target": [ "AppImage" ],
+      "icon": "public/icon.png",
+      "category": "Utility"
     }
   },
   "eslintConfig": {

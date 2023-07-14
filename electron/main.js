@@ -10,7 +10,6 @@ const {
 } = require('electron');
 
 
-// ----------------------- WEBPACK STUFF ------------------------
 //app.commandLine.appendSwitch('disable-gpu-vsync');
 //app.commandLine.appendSwitch('ignore-gpu-blacklist');
 app.commandLine.appendSwitch('disable-gpu');
@@ -24,7 +23,7 @@ const {
 } = require('./settings');
 
 
-// ------------------- Wifi Setup --------------------
+// ------------------------ Wifi Setup --------------------------
 var Wifi = require('rpi-wifi-connection');
 var wifi = new Wifi();
 
@@ -73,22 +72,22 @@ function connectWifi(data) {
     });
 }
 
+
 ipcMain.on('wifiUpdate', () => {
   //if(isDev)console.log('Updating Wifi');
   getWifiStatus();
   getWifiNetworks();
 });
 
+
 ipcMain.on('wifiConnect', (event, data) => {
   connectWifi(data);
 });
 
+
 // ------------------- Bluetooth Setup --------------------
 //---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
+//-----------------------Placeholder-----------------------
 //---------------------------------------------------------
 
 
@@ -97,7 +96,7 @@ const { Readable } = require('stream');
 const Carplay = require('node-carplay');
 
 const mp4Reader = new Readable({ read(size) { }, });
-const keys = require('./bindings.json');
+const keys = require('./settings/bindings.json');
 
 
 // ------------------- Main Window --------------------
@@ -112,12 +111,10 @@ function createWindow(data) {
       slashes: true,
     });
 
-
   globalShortcut.register('f5', function () {
     console.log('opening dev tools');
     mainWindow.webContents.openDevTools();
   });
-
 
   // Adjust minimum window height to topbars and frames.
   let minWinHeight = 0
@@ -126,7 +123,6 @@ function createWindow(data) {
     minWinHeight += data.carplay.height + 40;
   else
     minWinHeight += data.carplay.height;
-
 
   if (isDev || !(data.carplay.kiosk)) {
     mainWindow = new BrowserWindow({
@@ -137,6 +133,7 @@ function createWindow(data) {
       kiosk: false,
       show: false,
       backgroundColor: '#000000',
+      icon: "../public/icon.png",
       webPreferences: {
         nodeIntegration: true,
         preload: path.join(__dirname, 'preload.js'),
@@ -155,9 +152,8 @@ function createWindow(data) {
       show: false,
       frame: false,
       resizable: false,
-
       backgroundColor: '#000000',
-
+      icon: "../public/icon.png",
       webPreferences: {
         nodeIntegration: true,
         preload: path.join(__dirname, 'preload.js'),
@@ -165,7 +161,6 @@ function createWindow(data) {
       }
     });
   }
-
 
   mainWindow.removeMenu();
   mainWindow.loadURL(startUrl);
@@ -176,12 +171,9 @@ function createWindow(data) {
     mainWindow.show();
   });
 
-
-  let size = mainWindow.getSize();
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
-
 
   const config = {
     dpi: data.carplay.dpi,
@@ -223,50 +215,34 @@ function createWindow(data) {
     }
   });
 
-
   ipcMain.on('getSettings', () => {
-    const retrieveSettings = (settingsType) => {
-      return getSettings(settingsType)
-        .then((data) => {
-          mainWindow.webContents.send(`${settingsType}Settings`, data);
-        })
-        .catch((error) => {
-          console.error('Error retrieving settings:', error);
-        });
-    };
-    
-    retrieveSettings('user');
-    retrieveSettings('canbus');
+    const settingsTypes = ['user', 'canbus'];
+  
+    settingsTypes.forEach((type) => {
+      getSettings(type, (error, settings) => {
+        if (error) {
+          console.error(`Error retrieving ${type}Settings:`, error);
+          return;
+        }
+  
+        mainWindow.webContents.send(`${type}Settings`, settings);
+      });
+    });
   });
-
 
   ipcMain.on('saveSettings', (event, newSettings) => {
     if (isDev) console.log('Saving settings...')
     saveSettings(newSettings)
   });
 
-
-  ipcMain.on('settingsUpdate', (event, { setting, value }) => {
-    getSettings()
-      .then((data) => {
-        mainWindow.webContents.send('userSettings', data);
-      })
-      .catch((error) => {
-        console.error('Error retrieving settings:', error);
-      });
-  });
-
-
   ipcMain.on('reqReload', () => {
     app.relaunch();
     app.exit();
   });
 
-
   ipcMain.on('reqClose', () => {
     app.quit();
   });
-
 
   ipcMain.on('reqReboot', () => {
     const exec = require('child_process').exec;
@@ -276,7 +252,6 @@ function createWindow(data) {
       console.log(error);
     });
   });
-
 
   for (const [key, value] of Object.entries(keys)) {
     if (isDev) {
@@ -296,21 +271,23 @@ function createWindow(data) {
 
 
 function startUp() {
-  getSettings('user')
-    .then((data) => {
-      createWindow(data);
-      createBackgroundWorker(data);
-    })
-    .catch((error) => {
-      console.error('Error retrieving settings:', error);
-    });
+  getSettings('user', (error, userSettings) => {
+    if (error) {
+      console.error('Error retrieving userSettings:', error);
+      return;
+    }
+
+    createWindow(userSettings);
+    createBackgroundWorker(userSettings);
+  });
 }
 
 
 app.on('ready', function () {
-  //createWindow();
   startUp();
 });
+
+
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
     app.quit();
@@ -332,11 +309,9 @@ function createBackgroundWorker(data) {
     data: undefined,
   };
 
-
   if (data.interface.activateCAN.value) {
     if (isDev) console.log('starting background worker');
     const backgroundFileURL = ''
-
 
     if (isDev) {
       backgroundFileUrl = url.format({
@@ -344,7 +319,6 @@ function createBackgroundWorker(data) {
         protocol: 'file:',
         slashes: true,
       });
-
 
       hiddenWindow = new BrowserWindow({
         width: 150,
@@ -363,7 +337,6 @@ function createBackgroundWorker(data) {
         slashes: true,
       });
 
-
       hiddenWindow = new BrowserWindow({
         show: false,
         webPreferences: {
@@ -375,7 +348,6 @@ function createBackgroundWorker(data) {
     }
 
     hiddenWindow.loadURL(backgroundFileUrl);
-
     hiddenWindow.on('closed', () => {
       hiddenWindow = null;
     });
@@ -393,16 +365,19 @@ ipcMain.on('backgroundReady', (event, args) => {
   });
 });
 
+
 ipcMain.on('stopScript', (event, args) => {
   if (hiddenWindow != null) {
     hiddenWindow.webContents.send('stopPython');
   }
 });
 
+
 ipcMain.on('backgroundClose', (event, args) => {
   if (isDev) console.log('closing background worker');
   hiddenWindow.close();
 });
+
 
 ipcMain.on('msgToMain', (event, args) => {
   mainWindow.webContents.send('msgFromBackground', args.message);

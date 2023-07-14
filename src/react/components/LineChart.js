@@ -15,7 +15,7 @@ const LineChart = ({
     unit,
     length
 }) => {
-
+    
     const [dataStream, setDataStream] = useState(Array.from({ length: length }, (_, index) => yMin));
 
     useEffect(() => {
@@ -25,41 +25,44 @@ const LineChart = ({
         setDataStream((prevDataStream1) => [value, ...prevDataStream1.slice(0, length - 1)]);
     }, [carData, length, yMax, yMin]);
 
-
     const xData = Array.from({ length: length }, (_, index) => index + 1)
 
-    // find the minimum and maximum values for the x data
+    // Find the minimum and maximum values for the x data
     const xMin = Math.min(...xData);
     const xMax = Math.max(...xData);
 
-    // calculate the x and y scales
+
+    // Calculate the x and y scales
     const xScale = (width - padding * 2) / (xMax - xMin);
     const yScale = (height - padding * 2) / (yMax - yMin);
 
-    // create the data points for the line chart
+
+    // Create the data points for the line chart
     const dataPoints = xData.map((value, index) => ({
         x: (value - xMin) * xScale + padding,
         y: (yMax - dataStream[index]) * yScale + padding
     }));
 
 
-    // create the path string for the line
+    // Create the path string for the line
     const path = dataPoints.reduce(
         (acc, point, index) =>
             index === 0 ? `M ${point.x} ${point.y}` : `${acc} L ${point.x} ${point.y}`,
         ''
     );
 
-    // create the path string for the y axis
+
+    // Create the path string for the y axis
     const yAxis = `M ${padding} ${height - padding} L ${padding} ${padding}`;
 
 
-    // create the path string and labels for the x axis ticks
+    // Create the path string and labels for the x axis ticks
     const xTicks = [];
     const tickDistance = (xMax - xMin) / tickCountX;
     for (let i = 0; i <= tickCountX; i++) {
         const xTick = xMin + i * tickDistance;
         const xTickPosition = (xTick - xMin) * xScale + padding;
+
         xTicks.push(
             <g key={i}>
                 <path
@@ -82,7 +85,7 @@ const LineChart = ({
     }
 
 
-    // create the path string and labels for the y axis ticks
+    // Create the path string and labels for the y axis ticks
     const yTicks = [];
     const yTickDistance = (yMax - yMin) / tickCountY;
     for (let i = 0; i <= tickCountY; i++) {
@@ -111,6 +114,7 @@ const LineChart = ({
         );
     }
 
+
     return (
         <div className={`swiper ${userSettings.app.colorTheme.value}`} style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
             <div className="values">
@@ -132,5 +136,6 @@ const LineChart = ({
         </div>
     );
 };
+
 
 export default LineChart;

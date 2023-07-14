@@ -17,21 +17,17 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
   const { wifiModalIsShowing, wifiModalToggle } = useModal();
   const [newSettings, setNewSettings] = useState(structuredClone(userSettings));
 
+
   /* Use Effects */
   useEffect(() => {
-    console.log(canbusSettings)
     ipcRenderer.on('wifiList', updateWifi);
     ipcRenderer.on('wifiConnected', updateWifiStatus);
 
+    refreshWifi();
+
     return function cleanup() {
-      setNewSettings(userSettings);
-      console.log("settings:", userSettings.app.colorTheme.value)
       ipcRenderer.removeAllListeners();
     };
-  }, []);
-
-  useEffect(() => {
-    ipcRenderer.send('wifiUpdate');
   }, []);
 
 
@@ -41,8 +37,6 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
   const handleTabChange = (tabIndex) => {
     setActiveTab(tabIndex);
   };
-
-
 
 
   /* Change Settings */
@@ -59,8 +53,6 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
     } else {
       update[key][name].value = convertedValue || newValue;
     }
-
-
 
     setNewSettings(structuredClone(update));
 
@@ -79,6 +71,7 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
   /* Render Settings */
   function renderSetting(key, handleSettingChange, settingsObj) {
     if (!settingsObj) return null;
+
     const { label, ...nestedObjects } = settingsObj[key];
     const labelParagraph = <h3>{label}</h3>;
 
@@ -93,10 +86,10 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
         isBoolean = typeof nestedObj === 'boolean';
       } else {
         label = nestedObj.label;
+
         try {
           value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' ? nestedObj.value : canbusSettings.messages[nestedObj.value].label;
-        } catch { console.log('ERROR: Reading settings.') }
-
+        } catch { return null }
         options = typeof value === 'number' || typeof value === 'boolean' ? null : nestedObj.options || Object.keys(canbusSettings.messages).map(messageKey => canbusSettings.messages[messageKey].label);
         isBoolean = typeof value === 'boolean'; isBoolean = typeof value === 'boolean';
       }
@@ -111,6 +104,7 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
           handleSettingChange(key, name, newValue, settingsObj);
         }
       };
+
 
       return (
         <div className='setting__row' key={nestedKey}>
@@ -162,6 +156,11 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
     ipcRenderer.send('wifiConnect', _credentials);
   };
 
+  /* Update WiFi */
+  function refreshWifi() {
+    ipcRenderer.send('wifiUpdate');
+  };
+
 
   const updateWifi = (event, args) => {
     setWifiList(args);
@@ -210,6 +209,7 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
         <div className='settings__header'>
           <h2>RTVI Settings</h2>
         </div>
+
         <div className='settings__body'>
           <div className='section'>
             <div className='section__1'>
@@ -217,7 +217,6 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
                 <div className='section__frame__row'>
                   <h3>WiFi Networks:</h3>
                 </div>
-
 
                 <div className='section__frame__content'>
                   <div className='scroller__container'>
@@ -231,33 +230,39 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
                       </div>
                     </div>
                   </div>
+
+                  <div className='section__frame__row'>
+                    <button className='app-button' type='button' onClick={refreshWifi}>Refresh</button>
+                  </div>
                 </div>
               </div>
-
 
               <div className='section__frame'>
                 <div className='section__frame__content'>
                   <div className='section__frame__row'>
                     <h3>I/O:</h3>
                   </div>
+
                   <div className='section__frame__row'>
                     <div className='section__frame__column'>
                       <button className='app-button' type='button' onClick={handleIO('reqReboot')}>Reboot</button>
                     </div>
+
                     <div className='section__frame__column'>
                       <button className='app-button' type='button' onClick={handleIO('reqReload')}>Restart</button>
                     </div>
                   </div>
+
                   <div className='section__frame__row'>
                     <button className='app-button' type='button' onClick={handleIO('reqClose')}>Quit</button>
                   </div>
+
                   <div className='section__frame__row'>
                     <h4><i>v{versionNumber}</i></h4>
                   </div>
                 </div>
               </div>
             </div>
-
 
             <div className='section__2'>
               <div className='section__frame'>
@@ -266,9 +271,8 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
                     <button className={`tab-button ${activeTab === 1 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(1)}> General </button>
                     <button className={`tab-button ${activeTab === 2 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(2)}> Customization </button>
                     {/* <button className={`tab-button ${activeTab === 3 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(3)}> Vehicle </button> */}
-                    { userSettings.dev.advancedSettings.value ? <button className={`tab-button ${activeTab === 4 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(4)}> Advanced </button> : <></> }
+                    {userSettings.dev.advancedSettings.value ? <button className={`tab-button ${activeTab === 4 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(4)}> Advanced </button> : <></>}
                   </div>
-
 
                   {activeTab === 1 &&
                     <div className='scroller__container__content'>
@@ -303,7 +307,6 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
                   }
                 </div>
 
-
                 <div className='section__frame__row'>
                   <button className='app-button' type='button' onClick={saveSettings}>Save</button>
                 </div>
@@ -312,10 +315,11 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
           </div>
         </div>
       </div>
+
       <div className='spacer' />
     </>
-
   )
 };
+
 
 export default Settings;

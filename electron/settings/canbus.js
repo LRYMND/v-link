@@ -36,28 +36,28 @@
 
 
 const command = [
-    'A1', // [00] No Operation Performed (keep alive)
-    'A3', // [01] Security Access Mode
-    'A5', // [02] Read Current Data By Offset
-    'A6', // [03] Read Current Data By Identifier
-    'A7', // [04] Read Current Data By Address
-    'A8', // [05] Set Data Transmission
-    'A9', // [06] Stop Data Transmission
-    'AA', // [07] Dynamically Define Record
-    'AB', // [08] Read Freeze Frame Data By Offset
-    'AC', // [09] Read Freeze Frame
-    'AD', // [10] Read Freeze Frame By DTC
-    'AE', // [11] Read DTC
-    'AF', // [12] Clear DTC
+    '0xA1', // [00] No Operation Performed (keep alive)
+    '0xA3', // [01] Security Access Mode
+    '0xA5', // [02] Read Current Data By Offset
+    '0xA6', // [03] Read Current Data By Identifier
+    '0xA7', // [04] Read Current Data By Address
+    '0xA8', // [05] Set Data Transmission
+    '0xA9', // [06] Stop Data Transmission
+    '0xAA', // [07] Dynamically Define Record
+    '0xAB', // [08] Read Freeze Frame Data By Offset
+    '0xAC', // [09] Read Freeze Frame
+    '0xAD', // [10] Read Freeze Frame By DTC
+    '0xAE', // [11] Read DTC
+    '0xAF', // [12] Clear DTC
 
-    'B0', // [13] Input Output Control By Offset
-    'B1', // [14] Input Output Control By Identifier
-    'B2', // [15] Control Routine By Offset
-    'B4', // [16] Define Read Write ECU data
-    'B8', // [17] Write Data Block By Offset
-    'B9', // [18] Read Data Block By Offset
-    'BA', // [19] Write Data Block By Address
-    'BB', // [20] Read Data Block By Address
+    '0xB0', // [13] Input Output Control By Offset
+    '0xB1', // [14] Input Output Control By Identifier
+    '0xB2', // [15] Control Routine By Offset
+    '0xB4', // [16] Define Read Write ECU data
+    '0xB8', // [17] Write Data Block By Offset
+    '0xB9', // [18] Read Data Block By Offset
+    '0xBA', // [19] Write Data Block By Address
+    '0xBB', // [20] Read Data Block By Address
 ]
 
 const req_id = [
@@ -69,7 +69,7 @@ const rep_id = [
 ]
 
 const target_id = [
-    "7A",           // [00] ECM ID
+    "0x7A",           // [00] ECM ID
 ]
 
 class CanbusSettings {
@@ -85,7 +85,7 @@ class CanbusSettings {
             messages: {
                 boost: {
                     //CAN-Bus parameter:
-                    parameter: ['12', '9D'],
+                    parameter: ['0x12', '0x9D'],
                     rtvi_id: "map:",
                     req_id: req_id[0],
                     rep_id: rep_id[0],
@@ -104,7 +104,7 @@ class CanbusSettings {
 
                 intake: {
                     //CAN-Bus parameter:
-                    parameter: ['10', 'CE'],
+                    parameter: ['0x10', '0xCE'],
                     rtvi_id: "iat:",
                     req_id: req_id[0],
                     rep_id: rep_id[0],
@@ -123,7 +123,7 @@ class CanbusSettings {
 
                 coolant: {
                     //CAN-Bus parameter:
-                    parameter: ['10', 'D8'],
+                    parameter: ['0x10', '0xD8'],
                     rtvi_id: "col:",
                     req_id: req_id[0],
                     rep_id: rep_id[0],
@@ -142,7 +142,7 @@ class CanbusSettings {
 
                 voltage: {
                     //CAN-Bus parameter:
-                    parameter: ['10', '0A'],
+                    parameter: ['0x10', '0x0A'],
                     rtvi_id: "vol:",
                     req_id: req_id[0],
                     rep_id: rep_id[0],
@@ -161,7 +161,7 @@ class CanbusSettings {
 
                 lambda1: {
                     //CAN-Bus parameter:
-                    parameter: ['10', '34'],
+                    parameter: ['0x10', '0x34'],
                     rtvi_id: "ld1:",
                     req_id: req_id[0],
                     rep_id: rep_id[0],
@@ -180,7 +180,7 @@ class CanbusSettings {
 
                 lambda2: {
                     //CAN-Bus parameter:
-                    parameter: ['10', '2C'],
+                    parameter: ['0x10', '0x2C'],
                     rtvi_id: "ld2:",
                     req_id: req_id[0],
                     rep_id: rep_id[0],

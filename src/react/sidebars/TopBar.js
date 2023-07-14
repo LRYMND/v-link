@@ -5,11 +5,14 @@ import "../themes.scss";
 import "./topbar.scss";
 
 const TopBar = ({ userSettings, phoneState, wifiState }) => {
+  
   const [time, setDate] = useState(new Date());
+
 
   function updateTime() {
     setDate(new Date());
   }
+
 
   useEffect(() => {
     const timer1 = setInterval(updateTime, 10000);
@@ -18,6 +21,7 @@ const TopBar = ({ userSettings, phoneState, wifiState }) => {
       clearInterval(timer1);
     };
   }, []);
+
 
   return (
     <div className={`topbar ${userSettings.app.colorTheme.value}`}>
@@ -48,5 +52,6 @@ const TopBar = ({ userSettings, phoneState, wifiState }) => {
 
   );
 };
+
 
 export default TopBar;

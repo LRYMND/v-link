@@ -7,10 +7,11 @@ import "../themes.scss";
 import "./navbar.scss";
 
 const NavBar = ({ userSettings, view, setView }) => {
-
+  
   function changeView(page) {
     setView(page)
   }
+
 
   return (
         <div className={`navbar ${userSettings.app.colorTheme.value}`} style={{ backgroundImage: `url(${NavBarBackground})` }}>
@@ -34,7 +35,6 @@ const NavBar = ({ userSettings, view, setView }) => {
             </svg>
           </IconButton>
 
-
           {/*
           <IconButton onClick={() => changeView('Volvo')} style={{ fill: (view === 'Volvo') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
             <svg className="navbar__icon">
@@ -45,5 +45,6 @@ const NavBar = ({ userSettings, view, setView }) => {
         </div >
   );
 };
+
 
 export default NavBar;

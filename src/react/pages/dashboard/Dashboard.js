@@ -9,20 +9,15 @@ import './dashboard.scss';
 const Dashboard = ({ canbusSettings, userSettings, carData }) => {
 
 	useEffect(() => {
-		console.log(userSettings.dash_1.value_1.value)
-
 		loadTheme();
 	}, []);
 
+
 	const [loaded, setLoaded] = useState(false);
 	const [colorNeedle, setColorNeedle] = useState(null);
-
-	//const [textColor, setTextColor] = useState(null);
 	const [textColorActive, setTextColorActive] = useState(null);
-
 	const [fillActive, setFillActive] = useState(null);
 	const [fillInactive, setFillInactive] = useState(null);
-
 	const [sectionColor, setSectionColor] = useState(null);
 
 
@@ -31,13 +26,13 @@ const Dashboard = ({ canbusSettings, userSettings, carData }) => {
 
 		setSectionColor(style.getPropertyValue("--sectionColor"));
 		setColorNeedle(style.getPropertyValue("--colorNeedle"));
-		//setTextColor(style.getPropertyValue("--textColor"));
 		setTextColorActive(style.getPropertyValue("--textColorActive"));
 		setFillActive(style.getPropertyValue("--fillActive"));
 		setFillInactive(style.getPropertyValue("--fillInactive"));
 
 		setLoaded(true);
 	}
+
 
 	return (
 		<div className={`dashboard ${userSettings.app.colorTheme.value}`}>
@@ -156,5 +151,6 @@ const Dashboard = ({ canbusSettings, userSettings, carData }) => {
 		</div>
 	)
 };
+
 
 export default Dashboard;

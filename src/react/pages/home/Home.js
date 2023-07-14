@@ -119,11 +119,9 @@ const Home = () => {
     if (data != null) {
       if (obj === 'user') {
         setUserSettings(data);
-        console.log('user: ', data);
       }
       else {
         setCanbusSettings(data);
-        console.log('canbus: ', data)
       }
     }
   }
@@ -257,6 +255,7 @@ const Home = () => {
     }
   }
 
+
   return (
     <>
       {startedUp ?
@@ -270,9 +269,7 @@ const Home = () => {
             />
           }
 
-
           {renderView()}
-
 
           {showNav &&
             <NavBar
@@ -293,5 +290,6 @@ const Home = () => {
     </>
   );
 };
+
 
 export default Home;

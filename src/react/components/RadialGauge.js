@@ -63,29 +63,29 @@ export const RadialGauge = ({
 
     smallTicks = (bigTicks) * (smallTicks + 1)
 
-    let cx = size                                               //Center
+    let cx = size                                                                       //Center
     let cy = cx
 
-    let rx1 = progressRadius                                       //Radius of inner circle
+    let rx1 = progressRadius                                                            //Radius of inner circle
     let ry1 = rx1
 
-    let rx2 = size - (heightBigTicks / 2) - borderSize - borderGap                    //Radius of big ticks
+    let rx2 = size - (heightBigTicks / 2) - borderSize - borderGap                      //Radius of big ticks
     let ry2 = rx2
 
-    let rx3 = size - (heightBigTicks - heightSmallTicks / 2) - borderSize - borderGap    //Radius of small ticks
+    let rx3 = size - (heightBigTicks - heightSmallTicks / 2) - borderSize - borderGap   //Radius of small ticks
     let ry3 = rx3
 
-    let rx4 = limitRadius                                       //Radius of limit
+    let rx4 = limitRadius                                                               //Radius of limit
     let ry4 = rx4
 
 
-    let t1 = 0 //Start angle                    Userdefined
-    let Δ = arc //Sweep angle                   Userdefined
-    let φ = globalRotation //Global rotation                Userdefined
-    let ε1 = Δ * (percent1 / 100) //Progress-End
-    let ε2 = Δ * (percent2 / 100) //Limit-Start
+    let t1 = 0                                                                          //Start angle (Userdefined)
+    let Δ = arc                                                                         //Sweep angle (Userdefined)
+    let φ = globalRotation                                                              //Global rotation (Userdefined)
+    let ε1 = Δ * (percent1 / 100)                                                       //Progress-End
+    let ε2 = Δ * (percent2 / 100)                                                       //Limit-Start
 
-    let δ = (360 - Δ) / 2 //Orient gap to global rotation
+    let δ = (360 - Δ) / 2                                                               //Orient gap to global rotation
     φ = φ + δ
 
     Δ = Δ * π / 180;
@@ -103,32 +103,39 @@ export const RadialGauge = ({
     //Progress Start
     const [sX1, sY1] = (f_vec_add(f_matrix_times(rotMatrix, [rx1 * cos(t1), ry1 * sin(t1)]), [cx, cy]));
 
+
     //Background End
     const [eX1, eY1] = (f_vec_add(f_matrix_times(rotMatrix, [rx1 * cos(t1 + Δ), ry1 * sin(t1 + Δ)]), [cx, cy]));
     const fA1 = ((Δ > π) ? 1 : 0);
     const fS1 = ((Δ > 0) ? 1 : 0);
+
 
     //Filler End
     const [eX2, eY2] = (f_vec_add(f_matrix_times(rotMatrix, [rx1 * cos(t1 + ε1), ry1 * sin(t1 + ε1)]), [cx, cy]));
     const fA2 = ((ε1 > π) ? 1 : 0);
     const fS2 = ((ε1 > 0) ? 1 : 0);
 
+
     //BigTicks
     const [sX2, sY2] = (f_vec_add(f_matrix_times(rotMatrix, [rx2 * cos(t1), ry2 * sin(t1)]), [cx, cy]));
     const [eX3, eY3] = (f_vec_add(f_matrix_times(rotMatrix, [rx2 * cos(t1 + Δ), ry2 * sin(t1 + Δ)]), [cx, cy]));
+
 
     //SmallTicks
     const [sX3, sY3] = (f_vec_add(f_matrix_times(rotMatrix, [rx3 * cos(t1), ry3 * sin(t1)]), [cx, cy]));
     const [eX4, eY4] = (f_vec_add(f_matrix_times(rotMatrix, [rx3 * cos(t1 + Δ), ry3 * sin(t1 + Δ)]), [cx, cy]));
 
+
     //Needle Endpoint
     const [eX5, eY5] = (f_vec_add(f_matrix_times(rotMatrix, [needleLength * cos(t1 + ε1), needleLength * sin(t1 + ε1)]), [cx, cy]));
+
 
     //Limit
     const [sX4, sY4] = (f_vec_add(f_matrix_times(rotMatrix, [rx4 * cos(t1 + ε2), ry4 * sin(t1 + ε2)]), [cx, cy]));
     const [eX6, eY6] = (f_vec_add(f_matrix_times(rotMatrix, [rx4 * cos(t1 + Δ), ry4 * sin(t1 + Δ)]), [cx, cy]));
     const fA3 = ((ε2 > π) ? 1 : 0);
     const fS3 = ((ε2 > 0) ? 1 : 0);
+
 
     //Annotation 
     const interval = maxValue / (bigTicks)
@@ -137,6 +144,7 @@ export const RadialGauge = ({
     for (let i = 0; i < bigTicks; i++) {
         values[i] = interval * i;
     }
+    
 
     // x,y start position
     // rx,ry radius x and y

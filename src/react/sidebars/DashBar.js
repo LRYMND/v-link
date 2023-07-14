@@ -13,6 +13,7 @@ const DashBar = ({ canbusSettings, userSettings, carData, wifiState, phoneState 
         loadTheme();
     }, []);
 
+
     const [textColor, setTextColor] = useState(null);
     const [fillActive, setFillActive] = useState(null);
     const [fillInactive, setFillInactive] = useState(null);
@@ -27,6 +28,7 @@ const DashBar = ({ canbusSettings, userSettings, carData, wifiState, phoneState 
         setFillActive(style.getPropertyValue("--fillActive"));
         setFillInactive(style.getPropertyValue("--fillInactive"));
     }
+
 
     return (
         <div className={`dashbar ${userSettings.app.colorTheme.value}`}>
@@ -89,5 +91,6 @@ const DashBar = ({ canbusSettings, userSettings, carData, wifiState, phoneState 
         </div>
     );
 };
+
 
 export default DashBar;
