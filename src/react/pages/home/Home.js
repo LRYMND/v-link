@@ -37,21 +37,15 @@ const Home = () => {
   const [wifiState, setWifiState] = useState(false);
   const [phoneState, setPhoneState] = useState(false);
 
-  const [carData, setCarData] = useState({
-    boost: 0,
-    intake: 0,
-    coolant: 0,
-    voltage: 0,
-    lambda1: 0,
-    lambda2: 0,
-  })
+  const [carData, setCarData] = useState({})
 
 
   useEffect(() => {
     ipcRenderer.on('userSettings', (event, args) => { loadSettings(args, 'user') });
     ipcRenderer.on('canbusSettings', (event, args) => { loadSettings(args, 'canbus') });
 
-    ipcRenderer.on('msgFromBackground', (event, args) => { msgFromBackground(args) });
+    ipcRenderer.on('msgFromBackground', (event, args) => { updateCardata(args) });
+
     ipcRenderer.on('wifiOn', () => { setWifiState(true) });
     ipcRenderer.on('wifiOff', () => { setWifiState(false) });
     ipcRenderer.on("plugged", () => { setPhoneState(true) });
@@ -119,12 +113,34 @@ const Home = () => {
     if (data != null) {
       if (obj === 'user') {
         setUserSettings(data);
-      }
-      else {
+      } else {
         setCanbusSettings(data);
+  
+        const canbusKeys = Object.keys(data.messages);
+        const initialCardata = canbusKeys.reduce(function(data, key) {
+          data[key] = 0;
+          return data;
+        }, {});
+  
+        setCarData(initialCardata);
       }
     }
   }
+
+
+  const updateCardata = (args) => {
+    if (args != null) {
+      Object.keys(canbusSettings.messages).forEach((key) => {
+        const message = canbusSettings.messages[key];
+        const rtviId = message.rtvi_id;
+  
+        if (args.includes(rtviId)) {
+          const value = args.replace(rtviId, "");
+          setCarData((prevState) => ({ ...prevState, [key]: Number(value).toFixed(2) }));
+        }
+      });
+    }
+  };
 
 
   function reloadApp() {
@@ -143,36 +159,7 @@ const Home = () => {
 
 
   const template = () => {
-    console.log('hello world')
-  }
-
-
-  const msgFromBackground = (args) => {
-    if (args != null)
-      if (args.includes("map:")) {
-        args = args.replace("map:", "")
-        setCarData((prevState) => ({ ...prevState, boost: Number(args).toFixed(2) }));
-      }
-    if (args.includes("iat:")) {
-      args = args.replace("iat:", "")
-      setCarData((prevState) => ({ ...prevState, intake: Number(args).toFixed(2) }));
-    }
-    if (args.includes("col:")) {
-      args = args.replace("col:", "")
-      setCarData((prevState) => ({ ...prevState, coolant: Number(args).toFixed(2) }));
-    }
-    if (args.includes("vol:")) {
-      args = args.replace("vol:", "")
-      setCarData((prevState) => ({ ...prevState, voltage: Number(args).toFixed(2) }));
-    }
-    if (args.includes("ld1:")) {
-      args = args.replace("ld1:", "")
-      setCarData((prevState) => ({ ...prevState, lambda1: Number(args).toFixed(2) }));
-    }
-    if (args.includes("ld2:")) {
-      args = args.replace("ld2:", "")
-      setCarData((prevState) => ({ ...prevState, lambda2: Number(args).toFixed(2) }));
-    }
+    return null;
   }
 
 
@@ -210,6 +197,7 @@ const Home = () => {
             </div >
           </div >
         )
+        
       case 'Dashboard':
         return (
           <Swiper
