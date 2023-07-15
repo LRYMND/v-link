@@ -13,6 +13,7 @@ import time
 import os
 import sys
 import json
+import array as arr
 
 from threading import Thread
 
@@ -53,6 +54,7 @@ for key, message in SETTINGS['messages'].items():
     message_bytes = [
         0xCD, target, action, parameter0, parameter1, 0x01, 0x00, 0x00
     ]
+    print(message_bytes)
     rep_id_bytes = [
         rep_id
     ]
@@ -72,10 +74,7 @@ for key, message in SETTINGS['messages'].items():
 def request(messages):
     i = 0
     while (i < len(messages)):
-
-        print(messages[i][0])
-        print(messages[i][2])
-        msg = can.Message(arbitration_id=messages[i][0], data=messages[i][2],is_extended_id=True)
+        msg = can.Message(arbitration_id=messages[i][0][0], data=messages[i][2],is_extended_id=True)
 
         try:
             received = False
@@ -83,7 +82,7 @@ def request(messages):
 
             retries = 500
 
-            while not received == True or retries == 0:
+            while not received == True  or retries == 0:
                 data = CAN_BUS.recv()
                 received = filter(data, messages[i])
                 retries -= 1
@@ -95,7 +94,7 @@ def request(messages):
 
 #DEFINE MESSAGE FILTER
 def filter(data, message):
-    if(data.arbitration_id == message[1] and data.data[4] == message[2][4]):
+    if(data.arbitration_id == message[1][0] and data.data[4] == message[2][4]):
         value = 0
         if(message[4] == True):
             value = (data.data[5] << 8) | data.data[6]
@@ -104,7 +103,7 @@ def filter(data, message):
 
         conversion_formula = message[3]
         converted_value = eval(conversion_formula, {'value': value})
-        
+
         print(message[5]+str(float(converted_value)))
         sys.stdout.flush()
         return True
@@ -112,7 +111,7 @@ def filter(data, message):
         return False
 
 
-#MAIN LOOP  
+#MAIN LOOP
 try:
     x = 0
     while (True):
