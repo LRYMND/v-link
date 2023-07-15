@@ -116,12 +116,12 @@ const LineChart = ({
 
 
     return (
-        <div className={`swiper ${userSettings.app.colorTheme.value}`} style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
-            <div className="values">
-                <div className="values__label" style={{ color: "var(--textColorHover)" }}>
+        <div className={`swiper ${userSettings.app.colorTheme.value}`} style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginBottom: "-1rem"}}>
+            <div className="values" style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", marginBottom: "-1.5rem"}}>
+                <div className="values__label" style={{ color: "var(--textColorHover)"}}>
                     <h4>{label}:</h4>
                 </div>
-                <div className="values__data" style={{ color: "var(--fillActive)", marginTop: "-1rem" }}>
+                <div className="values__data" style={{ color: "var(--fillActive)", marginLeft: ".5rem" }}>
                     <h3>{parseFloat(carData).toFixed(2)}{unit}</h3>
                 </div>
             </div>

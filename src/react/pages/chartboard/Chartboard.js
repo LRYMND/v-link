@@ -5,13 +5,13 @@ import "../../themes.scss";
 import './chartboard.scss';
 
 const Chartboard = ({ canbusSettings, userSettings, carData, length }) => {
-    
+
     return (
         <div className={`chartboard ${userSettings.app.colorTheme.value}`}>
             <div className="chartboard__header">
             </div>
 
-                {canbusSettings && userSettings ?
+            {canbusSettings && userSettings ?
                 <div className="chartboard__content">
                     <div className="chartboard__content__left">
                         <div className="chartboard__content__element">
@@ -44,31 +44,35 @@ const Chartboard = ({ canbusSettings, userSettings, carData, length }) => {
 
                     <div className="chartboard__content__right">
                         <LineChart
-                            label={canbusSettings.messages[userSettings.dash_2.chart_1.value].label}
-                            width={450}
-                            height={170}
-                            padding={30}
                             userSettings={userSettings}
-                            carData={carData[userSettings.dash_2.chart_2.value]}
+
+                            label={canbusSettings.messages[userSettings.dash_2.chart_1.value].label}
+                            carData={carData[userSettings.dash_2.chart_1.value]}
                             unit={canbusSettings.messages[userSettings.dash_2.chart_1.value].unit}
-                            length={length}
                             yMin={userSettings.charts.chart_1_min.value}
                             yMax={userSettings.charts.chart_1_max.value}
+
+                            width={500}
+                            height={150}
+                            padding={30}
+                            length={length}
                             tickCountX={5}
                             tickCountY={2}
-                         />
+                        />
 
                         <LineChart
-                            label={canbusSettings.messages[userSettings.dash_2.chart_2.value].label}
-                            width={450}
-                            height={170}
-                            padding={30}
                             userSettings={userSettings}
+
+                            label={canbusSettings.messages[userSettings.dash_2.chart_2.value].label}
                             carData={carData[userSettings.dash_2.chart_2.value]}
                             unit={canbusSettings.messages[userSettings.dash_2.chart_2.value].unit}
-                            length={length}
                             yMin={userSettings.charts.chart_2_min.value}
                             yMax={userSettings.charts.chart_2_max.value}
+
+                            width={500}
+                            height={150}
+                            padding={30}
+                            length={length}
                             tickCountX={5}
                             tickCountY={2}
                         />

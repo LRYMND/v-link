@@ -61,6 +61,8 @@ export const RadialGauge = ({
     let percent1 = (currentValue / maxValue) * 100;
     let percent2 = (limitStart / maxValue) * 100;
 
+    console.log(percent2)
+
     smallTicks = (bigTicks) * (smallTicks + 1)
 
     let cx = size                                                                       //Center
@@ -133,8 +135,9 @@ export const RadialGauge = ({
     //Limit
     const [sX4, sY4] = (f_vec_add(f_matrix_times(rotMatrix, [rx4 * cos(t1 + ε2), ry4 * sin(t1 + ε2)]), [cx, cy]));
     const [eX6, eY6] = (f_vec_add(f_matrix_times(rotMatrix, [rx4 * cos(t1 + Δ), ry4 * sin(t1 + Δ)]), [cx, cy]));
-    const fA3 = ((ε2 > π) ? 1 : 0);
+    const fA3 = ((ε2 > Δ) ? 1 : 0);
     const fS3 = ((ε2 > 0) ? 1 : 0);
+
 
 
     //Annotation 
@@ -144,7 +147,11 @@ export const RadialGauge = ({
     for (let i = 0; i < bigTicks; i++) {
         values[i] = interval * i;
     }
-    
+
+    console.log(title)
+    console.log(sX4, sY4)
+    console.log(eX6, eY6)
+    console.log(fA3, fS3)
 
     // x,y start position
     // rx,ry radius x and y
