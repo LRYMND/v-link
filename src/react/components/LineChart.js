@@ -13,17 +13,29 @@ const LineChart = ({
     userSettings,
     carData,
     unit,
-    length
+    length,
+    interval
 }) => {
-    
+
     const [dataStream, setDataStream] = useState(Array.from({ length: length }, (_, index) => yMin));
 
     useEffect(() => {
+        const timer1 = setInterval(updateDatastream, interval);
+
+        return function cleanup() {
+            clearInterval(timer1);
+        };
+    }, []);
+
+    function updateDatastream() {
+
         let value = carData;
         if (value > yMax) value = yMax;
         if (value < yMin) value = yMin;
-        setDataStream((prevDataStream1) => [value, ...prevDataStream1.slice(0, length - 1)]);
-    }, [carData, length, yMax, yMin]);
+
+        setDataStream(prevDataStream => [value, ...prevDataStream.slice(0, length - 1)]);
+    }
+
 
     const xData = Array.from({ length: length }, (_, index) => index + 1)
 
@@ -116,9 +128,9 @@ const LineChart = ({
 
 
     return (
-        <div className={`swiper ${userSettings.app.colorTheme.value}`} style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginBottom: "-1rem"}}>
-            <div className="values" style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", marginBottom: "-1.5rem"}}>
-                <div className="values__label" style={{ color: "var(--textColorHover)"}}>
+        <div className={`swiper ${userSettings.app.colorTheme.value}`} style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginBottom: "-1rem" }}>
+            <div className="values" style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", marginBottom: "-1.5rem" }}>
+                <div className="values__label" style={{ color: "var(--textColorHover)" }}>
                     <h4>{label}:</h4>
                 </div>
                 <div className="values__data" style={{ color: "var(--fillActive)", marginLeft: ".5rem" }}>

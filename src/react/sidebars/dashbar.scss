@@ -68,3 +68,35 @@
         background: red;
     }
 }
+
+.exit-button {
+    color: var(--textColor);
+    background-color: var(--backgroundColor);
+    border: none;
+    border-radius: 10px;
+
+    width: 2rem;
+    height: 30px;
+
+    text-align: center;
+    font-size: .8rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+    &:hover {
+        color: var(--textColorActive);
+        cursor: pointer;
+    }
+
+    &:active {
+        color: var(--textColorHover);
+    }
+
+    &:disabled {
+        color: var(--textColorInactive);
+        cursor: default;
+    }
+}

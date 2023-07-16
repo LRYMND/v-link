@@ -45,7 +45,21 @@ const saveSettings = (newSettings) => {
   });
 };
 
+
+const resetSettings = (obj, callback) => {
+  const defaultSettings = obj === 'user' ? userSettings.schema : canbusSettings.schema;
+  storage.set(obj, defaultSettings, (error) => {
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, defaultSettings);
+    }
+  });
+};
+
+
 module.exports = {
   getSettings,
-  saveSettings
+  saveSettings,
+  resetSettings
 };

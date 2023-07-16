@@ -19,7 +19,8 @@ app.commandLine.appendSwitch('disable-gpu');
 // ------------------- Electron JSON Storage --------------------
 const {
   getSettings,
-  saveSettings
+  saveSettings,
+  resetSettings
 } = require('./settings');
 
 
@@ -233,6 +234,21 @@ function createWindow(data) {
   ipcMain.on('saveSettings', (event, newSettings) => {
     if (isDev) console.log('Saving settings...')
     saveSettings(newSettings)
+  });
+
+  ipcMain.on('resetSettings', () => {
+    const settingsTypes = ['user', 'canbus'];
+  
+    settingsTypes.forEach((type) => {
+      resetSettings(type, (error, settings) => {
+        if (error) {
+          console.error(`Error retrieving ${type}Settings:`, error);
+          return;
+        }
+  
+        mainWindow.webContents.send(`${type}Settings`, settings);
+      });
+    });
   });
 
   ipcMain.on('reqReload', () => {

@@ -51,6 +51,7 @@ const Chartboard = ({ canbusSettings, userSettings, carData, length }) => {
                             unit={canbusSettings.messages[userSettings.dash_2.chart_1.value].unit}
                             yMin={userSettings.charts.chart_1_min.value}
                             yMax={userSettings.charts.chart_1_max.value}
+                            interval={userSettings.charts.chart_1_interval.value}
 
                             width={500}
                             height={150}
@@ -68,6 +69,7 @@ const Chartboard = ({ canbusSettings, userSettings, carData, length }) => {
                             unit={canbusSettings.messages[userSettings.dash_2.chart_2.value].unit}
                             yMin={userSettings.charts.chart_2_min.value}
                             yMax={userSettings.charts.chart_2_max.value}
+                            interval={userSettings.charts.chart_2_interval.value}
 
                             width={500}
                             height={150}

@@ -95,6 +95,10 @@ class UserSettings {
                     value: 1.2,
                     label: 'Chart 1 Max.',
                 },
+                chart_1_interval: {
+                    value: 200,
+                    label: 'Refresh Rate (ms)',
+                },
                 chart_2_min: {
                     value: 0.0,
                     label: 'Chart 2 Min.',
@@ -102,6 +106,10 @@ class UserSettings {
                 chart_2_max: {
                     value: 2.0,
                     label: 'Chart 2 Max.',
+                },
+                chart_2_interval: {
+                    value: 200,
+                    label: 'Refresh Rate (ms)',
                 },
             },
 

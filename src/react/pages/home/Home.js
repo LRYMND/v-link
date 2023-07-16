@@ -115,13 +115,13 @@ const Home = () => {
         setUserSettings(data);
       } else {
         setCanbusSettings(data);
-  
+
         const canbusKeys = Object.keys(data.messages);
-        const initialCardata = canbusKeys.reduce(function(data, key) {
+        const initialCardata = canbusKeys.reduce(function (data, key) {
           data[key] = 0;
           return data;
         }, {});
-  
+
         setCarData(initialCardata);
       }
     }
@@ -133,7 +133,7 @@ const Home = () => {
       Object.keys(canbusSettings.messages).forEach((key) => {
         const message = canbusSettings.messages[key];
         const rtviId = message.rtvi_id;
-  
+
         if (args.includes(rtviId)) {
           const value = args.replace(rtviId, "");
           setCarData((prevState) => ({ ...prevState, [key]: Number(value).toFixed(2) }));
@@ -176,6 +176,7 @@ const Home = () => {
                 carData={carData}
                 phoneState={phoneState}
                 wifiState={wifiState}
+                setView={setView}
               />
             }
             <div className={`carplay ${userSettings.app.colorTheme}`} style={{ height: userSettings.carplay.height, width: userSettings.carplay.width }}>
@@ -197,7 +198,7 @@ const Home = () => {
             </div >
           </div >
         )
-        
+
       case 'Dashboard':
         return (
           <Swiper

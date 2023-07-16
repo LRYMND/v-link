@@ -31,6 +31,12 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
   }, []);
 
 
+  useEffect(() => {
+    if (userSettings != null)
+      setNewSettings(structuredClone(userSettings))
+  }, [userSettings]);
+
+
   /* Change Tabs */
   const [activeTab, setActiveTab] = useState(1);
 
@@ -55,9 +61,6 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
     }
 
     setNewSettings(structuredClone(update));
-
-    console.log("Settings: ", userSettings.app.colorTheme.value)
-    console.log("NewSettings: ", newSettings.app.colorTheme.value)
   };
 
 
@@ -70,7 +73,7 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
 
   /* Render Settings */
   function renderSetting(key, handleSettingChange, settingsObj) {
-    if (!settingsObj) return null;
+    if (!settingsObj || !canbusSettings) return null;
 
     const { label, ...nestedObjects } = settingsObj[key];
     const labelParagraph = <h3>{label}</h3>;
@@ -78,6 +81,7 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
     const nestedElements = Object.entries(nestedObjects).map(([nestedKey, nestedObj]) => {
       if (nestedKey === "label") return null;
       let label, value, options, isBoolean;
+
 
       if (key === "carplay") {
         label = nestedKey;
@@ -88,11 +92,16 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
         label = nestedObj.label;
 
         try {
-          value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' ? nestedObj.value : canbusSettings.messages[nestedObj.value].label;
-        } catch { return null }
+          value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' ? nestedObj.value : nestedObj.value || canbusSettings.messages[nestedObj.value].label;
+        } catch (err) {
+          console.log("Error reading:", label, " (", err, ")")
+          return null
+        }
+
         options = typeof value === 'number' || typeof value === 'boolean' ? null : nestedObj.options || Object.keys(canbusSettings.messages).map(messageKey => canbusSettings.messages[messageKey].label);
         isBoolean = typeof value === 'boolean'; isBoolean = typeof value === 'boolean';
       }
+
 
       const handleChange = (event) => {
         const { name, value, checked, type } = event.target;
@@ -246,16 +255,16 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
                   <div className='section__frame__row'>
                     <div className='section__frame__column'>
                       <button className='app-button' type='button' onClick={handleIO('reqReboot')}>Reboot</button>
-                    </div>
-
-                    <div className='section__frame__column'>
                       <button className='app-button' type='button' onClick={handleIO('reqReload')}>Restart</button>
                     </div>
+
+
+                    <div className='section__frame__column'>
+                      <button className='app-button' type='button' onClick={handleIO('reqClose')}>Quit</button>
+                      <button className='app-button' type='button' onClick={handleIO('resetSettings')}>Reset</button>
+                    </div>
                   </div>
 
-                  <div className='section__frame__row'>
-                    <button className='app-button' type='button' onClick={handleIO('reqClose')}>Quit</button>
-                  </div>
 
                   <div className='section__frame__row'>
                     <h4><i>v{versionNumber}</i></h4>

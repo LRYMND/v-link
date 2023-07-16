@@ -58,10 +58,12 @@ export const RadialGauge = ({
     if (heightSmallTicks > heightBigTicks)
         heightSmallTicks = heightBigTicks
 
+    if (currentValue > maxValue) {
+        currentValue = maxValue;
+    }
+
     let percent1 = (currentValue / maxValue) * 100;
     let percent2 = (limitStart / maxValue) * 100;
-
-    console.log(percent2)
 
     smallTicks = (bigTicks) * (smallTicks + 1)
 
@@ -147,11 +149,6 @@ export const RadialGauge = ({
     for (let i = 0; i < bigTicks; i++) {
         values[i] = interval * i;
     }
-
-    console.log(title)
-    console.log(sX4, sY4)
-    console.log(eX6, eY6)
-    console.log(fA3, fS3)
 
     // x,y start position
     // rx,ry radius x and y
