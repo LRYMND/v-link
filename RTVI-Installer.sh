@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Installing Volvo RTVI 1.2.3"
+echo "Installing Volvo RTVI 1.3.0"
 
 while true; do
     read -p "Update System? (Recommended) [Y/N]" yn
@@ -43,12 +43,12 @@ if [[ $? -eq 0 ]]; then
 	echo -e Unable to create permissions'\n'
 fi
 
-echo "Downloading RTVI v1.2.3"
+echo "Downloading RTVI v1.3.0"
 while true; do
     read -p "Download 64bit version? [Y/N]" yn
     case $yn in
-        [Yy]* ) curl -L https://github.com/LRYMND/volvo-rtvi/releases/download/v1.2.3/Volvo_RTVI-1.2.3-armv64.AppImage --output /home/pi/RTVI.AppImage; break;;
-        [Nn]* ) curl -L https://github.com/LRYMND/volvo-rtvi/releases/download/v1.2.3/Volvo_RTVI-1.2.3-armv7l.AppImage --output /home/pi/RTVI.AppImage; break;;
+        [Yy]* ) curl -L https://github.com/LRYMND/volvo-rtvi/releases/download/v1.3.0/Volvo_RTVI-1.3.0-armv64.AppImage --output /home/pi/RTVI.AppImage; break;;
+        [Nn]* ) curl -L https://github.com/LRYMND/volvo-rtvi/releases/download/v1.3.0/Volvo_RTVI-1.3.0-armv7l.AppImage --output /home/pi/RTVI.AppImage; break;;
         * ) echo "Answer with Y or N";;
     esac
 done

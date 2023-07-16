@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const LineChart = ({
     label,
@@ -18,32 +18,25 @@ const LineChart = ({
 }) => {
 
     const [dataStream, setDataStream] = useState(Array.from({ length: length }, (_, index) => yMin));
-    const [chartValue, setChartValue] = useState(carData)
-
+    const cardataRef = useRef(0);
 
     useEffect(() => {
-console.log("Starting Timer")
-        const timer1 = setInterval(updateDatastream(), interval);
+        // Update the reference variable with the current counter value
+        cardataRef.current = carData;
+      }, [carData]);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            let value = cardataRef.current;
+            if (value > yMax) value = yMax;
+            if (value < yMin) value = yMin;
+            setDataStream(prevDataStream => [value, ...prevDataStream.slice(0, length - 1)]);
+        }, interval);
 
         return function cleanup() {
-            clearInterval(timer1);
+            clearInterval(timer);
         };
-    }, [updateDatastream, interval]);
-
-    useEffect(() => {
-        setChartValue(carData)
-    }, [carData]);
-
-    function updateDatastream() {
-
-        let value = chartValue;
-        if (value > yMax) value = yMax;
-        if (value < yMin) value = yMin;
-
-console.log(value)
-
-        setDataStream(prevDataStream => [value, ...prevDataStream.slice(0, length - 1)]);
-    }
+    }, [interval, length, yMin, yMax]);
 
 
     const xData = Array.from({ length: length }, (_, index) => index + 1)

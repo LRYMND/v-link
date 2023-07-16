@@ -22,12 +22,14 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
   useEffect(() => {
     ipcRenderer.on('wifiList', updateWifi);
     ipcRenderer.on('wifiConnected', updateWifiStatus);
-
-    refreshWifi();
-
     return function cleanup() {
       ipcRenderer.removeAllListeners();
     };
+  });
+
+  useEffect(() => {
+    refreshWifi();
+
   }, []);
 
 
@@ -90,14 +92,7 @@ const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber
         isBoolean = typeof nestedObj === 'boolean';
       } else {
         label = nestedObj.label;
-
-        try {
-          value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' ? nestedObj.value : nestedObj.value || canbusSettings.messages[nestedObj.value].label;
-        } catch (err) {
-          console.log("Error reading:", label, " (", err, ")")
-          return null
-        }
-
+        value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' || nestedKey === 'colorTheme' ? nestedObj.value : canbusSettings.messages[nestedObj.value].label;
         options = typeof value === 'number' || typeof value === 'boolean' ? null : nestedObj.options || Object.keys(canbusSettings.messages).map(messageKey => canbusSettings.messages[messageKey].label);
         isBoolean = typeof value === 'boolean'; isBoolean = typeof value === 'boolean';
       }
