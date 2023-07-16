@@ -18,20 +18,29 @@ const LineChart = ({
 }) => {
 
     const [dataStream, setDataStream] = useState(Array.from({ length: length }, (_, index) => yMin));
+    const [chartValue, setChartValue] = useState(carData)
+
 
     useEffect(() => {
-        const timer1 = setInterval(updateDatastream, interval);
+console.log("Starting Timer")
+        const timer1 = setInterval(updateDatastream(), interval);
 
         return function cleanup() {
             clearInterval(timer1);
         };
-    }, []);
+    }, [updateDatastream, interval]);
+
+    useEffect(() => {
+        setChartValue(carData)
+    }, [carData]);
 
     function updateDatastream() {
 
-        let value = carData;
+        let value = chartValue;
         if (value > yMax) value = yMax;
         if (value < yMin) value = yMin;
+
+console.log(value)
 
         setDataStream(prevDataStream => [value, ...prevDataStream.slice(0, length - 1)]);
     }

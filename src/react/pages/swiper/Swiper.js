@@ -6,8 +6,6 @@ import Chartboard from '../chartboard/Chartboard';
 
 function Swiper({ canbusSettings, userSettings, carData }) {
 
-  console.log(canbusSettings)
-
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const swipeContainerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
