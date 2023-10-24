@@ -88,6 +88,7 @@ In short, here are the reasons why:
 
 More info’s on the issues and the solution can be found here: [link](https://forum.core-electronics.com.au/t/pi-power-switch-using-car-ignition-logic/6177/7). You can also find an updated and working schematic in the schematics folder of this repository. Basically, you only need to add two resistors. As stated in the original article, it is advisable to put a heatsink on the big transistor.
 
+A KiCAD project file and the PSU Gerber files are also available in the schematics folder. 
 
 ## 04 | CAN Implementation
 
