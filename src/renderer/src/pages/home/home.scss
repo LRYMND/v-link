@@ -1,0 +1,98 @@
+.container {
+    background: var(--backgroundColor);
+
+    width: 100%;
+    height: 100%;
+
+    font-family: 'Helvetica';
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.refresh {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    fill: #ffffff;
+    margin-top: 3rem;
+    gap: 5rem;
+
+    &__icon{
+        
+        width: 7rem;
+        height: 7rem;
+    }
+
+    &__button{
+        background-color: #000000;
+        color: #ffffff;
+        font-size: 3rem;
+        border: none;
+    }
+}
+
+.navbar {
+    position: absolute;
+    z-index: 10;
+}
+
+.topbar {
+    position: absolute;
+    z-index: 10;
+}
+
+.dashbar {
+    //position: absolute;
+    width: 100%;
+}
+
+.carplay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    &__load {
+        width: 100%;
+        font-size: 30px;
+
+        background: var(--backgroundColor);
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+
+        position: absolute;
+    }
+
+    &__stream {
+        height: 100%;
+        width: 100%;
+        
+        position: relative;
+
+    }
+}
+
+.loading {
+    margin-top: .7rem;
+    display: inline-block;
+    font-family: monospace;
+    font-size: 20px;
+    clip-path: inset(0 3ch 0 0);
+    animation: dots 3s steps(4) infinite;
+}
+
+@keyframes dots {
+    to {
+        clip-path: inset(0 -1ch 0 0)
+    }
+}

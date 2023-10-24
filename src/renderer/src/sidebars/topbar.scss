@@ -1,0 +1,48 @@
+.topbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  //position: absolute;
+  top: 0;
+
+  height: 4rem;
+  width: 100%;
+  background: var(--backgroundColor);
+
+  background-position: center;
+
+  &__info {
+    width: 15%;
+  }
+
+  &__banner{
+    width: 80%;
+    margin-top: -1.5rem;
+  }
+
+  &__time {
+    margin-top: -1rem;
+    width: 15%;
+    color: var(--fillActive);
+
+    &__container {
+      margin-left: 4.5rem;
+    }
+  }
+
+  &__icon {
+    margin-top: -1.5rem;
+    margin-right: 1rem;
+    width: 1rem;
+    height: 1rem;
+
+    &--connected {
+      color: var(--fillActive);
+    }
+
+    &--disconnected {
+      color: var(--fillInactive);
+    }
+  }
+}

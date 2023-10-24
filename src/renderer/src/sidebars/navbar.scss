@@ -1,0 +1,27 @@
+.navbar {
+  background: var(--background-color);
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  bottom: 0;
+  gap: 10rem;
+  height: 5rem;
+  width: 100%;
+
+
+  &__icon {
+    width: 2.2rem;
+    height: 2.2rem;
+
+    margin-top: 1rem;
+    transition: fill 0.3s;
+
+    &:hover {
+      fill: var(--fillHover);
+    }
+  }
+}

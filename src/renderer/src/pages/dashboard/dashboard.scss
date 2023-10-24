@@ -1,0 +1,42 @@
+body {
+  background:var(--backgroundColor);
+}
+
+.dashboard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  
+  &__title {
+    display: flex;
+    align-items: center;
+  }
+
+  &__gauges {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: row;
+    margin-top: 6rem;
+    gap: 2rem;
+  }
+
+  &__footer {
+    width: 100%;
+    margin-top: .5rem;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: row;
+
+    &__element {
+      width: 30%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+}

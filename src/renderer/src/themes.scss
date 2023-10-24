@@ -1,0 +1,167 @@
+:root {
+    --textColor: #7c7c7c;
+    --textColorInactive: #535353;
+    --textColorHover: #dddddd;
+    
+    //--fillActive: #dddddd;
+    //--fillInactive: #444444;
+    --backgroundColor: #000000;
+    --sectionColor:  #303030;
+    --subSectionColor:  #252525;
+
+    --buttonBackground:#222222;
+    --buttonBackgroundHover:#1a1a1a;
+    --buttonBackgroundActive:#101010;
+    --buttonBackgroundInactive:#313131;
+
+    --scrollContentBackground:#282828;
+    --scrollBarBackground:#222222;
+}
+
+.Blue {
+    //HMI
+    --fillHover:                #708fa8;
+    --fillActive:               #3f77a4;
+    --fillInactive:             #444444;
+    --textColorActive:          #3f77a4;
+
+    //Gauges
+    --colorPlate:               #000000;
+    --colorPlateEnd:            #121212; 
+
+    --colorTitle:               #ffffff;
+    --colorUnits:               #ffffff;
+    --colorHighlight:           #4a5e7a;
+
+    --colorMinorTicks:          #ffffff;
+    --colorMajorTicks:          #ffffff;
+    --colorNumbers:             #ffffff;
+
+    --colorNeedle:              #1a80d2;
+    --colorNeedleEnd:           #3f6baa;
+    --colorNeedleShadowUp:      #294087;
+    --colorNeedleShadowDown:    #131c2e;
+
+    --colorNeedleCircleInner:   #282c35;
+	--colorNeedleCircleInnerEnd:#282c35;
+	--colorNeedleCircleOuter:   #363a43;
+	--colorNeedleCircleOuterEnd:#282c35;
+
+    --colorBorderOuter:         #222222;
+    --colorBorderMiddle:        #222222;
+    --colorBorderInner:         #222222;
+    --colorBorderOuterEnd:      #222222;
+    --colorBorderMiddleEnd:     #222222;
+    --colorBorderInnerEnd:      #222222;
+}
+
+.Green {
+    //HMI
+    --fillHover:                #84c884;
+    --fillActive:               #5acc5a;
+    --fillInactive:             #444444;
+    --textColorActive:          #5acc5a;
+
+    //Gauges
+    --colorPlate:               #000000;
+    --colorPlateEnd:            #303030; 
+
+    --colorTitle:               #5acc5a;
+    --colorUnits:               #5acc5a;
+    --colorHighlight:           #bc0013;
+    
+    --colorMinorTicks:          #5acc5a;
+    --colorMajorTicks:          #5acc5a;
+    --colorNumbers:             #5acc5a;
+    
+    --colorNeedle:              #bc0013;
+    --colorNeedleEnd:           #ff0019;
+    --colorNeedleShadowUp:      #2e1313;
+    --colorNeedleShadowDown:    #231117;
+
+    --colorNeedleCircleInner:   #282c35;
+	--colorNeedleCircleInnerEnd:#282c35;
+	--colorNeedleCircleOuter:   #363a43;
+	--colorNeedleCircleOuterEnd:#282c35;
+    
+    --colorBorderOuter:         #000000;
+    --colorBorderMiddle:        #000000;
+    --colorBorderInner:         #000000;
+    --colorBorderOuterEnd:      #000000;
+    --colorBorderMiddleEnd:     #000000;
+    --colorBorderInnerEnd:      #000000;
+}
+
+.Red {
+    //HMI
+    --fillHover:                #cd6969;
+    --fillActive:               #cd2424;
+    --fillInactive:             #444444;
+    --textColorActive:          #cd2424;
+
+    //Gauges
+    --colorPlate:               #000000;
+    --colorPlateEnd:            #121212; 
+
+    --colorTitle:               #ffffff;
+    --colorUnits:               #ffffff;
+    --colorHighlight:           #7c000c;
+    
+    --colorMinorTicks:          #ffffff;
+    --colorMajorTicks:          #ffffff;
+    --colorNumbers:             #ffffff;
+    
+    --colorNeedle:              #bc0013;
+    --colorNeedleEnd:           #ff0019;
+    --colorNeedleShadowUp:      #2e1313;
+    --colorNeedleShadowDown:    #231117;
+
+    --colorNeedleCircleInner:   #282c35;
+	--colorNeedleCircleInnerEnd:#282c35;
+	--colorNeedleCircleOuter:   #363a43;
+	--colorNeedleCircleOuterEnd:#282c35;
+    
+    --colorBorderOuter:         #222222;
+    --colorBorderMiddle:        #222222;
+    --colorBorderInner:         #222222;
+    --colorBorderOuterEnd:      #222222;
+    --colorBorderMiddleEnd:     #222222;
+    --colorBorderInnerEnd:      #222222;
+}
+
+.White {
+    //HMI
+    --fillHover:                #9f9f9f;
+    --fillActive:               #ffffff;
+    --fillInactive:             #444444;
+    --textColorActive:          #ffffff;
+
+    //Gauges
+    --colorPlate:               #000000;
+    --colorPlateEnd:            #121212; 
+
+    --colorTitle:               #ffffff;
+    --colorUnits:               #ffffff;
+    --colorHighlight:           #9f9f9f;
+    
+    --colorMinorTicks:          #ffffff;
+    --colorMajorTicks:          #ffffff;
+    --colorNumbers:             #ffffff;
+    
+    --colorNeedle:              #9f9f9f;
+    --colorNeedleEnd:           #ffffff;
+    --colorNeedleShadowUp:      #7c7c7c;
+    --colorNeedleShadowDown:    #131c2e;
+
+    --colorNeedleCircleInner:   #282c35;
+	--colorNeedleCircleInnerEnd:#282c35;
+	--colorNeedleCircleOuter:   #363a43;
+	--colorNeedleCircleOuterEnd:#282c35;
+    
+    --colorBorderOuter:         #222222;
+    --colorBorderMiddle:        #222222;
+    --colorBorderInner:         #222222;
+    --colorBorderOuterEnd:      #222222;
+    --colorBorderMiddleEnd:     #222222;
+    --colorBorderInnerEnd:      #222222;
+}
