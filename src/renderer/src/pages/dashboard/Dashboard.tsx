@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 
-import RadialGauge from '../../components/RadialGauge'
+import RadialGauge from '../../components/rtvi/RadialGauge'
 
 import "../../themes.scss";
 import './dashboard.scss';

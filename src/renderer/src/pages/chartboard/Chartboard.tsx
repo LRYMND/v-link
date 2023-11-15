@@ -1,5 +1,5 @@
 import React from 'react';
-import LineChart from '../../components/LineChart'
+import LineChart from '../../components/rtvi/LineChart'
 
 import "../../themes.scss";
 import './chartboard.scss';

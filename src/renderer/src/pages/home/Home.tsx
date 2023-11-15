@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GooSpinner } from 'react-spinners-kit';
-import  Carplay from '../../components/Carplay'
+import Carplay from '../../components/carplay/Carplay'
 import { io } from "socket.io-client";
 
 import NavBar from '../../sidebars/NavBar';
@@ -11,17 +11,33 @@ import Swiper from '../swiper/Swiper';
 import Settings from '../settings/Settings';
 import Volvo from '../volvo/Volvo';
 
+import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
+
 import "../../themes.scss"
 import './home.scss';
 
 const socket = io("ws://localhost:5005")
-const electron = window.require('electron')
-const { ipcRenderer } = electron;
-const versionNumber = process.env.PACKAGE_VERSION;
+//const versionNumber = process.env.PACKAGE_VERSION;
 
 
 const Home = () => {
+  const [showNav, setShowNav] = useState(true);
   const [view, setView] = useState('Dashboard')
+
+
+  useEffect(() => {
+    socket.on('userSettings', (event, args) => { test(args)});
+  })
+
+  function test (args) {
+    console.log('hallo')
+  }
+  
+  
+  /*
+  const [view, setView] = useState('Dashboard')
+
+  const [settings, setSettings] = useState<ExtraConfig | null>(null)
 
   const [userSettings, setUserSettings] = useState(null);
   const [canbusSettings, setCanbusSettings] = useState(null);
@@ -37,8 +53,10 @@ const Home = () => {
   const [phoneState, setPhoneState] = useState(false);
 
   const [carData, setCarData] = useState({})
+  */
 
 
+  /*
   useEffect(() => {
     ipcRenderer.on('userSettings', (event, args) => { loadSettings(args, 'user') });
     ipcRenderer.on('canbusSettings', (event, args) => { loadSettings(args, 'canbus') });
@@ -54,7 +72,6 @@ const Home = () => {
       ipcRenderer.removeAllListeners();
     };
   })
-
 
   useEffect(() => {
     socket.on('carplay', (data) => {
@@ -161,12 +178,15 @@ const Home = () => {
     return null;
   }
 
+  */
+
 
   const renderView = () => {
     switch (view) {
       case 'Carplay':
         return (
           <div className='container'>
+            {/*
             {showOsd &&
               <DashBar
                 className='dashbar'
@@ -180,14 +200,7 @@ const Home = () => {
             }
             <div className={`carplay ${userSettings.app.colorTheme}`} style={{ height: userSettings.carplay.height, width: userSettings.carplay.width }}>
               <div className='carplay__stream'>
-                <Carplay
-                  settings={userSettings.carplay}
-                  status={true}
-                  openModal={false}
-                  touchEvent={touchEvent}
-                  openModalReq={leaveCarplay}
-                  closeModalReq={template}
-                />
+                {settings ? <Carplay  receivingVideo={receivingVideo} setReceivingVideo={setReceivingVideo} settings={settings} command={keyCommand} commandCounter={commandCounter}/> : null}
               </div >
 
               <div className='carplay__load' style={{ height: (phoneState && streaming) ? '0%' : '100%' }}>
@@ -195,33 +208,40 @@ const Home = () => {
                 {(!streaming && phoneState) ? <GooSpinner size={60} color='var(--fillActive)' loading={!streaming} /> : <></>}
               </div>
             </div >
+            */}
           </div >
         )
 
       case 'Dashboard':
         return (
+          {/* 
           <Swiper
             canbusSettings={canbusSettings}
             userSettings={userSettings}
             carData={carData}
           />
+          */}
         )
 
       case 'Settings':
         return (
+          {/* 
           <Settings
             canbusSettings={canbusSettings}
             userSettings={userSettings}
             setUserSettings={setUserSettings}
             versionNumber={versionNumber}
           />
+        */}
         )
 
       case 'Volvo':
         return (
+          {/* 
           <Volvo
             userSettings={userSettings}
           />
+          */}        
         )
 
       case 'Template':
@@ -231,11 +251,13 @@ const Home = () => {
 
       default:
         return (
+          {/* 
           <Swiper
             canbusSettings={canbusSettings}
             userSettings={userSettings}
             carData={carData}
           />
+          */}
         )
 
     }
@@ -244,6 +266,16 @@ const Home = () => {
 
   return (
     <>
+    Home
+
+    {showNav &&
+            <NavBar
+              className='navbar'
+              view={view}
+              setView={setView}
+            />
+          }
+    {/*
       {startedUp ?
         <div className='container'>
           {showTop &&
@@ -273,6 +305,7 @@ const Home = () => {
           </button>
           <span className='refresh__version'>v{versionNumber}</span>
         </div>}
+        */}
     </>
   );
 };

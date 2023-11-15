@@ -7,7 +7,7 @@ import {
   AudioFormat,
   decodeTypeMap,
 } from 'node-carplay/web'
-import { PcmPlayer } from '../pcm-ringbuf-player/src/PcmPlayer'
+import { PcmPlayer } from '../../pcm-ringbuf-player/src/PcmPlayer'
 import { CarPlayWorker } from './worker/types'
 
 //TODO: allow to configure

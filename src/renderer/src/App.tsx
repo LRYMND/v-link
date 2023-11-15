@@ -3,7 +3,7 @@ import './App.css';
 import { useEffect, useRef, useState } from "react";
 import { ExtraConfig } from "../../main/Globals";
 import Home from './pages/home/Home';
-import Carplay from './components/Carplay'
+import Carplay from './components/carplay/Carplay'
 import { IpcRendererEvent } from "electron";
 
 // rm -rf node_modules/.vite; npm run dev
@@ -90,7 +90,7 @@ function App() {
 
     <div>
       {/*settings ? <Carplay  receivingVideo={receivingVideo} setReceivingVideo={setReceivingVideo} settings={settings} command={keyCommand} commandCounter={commandCounter}/> : null*/}
-      <Home />
+      {<Home />}
     </div>
   )
 }

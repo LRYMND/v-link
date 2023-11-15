@@ -5,8 +5,10 @@ import useModal from './modal/useModal';
 import "../../themes.scss";
 import './settings.scss';
 
-const electron = window.require('electron');
-const { ipcRenderer } = electron;
+// const electron = require('electron');
+// const { ipcRenderer } = electron;
+
+import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron'
 
 const Settings = ({ canbusSettings, userSettings, setUserSettings, versionNumber }) => {
 

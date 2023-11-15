@@ -9,7 +9,7 @@ import JMuxer from 'jmuxer'
 import { CarPlayWorker } from './worker/types'
 import useCarplayAudio from './useCarplayAudio'
 import { useCarplayTouch } from './useCarplayTouch'
-import { ExtraConfig} from "../../../main/Globals";
+import { ExtraConfig} from "../../../../main/Globals";
 
 const width = window.innerWidth
 const height = window.innerHeight
@@ -39,7 +39,7 @@ function Carplay({ receivingVideo, setReceivingVideo, settings, command, command
     height: height,
     mediaDelay: settings.mediaDelay
   }
-  // const pathname = "/"
+   const pathname = "/"
   console.log(pathname)
 
   const carplayWorker = useMemo(
