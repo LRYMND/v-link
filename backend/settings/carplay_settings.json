@@ -1,0 +1,41 @@
+{
+    "audioTransferMode": false,
+    "bindings": {
+        "back": "Backspace",
+        "down": "ArrowDown",
+        "home": "KeyH",
+        "left": "ArrowLeft",
+        "next": "KeyM",
+        "pause": "KeyO",
+        "play": "KeyP",
+        "prev": "KeyN",
+        "right": "ArrowRight",
+        "selectDown": "Space"
+    },
+    "boxName": "nodePlay",
+    "dpi": 160,
+    "format": 5,
+    "fps": 20,
+    "hand": 0,
+    "height": 640,
+    "iBoxVersion": 2,
+    "kiosk": true,
+    "mediaDelay": 300,
+    "micType": "os",
+    "microphone": "",
+    "most": {},
+    "nightMode": false,
+    "packetMax": 49152,
+    "phoneConfig": {
+        "3": {
+            "frameInterval": 5000
+        },
+        "5": {
+            "frameInterval": null
+        }
+    },
+    "phoneWorkMode": 2,
+    "piMost": false,
+    "width": 800,
+    "wifiType": "5ghz"
+}

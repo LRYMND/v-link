@@ -1,0 +1,45 @@
+.dashbar {
+    width: 100%;
+    height: 35px;
+    background: black;
+
+    display: flex;
+    position: absolute;
+
+    align-items: center;
+    justify-content: space-evenly;
+    flex-direction: row;
+
+    border-radius: 2rem;
+    margin-bottom: 5px;
+
+    top: 0;
+
+    &__dash {
+        width: 30%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        margin-left: -1rem;
+        gap: 5px;
+
+        &__bar{
+            width: 30%;
+        }
+    }
+
+    &__banner {
+        width: 30%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__info {
+        width: 30%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+}

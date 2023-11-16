@@ -1,0 +1,160 @@
+{
+    "version": "1.0",
+    "timing": {
+        "refresh_rate": 0.02,
+        "interval": 50
+    },
+    "canbus": {
+        "interface": "socketcan",
+        "channel": "can0",
+        "bitrate": 500000
+    },
+    "commands": [
+        "0xA1",
+        "0xA3",
+        "0xA5",
+        "0xA6",
+        "0xA7",
+        "0xA8",
+        "0xA9",
+        "0xAA",
+        "0xAB",
+        "0xAC",
+        "0xAD",
+        "0xAE",
+        "0xAF",
+        "0xB0",
+        "0xB1",
+        "0xB2",
+        "0xB4",
+        "0xB8",
+        "0xB9",
+        "0xBA",
+        "0xBB"
+    ],
+    "request_ids": [
+        "0x000FFFFE"
+    ],
+    "reply_ids": [
+        "0x00400021"
+    ],
+    "target_ids": [
+        "0x7A"
+    ],
+    "messages": {
+        "boost": {
+            "parameter": [
+                "0x12",
+                "0x9D"
+            ],
+            "rtvi_id": "map:",
+            "req_id": "0x000FFFFE",
+            "rep_id": "0x00400021",
+            "action": "0xA6",
+            "target": "0x7A",
+            "is_16bit": false,
+            "refresh_rate": "high",
+            "scale": "((value - 101.0) * 0.01)",
+            "label": "Boost",
+            "unit": "Bar",
+            "min_value": 0,
+            "max_value": 2,
+            "limit_start": 1.5
+        },
+        "intake": {
+            "parameter": [
+                "0x10",
+                "0xCE"
+            ],
+            "rtvi_id": "iat:",
+            "req_id": "0x000FFFFE",
+            "rep_id": "0x00400021",
+            "action": "0xA6",
+            "target": "0x7A",
+            "is_16bit": false,
+            "refresh_rate": "low",
+            "scale": "((value * 0.75) - 47.0)",
+            "label": "Intake",
+            "unit": "°C",
+            "min_value": 0,
+            "max_value": 90,
+            "limit_start": 60
+        },
+        "coolant": {
+            "parameter": [
+                "0x10",
+                "0xD8"
+            ],
+            "rtvi_id": "col:",
+            "req_id": "0x000FFFFE",
+            "rep_id": "0x00400021",
+            "action": "0xA6",
+            "target": "0x7A",
+            "is_16bit": false,
+            "refresh_rate": "low",
+            "scale": "((value * 0.75) - 47.0)",
+            "label": "Coolant",
+            "unit": "°C",
+            "min_value": 0,
+            "max_value": 150,
+            "limit_start": 100
+        },
+        "voltage": {
+            "parameter": [
+                "0x10",
+                "0x0A"
+            ],
+            "rtvi_id": "vol:",
+            "req_id": "0x000FFFFE",
+            "rep_id": "0x00400021",
+            "action": "0xA6",
+            "target": "0x7A",
+            "is_16bit": false,
+            "refresh_rate": "low",
+            "scale": "(value * 0.094238)",
+            "label": "Voltage",
+            "unit": "V",
+            "min_value": 0,
+            "max_value": 16,
+            "limit_start": 16
+        },
+        "lambda1": {
+            "parameter": [
+                "0x10",
+                "0x34"
+            ],
+            "rtvi_id": "ld1:",
+            "req_id": "0x000FFFFE",
+            "rep_id": "0x00400021",
+            "action": "0xA6",
+            "target": "0x7A",
+            "is_16bit": true,
+            "refresh_rate": "high",
+            "scale": "((value * 16.0) / 65536.0)",
+            "label": "Lambda 1",
+            "unit": "",
+            "min_value": 0,
+            "max_value": 2,
+            "limit_start": 2
+        },
+        "lambda2": {
+            "parameter": [
+                "0x10",
+                "0x2C"
+            ],
+            "rtvi_id": "ld2:",
+            "req_id": "0x000FFFFE",
+            "rep_id": "0x00400021",
+            "action": "0xA6",
+            "target": "0x7A",
+            "is_16bit": false,
+            "refresh_rate": "low",
+            "scale": "(value * (1.33 / 255.0))",
+            "label": "Lambda 2",
+            "unit": "V",
+            "min_value": 0,
+            "max_value": 2,
+            "limit_start": 2
+        }
+    }
+}

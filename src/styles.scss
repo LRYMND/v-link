@@ -1,0 +1,208 @@
+.output {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+
+    margin-bottom: -1rem;
+
+    &__label {
+        color: var(--textColorHover);
+    }
+
+    &__data {
+        color: var(--fillActive);
+    }
+}
+
+.nav-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+
+    margin-top: 1rem;
+    transition: fill 0.3s;
+
+    &:hover {
+        fill: var(--fillHover);
+    }
+}
+
+.status-icon {
+    margin-right: 1rem;
+    width: 1rem;
+    height: 1rem;
+
+    &--active {
+        color: var(--fillActive);
+    }
+
+    &--inactive {
+        color: var(--fillInactive);
+    }
+}
+
+.round-button {
+    flex: 1;
+    font-size: .8rem;
+    border-radius: 10px;
+    margin-bottom: .5rem;
+    height: 2rem;
+    background-color: var(--buttonBackground);
+    width: 100%;
+
+    &:hover {
+        background-color: var(--buttonBackgroundHover);
+    }
+}
+
+.square-button {
+    height: 2rem;
+    margin-right: 2px;
+    font-size: .7rem;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    width: 2rem;
+}
+
+.button-background {
+    background-color: var(--buttonBackground);
+
+    &:hover {
+        background-color: var(--buttonBackgroundHover);
+    }
+
+    &:active {
+        background-color: var(--buttonBackgroundActive);
+    }
+
+    &:disabled {
+        background-color: var(--buttonBackgroundInactive);
+    }
+
+    &.inactive {
+        color: var(--textColor);
+        background-color: var(--buttonBackgroundHover);
+    }
+
+    &.active {
+        color: var(--textColorHover);
+        background-color: var(--scrollContentBackground);
+    }
+}
+
+.button-styles {
+    color: var(--textColor);
+    border: none;
+    text-align: center;
+    padding-left: .5rem;
+    padding-right: .5rem;
+    cursor: pointer;
+
+
+    &:hover {
+        color: var(--textColorHover);
+        cursor: pointer;
+    }
+
+    &:active {
+        color: var(--textColorActive);
+    }
+
+    &:disabled {
+        color: var(--textColorInactive);
+        cursor: default;
+    }
+}
+
+.scrollbar-styles {
+    &::-webkit-scrollbar {
+        width: 1.4rem;
+        cursor: auto;
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: var(--scrollBarBackground);
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--fillActive);
+        border-radius: 10px;
+        min-height: 20px;
+
+        &:active {
+            background-color: var(--fillHover);
+        }
+    }
+}
+
+.dropdown {
+    height: 2rem;
+    width: 6rem;
+    color: var(--textColor);
+    background-color: var(--buttonBackground);
+
+    border: none;
+    border-radius: 10px;
+
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.input {
+    height: 2rem;
+    width: 5.7rem;
+    color: var(--textColor);
+    background-color: var(--buttonBackground);
+
+    border: none;
+    border-radius: 10px;
+
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+input[type=checkbox] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    display: inline-block;
+    vertical-align: text-bottom;
+    width: 1rem;
+    height: 1rem;
+    padding: .05rem;
+
+    background-clip: content-box;
+    border: .1rem solid var(--textColor);
+    border-radius: 5px;
+    background-color: var(--sectionColor);
+    margin-right: 2rem;
+
+    color: #ffffff;
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    &:checked {
+        background-color: var(--fillActive);
+    }
+
+    &:focus {
+        outline: none !important;
+    }
+
+    &:disabled {
+        background-color: var(--buttonBackgroundInactive);
+        cursor: default;
+    }
+
+    &:disabled+span {
+        color: var(--textColorInactive);
+    }
+}

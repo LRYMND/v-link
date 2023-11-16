@@ -1,0 +1,193 @@
+body {
+    background: var(--backgroundColor);
+    color: var(--textColor);
+    font-size: 10pt;
+
+    user-select: none;
+}
+
+.spacer {
+    height: 4rem;
+    margin: 0;
+}
+
+.section {
+    height: calc(100vh - 10rem);
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+
+    margin-left: .5rem;
+    margin-right: .5rem;
+
+    //Insert and adjust vertical columns as needed
+    &__1 {
+        width: 40%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__2 {
+        width: 60%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__frame {
+        flex: 1;
+        display: flex;
+
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        background-color: var(--sectionColor);
+        border-radius: 10px;
+
+        margin: .5rem;
+        padding: .5rem;
+        overflow: hidden;
+
+        &__row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 95%;
+            height: 2rem;
+            gap: .5rem;
+            margin-bottom: .5rem;
+        }
+
+        &__column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        &__content {
+            flex: 1;
+            width: 100%;
+            height: calc(100% - 2rem);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+}
+
+.list {
+    margin-top: .5rem;
+    width: 95%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.scroller {
+    &__container {
+        flex: 1;
+        width: 100%;
+        margin-bottom: .5rem;
+        min-height: 0;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+
+        overflow: hidden;
+
+        &__content {
+            width: 95%;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            border-radius: 12px;
+            background-color: var(--scrollContentBackground);
+        }
+    }
+}
+
+
+.settings {
+    width: 100vw;
+    height: calc(100vh - 8rem);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    &__header {
+        width: 100%;
+        height: 2rem;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__body {
+        flex: 1;
+        width: 100%;
+        height: 100%;
+
+        display: flex;
+    }
+}
+
+.setting-elements {
+    width: 90%;
+    //margin: 1rem;
+    margin-bottom: 2rem;
+
+    &__row {
+        flex: 1;
+        flex-grow: 0;
+        width: 90%;
+        margin-top: .5rem;
+        margin-right: 3rem;
+
+        line-height: .2rem;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        &__item {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 2rem;
+        }
+
+        &__divider {
+            flex-grow: 1;
+            border-bottom: 1px solid var(--fillInactive);
+            margin-left: .5rem;
+            margin-right: .5rem;
+            margin-top: .5rem;
+        }
+    }
+}
+
+.tab {
+    align-self: flex-start;
+    margin-left: 2.5rem;
+
+    line-height: .2rem;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}

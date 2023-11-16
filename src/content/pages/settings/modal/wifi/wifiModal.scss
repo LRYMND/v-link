@@ -1,0 +1,215 @@
+.wifi-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1040;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--backgroundColor);
+    opacity: .7;
+
+    overflow-x: hidden;
+    overflow-y: hidden;
+
+    animation-name: blend_bg;
+    animation-duration: .5s;
+
+
+}
+
+.wifi-modal-wrapper {
+    position: fixed;
+    top: 1rem;
+    left: 0;
+    z-index: 1050;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    outline: 0;
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    gap: .5rem;
+
+}
+
+.wifi-modal-container {
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.wifi-modal {
+    background: var(--sectionColor);
+
+    position: relative;
+    width: 40rem;
+    height: 12rem;
+
+    border-radius: 10px;
+
+    animation-name: blend_modal;
+    animation-duration: .2s;
+
+    &__body {
+        height: 100%;
+        width: 100%;
+
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+
+        gap: 1rem;
+        
+        &__title {
+            height: 2rem;
+            gap: .5rem;
+        }
+
+        &__element {
+            width: 80%;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            margin-top: -1rem;
+        }
+
+        & form {
+            width: 90%;
+        }
+
+
+        &__input {
+            height: 2rem;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        & input {
+            height: 2rem;
+            width: 100%;
+            text-align: center;
+            border: none;
+            border-radius: 10px;
+
+        }
+
+        &__buttons {
+            margin-top: 1rem;
+            width: 100%;
+            gap: 1rem;
+
+            display: flex;
+        }
+    }
+}
+
+.button {
+    color: var(--textColor);
+    background-color: var(--buttonBackground);
+
+    border: none;
+    border-radius: 10px;
+
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--buttonBackgroundHover);
+        color: var(--fillHover);
+    }
+
+    &:active {
+        background-color: var(--buttonBackgroundActive);
+        color: var(--fillActive);
+    }
+}
+
+.keyboard {
+    width: 40rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.simple-keyboard {
+    max-width: 100%;
+
+    color: var(--textColor);
+    background-color: var(--sectionColor);
+
+    border-radius: 10px;
+
+    position: relative;
+
+    animation-name: blend_keyboard;
+    animation-duration: .2s;
+}
+
+.simple-keyboard .hg-button {
+    color: var(--textColor);
+    background-color: var(--buttonBackground);
+    border-color: var(--buttonBackgroundActive);
+
+
+    &:hover {
+        color: var(--textColorHover);
+        background-color: var(--buttonBackgroundHover);
+    }
+
+    &:active {
+        color: var(--textColorActive);
+        background-color: var(--buttonBackgroundActive);
+    }
+}
+
+
+@keyframes blend_keyboard {
+    0% {
+        top: 6rem;
+        opacity: 0%;
+    }
+
+    100% {
+        top: 0rem;
+        opacity: 100%;
+    }
+}
+
+@keyframes blend_modal {
+    0% {
+        top: 3rem;
+        opacity: 0%;
+    }
+
+    100% {
+        top: 0rem;
+        opacity: 100%;
+    }
+}
+
+@keyframes blend_bg {
+    0% {
+        opacity: 0%;
+    }
+
+    100% {
+        opacity: 70%;
+    }
+}

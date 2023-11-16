@@ -1,0 +1,14 @@
+.navbar {
+  background: var(--background-color);
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  bottom: 0;
+  gap: 10rem;
+  height: 5rem;
+  width: 100%;
+}

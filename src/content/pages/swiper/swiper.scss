@@ -1,0 +1,29 @@
+.swipe-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.swipe-container {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  width: 200%;
+  height: 100%;
+  transition: transform 0.5s ease-in-out;
+}
+
+.swipe-container > div {
+  width: 50%; /* Set each page to 50% width */
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.page1,
+.page2 {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: black;
+}
