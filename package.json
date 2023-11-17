@@ -9,9 +9,9 @@
   },
   "type": "module",
   "scripts": {
-    "dev": "./scripts/start.sh dev",
-    "app": "./scripts/start.sh app",
-    "kiosk": "./scripts/start.sh kiosk",
+    "dev": "./scripts/dev.sh dev",
+    "app": "./scripts/dev.sh app",
+    "kiosk": "./scripts/dev.sh kiosk",
     "vite": "vite",
     "tsc": "tsc",
     "build": "vite build",

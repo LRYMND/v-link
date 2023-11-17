@@ -1,15 +1,10 @@
 #directories
-
 node_modules
-dist
-dist_OLD
-build
-assets
-
+backend/__pycache__/
+backend/venv/
 
 
 #files
-
 *.tgz
 *.log
 *.apk
