@@ -37,6 +37,7 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
     height,
     fps: 60,
     mediaDelay: 300,
+    phoneWorkMode: 2, // 2 for Carplay, 5 for Android
   }
 
   const [isPlugged, setIsPlugged] = useState(false)
@@ -227,7 +228,7 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
           {deviceFound === false && (
             <>
 
-              <button className="nav-button" style={{ color: 'var(--textColor)' }}>
+              <button className="nav-button" onClick={onClick} style={{ color: 'var(--textColor)' }}>
                 <h3>Connect or click to pair dongle.</h3>
                 <svg xmlns="http://www.w3.org/2000/svg" className="nav-icon">
                   <use xlinkHref="/assets/svg/link.svg#link"></use>

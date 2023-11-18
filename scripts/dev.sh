@@ -28,7 +28,7 @@ case "$1" in
   "app")
     # Set port and chrome mode for app mode
     port="4001"
-    chrome_mode="--app=http://localhost:$port/ --window-size=800,480 --disable-resize --enable-features=SharedArrayBuffer --autoplay-policy=no-user-gesture-required"
+    chrome_mode="--app=http://localhost:$port/ --window-size=800,480 --disable-resize --enable-features=SharedArrayBuffer,OverlayScrollbar --autoplay-policy=no-user-gesture-required"
     vite_start=false
     ;;
   "kiosk")
