@@ -34,7 +34,7 @@ for key, message in SETTINGS['messages'].items():
     parameter0 = int(message['parameter'][0], 16)
     parameter1 = int(message['parameter'][1], 16)
 
-    dlc = 0xC8 + len([byte for byte in [parameter0, parameter1] if byte != 0]) # OxC8 + number of non-zero significant bytes 
+    dlc = 0xC8 + len([byte for byte in [rep_id, target, action, parameter0, parameter1] if byte != 0]) # OxC8 + number of non-zero significant bytes 
 
     #CONSTRUCT BYTE ARRAYS AND STORE PARAMETERS
     req_id_bytes = [
@@ -43,7 +43,10 @@ for key, message in SETTINGS['messages'].items():
     message_bytes = [
         dlc, target, action, parameter0, parameter1, 0x01, 0x00, 0x00
     ]
-    print(message_bytes)
+
+    hex_message_bytes = [hex(byte) for byte in message_bytes]
+    print(hex_message_bytes)
+    
     rep_id_bytes = [
         rep_id
     ]
