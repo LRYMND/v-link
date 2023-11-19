@@ -249,13 +249,13 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
         >
           {deviceFound === false && (
             <>
-
-              <button className="nav-button" onClick={onClick} style={{ color: 'var(--textColor)' }}>
-                <h3>Connect or click to pair dongle.</h3>
+              <div className='connect'><h3>Connect phone or click to pair dongle.</h3>
+              <button className="button-styles nav-button" onClick={onClick} style={{ fill: 'var(--fillInactive)' }}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="nav-icon">
                   <use xlinkHref="/assets/svg/link.svg#link"></use>
                 </svg>
               </button>
+              </div>
             </>
           )}
           {deviceFound === true && (

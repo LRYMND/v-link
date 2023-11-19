@@ -57,12 +57,12 @@ const Home = ({
   useEffect(() => {
     //Dummyvalues
     setCarData({
-      intake: 12.3,
-      boost: 1.1,
-      coolant: 94.5,
-      lambda1: .9,
-      lambda2: .85,
-      voltage: 14.2,
+      intake:  0,
+      boost:   0,
+      coolant: 0,
+      lambda1: 0,
+      lambda2: 0,
+      voltage: 0,
     });
 
     // Event listener for receiving settings data
@@ -93,12 +93,11 @@ const Home = ({
       updateCardata(data);
     };
 
-    settingsChannel.on("data", handleCanbusData);
+    canbusChannel.on("data", handleCanbusData);
 
     // Cleanup function for removing the event listener when the component is unmounted
     return () => {
-      settingsChannel.off("application", handleApplicationSettings);
-      settingsChannel.off("canbus", handleCanbusSettings);
+      settingsChannel.off("data", handleCanbusData);
     };
   }, []);
 

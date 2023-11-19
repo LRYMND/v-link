@@ -49,18 +49,17 @@ def stop_chromium():
     subprocess.Popen("pkill -o chromium", shell=True)
 
 # Function to start the CAN bus thread
-#def start_canbus():
-#    global can_thread
-#    if can_thread is None or not can_thread.is_alive():
-#        can_thread = threading.Thread(target=canbus.main)
-#        can_thread.start()
+def start_canbus():
+    global can_thread
+    if can_thread is None or not can_thread.is_alive():
+        can_thread = threading.Thread(target=canbus.main)
+        can_thread.start()
 
 # Function to stop the CAN bus thread
-#def stop_canbus():
-#    global can_thread
-#    if can_thread is not None and can_thread.is_alive():
-#        # You might want to add logic to gracefully stop the CAN bus script
-#        can_thread.join()  # Wait for the thread to finish
+def stop_canbus():
+    global can_thread
+    if can_thread is not None and can_thread.is_alive():
+        can_thread.join()  # Wait for the thread to finish
 
 # Send notification when frontend connects via socket.io
 @socketio.on('connect')
@@ -73,11 +72,18 @@ def handle_canbus_request(args):
     print('toggle canbus: ' + args)
 
     if args == 'on':
+        start_canbus()
         print('start canbus')
     elif args == 'off':
+        stop_canbus()
         print('stop canbus')
     else:
         print('Unknown action:', args)
+
+# Return settings object to frontend via socket.io
+@socketio.on('data', namespace='/canbus')
+def handle_can_data(args):
+    print('data: ', args)
 
 # Return settings object to frontend via socket.io
 @socketio.on('requestSettings', namespace='/settings')
@@ -109,4 +115,5 @@ def handle_perform_io(args):
         print('Unknown action:', args)
 
 if __name__ == '__main__':
+    #start_canbus()
     socketio.run(app, host='0.0.0.0', port=4001)

@@ -5,12 +5,14 @@ import sys
 import array as arr
 import settings
 from queue import Queue
-from socketIO_client import SocketIO, BaseNamespace
+import socketio
 
-#DEFINE BUS
+#DEFINE CANBUS
 #FILTER = [{"can_id":REP_ID, "can_mask": 0xFFFFFFFF, "extended": True}]
 CAN_BUS = can.interface.Bus(channel='can0', bustype='socketcan', bitrate=500000)
 
+#DEFINE SOCKETIO
+CLIENT = socketio.Client()
 
 #LOAD JSON CONFIG
 SETTINGS = settings.load_settings("canbus")
@@ -96,7 +98,9 @@ def filter(data, message):
         conversion_formula = message[3]
         converted_value = eval(conversion_formula, {'value': value})
 
-        print(message[5]+str(float(converted_value)))
+        data = message[5]+str(float(converted_value))
+        print(data)
+        emit_data_to_frontend(data)
         sys.stdout.flush()
         return True
     else:
@@ -122,16 +126,16 @@ def run_can_bus():
         sys.exit()
 
 # Function to emit data to frontend via Socket.IO
-def emit_data_to_frontend(id, value):
-    canbusChannel.emit('can_data', {'id': id, 'value': value})
+def emit_data_to_frontend(data):
+    CLIENT.emit('data', data, namespace='/canbus')
 
 
 # Main method
 def main():
     # Start the CAN bus logic
+    print('canbus worker started')
     run_can_bus()
 
 if __name__ == "__main__":
-    socketIO = SocketIO('localhost', 4001, BaseNamespace)
-    canbusChannel = socketIO.define(BaseNamespace, '/canbus')
+    CLIENT.connect('http://localhost:4001')
     main()
