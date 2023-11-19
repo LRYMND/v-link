@@ -14,7 +14,7 @@ import {
   DongleConfig,
   CommandMapping,
 } from 'node-carplay/web'
-import { CarPlayWorker } from './worker/types'
+import { CarPlayWorker, KeyCommand } from './worker/types'
 import useCarplayAudio from './useCarplayAudio'
 import { useCarplayTouch } from './useCarplayTouch'
 import { InitEvent } from './worker/render/RenderEvents'
@@ -207,6 +207,28 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
   const sendTouchEvent = useCarplayTouch(carplayWorker, width, height)
 
   const isLoading = !isPlugged
+
+  const handleKeyBindings = useCallback((event: KeyboardEvent) => {
+    console.log(event.code);
+    if(Object.values(applicationSettings!.keyBindings).includes(event.code)) {
+      let action = Object.keys(applicationSettings!.keyBindings).find(key =>
+        applicationSettings!.keyBindings[key] === event.code
+      )
+      if(action !== undefined) {
+        console.log(`Matched ${event.code} to ${action}`);
+        const command: KeyCommand = action as KeyCommand
+        carplayWorker.postMessage({ type: 'keyCommand', command})
+      }
+    }
+  }, [applicationSettings]); 
+  
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyBindings);
+  
+    return () => {
+      document.removeEventListener('keydown', handleKeyBindings);
+    };
+  }, [handleKeyBindings]);
 
   return (
     <div

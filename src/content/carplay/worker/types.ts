@@ -26,6 +26,18 @@ export type StartPayload = {
   config: Partial<DongleConfig>
 }
 
+export type KeyCommand = 'left' |
+  'right' |
+  'selectDown' |
+  'selectUp' |
+  'back' |
+  'down' |
+  'home' |
+  'play' |
+  'pause' |
+  'next' |
+  'prev'
+
 export type Command =
   | { type: 'frame' }
   | { type: 'stop' }
@@ -33,6 +45,7 @@ export type Command =
   | { type: 'audioBuffer'; payload: AudioPlayerPayload }
   | { type: 'start'; payload: StartPayload }
   | { type: 'touch'; payload: { x: number; y: number; action: TouchAction } }
+  | { type: 'keyCommand', command: KeyCommand}
 
 export interface CarPlayWorker
   extends Omit<Worker, 'postMessage' | 'onmessage'> {

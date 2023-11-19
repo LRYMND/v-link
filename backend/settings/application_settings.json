@@ -30,6 +30,19 @@
       "label": "Window Height"
     }
   },
+  "keyBindings": {
+    "left": "ArrowLeft",
+    "right": "ArrowRight",
+    "selectDown": "Space",
+    "selectUp": "ArrowUp",
+    "back": "Backspace",
+    "down": "ArrowDown",
+    "home": "KeyH",
+    "play": "KeyP",
+    "pause": "KeyO",
+    "next": "KeyN",
+    "prev": "KeyV"
+  },
   "dash_1": {
     "label": "Dashboard Page 1",
     "gauge_1": {
