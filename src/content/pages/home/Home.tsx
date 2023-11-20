@@ -17,7 +17,7 @@ import Settings from '../settings/Settings';
 import "./../../../themes.scss"
 import './home.scss';
 
-const canbusChannel = io("ws://localhost:4001/canbus")
+const canbusChannel   = io("ws://localhost:4001/canbus")
 const settingsChannel = io("ws://localhost:4001/settings")
 const versionNumber = "2.0"
 
@@ -57,8 +57,8 @@ const Home = ({
   useEffect(() => {
     //Dummyvalues
     setCarData({
-      intake:  0,
-      boost:   0,
+      intake: 0,
+      boost: 0,
       coolant: 0,
       lambda1: 0,
       lambda2: 0,
@@ -86,20 +86,14 @@ const Home = ({
     };
   }, []);
 
+  
   useEffect(() => {
-    // Event listener for receiving canbus data
-    const handleCanbusData = (data) => {
-      console.log("Data received from canbus:", data);
-      updateCardata(data);
-    };
-
-    canbusChannel.on("data", handleCanbusData);
-
-    // Cleanup function for removing the event listener when the component is unmounted
+    canbusChannel.on("data", (data) => { updateCardata(data) });
     return () => {
-      settingsChannel.off("data", handleCanbusData);
+      canbusChannel.off("data", updateCardata);
     };
-  }, []);
+  });
+
 
   useEffect(() => {
     console.log("Updating application-settings");
@@ -108,6 +102,7 @@ const Home = ({
       console.log("Settings loaded.")
     }
   }, [applicationSettings])
+
 
   useEffect(() => {
     console.log("Updating canbus-settings");
@@ -118,11 +113,11 @@ const Home = ({
 
 
   const updateCardata = (data) => {
-    if (data != null) {
+    if (canbusSettings && canbusSettings.messages && data != null) {
       Object.keys(canbusSettings.messages).forEach((key) => {
         const message = canbusSettings.messages[key];
         const rtviId = message.rtvi_id;
-
+  
         if (data.includes(rtviId)) {
           const value = data.replace(rtviId, "");
           setCarData((prevState) => ({ ...prevState, [key]: Number(value).toFixed(2) }));
@@ -130,7 +125,7 @@ const Home = ({
       });
     }
   };
-
+  
   useEffect(() => {
     console.log("phone connected: ", phoneState)
     console.log("view: ", view)

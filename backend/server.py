@@ -2,11 +2,12 @@ import json
 from flask import Flask, send_from_directory, render_template
 from flask_socketio import SocketIO
 from flask_cors import CORS 
-#import canbus
+import canbus
 import settings
 import os
 import subprocess
 import threading
+import time
 
 # Global variable to hold the reference to the CAN bus thread
 can_thread = None
@@ -82,8 +83,9 @@ def handle_canbus_request(args):
 
 # Return settings object to frontend via socket.io
 @socketio.on('data', namespace='/canbus')
-def handle_can_data(args):
-    print('data: ', args)
+def handle_can_data(data):
+    socketio.emit('data', data, namespace='/canbus')
+
 
 # Return settings object to frontend via socket.io
 @socketio.on('requestSettings', namespace='/settings')
@@ -115,5 +117,21 @@ def handle_perform_io(args):
         print('Unknown action:', args)
 
 if __name__ == '__main__':
-    #start_canbus()
-    socketio.run(app, host='0.0.0.0', port=4001)
+    # Create threads for Socket.IO and CAN bus
+    socketio_thread = threading.Thread(target=lambda: socketio.run(app, host='0.0.0.0', port=4001))
+    canbus_thread = threading.Thread(target=start_canbus)
+
+    # Start the Socket.IO thread
+    print("Starting Server")
+    socketio_thread.start()
+
+    # Wait for a moment to ensure Socket.IO thread is running
+    time.sleep(1)
+
+    # Start the CAN bus thread
+    print("Start Canbus Worker")
+    canbus_thread.start()
+
+    # Wait for both threads to finish
+    socketio_thread.join()
+    canbus_thread.join()

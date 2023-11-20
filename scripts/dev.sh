@@ -6,7 +6,7 @@ set -e
 # Function for cleanup
 cleanup() {
   echo "Cleaning up..."
-  kill -TERM $vite_pid $python_pid $chromium_pid 2>/dev/null
+  kill -TERM $vite_pid $python_pid $chromium_pid $vcan_pid 2>/dev/null
 }
 
 # Trap signals for cleanup
@@ -15,26 +15,37 @@ trap 'cleanup; exit 1' INT TERM EXIT
 # Set the default values
 port=""
 vite_start=false
+vcan_start=false
 chrome_mode=""
 
 # Check the argument passed
 case "$1" in
+  "vcan")
+    # Set port and chrome mode and indicate to start Vite for dev mode
+    port="5173"
+    chrome_mode="http://localhost:$port/ --window-size=800,480 --autoplay-policy=no-user-gesture-required"
+    vcan_start=true
+    vite_start=true
+    ;;
   "dev")
     # Set port and chrome mode and indicate to start Vite for dev mode
     port="5173"
     chrome_mode="http://localhost:$port/ --window-size=800,480 --autoplay-policy=no-user-gesture-required"
+    vcan_start=false
     vite_start=true
     ;;
   "app")
     # Set port and chrome mode for app mode
     port="4001"
     chrome_mode="--app=http://localhost:$port/ --window-size=800,480 --disable-resize --enable-features=SharedArrayBuffer,OverlayScrollbar --autoplay-policy=no-user-gesture-required"
+    vcan_start=false
     vite_start=false
     ;;
   "kiosk")
     # Set port and chrome mode for kiosk mode
     port="5173"
     chrome_mode="http://localhost:$port/ --window-size=800,480 --kiosk --enable-features=SharedArrayBuffer --autoplay-policy=no-user-gesture-required"
+    vcan_start=false
     vite_start=false
     ;;
   *)
@@ -43,8 +54,11 @@ case "$1" in
     ;;
 esac
 
+# Start Virtual CAN in the background if "dev" was passed
+$vcan_start && echo "Starting virtual CAN" && python ./backend/vcan.py & vcan_pid=$!
+
 # Start Vite in the background if "dev" was passed
-$vite_start && npm run vite & vite_pid=$!
+$vite_start && echo "Starting Vite" && npm run vite & vite_pid=$!
 
 # Start the Python server in the background
 echo "Starting Backend"

@@ -7,9 +7,14 @@ import settings
 from queue import Queue
 import socketio
 
-#DEFINE CANBUS
-#FILTER = [{"can_id":REP_ID, "can_mask": 0xFFFFFFFF, "extended": True}]
-CAN_BUS = can.interface.Bus(channel='can0', bustype='socketcan', bitrate=500000)
+
+#DEFINE MODE
+IS_DEV = True
+
+if(IS_DEV):
+    CAN_BUS = can.interface.Bus(channel='vcan0', bustype='socketcan', bitrate=500000)
+else:
+    CAN_BUS = can.interface.Bus(channel='can0', bustype='socketcan', bitrate=500000)
 
 #DEFINE SOCKETIO
 CLIENT = socketio.Client()
@@ -47,7 +52,7 @@ for key, message in SETTINGS['messages'].items():
     ]
 
     hex_message_bytes = [hex(byte) for byte in message_bytes]
-    print(hex_message_bytes)
+    #print(hex_message_bytes)
     
     rep_id_bytes = [
         rep_id
@@ -99,7 +104,7 @@ def filter(data, message):
         converted_value = eval(conversion_formula, {'value': value})
 
         data = message[5]+str(float(converted_value))
-        print(data)
+        #print(data)
         emit_data_to_frontend(data)
         sys.stdout.flush()
         return True
@@ -132,10 +137,25 @@ def emit_data_to_frontend(data):
 
 # Main method
 def main():
-    # Start the CAN bus logic
-    print('canbus worker started')
-    run_can_bus()
+    # Connect to Socket.IO with retries
+    max_retries = 5
+    current_retry = 0
+    while not CLIENT.connected and current_retry < max_retries:
+        try:
+            CLIENT.connect('http://localhost:4001', namespaces=['/canbus'])
+        except Exception as e:
+            print(f"Socket.IO connection failed. Retry {current_retry}/{max_retries}. Error: {e}")
+            time.sleep(2)  # Wait for 2 seconds before retry
+            current_retry += 1
+
+    if CLIENT.connected:
+        print("Socket.IO connected successfully")
+        # Start the CAN bus logic
+        print('canbus worker started')
+        run_can_bus()
+    else:
+        print("Failed to connect to Socket.IO. Exiting.")
 
 if __name__ == "__main__":
-    CLIENT.connect('http://localhost:4001')
+    CLIENT.connect('http://localhost:4001/canbus')
     main()

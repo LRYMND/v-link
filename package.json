@@ -9,6 +9,7 @@
   },
   "type": "module",
   "scripts": {
+    "vcan": "./scripts/dev.sh vcan",
     "dev": "./scripts/dev.sh dev",
     "app": "./scripts/dev.sh app",
     "kiosk": "./scripts/dev.sh kiosk",
