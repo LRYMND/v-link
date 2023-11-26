@@ -111,7 +111,7 @@
             "target": "0x7A",
             "is_16bit": false,
             "refresh_rate": "low",
-            "scale": "(value * 0.094238)",
+            "scale": "((value * 1) / 10.611399)",
             "label": "Voltage",
             "unit": "V",
             "min_value": 0,
@@ -155,6 +155,44 @@
             "min_value": 0,
             "max_value": 2,
             "limit_start": 2
+        },
+        "rpm": {
+            "parameter": [
+                "0x10",
+                "0x1D"
+            ],
+            "rtvi_id": "rpm:",
+            "req_id": "0x000FFFFE",
+            "rep_id": "0x00400021",
+            "action": "0xA6",
+            "target": "0x7A",
+            "is_16bit": false,
+            "refresh_rate": "high",
+            "scale": "(value * 40)",
+            "label": "RPM",
+            "unit": "rpm",
+            "min_value": 0,
+            "max_value": 8000,
+            "limit_start":7000
+        },
+        "speed": {
+            "parameter": [
+                "0x10",
+                "0xA5"
+            ],
+            "rtvi_id": "spd:",
+            "req_id": "0x000FFFFE",
+            "rep_id": "0x00400021",
+            "action": "0xA6",
+            "target": "0x7A",
+            "is_16bit": true,
+            "refresh_rate": "high",
+            "scale": "(value * 512) / 65536.0))",
+            "label": "Speed",
+            "unit": "km/h",
+            "min_value": 0,
+            "max_value": 260,
+            "limit_start": 240
         }
     }
 }

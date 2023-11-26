@@ -78,7 +78,7 @@ output_path="/home/$USER/volvo-rtvi"
 
 # Download the file
 echo "Downloading volvo-rtvi..."
-sudo mkdir -p $output_path
+mkdir -p $output_path
 curl -L $download_url --output $output_path/Volvo-RTVI-2.0.0.zip
 
 # Unzip the contents
