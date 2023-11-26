@@ -6,7 +6,7 @@ set -e
 # Function for cleanup
 cleanup() {
   echo "Cleaning up..."
-  kill -TERM $vite_pid $python_pid $chromium_pid $vcan_pid 2>/dev/null
+  kill -TERM $vcan_pid $vite_pid $python_pid $chromium_pid 2>/dev/null
 }
 
 # Trap signals for cleanup
@@ -16,14 +16,16 @@ trap 'cleanup; exit 1' INT TERM EXIT
 port=""
 vite_start=false
 vcan_start=false
-chrome_mode=""
+app="--app=http://localhost:$port/ --window-size=800,480 --disable-resize --enable-features=SharedArrayBuffer,OverlayScrollbar --autoplay-policy=no-user-gesture-required"
+kiosk="http://localhost:$port/ --window-size=800,480 --kiosk --enable-features=SharedArrayBuffer --autoplay-policy=no-user-gesture-required"
+browser="http://localhost:$port/ --window-size=800,480 --autoplay-policy=no-user-gesture-required"
 
 # Check the argument passed
 case "$1" in
   "vcan")
     # Set port and chrome mode and indicate to start Vite for dev mode
     port="5173"
-    chrome_mode="http://localhost:$port/ --window-size=800,480 --autoplay-policy=no-user-gesture-required"
+    chrome_mode="--app=http://localhost:$port/ --window-size=800,480 --disable-resize --enable-features=SharedArrayBuffer,OverlayScrollbar --autoplay-policy=no-user-gesture-required"
     vcan_start=true
     vite_start=true
     ;;

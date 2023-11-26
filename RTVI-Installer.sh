@@ -52,17 +52,24 @@ while true; do
     esac
 done
 
-#create udev rule that grants access to carlinkit device
+
+# Create udev rule that grants access to carlinkit device and ttys0
 echo "Creating udev rules"
 
-FILE=/etc/udev/rules.d/52-volvo-rtvi.rules
-echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"1314\", ATTR{idProduct}==\"152*\", MODE=\"0660\", GROUP=\"plugdev\"" | sudo tee $FILE
+# USB device rule
+USB_RULE_FILE=/etc/udev/rules.d/52-volvo-rtvi-usb.rules
+echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="1314", ATTR{idProduct}=="152*", MODE="0660", GROUP="plugdev"' | sudo tee $USB_RULE_FILE
+
+# Serial port rule
+SERIAL_RULE_FILE=/etc/udev/rules.d/52-volvo-rtvi-serial.rules
+echo 'KERNEL=="ttyS0", MODE="0660", GROUP="plugdev"' | sudo tee $SERIAL_RULE_FILE
 
 if [[ $? -eq 0 ]]; then
-	echo -e Permissions created'\n'
-    else
-	echo -e Unable to create permissions'\n'
+    echo -e "Permissions created\n"
+else
+    echo -e "Unable to create permissions\n"
 fi
+
 
 echo "Downloading volvo-rtvi"
 curl -L https://github.com/LRYMND/volvo-rtvi/releases/download/ --output /home/$USER/volvo-rtvi

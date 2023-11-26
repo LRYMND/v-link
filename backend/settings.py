@@ -28,7 +28,7 @@ def load_settings(setting):
     # Load or create the settings file
     if not os.path.exists(destination_path):
         try:
-            shutil.copyfile(os.path.join(os.path.dirname(__file__), "settings", default_settings_file), destination_path)
+            shutil.copyfile(os.path.join(os.path.dirname(__file__), "config", default_settings_file), destination_path)
             print(f"Created settings file at: '{destination_path}'")
         except Exception as e:
             print(f"Error copying default settings file: {e}")
@@ -71,7 +71,7 @@ def reset_settings(setting):
 
     # Reset the settings to the original state
     try:
-        shutil.copyfile(os.path.join(os.path.dirname(__file__), "settings", default_settings_file), destination_path)
+        shutil.copyfile(os.path.join(os.path.dirname(__file__), "config", default_settings_file), destination_path)
         print(f"Reset {setting}-settings to the original state.")
     except Exception as e:
         print(f"Error resetting settings: {e}")

@@ -1,0 +1,7 @@
+Flask
+Flask-SocketIO
+Flask-CORS
+python-can
+python-socketio
+werkzeug
+pyautogui

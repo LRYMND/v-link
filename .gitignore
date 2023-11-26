@@ -1,7 +1,10 @@
 #directories
-node_modules
+node_modules/
 backend/__pycache__/
 backend/venv/
+.notes/
+venv/
+__pycache__/
 
 
 #files
@@ -10,3 +13,4 @@ backend/venv/
 *.apk
 ._*
 .DS*
+*.py[cod]

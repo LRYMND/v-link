@@ -17,7 +17,7 @@ import Settings from '../settings/Settings';
 import "./../../../themes.scss"
 import './home.scss';
 
-const canbusChannel   = io("ws://localhost:4001/canbus")
+const canbusChannel = io("ws://localhost:4001/canbus")
 const settingsChannel = io("ws://localhost:4001/settings")
 const versionNumber = "2.0"
 
@@ -44,18 +44,13 @@ const Home = ({
 
   // Connection state variables
   const [wifiState, setWifiState] = useState(false);
+  const [canState, setCanState] = useState(false);
 
   // Canbus state variable
   const [carData, setCarData] = useState({})
 
   useEffect(() => {
-    // Initial request for settings when component mounts
-    settingsChannel.emit("requestSettings", "application");
-    settingsChannel.emit("requestSettings", "canbus");
-  }, []);
-
-  useEffect(() => {
-    //Dummyvalues
+    // Initialize cardata object
     setCarData({
       intake: 0,
       boost: 0,
@@ -67,26 +62,35 @@ const Home = ({
 
     // Event listener for receiving settings data
     const handleApplicationSettings = (data) => {
-      console.log("Data received from socket:", data);
+      console.log("App-settings received from socket:", data);
       setApplicationSettings(data);
     };
 
     const handleCanbusSettings = (data) => {
-      console.log("Data received from socket:", data);
+      console.log("CAN-settings received from socket:", data);
       setCanbusSettings(data);
+    };
+
+    const handleCanbusStatus = (data) => {
+      console.log("CAN-status received from socket:", data);
+      setCanState(data);
     };
 
     settingsChannel.on("application", handleApplicationSettings);
     settingsChannel.on("canbus", handleCanbusSettings);
+    canbusChannel.on("status", handleCanbusStatus);
 
-    // Cleanup function for removing the event listener when the component is unmounted
+    settingsChannel.emit("requestSettings", "application");
+    settingsChannel.emit("requestSettings", "canbus");
+    canbusChannel.emit("requestStatus");
+
     return () => {
       settingsChannel.off("application", handleApplicationSettings);
-      settingsChannel.off("canbus", handleCanbusSettings);
+      canbusChannel.off("canbus", handleCanbusSettings);
     };
   }, []);
 
-  
+
   useEffect(() => {
     canbusChannel.on("data", (data) => { updateCardata(data) });
     return () => {
@@ -117,7 +121,7 @@ const Home = ({
       Object.keys(canbusSettings.messages).forEach((key) => {
         const message = canbusSettings.messages[key];
         const rtviId = message.rtvi_id;
-  
+
         if (data.includes(rtviId)) {
           const value = data.replace(rtviId, "");
           setCarData((prevState) => ({ ...prevState, [key]: Number(value).toFixed(2) }));
@@ -125,7 +129,7 @@ const Home = ({
       });
     }
   };
-  
+
   useEffect(() => {
     console.log("phone connected: ", phoneState)
     console.log("view: ", view)
@@ -176,6 +180,7 @@ const Home = ({
       case 'Settings':
         return (
           <Settings
+            canState={canState}
             canbusSettings={canbusSettings}
             applicationSettings={applicationSettings}
             setApplicationSettings={setApplicationSettings}

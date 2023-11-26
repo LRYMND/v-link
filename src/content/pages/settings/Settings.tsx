@@ -8,9 +8,10 @@ import "./../../../styles.scss"
 import './settings.scss';
 
 const settingsChannel = io("ws://localhost:4001/settings")
+const canbusChannel = io("ws://localhost:4001/canbus")
 const ioChannel = io("ws://localhost:4001/io")
 
-const Settings = ({ canbusSettings, applicationSettings, versionNumber }) => {
+const Settings = ({ canState, canbusSettings, applicationSettings, versionNumber }) => {
 
   // Wifi state variables
   const { wifiModalIsShowing, wifiModalToggle } = useModal();
@@ -24,6 +25,10 @@ const Settings = ({ canbusSettings, applicationSettings, versionNumber }) => {
       setNewSettings(structuredClone(applicationSettings))
     console.log("app settings received in settings page:", applicationSettings)
   }, [applicationSettings]);
+
+  useEffect(() => {
+    console.log(canState)
+  }, [canState]);
 
 
   /* Change Tabs */
@@ -68,6 +73,11 @@ const Settings = ({ canbusSettings, applicationSettings, versionNumber }) => {
     ioChannel.emit("performIO", request);
   }
 
+  /* I/O Functionality */
+  function handleCAN() {
+    canbusChannel.emit("toggle");
+    canbusChannel.emit("requestStatus");
+  }
 
   /* Render Settings */
   function renderSetting(key, handleSettingChange, settingsObj) {
@@ -160,13 +170,13 @@ const Settings = ({ canbusSettings, applicationSettings, versionNumber }) => {
         />
         */}
 
-        <div className='settings__header'>
-          <h2>RTVI Settings</h2>
-        </div>
-
         <div className='settings__body'>
+
           <div className='section'>
             <div className='section__1'>
+              <div className='settings__header'>
+                <h2>RTVI Settings</h2>
+              </div>
               <div className='section__frame'>
                 <div className='section__frame__row'>
                   <h3>Wireless Connections:</h3>
@@ -189,14 +199,14 @@ const Settings = ({ canbusSettings, applicationSettings, versionNumber }) => {
 
                   <div className='section__frame__row'>
                     <div className='section__frame__column'>
-                      <button className='round-button button-styles button-background' type='button' onClick={() => {handleIO('reboot')}}>Reboot</button>
-                      <button className='round-button button-styles button-background' type='button' onClick={() => {handleIO('restart')}}>Restart</button>
+                      <button className='round-button button-styles button-background' type='button' onClick={() => { handleIO('reboot') }}>Reboot</button>
+                      <button className='round-button button-styles button-background' type='button' onClick={() => { handleIO('restart') }}>Restart</button>
                     </div>
 
 
                     <div className='section__frame__column'>
-                      <button className='round-button button-styles button-background' type='button' onClick={() => {handleIO('quit')}}>Quit</button>
-                      <button className='round-button button-styles button-background' type='button' onClick={() => {handleIO('reset')}}>Reset</button>
+                      <button className='round-button button-styles button-background' type='button' onClick={() => { handleIO('quit') }}>Quit</button>
+                      <button className='round-button button-styles button-background' type='button' onClick={() => { handleIO('reset') }}>Reset</button>
                     </div>
                   </div>
 
@@ -215,7 +225,7 @@ const Settings = ({ canbusSettings, applicationSettings, versionNumber }) => {
                     <button className={`square-button button-styles button-background ${activeTab === 1 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(1)}> General </button>
                     <button className={`square-button button-styles button-background ${activeTab === 2 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(2)}> Customization </button>
                     {/* <button className={`tab-button ${activeTab === 3 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(3)}> Vehicle </button> */}
-                    {applicationSettings.dev.advancedSettings.value ? <button className={`square-button button-styles button-background ${activeTab === 4 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(4)}> Advanced </button> : <></>}
+                    {applicationSettings.dev.advancedSettings.value ? <button className={`square-button button-styles button-background ${activeTab === 0 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(0)}> Advanced </button> : <></>}
                   </div>
 
                   {activeTab === 1 &&
@@ -223,6 +233,17 @@ const Settings = ({ canbusSettings, applicationSettings, versionNumber }) => {
                       {renderSetting("app", handleSettingChange, newSettings)}
                       {renderSetting("interface", handleSettingChange, newSettings)}
                       {renderSetting("connections", handleSettingChange, newSettings)}
+
+                      <div className='setting-elements__row'>
+                        <div className='setting-elements__row__item'>
+                          <span>CAN Worker {canState ? "(Inactive)" : "(Active)"}</span>
+                          <span className='setting-elements__row__divider'></span>
+                          <span>
+                          <button className='round-button button-styles button-background' type='button' onClick={() => { handleCAN() }}>{canState ? "On" : "Off"}</button>
+                          </span>
+                        </div>
+                      </div>
+
                       {renderSetting("dev", handleSettingChange, newSettings)}
                     </div>
                   }
@@ -245,7 +266,7 @@ const Settings = ({ canbusSettings, applicationSettings, versionNumber }) => {
                   }
 
 
-                  {activeTab === 4 &&
+                  {activeTab === 0 &&
                     <div className='scroller__container__content scrollbar-styles'>
                       {renderSetting("carplay", handleSettingChange, newSettings)}
                     </div>

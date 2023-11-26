@@ -1,137 +1,112 @@
-import json
-from flask import Flask, send_from_directory, render_template
-from flask_socketio import SocketIO
-from flask_cors import CORS 
-import canbus
-import settings
-import os
-import subprocess
 import threading
 import time
+import os
+import subprocess
+import eventlet
 
-# Global variable to hold the reference to the CAN bus thread
-can_thread = None
+from werkzeug.serving       import run_with_reloader
+from flask                  import Flask, send_from_directory, render_template
+from flask_socketio         import SocketIO
+from flask_cors             import CORS
 
-# Frontend port (Dev: 5173 | Production: 4001)
-port = 4001
+from .                      import settings
+from .shared.shared_state   import shared_state
 
 # Flask configuration
-app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), '..', 'dist'), static_folder=os.path.join(os.path.dirname(__file__), '..', 'dist', 'assets'), static_url_path='/assets')
-app.config['SECRET_KEY'] = 'your_secret_key'
-CORS(app, resources={r"/*": {"origins": "*"}})
+server = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), '..', 'dist'), static_folder=os.path.join(os.path.dirname(__file__), '..', 'dist', 'assets'), static_url_path='/assets')
+server.config['SECRET_KEY'] = 'your_secret_key'
+CORS(server, resources={r"/*": {"origins": "*"}})
 
 # Socket.io configuration
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+socketio = SocketIO(server, cors_allowed_origins="*", async_mode='eventlet')
 
-# Add custom headers to all responses
-@app.after_request
-def after_request(response):
-    return response
+class ServerThread(threading.Thread):
 
-# Route to serve the index.html file
-@app.route('/')
-def serve_index():
-    return render_template('index.html')
+    def __init__(self, isDev):
+        threading.Thread.__init__(self)
+        self.isDev = isDev
+        self.daemon = True
+        self.app = server
+        self.socketio = socketio
+        self.server = None  # Initialize self.server
+        self.current_state = {}
+        self.toggle_event = shared_state.toggle_event
+        self.THREAD_STATES = shared_state.THREAD_STATES
 
-# Route to serve static files (js, css, etc.) from the 'dist/assets' folder
-@app.route('/assets/<path:filename>')
-def serve_assets(filename):
-    response = send_from_directory(os.path.join(os.path.dirname(__file__), '..', 'dist', 'assets'), filename)
-    response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
-    response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
-    return response
+    def run(self):
+        print('Starting Server...')
+        self.server = eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 4001)), self.app, log=open(os.devnull,"w"))
 
-# Function to start Chromium in its own thread
-def start_chromium():
-    subprocess.Popen("chromium-browser --app=http://localhost:" + str(port) + " --window-size=800,440 --disable-features=OverlayScrollbar", shell=True)
-
-# Function to stop Chromium
-def stop_chromium():
-    subprocess.Popen("pkill -o chromium", shell=True)
-
-# Function to start the CAN bus thread
-def start_canbus():
-    global can_thread
-    if can_thread is None or not can_thread.is_alive():
-        can_thread = threading.Thread(target=canbus.main)
-        can_thread.start()
-
-# Function to stop the CAN bus thread
-def stop_canbus():
-    global can_thread
-    if can_thread is not None and can_thread.is_alive():
-        can_thread.join()  # Wait for the thread to finish
-
-# Send notification when frontend connects via socket.io
-@socketio.on('connect')
-def handle_connect():
-    print("Client connected")
-
-# Activate canbus stream
-@socketio.on('toggle', namespace='/canbus')
-def handle_canbus_request(args):
-    print('toggle canbus: ' + args)
-
-    if args == 'on':
-        start_canbus()
-        print('start canbus')
-    elif args == 'off':
-        stop_canbus()
-        print('stop canbus')
-    else:
-        print('Unknown action:', args)
-
-# Return settings object to frontend via socket.io
-@socketio.on('data', namespace='/canbus')
-def handle_can_data(data):
-    socketio.emit('data', data, namespace='/canbus')
+    def stop_thread(self):
+        print('Stopping Server...')
+        if self.server:
+            self.server.stop()
+            self.server = None  # Reset self.server to avoid AttributeError
 
 
-# Return settings object to frontend via socket.io
-@socketio.on('requestSettings', namespace='/settings')
-def handle_request_settings(args):
-    socketio.emit(args, settings.load_settings(args), namespace='/settings')
+    # Add custom headers to all responses
+    @server.after_request
+    def after_request(response):
+        return response
 
-# Save settings object from frontend to .config directory
-@socketio.on('saveSettings', namespace='/settings')
-def handle_save_settings(args, data):
-    print('settings saving for: ' + args)
-    settings.save_settings(args, data)
-    socketio.emit(args, settings.load_settings(args), namespace='/settings')
+    # Route to serve the index.html file
+    @server.route('/')
+    def serve_index():
+        return render_template('index.html')
 
-@socketio.on('performIO', namespace='/io')
-def handle_perform_io(args):
-    print('Executing io: ' + args)
+    # Route to serve static files (js, css, etc.) from the 'dist/assets' folder
+    @server.route('/assets/<path:filename>')
+    def serve_assets(filename):
+        response = send_from_directory(os.path.join(os.path.dirname(__file__), '..', 'dist', 'assets'), filename)
+        response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
+        response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
+        return response
 
-    if args == 'reboot':
-        subprocess.run("sudo reboot -h now", shell=True)
-    elif args == 'restart':
-        stop_chromium()
-        start_chromium()
-    elif args == 'quit':
-        stop_chromium()
-    elif args == 'reset':
-        settings.reset_settings("application")
-        socketio.emit("application", settings.load_settings("application"), namespace='/settings')
-    else:
-        print('Unknown action:', args)
+    # Send notification when frontend connects via socket.io
+    @socketio.on('connect')
+    def handle_connect():
+        print("Client connected")
 
-if __name__ == '__main__':
-    # Create threads for Socket.IO and CAN bus
-    socketio_thread = threading.Thread(target=lambda: socketio.run(app, host='0.0.0.0', port=4001))
-    canbus_thread = threading.Thread(target=start_canbus)
+    # Return settings object to frontend via socket.io
+    @socketio.on('requestSettings', namespace='/settings')
+    def handle_request_settings(args):
+        socketio.emit(args, settings.load_settings(args), namespace='/settings')
 
-    # Start the Socket.IO thread
-    print("Starting Server")
-    socketio_thread.start()
+    # Save settings object from frontend to .config directory
+    @socketio.on('saveSettings', namespace='/settings')
+    def handle_save_settings(args, data):
+        print('settings saving for: ' + args)
+        settings.save_settings(args, data)
+        socketio.emit(args, settings.load_settings(args), namespace='/settings')
 
-    # Wait for a moment to ensure Socket.IO thread is running
-    time.sleep(1)
+    # Return settings object to frontend via socket.io
+    @socketio.on('requestStatus', namespace='/canbus')
+    def emit_can_status():
+        socketio.emit('status', shared_state.THREAD_STATES["Canbus"], namespace='/canbus')
 
-    # Start the CAN bus thread
-    print("Start Canbus Worker")
-    canbus_thread.start()
+    # Return settings object to frontend via socket.io
+    @socketio.on('data', namespace='/canbus')
+    def handle_can_data(data):
+        socketio.emit('data', data, namespace='/canbus')
 
-    # Wait for both threads to finish
-    socketio_thread.join()
-    canbus_thread.join()
+    # Toggle canbus stream
+    @socketio.on('toggle', namespace='/canbus')
+    def handle_canbus_request():
+        shared_state.toggle_event.set()
+
+    # Toggle linbus stream
+    @socketio.on('toggle', namespace='/linbus')
+    def handle_linbus_request():
+        print('toggle')
+
+    @socketio.on('performIO', namespace='/io')
+    def handle_perform_io(args):
+        print('Executing io: ' + args)
+
+        if args == 'reboot':
+            subprocess.run("sudo reboot -h now", shell=True)
+        elif args == 'reset':
+            settings.reset_settings("application")
+            socketio.emit("application", settings.load_settings("application"), namespace='/settings')
+        else:
+            print('Unknown action:', args)
