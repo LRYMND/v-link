@@ -13,7 +13,7 @@ from .                      import settings
 from .shared.shared_state   import shared_state
 
 # Flask configuration
-server = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), '..', 'dist'), static_folder=os.path.join(os.path.dirname(__file__), '..', 'dist', 'assets'), static_url_path='/assets')
+server = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist'), static_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist', 'assets'), static_url_path='/assets')
 server.config['SECRET_KEY'] = 'your_secret_key'
 CORS(server, resources={r"/*": {"origins": "*"}})
 
@@ -56,7 +56,7 @@ class ServerThread(threading.Thread):
     # Route to serve static files (js, css, etc.) from the 'dist/assets' folder
     @server.route('/assets/<path:filename>')
     def serve_assets(filename):
-        response = send_from_directory(os.path.join(os.path.dirname(__file__), '..', 'dist', 'assets'), filename)
+        response = send_from_directory(os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist', 'assets'), filename)
         response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
         response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
         return response
