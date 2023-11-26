@@ -5,6 +5,7 @@ import threading
 
 class SharedState:
     def __init__(self):
+        self.isDev = False
         self.toggle_event = threading.Event()
         self.THREAD_STATES = {
             "Server": False,

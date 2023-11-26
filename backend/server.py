@@ -22,9 +22,8 @@ socketio = SocketIO(server, cors_allowed_origins="*", async_mode='eventlet')
 
 class ServerThread(threading.Thread):
 
-    def __init__(self, isDev):
+    def __init__(self):
         threading.Thread.__init__(self)
-        self.isDev = isDev
         self.daemon = True
         self.app = server
         self.socketio = socketio

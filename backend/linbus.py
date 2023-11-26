@@ -44,11 +44,10 @@ class LinFrame:
         self.bytes = []
 
 class LinBusThread(threading.Thread):
-    def __init__(self, isDev):
+    def __init__(self):
         super(LinBusThread, self).__init__()
         
         self._stop_event = threading.Event()
-        self.isDev = isDev
         self.daemon = True
         self.linframe = LinFrame()
         self.config = Config()

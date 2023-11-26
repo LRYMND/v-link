@@ -2,16 +2,16 @@ import threading
 import time
 import sys
 import os
+import subprocess
 
 sys.path.append('/backend')
 from backend.server              import ServerThread
 from backend.canbus              import CanBusThread
 from backend.linbus              import LinBusThread
+from backend.browser             import BrowserThread
 
 from backend.dev.vcan            import VCanThread
 from backend.shared.shared_state import shared_state
-
-isDev=("dev" in sys.argv)
 
 # Event to signal thread state changes
 state_change_event = threading.Event()
@@ -19,22 +19,24 @@ state_change_event = threading.Event()
 class RTVI:
     def __init__(self):
         self.threads = {
-            "Server": ServerThread(isDev=isDev),
-            "Canbus": CanBusThread(isDev=isDev),
-            #"Linbus": LinBusThread(isDev)
-            "VCan": VCanThread(isDev=isDev),
+            "VCan": VCanThread(),
+            "Browser": BrowserThread(),
+            "Server": ServerThread(),
+            "Canbus": CanBusThread(),
+            #"Linbus": LinBusThread()
         }
-
-        self.start_thread("Server")
 
         self.toggle_event = shared_state.toggle_event
         self.THREAD_STATES = shared_state.THREAD_STATES
+
+        self.start_thread("Server")
+
 
     def start_thread(self, thread_name):
         thread_class = self.threads[thread_name].__class__
 
         if not self.threads[thread_name].is_alive():
-            self.threads[thread_name] = thread_class(isDev=isDev)
+            self.threads[thread_name] = thread_class()
             thread = self.threads[thread_name]
             thread.daemon = True
             thread.start()
@@ -84,6 +86,7 @@ class RTVI:
             self.toggle_thread("Canbus")  # Perform your desired action here
             self.toggle_event.clear()  # Reset the event
 
+
 def clear_screen():
     if os.name == 'nt':
         os.system('cls')
@@ -101,10 +104,14 @@ if __name__ == "__main__":
     rtvi = RTVI()
 
     if len(sys.argv) > 1 and sys.argv[1] == "dev":
+        shared_state.isDev = True
         choice = non_blocking_input("Start VCAN? (Y/N): ")
         if choice == 'Y':
             print("Starting VCAN...")
             rtvi.toggle_thread("VCan")
+
+    time.sleep(.1)
+    rtvi.start_thread("Browser")
 
     try:
         while(True):

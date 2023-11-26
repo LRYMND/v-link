@@ -4,6 +4,7 @@ import can
 import socketio
 import sys
 from . import settings
+from .shared.shared_state import shared_state
 
 class Config:
     def __init__(self):
@@ -41,9 +42,8 @@ class Config:
                 self.msg_ls.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, rtvi_id))
 
 class CanBusThread(threading.Thread):
-    def __init__(self, isDev):
+    def __init__(self):
         super(CanBusThread, self).__init__()
-        self.isDev=isDev
         self._stop_event = threading.Event()
         self.daemon = True
         self.client = socketio.Client()
@@ -57,7 +57,7 @@ class CanBusThread(threading.Thread):
 
     def initialize_canbus(self):
         try:
-            if(self.isDev):
+            if(shared_state.isDev):
                 self.can_bus = can.interface.Bus(channel='vcan0', bustype='socketcan', bitrate=500000)
             else:    
                 self.can_bus = can.interface.Bus(channel='can0', bustype='socketcan', bitrate=500000)    

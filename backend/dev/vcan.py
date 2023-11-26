@@ -6,12 +6,13 @@ import threading
 import subprocess
 import os
 
+from ..shared.shared_state import shared_state
+
 class VCanThread(threading.Thread):
-    def __init__(self, isDev):
+    def __init__(self):
         super(VCanThread, self).__init__()
         self._stop_event = threading.Event()
         self.daemon = True
-        self.isDev = isDev
         self.can_bus = None
 
         # Initial values
