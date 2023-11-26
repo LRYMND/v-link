@@ -130,7 +130,6 @@ class CanBusThread(threading.Thread):
 
             data = message[5] + str(float(converted_value))
             self.emit_data_to_frontend(data)
-            print(data)
             sys.stdout.flush()
             return True
         else:

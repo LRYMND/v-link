@@ -2,7 +2,6 @@ import threading
 import time
 import sys
 import os
-import subprocess
 
 sys.path.append('/backend')
 from backend.server              import ServerThread
@@ -13,20 +12,20 @@ from backend.browser             import BrowserThread
 from backend.dev.vcan            import VCanThread
 from backend.shared.shared_state import shared_state
 
-# Event to signal thread state changes
 state_change_event = threading.Event()
 
 class RTVI:
     def __init__(self):
         self.threads = {
-            "VCan": VCanThread(),
-            "Browser": BrowserThread(),
-            "Server": ServerThread(),
-            "Canbus": CanBusThread(),
-            #"Linbus": LinBusThread()
+            "VCan":     VCanThread(),
+            "Browser":  BrowserThread(),
+            "Server":   ServerThread(),
+            "Canbus":   CanBusThread(),
+            #"Linbus":  LinBusThread()
         }
 
         self.toggle_event = shared_state.toggle_event
+        self.exit_event = shared_state.exit_event
         self.THREAD_STATES = shared_state.THREAD_STATES
 
         self.start_thread("Server")
@@ -64,11 +63,9 @@ class RTVI:
             self.start_thread(thread_name)
 
     def join_threads(self):
-        # Stop the threads
         for thread_name in self.threads:
             self.stop_thread(thread_name)
 
-        # Join the threads
         for thread_name, thread in self.threads.items():
             if thread.is_alive():
                 thread.join()
@@ -83,8 +80,16 @@ class RTVI:
 
     def process_toggle_event(self):
         if self.toggle_event.is_set():
-            self.toggle_thread("Canbus")  # Perform your desired action here
-            self.toggle_event.clear()  # Reset the event
+            self.toggle_thread("Canbus")
+            self.toggle_event.clear()
+
+    def process_exit_event(self):
+        if self.exit_event.is_set():
+            #self.join_threads()
+            shared_state.browser_event.set()
+            time.sleep(1)
+            sys.exit(0)
+
 
 
 def clear_screen():
@@ -106,19 +111,21 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "dev":
         shared_state.isDev = True
         choice = non_blocking_input("Start VCAN? (Y/N): ")
-        if choice == 'Y':
+        if choice.lower() == 'y':
             print("Starting VCAN...")
             rtvi.toggle_thread("VCan")
 
     time.sleep(.1)
     rtvi.start_thread("Browser")
+    rtvi.start_thread("Canbus")
 
     try:
         while(True):
             rtvi.process_toggle_event()
+            rtvi.process_exit_event()
             time.sleep(.1)
     except KeyboardInterrupt:
             print("\nExiting... Stopping threads.")
-            rtvi.join_threads()
+            #rtvi.join_threads()
             sys.exit(0)
     

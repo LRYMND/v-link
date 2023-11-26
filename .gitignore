@@ -4,7 +4,9 @@ backend/__pycache__/
 backend/venv/
 .notes/
 venv/
+.vite/
 __pycache__/
+package/
 
 
 #files

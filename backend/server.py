@@ -1,5 +1,4 @@
 import threading
-import time
 import os
 import subprocess
 import eventlet
@@ -29,7 +28,6 @@ class ServerThread(threading.Thread):
         self.socketio = socketio
         self.server = None  # Initialize self.server
         self.current_state = {}
-        self.toggle_event = shared_state.toggle_event
         self.THREAD_STATES = shared_state.THREAD_STATES
 
     def run(self):
@@ -100,12 +98,13 @@ class ServerThread(threading.Thread):
 
     @socketio.on('performIO', namespace='/io')
     def handle_perform_io(args):
-        print('Executing io: ' + args)
-
-        if args == 'reboot':
+        if   args == 'reboot':
             subprocess.run("sudo reboot -h now", shell=True)
         elif args == 'reset':
             settings.reset_settings("application")
             socketio.emit("application", settings.load_settings("application"), namespace='/settings')
+        elif args == 'quit':
+            shared_state.exit_event.set()
+
         else:
             print('Unknown action:', args)

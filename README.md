@@ -1,11 +1,11 @@
 # Volvo RTVI System
 Road Traffic and Vehicle Infotainment
 
-![TITLE IMAGE](repo/title2.jpg?raw=true "Title")  
+![TITLE IMAGE](repo/media/title2.jpg?raw=true "Title")  
 
 This is a react web-app to run natively on Mac/Linux and therefore also on a RaspberryPi. It's providing a fully functioning Carplay/AndroidAuto integration as well as an interface for canbus and linbus. The app is intended for Volvo P-chassis with a T5 engine (C30, V50, V70 II). However, the canbus codes can be easily adjusted with an exposed settings file in order to change the data.
 
-![PAGES IMAGE](repo/pages.jpg?raw=true "Pages")  
+![PAGES IMAGE](repo/media/pages.jpg?raw=true "Pages")  
 
 > You can find a demo gif at the end of the readme.
 
@@ -24,11 +24,22 @@ Join our discussion on [Swedespeed](https://www.swedespeed.com/threads/volvo-rtv
 
 ### > How to use:
 ```
-git clone https://github.com/lrymnd/volvo-rtvi.git
-cd volvo-rtvi
-npm i
-npm build
-npm run app / dev / kiosk
+Production:
+1.) Download Installer.sh
+2.) sh Installer.sh
+
+@volvo-rtvi/: python Volvo-RTVI-2.0.0.py
+```
+```
+Development:
+1.) git clone https://github.com/lrymnd/volvo-rtvi.git
+2.) cd volvo-rtvi
+3.) pip install -r requirements.txt
+4.) cd frontend
+5.) npm i & npm run build
+
+@volvo-rtvi/frontend/: npm run vite
+@volvo-rtvi/: python Volvo-RTVI-2.0.0.py dev
 ```
 
 ---
@@ -83,7 +94,7 @@ The app runs on a RPi3 as well as on a RPi4 with OS Buster and Bullseye, both on
 This guide involves adding an aftermarket touchscreen to the 6.5" LCD to enhance the usability. This is optional but it's highly recommended! To swap the display, you will have to disassemble your original RTI unit and take the original display components out. Afterwards you will need to mount the touchscreen to your LCD panel and mount the new display/touchscreen unit into the RTI frame. The buck converter as well as the display and touch screen drivers are mounted to the backside of the LCD panel because space is quite limited.
 
 
-![SCREENMOD IMAGE](repo/screenmod.jpg?raw=true "Screen Mod")
+![SCREENMOD IMAGE](repo/media/screenmod.jpg?raw=true "Screen Mod")
 
 ---
 
@@ -114,8 +125,8 @@ Make sure that you also set up the automatic CAN channel activation on boot!
 
 In the installation schematic you can see how you connect everything. Keep the cables longer in the beginning and then shorten everything to the appropriate length once you install the package in your car.
 
-![PACKAGE2 IMAGE](repo/package2.jpg?raw=true "Package2")
-![PACKAGE IMAGE](repo/package.jpg?raw=true "Package")
+![PACKAGE2 IMAGE](repo/media/package2.jpg?raw=true "Package2")
+![PACKAGE IMAGE](repo/media/package.jpg?raw=true "Package")
 
 The easiest way is to mount the wires to the pins of the CEM connectors. This way you are not destroying or splicing any harnesses, the pins can be found easily in the documentation and you can rebuild everything back to factory if you decide to undo the mod for whatever reason. The idea is to have a small additional wire harness to run your entire setup. Keep in mind to choose wires that are not too thick so you can put the pin back into the connector. This is especially an issue with the CAN wiring.
 
@@ -129,7 +140,7 @@ You need to make the following connections.
 | IGN         | A         | 17  |
 | 12V         | E         | 21  |
 
-![EWD SCHEMATIC](repo/ewdschematic.jpeg?raw=true "EWD Schematic")
+![EWD SCHEMATIC](repo/media/ewdschematic.jpeg?raw=true "EWD Schematic")
 (Borrowed from the original Volvo Electronic Wiring Diagrams)
 
 ### > Note:
@@ -138,20 +149,20 @@ Make sure that you stress-relief all wiring connections and secure them properly
 
 ---
 
-![WIRING IMAGE](repo/wiring.jpg?raw=true "Wiring")
+![WIRING IMAGE](repo/media/wiring.jpg?raw=true "Wiring")
 
 ## 06 | Set Up
 
 ### > Installing the app:
 
 ```
-Launch the script "RTVI-web-app-installer.sh" in order to install the app.
+Launch the script "Installer.sh" in order to install the app.
 ```
 
 ### > Running the app:
 
 ```
-Launch the script "run.sh" in order to run the app.
+python Volvo-RTVI-2.0.0.py
 ```
 
 ---
@@ -174,14 +185,14 @@ In order to implement the steering wheel controls, you need to connect the Raspb
 
 The LIN Bus wire must be connected to pin 6 of the LIN bus transceiver labeled "Lbus".
 
-![MCP2004_PINOUT_IMAGE](repo/MCP2004_pinout.png?raw=true "LIN Transceiver pinout")
+![MCP2004_PINOUT_IMAGE](repo/media/MCP2004_pinout.png?raw=true "LIN Transceiver pinout")
 
 
 The easiest place to find the LIN Bus is the "ICM Connector A" behind the waterfall. Either connect a DuPont wire to the associated pin or disassemble the ICM and solder a small wire to it.
 
 | LIN Connector | LIN Connection |
 | ----------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| ![ICM_CONNECTOR_IMAGE](repo/icm_connector.png?raw=true "LIN Connector") | ![ICM_CONNECTION_IMAGE](repo/icm_connection.jpg?raw=true "LIN Connection") |
+| ![ICM_CONNECTOR_IMAGE](repo/media/icm_connector.png?raw=true "LIN Connector") | ![ICM_CONNECTION_IMAGE](repo/media/icm_connection.jpg?raw=true "LIN Connection") |
 
 
 Connect RX, TX and CS from the MCP2004 to LIN_RX_PIN, LIN_TX_PIN and CS_PIN respectively. After testing, it turned out that it was not necessary to connect the Fault pin to the Arduino. In Laurynas' volvo_linbus repo, this fault pin is connected in the scheme but there is a typo in the code, so it's not used.
@@ -190,7 +201,7 @@ Connect RX, TX and CS from the MCP2004 to LIN_RX_PIN, LIN_TX_PIN and CS_PIN resp
 
 Connect RTI_TX_PIN to pin 4 of the RTI unit. Again, either use a DuPont wire or solder directly to the RTI PCB/connector. Don't forget to also connect pin 7 (GND) to the Raspi or another common grounding point.
 
-![RTI_CONNECTOR_IMAGE](repo/rti_connector.png?raw=true "RTI Connector")
+![RTI_CONNECTOR_IMAGE](repo/media/rti_connector.png?raw=true "RTI Connector")
 
 When ignition is turned on, the RTI screen automatically folds up and you can use the joystick on the back of the steering wheel to navigate through CarPlay. When clicking on the 'Enter' button on the back of the steering wheel, the Arduino sends an ASCII 'space' event (spacebar) to navigate the app. (CarPlay requires this instead of a left click or a return/enter)
 
@@ -214,7 +225,7 @@ Holding down 'prev' button for 2 seconds toggles between normal and mouse mode. 
 
 ### > Adding Peripherals
 
-![USB IMAGE](repo/usb.jpg?raw=true "USB")
+![USB IMAGE](repo/media/usb.jpg?raw=true "USB")
 
 To make life a bit easier, you can connect an USB extension cable to the Raspi and mount it to the removable tray behind the waterfall console. This way you can directly connect peripherals to it.
 
@@ -234,7 +245,7 @@ To make life a bit easier, you can connect an USB extension cable to the Raspi a
 
 I am distancing myself from any damage that you might do to your car in case you want to follow this guide. The setup described above is the way we fitted the package to our cars. Eventually you will need to find other places to mount your components and different paths to route your cables, it's DIY after all!
 
-![DEMOGIF](repo/demo.gif?raw=true "Demo")
+![DEMOGIF](repo/media/demo.gif?raw=true "Demo")
 (Outdated - Version 1.2.1)
 
 Got any tips for improvement or need help?  

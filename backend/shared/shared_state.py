@@ -14,4 +14,7 @@ class SharedState:
             "VCan": False,
         }
 
+        self.exit_event = threading.Event()
+        self.browser_event = threading.Event()
+
 shared_state = SharedState()
