@@ -187,7 +187,7 @@
             "target": "0x7A",
             "is_16bit": true,
             "refresh_rate": "high",
-            "scale": "(value * 512) / 65536.0))",
+            "scale": "(value * 512) / 65536.0",
             "label": "Speed",
             "unit": "km/h",
             "min_value": 0,

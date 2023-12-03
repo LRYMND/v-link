@@ -1,5 +1,6 @@
 import threading
 import os
+import time
 import subprocess
 import eventlet
 
@@ -27,8 +28,6 @@ class ServerThread(threading.Thread):
         self.app = server
         self.socketio = socketio
         self.server = None  # Initialize self.server
-        self.current_state = {}
-        self.THREAD_STATES = shared_state.THREAD_STATES
 
     def run(self):
         print('Starting Server...')
@@ -88,16 +87,16 @@ class ServerThread(threading.Thread):
 
     # Toggle canbus stream
     @socketio.on('toggle', namespace='/canbus')
-    def handle_canbus_request():
-        shared_state.toggle_event.set()
+    def handle_toggle_request():
+        shared_state.toggle_can.set()
 
     # Toggle linbus stream
     @socketio.on('toggle', namespace='/linbus')
     def handle_linbus_request():
         print('toggle')
 
-    @socketio.on('performIO', namespace='/io')
-    def handle_perform_io(args):
+    @socketio.on('systemTask', namespace='/system')
+    def handle_system_task(args):
         if   args == 'reboot':
             subprocess.run("sudo reboot -h now", shell=True)
         elif args == 'reset':
@@ -105,6 +104,14 @@ class ServerThread(threading.Thread):
             socketio.emit("application", settings.load_settings("application"), namespace='/settings')
         elif args == 'quit':
             shared_state.exit_event.set()
+        elif args == 'restart':
+            shared_state.toggle_browser.set()
+            shared_state.toggle_can.set()
+
+            time.sleep(5)
+            
+            shared_state.toggle_can.set()
+            shared_state.toggle_browser.set()
 
         else:
             print('Unknown action:', args)

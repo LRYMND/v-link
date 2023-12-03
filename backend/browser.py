@@ -10,20 +10,21 @@ class BrowserThread(threading.Thread):
     def __init__(self):
         super().__init__()
         self.url = f"http://localhost:{5173 if shared_state.isDev else 4001}"
-        self.browser_process = None
-        self.browser_event = shared_state.browser_event
+        self.browser = None
+        self._stop_event = threading.Event()
 
     def run(self):
         self.start_browser()
 
-        while(True):
-            self.process_browser_event()
+        while not self._stop_event.is_set():
+            if(shared_state.toggle_browser.is_set()):
+                self._stop_event.set()
+                self.stop_thread()
             time.sleep(.1)
 
-    def process_browser_event(self):
-        if(self.browser_event.isSet()):
-            self.close_browser()
-            self.browser_event.clear() 
+    def stop_thread(self):
+        self.close_browser()
+        shared_state.toggle_browser.clear()
 
 
     def start_browser(self):
@@ -34,16 +35,16 @@ class BrowserThread(threading.Thread):
             flags = "--window-size=800,480 --kiosk --enable-features=SharedArrayBuffer --autoplay-policy=no-user-gesture-required"
             command = f"chromium-browser --app={self.url} {flags}"
 
-        self.browser_process = subprocess.Popen(command, shell=True)
-        print(f"Chromium browser started with PID: {self.browser_process.pid}")
+        self.browser = subprocess.Popen(command, shell=True)
+        print(f"Chromium browser started with PID: {self.browser.pid}")
 
     def close_browser(self):
-        if self.browser_process:
+        if self.browser:
             print(f"Closing Chromium")
             try:
                 # Use subprocess to run a command that kills the process and its children
-                subprocess.run(['pkill', '-P', str(self.browser_process.pid)])
-                self.browser_process.wait()
+                subprocess.run(['pkill', '-P', str(self.browser.pid)])
+                self.browser.wait()
                 print("Chromium browser closed.")
             except subprocess.CalledProcessError:
                 # Handle possible exceptions

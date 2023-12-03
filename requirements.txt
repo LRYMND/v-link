@@ -5,3 +5,4 @@ python-can
 python-socketio
 werkzeug
 pyautogui
+eventlet

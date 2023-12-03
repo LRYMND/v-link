@@ -12,10 +12,9 @@ from backend.browser             import BrowserThread
 from backend.dev.vcan            import VCanThread
 from backend.shared.shared_state import shared_state
 
-state_change_event = threading.Event()
-
 class RTVI:
     def __init__(self):
+        self.exit_event = shared_state.exit_event
         self.threads = {
             "VCan":     VCanThread(),
             "Browser":  BrowserThread(),
@@ -23,12 +22,6 @@ class RTVI:
             "Canbus":   CanBusThread(),
             #"Linbus":  LinBusThread()
         }
-
-        self.toggle_event = shared_state.toggle_event
-        self.exit_event = shared_state.exit_event
-        self.THREAD_STATES = shared_state.THREAD_STATES
-
-        self.start_thread("Server")
 
 
     def start_thread(self, thread_name):
@@ -41,7 +34,6 @@ class RTVI:
             thread.start()
             shared_state.THREAD_STATES[thread_name] = True
             print(f"{thread_name} thread started.")
-            state_change_event.set()
         else:
             print(f"{thread_name} thread is already running.")
 
@@ -54,13 +46,14 @@ class RTVI:
             thread.join()
             shared_state.THREAD_STATES[thread_name] = False
             print(f"{thread_name} thread stopped.")
-            state_change_event.set()
 
     def toggle_thread(self, thread_name):
         if shared_state.THREAD_STATES[thread_name]:
             self.stop_thread(thread_name)
         else:
             self.start_thread(thread_name)
+
+        self.print_thread_states()
 
     def join_threads(self):
         for thread_name in self.threads:
@@ -72,23 +65,27 @@ class RTVI:
                 shared_state.THREAD_STATES[thread_name] = False
         print("Done.")
 
-    def process_state_changes(self):
-        if state_change_event.is_set():
-            server_thread = self.threads["Server"]
-            server_thread.set_state(shared_state.THREAD_STATES.copy())
-            state_change_event.clear()
-
     def process_toggle_event(self):
-        if self.toggle_event.is_set():
+        if shared_state.toggle_can.is_set():
             self.toggle_thread("Canbus")
-            self.toggle_event.clear()
+            shared_state.toggle_can.clear()
+
+        if shared_state.toggle_browser.is_set():
+            self.toggle_thread("Browser")
+            shared_state.toggle_browser.clear()
+
 
     def process_exit_event(self):
         if self.exit_event.is_set():
-            #self.join_threads()
-            shared_state.browser_event.set()
+            self.exit_event.clear()
+            shared_state.toggle_browser.set()
             time.sleep(1)
             sys.exit(0)
+
+    def print_thread_states(self):
+        for thread_name, thread in self.threads.items():
+            state = "Alive" if thread.is_alive() else "Not Alive"
+            print(f"{thread_name} Thread: {state}")
 
 
 
@@ -108,6 +105,8 @@ def non_blocking_input(prompt):
 if __name__ == "__main__":
     rtvi = RTVI()
 
+    rtvi.start_thread("Server")
+
     if len(sys.argv) > 1 and sys.argv[1] == "dev":
         shared_state.isDev = True
         choice = non_blocking_input("Start VCAN? (Y/N): ")
@@ -116,8 +115,11 @@ if __name__ == "__main__":
             rtvi.toggle_thread("VCan")
 
     time.sleep(.1)
-    rtvi.start_thread("Browser")
     rtvi.start_thread("Canbus")
+    time.sleep(.1)
+    rtvi.start_thread("Browser")
+
+    rtvi.print_thread_states()
 
     try:
         while(True):

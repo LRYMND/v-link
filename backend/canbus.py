@@ -66,37 +66,27 @@ class CanBusThread(threading.Thread):
 
     def stop_thread(self):
         self._stop_event.set()
-        self.disconnect_from_socketio()
         self.stop_canbus()
 
     def stop_canbus(self):
-        try:
-            if self.can_bus:
-                self.can_bus.shutdown()
-        except Exception as e:
-            print(f'Error stopping CAN Bus: {e}')
+        if self.can_bus:
+            self.can_bus.shutdown()
 
     def connect_to_socketio(self):
-        max_retries = 5
+        max_retries = 10
         current_retry = 0
-        while not self.client.connected and current_retry < max_retries and not self._stop_event.is_set():
+        while not self.client.connected and current_retry < max_retries:
             try:
                 self.client.connect('http://localhost:4001', namespaces=['/canbus'])
             except Exception as e:
                 print(f"Socket.IO connection failed. Retry {current_retry}/{max_retries}. Error: {e}")
-                time.sleep(2)
+                time.sleep(.5)
                 current_retry += 1
 
         if self.client.connected:
             print("Socket.IO connected successfully")
         else:
             print("Failed to connect to Socket.IO.")
-
-    def disconnect_from_socketio(self):
-        print("Disconnecting Client")
-        self.client.disconnect()
-        if not self.client.connected:
-            print("Socket.IO disconnected.")
 
     def emit_data_to_frontend(self, data):
         if self.client and self.client.connected:

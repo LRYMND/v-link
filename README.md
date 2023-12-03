@@ -25,8 +25,9 @@ Join our discussion on [Swedespeed](https://www.swedespeed.com/threads/volvo-rtv
 ### > How to use:
 ```
 Production:
-1.) Download Installer.sh
-2.) sh Installer.sh
+1.) wget "https://github.com/LRYMND/volvo-rtvi/releases/download/v2.0.0/Installer.sh"
+2.) chmod +x Installer.sh
+3.) sh Installer.sh
 
 @volvo-rtvi/: python Volvo-RTVI-2.0.0.py
 ```

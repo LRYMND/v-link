@@ -21,7 +21,7 @@ done
 
 # Check if Python is installed
 if command -v python &>/dev/null; then
-    echo "Python is already installed."
+	echo "Python is already installed."
 else
     read -p "Python is not installed. Do you want to install it? [Y/N]" yn
     case $yn in
@@ -33,7 +33,7 @@ fi
 
 # Check if pip is installed
 if command -v pip &>/dev/null; then
-    echo "pip is already installed."
+	echo "pip is already installed."
 else
     read -p "pip is not installed. Do you want to install it? [Y/N]" yn
     case $yn in
@@ -43,8 +43,10 @@ else
     esac
 fi
 
+echo "Install Volvo RTVI?"
+
 while true; do
-    read -p "Install Volvo RTVI? [Y/N]" yn
+    read -p "[Y/N]" yn
     case $yn in
         [Yy]* ) break;;
         [Nn]* ) exit;;
@@ -77,7 +79,7 @@ download_url="https://github.com/LRYMND/volvo-rtvi/releases/download/v2.0.0/Volv
 output_path="/home/$USER/volvo-rtvi"
 
 # Download the file
-echo "Downloading volvo-rtvi..."
+echo "Downloading files to: $output_path"
 mkdir -p $output_path
 curl -L $download_url --output $output_path/Volvo-RTVI-2.0.0.zip
 
@@ -91,9 +93,13 @@ cd $output_path
 # Install requirements
 echo "Installing requirements..."
 pip install -r requirements.txt
-
+echo
+echo
 # Provide some feedback
 echo "Volvo-RTVI installation completed."
+
+echo
+echo
 
 while true; do
     read -p "Create autostart file for Volvo RTVI? [Y/N]" yn
@@ -102,7 +108,7 @@ while true; do
             sudo bash -c "cat > /etc/xdg/autostart/volvo-rtvi.desktop <<EOL
 [Desktop Entry]
 Name=Volvo RTVI
-Exec=python /home/$USER/volvo-rtvi/Volvo-RTVI-2.0.0.py
+Exec=python /home/$USER/volvo-rtvi/Volvo-RTVI.py
 Type=Application
 EOL"
             break;;
@@ -120,7 +126,7 @@ while true; do
     read -p "Do you want to start the Application now? [Y/N]" yn
     case $yn in
         [Yy]* ) 
-            python /home/$USER/volvo-rtvi/Volvo-RTVI-2.0.0.py
+            python /home/$USER/volvo-rtvi/Volvo-RTVI.py
             ;;
         [Nn]* ) 
             exit;;

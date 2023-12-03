@@ -1,11 +1,14 @@
 #directories
 node_modules/
-backend/__pycache__/
-backend/venv/
-.notes/
-venv/
-.vite/
 __pycache__/
+backend/__pycache__/
+venv/
+backend/venv/
+
+.notes/
+.vite/
+.devicetree/
+
 package/
 
 
@@ -13,6 +16,6 @@ package/
 *.tgz
 *.log
 *.apk
-._*
 .DS*
 *.py[cod]
+._*

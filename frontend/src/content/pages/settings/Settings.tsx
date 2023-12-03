@@ -9,7 +9,7 @@ import './settings.scss';
 
 const settingsChannel = io("ws://localhost:4001/settings")
 const canbusChannel = io("ws://localhost:4001/canbus")
-const ioChannel = io("ws://localhost:4001/io")
+const systemChannel = io("ws://localhost:4001/system")
 
 const Settings = ({ canState, canbusSettings, applicationSettings, versionNumber }) => {
 
@@ -69,8 +69,8 @@ const Settings = ({ canState, canbusSettings, applicationSettings, versionNumber
 
 
   /* I/O Functionality */
-  function handleIO(request) {
-    ioChannel.emit("performIO", request);
+  function systemTask(request) {
+    systemChannel.emit("systemTask", request);
   }
 
   /* I/O Functionality */
@@ -199,14 +199,14 @@ const Settings = ({ canState, canbusSettings, applicationSettings, versionNumber
 
                   <div className='section__frame__row'>
                     <div className='section__frame__column'>
-                      <button className='round-button button-styles button-background' type='button' onClick={() => { handleIO('reboot') }}>Reboot</button>
-                      <button className='round-button button-styles button-background' type='button' onClick={() => { handleIO('restart') }}>Restart</button>
+                      <button className='round-button button-styles button-background' type='button' onClick={() => { systemTask('reboot') }}>Reboot</button>
+                      <button className='round-button button-styles button-background' type='button' onClick={() => { systemTask('restart') }}>Restart</button>
                     </div>
 
 
                     <div className='section__frame__column'>
-                      <button className='round-button button-styles button-background' type='button' onClick={() => { handleIO('quit') }}>Quit</button>
-                      <button className='round-button button-styles button-background' type='button' onClick={() => { handleIO('reset') }}>Reset</button>
+                      <button className='round-button button-styles button-background' type='button' onClick={() => { systemTask('quit') }}>Quit</button>
+                      <button className='round-button button-styles button-background' type='button' onClick={() => { systemTask('reset') }}>Reset</button>
                     </div>
                   </div>
 
