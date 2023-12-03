@@ -23,24 +23,29 @@ Got any tips for improvement or need help?
 Join our discussion on [Swedespeed](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)!
 
 ### > How to use:
-```
 Production:
-1.) wget "https://github.com/LRYMND/volvo-rtvi/releases/download/v2.0.0/Installer.sh"
-2.) chmod +x Installer.sh
-3.) sh Installer.sh
+```
+wget "https://github.com/LRYMND/volvo-rtvi/releases/download/v2.0.0/Installer.sh"
+chmod +x Installer.sh
+sh Installer.sh
 
-@volvo-rtvi/: python Volvo-RTVI-2.0.0.py
+cd /home/$USER/volvo-rtvi
+python Volvo-RTVI.py
 ```
-```
+
 Development:
-1.) git clone https://github.com/lrymnd/volvo-rtvi.git
-2.) cd volvo-rtvi
-3.) pip install -r requirements.txt
-4.) cd frontend
-5.) npm i & npm run build
+```
+git clone https://github.com/lrymnd/volvo-rtvi.git
+cd volvo-rtvi
+pip install -r requirements.txt
+cd frontend
+npm i & npm run build
 
-@volvo-rtvi/frontend/: npm run vite
-@volvo-rtvi/: python Volvo-RTVI-2.0.0.py dev
+cd /home/$USER/volvo-rtvi/frontend
+npm run vite
+
+cd /home/$USER/volvo-rtvi
+python Volvo-RTVI.py dev
 ```
 
 ---
@@ -154,17 +159,30 @@ Make sure that you stress-relief all wiring connections and secure them properly
 
 ## 06 | Set Up
 
-### > Installing the app:
+1.) To automatically hide the mouse curser you will need to install unclutter
+```
+sudo apt-get install unclutter
+```
 
+2.) Add these lines to your "/boot/config.txt"
 ```
-Launch the script "Installer.sh" in order to install the app.
+# Shutdown and remove power from PSU
+dtoverlay=gpio-shutdown,active_low=0,gpio_pull=up
+dtoverlay=gpio-poweroff
+
+# Disable rainbow image at boot
+disable_splash=1
+
+# Hide mouse-cursor after 2 seconds
+@unclutter -idle 2
 ```
 
-### > Running the app:
+3.) Open "/boot/cmdline.txt" and add this at the end of the line
+```
+logo.nologo vt.global_cursor_default=0
+```
 
-```
-python Volvo-RTVI-2.0.0.py
-```
+4.) To automatically hide the taskbar simply right-click it to activate this setting.
 
 ---
 
@@ -235,6 +253,8 @@ To make life a bit easier, you can connect an USB extension cable to the Raspi a
 ## 09 | Roadmap
 
 - [ ] 3D-printed display mount
+- [ ] Reimplement LIN interface
+- [ ] Integrate ADC functionality
 - [ ] Integrate DTC functionality
 - [ ] Sniff canbus messages
 - [ ] Integrate MOST-bus
