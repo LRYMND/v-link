@@ -15,16 +15,19 @@
 
     top: 0;
 
-    &__dash {
+    &__data {
+        height: 100%;
         width: 30%;
         display: flex;
         align-items: center;
         justify-content: flex-start;
 
         margin-left: -1rem;
-        gap: 5px;
+        //gap: 5px;
 
-        &__bar{
+        &__item{
+            font-size: 10px;
+            height: 100%;
             width: 30%;
         }
     }

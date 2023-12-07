@@ -4,6 +4,7 @@ __pycache__/
 backend/__pycache__/
 venv/
 backend/venv/
+frontend/dist/
 
 .notes/
 .vite/
@@ -19,3 +20,5 @@ package/
 .DS*
 *.py[cod]
 ._*
+create-package.sh
+

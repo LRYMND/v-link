@@ -22,7 +22,7 @@ function App() {
   const [carplayState, setCarplayState] = useState(false);
 
   return (
-    <>
+    <div className="container" style={{overflow:'hidden'}}>
     <Splash 
     versionNumber={versionNumber}
     />
@@ -53,7 +53,7 @@ function App() {
         setCarplayState={setCarplayState}
         versionNumber={versionNumber}
       />
-    </>
+    </div>
   )
 }
 

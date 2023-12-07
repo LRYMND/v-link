@@ -3,7 +3,7 @@ Road Traffic and Vehicle Infotainment
 
 ![TITLE IMAGE](repo/media/title2.jpg?raw=true "Title")  
 
-This is a react web-app to run natively on Mac/Linux and therefore also on a RaspberryPi. It's providing a fully functioning Carplay/AndroidAuto integration as well as an interface for canbus and linbus. The app is intended for Volvo P-chassis with a T5 engine (C30, V50, V70 II). However, the canbus codes can be easily adjusted with an exposed settings file in order to change the data.
+This is a react web-app to run natively on a RaspberryPi. It's providing a fully functioning Carplay/AndroidAuto integration as well as an interface for canbus and linbus. The app is intended for Volvo P-chassis with a T5 engine (C30, V50, V70 II). However, the canbus codes can be easily adjusted with an exposed settings file in order to change the data.
 
 ![PAGES IMAGE](repo/media/pages.jpg?raw=true "Pages")  
 
@@ -22,6 +22,13 @@ The project is based on the following repositories:
 Got any tips for improvement or need help?  
 Join our discussion on [Swedespeed](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)!
 
+### > System Requirements:
+```
+Raspbian 11 Bullseye
+Chromium 116
+Python 3.9.2
+```
+
 ### > How to use:
 Production:
 ```
@@ -30,7 +37,7 @@ chmod +x Installer.sh
 sh Installer.sh
 
 cd /home/$USER/volvo-rtvi
-python Volvo-RTVI.py
+python3 Volvo-RTVI.py
 ```
 
 Development:
@@ -45,7 +52,7 @@ cd /home/$USER/volvo-rtvi/frontend
 npm run vite
 
 cd /home/$USER/volvo-rtvi
-python Volvo-RTVI.py dev
+python3 Volvo-RTVI.py dev
 ```
 
 ---
@@ -93,7 +100,7 @@ Also:
 
 ### > Note:
 
-The app runs on a RPi3 as well as on a RPi4 with OS Buster and Bullseye, both on 32 and 64-bit.
+The app runs on a RPi3 as well as on a RPi4 with OS Bullseye, both on 32 and 64-bit.
 
 ## 02 | Display Mod
 

@@ -94,7 +94,7 @@ const Home = ({
   }, [canbusSettings])
 
 
-  useEffect(() => {    
+  useEffect(() => {
     if (phoneState === false) setCarplayState(false)
 
     if (phoneState && (view === 'Carplay')) {

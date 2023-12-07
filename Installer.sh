@@ -75,17 +75,17 @@ fi
 
 
 # Set the download URL and output path
-download_url="https://github.com/LRYMND/volvo-rtvi/releases/download/v2.0.0/Volvo-RTVI-2.0.0.zip"
+download_url="https://github.com/LRYMND/volvo-rtvi/releases/download/v2.0.0/Volvo-RTVI.zip"
 output_path="/home/$USER/volvo-rtvi"
 
 # Download the file
 echo "Downloading files to: $output_path"
 mkdir -p $output_path
-curl -L $download_url --output $output_path/Volvo-RTVI-2.0.0.zip
+curl -L $download_url --output $output_path/Volvo-RTVI.zip
 
 # Unzip the contents
 echo "Unzipping the contents..."
-unzip $output_path/Volvo-RTVI-2.0.0.zip -d $output_path
+unzip $output_path/Volvo-RTVI.zip -d $output_path
 
 # Change to the directory
 cd $output_path
@@ -126,7 +126,7 @@ while true; do
     read -p "Do you want to start the Application now? [Y/N]" yn
     case $yn in
         [Yy]* ) 
-            python /home/$USER/volvo-rtvi/Volvo-RTVI.py
+            python3 /home/$USER/volvo-rtvi/Volvo-RTVI.py
             ;;
         [Nn]* ) 
             exit;;
