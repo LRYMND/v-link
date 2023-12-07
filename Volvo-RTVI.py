@@ -83,9 +83,10 @@ class RTVI:
             sys.exit(0)
 
     def print_thread_states(self):
-        for thread_name, thread in self.threads.items():
-            state = "Alive" if thread.is_alive() else "Not Alive"
-            print(f"{thread_name} Thread: {state}")
+        if(shared_state.isDev):
+            for thread_name, thread in self.threads.items():
+                state = "Alive" if thread.is_alive() else "Not Alive"
+                print(f"{thread_name} Thread: {state}")
 
 
 
@@ -109,10 +110,15 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1 and sys.argv[1] == "dev":
         shared_state.isDev = True
-        choice = non_blocking_input("Start VCAN? (Y/N): ")
+        choice = non_blocking_input("Simulate CAN-Bus? (Y/N): ")
         if choice.lower() == 'y':
+            shared_state.vCan = True
             print("Starting VCAN...")
             rtvi.toggle_thread("VCan")
+
+            choice = non_blocking_input("Start on Vite-Port 5173? (Y/N): ")
+            if choice.lower() == 'y':
+                shared_state.isFlask = False
 
     time.sleep(.1)
     rtvi.start_thread("Canbus")

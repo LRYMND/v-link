@@ -78,7 +78,8 @@ class ServerThread(threading.Thread):
     # Return settings object to frontend via socket.io
     @socketio.on('requestStatus', namespace='/canbus')
     def emit_can_status():
-        socketio.emit('status', shared_state.THREAD_STATES["Canbus"], namespace='/canbus')
+        #socketio.emit('status', shared_state.THREAD_STATES["Canbus"], namespace='/canbus')
+        print('status request')
 
     # Return settings object to frontend via socket.io
     @socketio.on('data', namespace='/canbus')
@@ -89,6 +90,7 @@ class ServerThread(threading.Thread):
     @socketio.on('toggle', namespace='/canbus')
     def handle_toggle_request():
         shared_state.toggle_can.set()
+        socketio.emit('status', shared_state.THREAD_STATES["Canbus"], namespace='/canbus')
 
     # Toggle linbus stream
     @socketio.on('toggle', namespace='/linbus')

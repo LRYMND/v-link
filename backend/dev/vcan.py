@@ -27,8 +27,9 @@ class VCanThread(threading.Thread):
         self.TEMPLATE = [0xcd, 0x7a, 0xa6, 0x00, 0x00, 0x40, 0x0, 0x0]
 
 
-        script_path = os.path.join(os.getcwd(), 'backend/dev', 'setup.sh')
-        subprocess.run([script_path], shell=True)
+        script_directory = os.path.dirname(os.path.abspath(__file__))
+        setup_script_path = os.path.join(script_directory, 'setup.sh')
+        subprocess.run([setup_script_path], shell=True)
 
 
     def run(self):

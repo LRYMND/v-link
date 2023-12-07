@@ -6,6 +6,8 @@ import threading
 class SharedState:
     def __init__(self):
         self.isDev = False
+        self.vCan = False
+        self.isFlask = True
 
         self.exit_event = threading.Event()
 

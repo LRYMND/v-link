@@ -4,10 +4,15 @@ import {
 
 import './App.css'
 
+import Splash from './content/pages/splash/Splash'
 import Home from './content/pages/home/Home'
 import Carplay from './content/carplay/Carplay'
+import Cardata from './content/cardata/Cardata'
+
+
 
 function App() {
+  const versionNumber = "2.0.0"
 
   const [applicationSettings, setApplicationSettings] = useState(null)
   const [canbusSettings, setCanbusSettings] = useState(null)
@@ -16,11 +21,15 @@ function App() {
   const [phoneState, setPhoneState] = useState(false);
   const [carplayState, setCarplayState] = useState(false);
 
-
   return (
     <>
+    <Splash 
+    versionNumber={versionNumber}
+    />
+    <Cardata/>
     {applicationSettings ? 
       <div className='carplay'>
+        
         <Carplay
           applicationSettings={applicationSettings}
           phoneState={setPhoneState}
@@ -42,6 +51,7 @@ function App() {
         setPhoneState={setPhoneState}
         carplayState={carplayState}
         setCarplayState={setCarplayState}
+        versionNumber={versionNumber}
       />
     </>
   )

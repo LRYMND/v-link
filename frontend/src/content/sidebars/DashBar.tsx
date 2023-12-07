@@ -1,12 +1,31 @@
+import { useState, useEffect } from 'react';
+
+import CarDataStore from '../cardata/store/Datastore'
+
 import "./../../styles.scss"
 import "./../../themes.scss"
 import "./dashbar.scss";
 
 
-const DashBar = ({ canbusSettings, applicationSettings, carData, wifiState, phoneState, setView }) => {
+const DashBar = ({ canbusSettings, applicationSettings, wifiState, phoneState, setView }) => {
+
+    const [carData, setCarData] = useState({})
+
+    useEffect(() => {
+        const unsubscribe = CarDataStore.subscribe(
+            (event) => {
+                setCarData(event.carData)
+                //console.log(carData)
+            },
+        );
+
+        return () => {
+            unsubscribe();
+        };
+    }, []);
 
     return (
-        <div className={`dashbar ${applicationSettings.app.colorTheme.value}`} style={{ height: `${applicationSettings.interface.heightOSD.value}px`}}>
+        <div className={`dashbar ${applicationSettings.app.colorTheme.value}`} style={{ height: `${applicationSettings.interface.heightOSD.value}px` }}>
             <div className="dashbar__dash">
                 <div className="dashbar__dash__bar">
                     <h5>{canbusSettings.messages[applicationSettings.dash_bar.value_1.value].label}: {carData[applicationSettings.dash_bar.value_1.value]}{canbusSettings.messages[applicationSettings.dash_bar.value_1.value].unit}</h5>

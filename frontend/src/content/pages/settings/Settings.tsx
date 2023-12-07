@@ -20,16 +20,12 @@ const Settings = ({ canState, canbusSettings, applicationSettings, versionNumber
   // Settings state variables
   const [newSettings, setNewSettings] = useState(structuredClone(applicationSettings));
 
+
   useEffect(() => {
     if (applicationSettings != null)
       setNewSettings(structuredClone(applicationSettings))
-    console.log("app settings received in settings page:", applicationSettings)
   }, [applicationSettings]);
-
-  useEffect(() => {
-    console.log(canState)
-  }, [canState]);
-
+  
 
   /* Change Tabs */
   const [activeTab, setActiveTab] = useState(1);

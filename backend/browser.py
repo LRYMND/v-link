@@ -9,7 +9,7 @@ from .shared.shared_state import shared_state
 class BrowserThread(threading.Thread):
     def __init__(self):
         super().__init__()
-        self.url = f"http://localhost:{5173 if shared_state.isDev else 4001}"
+        self.url = f"http://localhost:{4001 if shared_state.isFlask else 5173}"
         self.browser = None
         self._stop_event = threading.Event()
 
@@ -29,10 +29,10 @@ class BrowserThread(threading.Thread):
 
     def start_browser(self):
         if shared_state.isDev:
-            flags = "--window-size=800,480 --disable-resize --enable-features=SharedArrayBuffer,OverlayScrollbar --autoplay-policy=no-user-gesture-required"
+            flags = "--window-size=800,480 --disable-resize --enable-features=SharedArrayBuffer,OverlayScrollbar --autoplay-policy=no-user-gesture-required --disable-extensions"
             command = f"chromium-browser {self.url} {flags}"
         else:
-            flags = "--window-size=800,480 --kiosk --enable-features=SharedArrayBuffer --autoplay-policy=no-user-gesture-required"
+            flags = "--window-size=800,480 --kiosk --enable-features=SharedArrayBuffer --autoplay-policy=no-user-gesture-required --disable-extensions"
             command = f"chromium-browser --app={self.url} {flags}"
 
         self.browser = subprocess.Popen(command, shell=True)

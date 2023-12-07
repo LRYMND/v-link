@@ -1,20 +1,20 @@
 import React from 'react';
-import LineChart from '../../components/LineChart'
+import LineChart from '../../../components/LineChart'
 
-import "./../../../styles.scss"
-import "./../../../themes.scss"
-import './chartboard.scss';
+import "./../../../../styles.scss"
+import "./../../../../themes.scss"
+import './charts.scss';
 
-const Chartboard = ({ canbusSettings, applicationSettings, carData, length }) => {
+const Charts = ({ canbusSettings, applicationSettings, carData, length }) => {
 
     return (
-        <div className={`chartboard ${applicationSettings.app.colorTheme.value}`}>
-            <div className="chartboard__header">
+        <div className={`charts ${applicationSettings.app.colorTheme.value}`}>
+            <div className="charts__header">
             </div>
 
             {canbusSettings && applicationSettings ?
-                <div className="chartboard__content">
-                    <div className="chartboard__content__left">
+                <div className="charts__content">
+                    <div className="charts__content__left">
                         <div className="output">
                             <div className="output__label">
                                 <h5>{canbusSettings.messages[applicationSettings.dash_2.value_1.value].label}</h5>
@@ -43,7 +43,7 @@ const Chartboard = ({ canbusSettings, applicationSettings, carData, length }) =>
                         </div>
                     </div>
 
-                    <div className="chartboard__content__right">
+                    <div className="charts__content__right">
                         <LineChart
                             applicationSettings={applicationSettings}
 
@@ -81,11 +81,11 @@ const Chartboard = ({ canbusSettings, applicationSettings, carData, length }) =>
                         />
                     </div>
                 </div> : <></>}
-            <div className="chartboard__footer">
+            <div className="charts__footer">
                 {applicationSettings.connections.activateCAN.value ? <></> : <div><h3><i>(CAN-Stream deactivated.)</i></h3></div>}
             </div>
         </div >
     )
 };
 
-export default Chartboard;
+export default Charts;

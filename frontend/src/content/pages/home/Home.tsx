@@ -10,7 +10,7 @@ import { io } from "socket.io-client";
 import NavBar from '../../sidebars/NavBar';
 import TopBar from '../../sidebars/TopBar';
 import DashBar from '../../sidebars/DashBar';
-import Swiper from '../swiper/Swiper';
+import Dashboard from '../dashboard/Dashboard';
 import Settings from '../settings/Settings';
 //import Volvo from '../volvo/Volvo';
 
@@ -19,7 +19,6 @@ import './home.scss';
 
 const canbusChannel = io("ws://localhost:4001/canbus")
 const settingsChannel = io("ws://localhost:4001/settings")
-const versionNumber = "2.0"
 
 
 const Home = ({
@@ -32,7 +31,8 @@ const Home = ({
   phoneState,
   setPhoneState,
   carplayState,
-  setCarplayState
+  setCarplayState,
+  versionNumber
 }) => {
   // Application state variables
   const [startedUp, setStartedUp] = useState(false);
@@ -47,19 +47,8 @@ const Home = ({
   const [canState, setCanState] = useState(false);
 
   // Canbus state variable
-  const [carData, setCarData] = useState({})
 
   useEffect(() => {
-    // Initialize cardata object
-    setCarData({
-      intake: 0,
-      boost: 0,
-      coolant: 0,
-      lambda1: 0,
-      lambda2: 0,
-      voltage: 0,
-    });
-
     // Event listener for receiving settings data
     const handleApplicationSettings = (data) => {
       console.log("App-settings received from socket:", data);
@@ -90,50 +79,22 @@ const Home = ({
     };
   }, []);
 
-
   useEffect(() => {
-    canbusChannel.on("data", (data) => { updateCardata(data) });
-    return () => {
-      canbusChannel.off("data", updateCardata);
-    };
-  });
-
-
-  useEffect(() => {
-    console.log("Updating application-settings");
     if (applicationSettings != null) {
       setStartedUp(true);
-      console.log("Settings loaded.")
+      console.log("Application settings loaded.")
     }
   }, [applicationSettings])
 
 
   useEffect(() => {
-    console.log("Updating canbus-settings");
     if (canbusSettings != null) {
-      console.log("Settings loaded.")
+      console.log("Canbus settings loaded.")
     }
   }, [canbusSettings])
 
 
-  const updateCardata = (data) => {
-    if (canbusSettings && canbusSettings.messages && data != null) {
-      Object.keys(canbusSettings.messages).forEach((key) => {
-        const message = canbusSettings.messages[key];
-        const rtviId = message.rtvi_id;
-
-        if (data.includes(rtviId)) {
-          const value = data.replace(rtviId, "");
-          setCarData((prevState) => ({ ...prevState, [key]: Number(value).toFixed(2) }));
-        }
-      });
-    }
-  };
-
-  useEffect(() => {
-    console.log("phone connected: ", phoneState)
-    console.log("view: ", view)
-
+  useEffect(() => {    
     if (phoneState === false) setCarplayState(false)
 
     if (phoneState && (view === 'Carplay')) {
@@ -159,7 +120,6 @@ const Home = ({
                 className='dashbar'
                 canbusSettings={canbusSettings}
                 applicationSettings={applicationSettings}
-                carData={carData}
                 phoneState={phoneState}
                 wifiState={wifiState}
                 setView={setView}
@@ -170,10 +130,9 @@ const Home = ({
 
       case 'Dashboard':
         return (
-          <Swiper
+          <Dashboard
             canbusSettings={canbusSettings}
             applicationSettings={applicationSettings}
-            carData={carData}
           />
         )
 
@@ -204,10 +163,9 @@ const Home = ({
 
       default:
         return (
-          <Swiper
+          <Dashboard
             canbusSettings={canbusSettings}
             applicationSettings={applicationSettings}
-            carData={carData}
           />
         )
 
