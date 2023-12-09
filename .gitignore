@@ -1,16 +1,14 @@
 #directories
 node_modules/
-__pycache__/
-backend/__pycache__/
 venv/
 backend/venv/
+dist/
 frontend/dist/
+.local/
 
 .notes/
 .vite/
-.devicetree/
 
-package/
 
 
 #files
