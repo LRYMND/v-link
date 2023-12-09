@@ -3,8 +3,7 @@ import time
 import can
 import socketio
 import sys
-from . import settings
-from .shared.shared_state import shared_state
+import settings
 
 class Config:
     def __init__(self):
@@ -49,6 +48,7 @@ class CanBusThread(threading.Thread):
         self.client = socketio.Client()
         self.config = Config()
         self.can_bus = None
+        self.isDev = True
 
     def run(self):
         self.connect_to_socketio()
@@ -57,7 +57,8 @@ class CanBusThread(threading.Thread):
 
     def initialize_canbus(self):
         try:
-            if(shared_state.isDev):
+            if(self.isDev):
+                print("Using Virtual CAN.")
                 self.can_bus = can.interface.Bus(channel='vcan0', bustype='socketcan', bitrate=500000)
             else:    
                 self.can_bus = can.interface.Bus(channel='can0', bustype='socketcan', bitrate=500000)    
@@ -94,21 +95,24 @@ class CanBusThread(threading.Thread):
 
     def request(self, messages):
         for message in messages:
+
             msg = can.Message(arbitration_id=message[0][0], data=message[2], is_extended_id=True)
-            self.can_bus.send(msg)
+            
+            try:
+                received = False
+                print(msg)
+                #print(self.can_bus)
+                self.can_bus.send(msg)
+                print("1")
+                data = self.can_bus.recv()
+                print(data)
+                print("2")
+                self.emit_data_to_frontend(self.filter(data, message))
+                print("3")
+                    
 
-            timeout = .01
-            data = None
-            data = self.can_bus.recv(timeout)
-            if(data):
-                self.filter(data, message)
-
-    def receive(self, messages):
-        while not self._stop_event.set():
-            data = self.can_bus.recv()
-
-            for message in messages:
-                self.filter(data, message)
+            except can.CanError as e:
+                print(f"Error sending/receiving CAN message: {e}")
 
     def filter(self, data, message):
         if data.arbitration_id == message[1][0] and data.data[4] == message[2][4]:
@@ -116,26 +120,35 @@ class CanBusThread(threading.Thread):
             converted_value = eval(message[3], {'value': value})
 
             data = message[5] + str(float(converted_value))
-            self.emit_data_to_frontend(data)
-            #print(data)
+            
             sys.stdout.flush()
-            return True
+            return data
         else:
-            return False
+            return None
 
     def run_can_bus(self):
         x = 0
         while not self._stop_event.is_set():
+            print("0")
             if x <= self.config.interval:
-                try:
-                    self.request(self.config.msg_hs)
-                except Exception as e:
-                    print(e) 
+                self.request(self.config.msg_hs)
                 time.sleep(self.config.refresh_rate)
             x += 1
             if x == self.config.interval:
-                try:
-                    self.request(self.config.msg_ls)
-                except Exception as e:
-                    print(e) 
+                self.request(self.config.msg_ls)
                 x = 0
+
+
+def main():
+    can_thread = CanBusThread()
+    can_thread.start()
+
+    # Let the thread run for a while (you can adjust the duration)
+    time.sleep(30)
+
+    # Stop the thread
+    can_thread.stop_thread()
+    can_thread.join()
+
+if __name__ == "__main__":
+    main()

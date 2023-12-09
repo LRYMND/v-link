@@ -59,10 +59,11 @@ class VCanThread(threading.Thread):
         # Define the request array
         request = [
             [0x12, 0x9D],
+            [0x10, 0x34],
+
             [0x10, 0xCE],
             [0x10, 0xD8],
             [0x10, 0x0A],
-            [0x10, 0x34],
             [0x10, 0x2C],
         ]
 
@@ -81,4 +82,3 @@ class VCanThread(threading.Thread):
 
         # Send the response
         self.can_bus.send(response_message)
-        time.sleep(0.1)

@@ -6,7 +6,7 @@
     },
     "canbus": {
         "interface": "socketcan",
-        "channel": "can0",
+        "channel": "can1",
         "bitrate": 500000
     },
     "commands": [
