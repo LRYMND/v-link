@@ -11,16 +11,18 @@ class SharedState:
 
         self.exit_event = threading.Event()
 
+        self.toggle_adc = threading.Event()
         self.toggle_can = threading.Event()
         self.toggle_lin = threading.Event()
         self.toggle_browser = threading.Event()
 
 
         self.THREAD_STATES = {
-            "Server": False,
-            "Canbus": False,
-            "Linbus": False,
-            "VCan": False,
+            "Server":   False,
+            "ADC":      False,
+            "Canbus":   False,
+            "Linbus":   False,
+            "VCan":     False,
         }
 
 shared_state = SharedState()

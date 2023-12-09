@@ -10,7 +10,7 @@ const totalPages = 2; // Adjust the number of pages accordingly
 const containerWidth = 100 * totalPages; // Set the total width of all pages
 
 
-function Dashboard({ canbusSettings, applicationSettings }) {
+function Dashboard({ sensorSettings, applicationSettings }) {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const swipeContainerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -100,7 +100,7 @@ function Dashboard({ canbusSettings, applicationSettings }) {
           }}
         >
           <Gauges
-            canbusSettings={canbusSettings}
+            sensorSettings={sensorSettings}
             applicationSettings={applicationSettings}
             carData={carData}
           />
@@ -111,7 +111,7 @@ function Dashboard({ canbusSettings, applicationSettings }) {
           }}
         >
           <Charts
-            canbusSettings={canbusSettings}
+            sensorSettings={sensorSettings}
             applicationSettings={applicationSettings}
             carData={carData}
             length={100}

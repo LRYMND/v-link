@@ -91,8 +91,9 @@ unzip $output_path/Volvo-RTVI.zip -d $output_path
 cd $output_path
 
 # Install requirements
+requirements="/home/$USER/volvo-rtvi/backend/requirements.txt"
 echo "Installing requirements..."
-pip install -r requirements.txt
+pip install -r $requirements
 echo
 echo
 # Provide some feedback

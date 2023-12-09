@@ -8,7 +8,7 @@ import './gauges.scss';
 
 
 
-const Gauges = ({ applicationSettings, canbusSettings, carData }) => {
+const Gauges = ({ applicationSettings, sensorSettings, carData }) => {
 
 
 
@@ -42,15 +42,15 @@ const Gauges = ({ applicationSettings, canbusSettings, carData }) => {
 		<div className={`gauges ${applicationSettings.app.colorTheme.value}`}>
 			<div className="gauges__header">
 			</div>
-			{loaded && canbusSettings && applicationSettings ?
+			{loaded && sensorSettings && applicationSettings ?
 				<div className="gauges__elements">
 					{applicationSettings.visibility.showGauge_1.value ?
 						<RadialGauge
 							currentValue={carData[applicationSettings.dash_1.gauge_1.value]}
-							maxValue={canbusSettings.messages[applicationSettings.dash_1.gauge_1.value].max_value}
-							limitStart={canbusSettings.messages[applicationSettings.dash_1.gauge_1.value].limit_start}
-							title={canbusSettings.messages[applicationSettings.dash_1.gauge_1.value].label}
-							unit={canbusSettings.messages[applicationSettings.dash_1.gauge_1.value].unit}
+							maxValue={sensorSettings[applicationSettings.dash_1.gauge_1.value].max_value}
+							limitStart={sensorSettings[applicationSettings.dash_1.gauge_1.value].limit_start}
+							title={sensorSettings[applicationSettings.dash_1.gauge_1.value].label}
+							unit={sensorSettings[applicationSettings.dash_1.gauge_1.value].unit}
 
 							globalRotation={90}
 							size={110}
@@ -83,10 +83,10 @@ const Gauges = ({ applicationSettings, canbusSettings, carData }) => {
 
 						<RadialGauge
 							currentValue={carData[applicationSettings.dash_1.gauge_2.value]}
-							maxValue={canbusSettings.messages[applicationSettings.dash_1.gauge_2.value].max_value}
-							limitStart={canbusSettings.messages[applicationSettings.dash_1.gauge_2.value].limit_start}
-							title={canbusSettings.messages[applicationSettings.dash_1.gauge_2.value].label}
-							unit={canbusSettings.messages[applicationSettings.dash_1.gauge_2.value].unit}
+							maxValue={sensorSettings[applicationSettings.dash_1.gauge_2.value].max_value}
+							limitStart={sensorSettings[applicationSettings.dash_1.gauge_2.value].limit_start}
+							title={sensorSettings[applicationSettings.dash_1.gauge_2.value].label}
+							unit={sensorSettings[applicationSettings.dash_1.gauge_2.value].unit}
 
 							globalRotation={90}
 							size={120}
@@ -118,10 +118,10 @@ const Gauges = ({ applicationSettings, canbusSettings, carData }) => {
 					{applicationSettings.visibility.showGauge_3.value ?
 						<RadialGauge
 							currentValue={carData[applicationSettings.dash_1.gauge_3.value]}
-							maxValue={canbusSettings.messages[applicationSettings.dash_1.gauge_3.value].max_value}
-							limitStart={canbusSettings.messages[applicationSettings.dash_1.gauge_3.value].limit_start}
-							title={canbusSettings.messages[applicationSettings.dash_1.gauge_3.value].label}
-							unit={canbusSettings.messages[applicationSettings.dash_1.gauge_3.value].unit}
+							maxValue={sensorSettings[applicationSettings.dash_1.gauge_3.value].max_value}
+							limitStart={sensorSettings[applicationSettings.dash_1.gauge_3.value].limit_start}
+							title={sensorSettings[applicationSettings.dash_1.gauge_3.value].label}
+							unit={sensorSettings[applicationSettings.dash_1.gauge_3.value].unit}
 
 							globalRotation={90}
 							size={110}
@@ -152,31 +152,31 @@ const Gauges = ({ applicationSettings, canbusSettings, carData }) => {
 						: <div></div>}
 				</div> : <></>}
 			<div className="footer">
-				{loaded && applicationSettings && canbusSettings ?
+				{loaded && applicationSettings && sensorSettings ?
 					<>
 						<div className="output">
 							<div className="output__label">
-								{canbusSettings.messages[applicationSettings.dash_1.value_1.value].label}:
+								{sensorSettings[applicationSettings.dash_1.value_1.value].label}:
 							</div>
 							<div className="output__data">
-								{carData[applicationSettings.dash_1.value_1.value]}{canbusSettings.messages[applicationSettings.dash_1.value_1.value].unit}
+								{carData[applicationSettings.dash_1.value_1.value]}{sensorSettings[applicationSettings.dash_1.value_1.value].unit}
 							</div>
 						</div>
 
 						<div className="output">
 							<div className="output__label">
-								{canbusSettings.messages[applicationSettings.dash_1.value_2.value].label}:
+								{sensorSettings[applicationSettings.dash_1.value_2.value].label}:
 							</div>
 							<div className="output__data">
-								{carData[applicationSettings.dash_1.value_2.value]}{canbusSettings.messages[applicationSettings.dash_1.value_2.value].unit}
+								{carData[applicationSettings.dash_1.value_2.value]}{sensorSettings[applicationSettings.dash_1.value_2.value].unit}
 							</div>
 						</div>
 						<div className="output">
 							<div className="output__label">
-								{canbusSettings.messages[applicationSettings.dash_1.value_3.value].label}:
+								{sensorSettings[applicationSettings.dash_1.value_3.value].label}:
 							</div>
 							<div className="output__data">
-								{carData[applicationSettings.dash_1.value_3.value]}{canbusSettings.messages[applicationSettings.dash_1.value_3.value].unit}
+								{carData[applicationSettings.dash_1.value_3.value]}{sensorSettings[applicationSettings.dash_1.value_3.value].unit}
 							</div>
 						</div>
 					</> :

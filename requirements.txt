@@ -6,3 +6,4 @@ python-socketio
 werkzeug
 pyautogui
 eventlet
+adafruit-circuitpython-ads1x15

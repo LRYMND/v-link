@@ -5,6 +5,7 @@ import os
 
 sys.path.append('/backend')
 from backend.server              import ServerThread
+from backend.adc                 import ADCThread
 from backend.canbus              import CanBusThread
 from backend.linbus              import LinBusThread
 from backend.browser             import BrowserThread
@@ -20,7 +21,8 @@ class RTVI:
             "Browser":  BrowserThread(),
             "Server":   ServerThread(),
             "Canbus":   CanBusThread(),
-            #"Linbus":  LinBusThread()
+            #"Linbus":  LinBusThread(),
+            "ADC":      ADCThread(),
         }
 
 
@@ -69,6 +71,10 @@ class RTVI:
         if shared_state.toggle_can.is_set():
             self.toggle_thread("Canbus")
             shared_state.toggle_can.clear()
+            
+        if shared_state.toggle_adc.is_set():
+            self.toggle_thread("ADC")
+            shared_state.toggle_adc.clear()
 
         if shared_state.toggle_browser.is_set():
             self.toggle_thread("Browser")
@@ -120,8 +126,9 @@ if __name__ == "__main__":
             if choice.lower() == 'y':
                 shared_state.isFlask = False
 
-    time.sleep(.1)
     rtvi.start_thread("Canbus")
+    time.sleep(.1)
+    rtvi.start_thread("ADC")
     time.sleep(.1)
     rtvi.start_thread("Browser")
 

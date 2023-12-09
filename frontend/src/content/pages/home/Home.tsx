@@ -17,15 +17,16 @@ import Settings from '../settings/Settings';
 import "./../../../themes.scss"
 import './home.scss';
 
-const canbusChannel = io("ws://localhost:4001/canbus")
+const canbusChannel =   io("ws://localhost:4001/canbus")
+const adcChannel  =     io("ws://localhost:4001/adc")
 const settingsChannel = io("ws://localhost:4001/settings")
 
 
 const Home = ({
   applicationSettings,
   setApplicationSettings,
-  canbusSettings,
-  setCanbusSettings,
+  sensorSettings,
+  setSensorSettings,
   view,
   setView,
   phoneState,
@@ -44,54 +45,61 @@ const Home = ({
 
   // Connection state variables
   const [wifiState, setWifiState] = useState(false);
-  const [canState, setCanState] = useState(false);
+  const [canState, setCANState] = useState(false);
+  const [adcState, setADCState] = useState(false);
 
   // Canbus state variable
 
   useEffect(() => {
     // Event listener for receiving settings data
-    const handleApplicationSettings = (data) => {
+    const handleAppSettings = (data) => {
       console.log("App-settings received from socket:", data);
       setApplicationSettings(data);
     };
 
-    const handleCanbusSettings = (data) => {
-      console.log("CAN-settings received from socket:", data);
-      setCanbusSettings(data);
+    const handleSensorSettings = (data) => {
+      console.log("Sensor-settings received from socket:", data);
+      setSensorSettings(data);
     };
 
-    const handleCanbusStatus = (data) => {
+    const handleCANStatus = (data) => {
       console.log("CAN-status received from socket:", data);
-      setCanState(data);
+      setCANState(data);
     };
 
-    settingsChannel.on("application", handleApplicationSettings);
-    settingsChannel.on("canbus", handleCanbusSettings);
-    canbusChannel.on("status", handleCanbusStatus);
+    const handleADCStatus = (data) => {
+      console.log("CAN-status received from socket:", data);
+      setADCState(data);
+    };
+
+    settingsChannel.on("application", handleAppSettings);
+    settingsChannel.on("sensors", handleSensorSettings);
+
+    canbusChannel.on("status", handleCANStatus);
+    adcChannel.on("status", handleADCStatus);
 
     settingsChannel.emit("requestSettings", "application");
-    settingsChannel.emit("requestSettings", "canbus");
+    settingsChannel.emit("requestSensors");
+
     canbusChannel.emit("requestStatus");
+    adcChannel.emit("requestStatus");
 
     return () => {
-      settingsChannel.off("application", handleApplicationSettings);
-      canbusChannel.off("canbus", handleCanbusSettings);
+      settingsChannel.off("application", handleAppSettings);
+      settingsChannel.off("sensors", handleSensorSettings);
+
+      canbusChannel.off("canbus", handleCANStatus);
+      adcChannel.off("canbus", handleADCStatus);
     };
   }, []);
 
+
   useEffect(() => {
-    if (applicationSettings != null) {
+    if (applicationSettings != null && sensorSettings != null) {
       setStartedUp(true);
-      console.log("Application settings loaded.")
+      console.log("Settings loaded.")
     }
-  }, [applicationSettings])
-
-
-  useEffect(() => {
-    if (canbusSettings != null) {
-      console.log("Canbus settings loaded.")
-    }
-  }, [canbusSettings])
+  }, [applicationSettings, sensorSettings])
 
 
   useEffect(() => {
@@ -118,7 +126,7 @@ const Home = ({
             {showOsd && phoneState &&
               <DashBar
                 className='dashbar'
-                canbusSettings={canbusSettings}
+                sensorSettings={sensorSettings}
                 applicationSettings={applicationSettings}
                 phoneState={phoneState}
                 wifiState={wifiState}
@@ -131,7 +139,7 @@ const Home = ({
       case 'Dashboard':
         return (
           <Dashboard
-            canbusSettings={canbusSettings}
+            sensorSettings={sensorSettings}
             applicationSettings={applicationSettings}
           />
         )
@@ -140,7 +148,8 @@ const Home = ({
         return (
           <Settings
             canState={canState}
-            canbusSettings={canbusSettings}
+            adcState={adcState}
+            sensorSettings={sensorSettings}
             applicationSettings={applicationSettings}
             setApplicationSettings={setApplicationSettings}
             versionNumber={versionNumber}
@@ -164,7 +173,7 @@ const Home = ({
       default:
         return (
           <Dashboard
-            canbusSettings={canbusSettings}
+            sensorSettings={sensorSettings}
             applicationSettings={applicationSettings}
           />
         )

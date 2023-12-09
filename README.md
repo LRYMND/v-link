@@ -3,7 +3,7 @@ Road Traffic and Vehicle Infotainment
 
 ![TITLE IMAGE](repo/media/title2.jpg?raw=true "Title")  
 
-This is a react web-app to run natively on a RaspberryPi. It's providing a fully functioning Carplay/AndroidAuto integration as well as an interface for canbus and linbus. The app is intended for Volvo P-chassis with a T5 engine (C30, V50, V70 II). However, the canbus codes can be easily adjusted with an exposed settings file in order to change the data.
+This is a react web-app to run natively on Mac/Linux and therefore also on a RaspberryPi. It's providing a fully functioning Carplay/AndroidAuto integration, an interface for canbus and linbus as well as an ADC to connect external sensors like a Bosch 0 261 340 482. The app is intended for Volvo P-chassis with a T5 engine (C30, V50, V70 II). However, the canbus codes can be easily adjusted with an exposed settings file in order to change the data.
 
 ![PAGES IMAGE](repo/media/pages.jpg?raw=true "Pages")  
 
@@ -32,7 +32,7 @@ Python 3.9.2
 ### > How to use:
 Production:
 ```
-wget "https://github.com/LRYMND/volvo-rtvi/releases/download/v2.0.0/Installer.sh"
+wget "https://github.com/LRYMND/volvo-rtvi/releases/download/v2.1.0/Installer.sh"
 chmod +x Installer.sh
 sh Installer.sh
 

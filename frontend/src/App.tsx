@@ -12,10 +12,10 @@ import Cardata from './content/cardata/Cardata'
 
 
 function App() {
-  const versionNumber = "2.0.0"
+  const versionNumber = "2.1.0"
 
   const [applicationSettings, setApplicationSettings] = useState(null)
-  const [canbusSettings, setCanbusSettings] = useState(null)
+  const [sensorSettings, setSensorSettings] = useState(null)
   const [view, setView] = useState('Dashboard')
 
   const [phoneState, setPhoneState] = useState(false);
@@ -43,8 +43,8 @@ function App() {
       <Home
         applicationSettings={applicationSettings}
         setApplicationSettings={setApplicationSettings}
-        canbusSettings={canbusSettings}
-        setCanbusSettings={setCanbusSettings}
+        sensorSettings={sensorSettings}
+        setSensorSettings={setSensorSettings}
         view={view}
         setView={setView}
         phoneState={phoneState}

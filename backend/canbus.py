@@ -17,13 +17,13 @@ class Config:
         self.initialize_messages()
 
     def initialize_messages(self):
-        for key, message in self.settings['messages'].items():
-            req_id = int(message['req_id'], 16)
-            rep_id = int(message['rep_id'], 16)
-            target = int(message['target'], 16)
-            action = int(message['action'], 16)
-            parameter0 = int(message['parameter'][0], 16)
-            parameter1 = int(message['parameter'][1], 16)
+        for key, sensor in self.settings['sensors'].items():
+            req_id = int(sensor['req_id'], 16)
+            rep_id = int(sensor['rep_id'], 16)
+            target = int(sensor['target'], 16)
+            action = int(sensor['action'], 16)
+            parameter0 = int(sensor['parameter'][0], 16)
+            parameter1 = int(sensor['parameter'][1], 16)
 
             dlc = 0xC8 + len([byte for byte in [rep_id, target, action, parameter0, parameter1] if byte != 0])
 
@@ -31,11 +31,11 @@ class Config:
             message_bytes = [dlc, target, action, parameter0, parameter1, 0x01, 0x00, 0x00]
 
             rep_id_bytes = [rep_id]
-            scale = message['scale']
-            is_16bit = message['is_16bit']
-            rtvi_id = message['rtvi_id']
+            scale = sensor['scale']
+            is_16bit = sensor['is_16bit']
+            rtvi_id = sensor['rtvi_id']
 
-            refresh_rate = message['refresh_rate']
+            refresh_rate = sensor['refresh_rate']
             if refresh_rate == "high":
                 self.msg_hs.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, rtvi_id))
             elif refresh_rate == "low":
@@ -67,6 +67,7 @@ class CanBusThread(threading.Thread):
     def stop_thread(self):
         self._stop_event.set()
         self.stop_canbus()
+        self.client.disconnect()
 
     def stop_canbus(self):
         if self.can_bus:
@@ -92,30 +93,30 @@ class CanBusThread(threading.Thread):
         if self.client and self.client.connected:
             self.client.emit('data', data, namespace='/canbus')
 
-    def request(self, messages):
-        for message in messages:
-            msg = can.Message(arbitration_id=message[0][0], data=message[2], is_extended_id=True)
+    def request(self, sensors):
+        for sensor in sensors:
+            msg = can.Message(arbitration_id=sensor[0][0], data=sensor[2], is_extended_id=True)
             self.can_bus.send(msg)
 
             timeout = .01
             data = None
             data = self.can_bus.recv(timeout)
             if(data):
-                self.filter(data, message)
+                self.filter(data, sensor)
 
-    def receive(self, messages):
+    def receive(self, sensors):
         while not self._stop_event.set():
             data = self.can_bus.recv()
 
-            for message in messages:
-                self.filter(data, message)
+            for sensor in sensors:
+                self.filter(data, sensor)
 
-    def filter(self, data, message):
-        if data.arbitration_id == message[1][0] and data.data[4] == message[2][4]:
-            value = (data.data[5] << 8) | data.data[6] if message[4] else data.data[5]
-            converted_value = eval(message[3], {'value': value})
+    def filter(self, data, sensor):
+        if data.arbitration_id == sensor[1][0] and data.data[4] == sensor[2][4]:
+            value = (data.data[5] << 8) | data.data[6] if sensor[4] else data.data[5]
+            converted_value = eval(sensor[3], {'value': value})
 
-            data = message[5] + str(float(converted_value))
+            data = sensor[5] + str(float(converted_value))
             self.emit_data_to_frontend(data)
             #print(data)
             sys.stdout.flush()

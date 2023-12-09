@@ -9,9 +9,10 @@ import './settings.scss';
 
 const settingsChannel = io("ws://localhost:4001/settings")
 const canbusChannel = io("ws://localhost:4001/canbus")
+const adcChannel = io("ws://localhost:4001/adc")
 const systemChannel = io("ws://localhost:4001/system")
 
-const Settings = ({ canState, canbusSettings, applicationSettings, versionNumber }) => {
+const Settings = ({ canState, adcState, sensorSettings, applicationSettings, versionNumber }) => {
 
   // Wifi state variables
   const { wifiModalIsShowing, wifiModalToggle } = useModal();
@@ -40,8 +41,8 @@ const Settings = ({ canState, canbusSettings, applicationSettings, versionNumber
     let update = structuredClone(newSettings);
 
     // Search for the key based on the label
-    const convertedValue = Object.keys(canbusSettings.messages).find(
-      (messageKey) => canbusSettings.messages[messageKey].label === newValue
+    const convertedValue = Object.keys(sensorSettings).find(
+      (messageKey) => sensorSettings[messageKey].label === newValue
     );
 
     if (key === 'carplay') {
@@ -75,9 +76,15 @@ const Settings = ({ canState, canbusSettings, applicationSettings, versionNumber
     canbusChannel.emit("requestStatus");
   }
 
+  /* I/O Functionality */
+  function handleADC() {
+    adcChannel.emit("toggle");
+    adcChannel.emit("requestStatus");
+  }
+
   /* Render Settings */
   function renderSetting(key, handleSettingChange, settingsObj) {
-    if (!settingsObj || !canbusSettings) return null;
+    if (!settingsObj || !sensorSettings) return null;
 
     const { label, ...nestedObjects } = settingsObj[key];
     const labelParagraph = <h3>{label}</h3>;
@@ -94,8 +101,8 @@ const Settings = ({ canState, canbusSettings, applicationSettings, versionNumber
         isBoolean = typeof nestedObj === 'boolean';
       } else {
         label = nestedObj.label;
-        value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' || nestedKey === 'colorTheme' ? nestedObj.value : canbusSettings.messages[nestedObj.value].label;
-        options = typeof value === 'number' || typeof value === 'boolean' ? null : nestedObj.options || Object.keys(canbusSettings.messages).map(messageKey => canbusSettings.messages[messageKey].label);
+        value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' || nestedKey === 'colorTheme' ? nestedObj.value : sensorSettings[nestedObj.value].label;
+        options = typeof value === 'number' || typeof value === 'boolean' ? null : nestedObj.options || Object.keys(sensorSettings).map(messageKey => sensorSettings[messageKey].label);
         isBoolean = typeof value === 'boolean'; isBoolean = typeof value === 'boolean';
       }
 
@@ -236,6 +243,16 @@ const Settings = ({ canState, canbusSettings, applicationSettings, versionNumber
                           <span className='setting-elements__row__divider'></span>
                           <span>
                           <button className='round-button button-styles button-background' type='button' onClick={() => { handleCAN() }}>{canState ? "On" : "Off"}</button>
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className='setting-elements__row'>
+                        <div className='setting-elements__row__item'>
+                          <span>ADC Worker {adcState ? "(Inactive)" : "(Active)"}</span>
+                          <span className='setting-elements__row__divider'></span>
+                          <span>
+                          <button className='round-button button-styles button-background' type='button' onClick={() => { handleADC() }}>{adcState ? "On" : "Off"}</button>
                           </span>
                         </div>
                       </div>

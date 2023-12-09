@@ -75,16 +75,48 @@ class ServerThread(threading.Thread):
         settings.save_settings(args, data)
         socketio.emit(args, settings.load_settings(args), namespace='/settings')
 
-    # Return settings object to frontend via socket.io
+    # Return filtered sensor object to frontend via socket.io
+    @socketio.on('requestSensors', namespace='/settings')
+    def handle_request_settings():
+        sensors = {}
+        sensors.update(settings.load_settings("canbus").get("sensors"))
+        sensors.update(settings.load_settings("adc").get("sensors"))
+
+        sensor_keys = [sensors[sensor_key].keys() for sensor_key in sensors]
+        common_keys = set(sensor_keys[0]).intersection(*sensor_keys[1:])
+        sensors = {
+                sensor_key: {key: sensors[sensor_key][key] for key in common_keys}
+                for sensor_key in sensors
+        }
+        socketio.emit('sensors', sensors, namespace='/settings')
+
+   # Return CAN status to frontend via socket.io
     @socketio.on('requestStatus', namespace='/canbus')
     def emit_can_status():
         #socketio.emit('status', shared_state.THREAD_STATES["Canbus"], namespace='/canbus')
+        print('status request') 
+
+    # Return ADC status to frontend via socket.io
+    @socketio.on('requestStatus', namespace='/adc')
+    def emit_adc_status():
+        #socketio.emit('status', shared_state.THREAD_STATES["ADC"], namespace='/adc')
         print('status request')
 
-    # Return settings object to frontend via socket.io
+    # Return CAN data via socket.io
     @socketio.on('data', namespace='/canbus')
     def handle_can_data(data):
         socketio.emit('data', data, namespace='/canbus')
+
+    # Return ADC data via socket.io
+    @socketio.on('data', namespace='/adc')
+    def handle_adc_data(data):
+        socketio.emit('data', data, namespace='/adc')
+
+     # Toggle adc stream
+    @socketio.on('toggle', namespace='/adc')
+    def handle_toggle_request():
+        shared_state.toggle_adc.set()
+        socketio.emit('status', shared_state.THREAD_STATES["ADC"], namespace='/adc')
 
     # Toggle canbus stream
     @socketio.on('toggle', namespace='/canbus')
@@ -94,7 +126,7 @@ class ServerThread(threading.Thread):
 
     # Toggle linbus stream
     @socketio.on('toggle', namespace='/linbus')
-    def handle_linbus_request():
+    def handle_toggle_request():
         print('toggle')
 
     @socketio.on('systemTask', namespace='/system')
@@ -107,12 +139,15 @@ class ServerThread(threading.Thread):
         elif args == 'quit':
             shared_state.exit_event.set()
         elif args == 'restart':
-            shared_state.toggle_browser.set()
             shared_state.toggle_can.set()
+            shared_state.toggle_adc.set()
+            shared_state.toggle_browser.set()
+            
 
             time.sleep(5)
             
             shared_state.toggle_can.set()
+            shared_state.toggle_adc.set()
             shared_state.toggle_browser.set()
 
         else:

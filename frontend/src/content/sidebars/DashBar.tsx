@@ -7,7 +7,7 @@ import "./../../themes.scss"
 import "./dashbar.scss";
 
 
-const DashBar = ({ canbusSettings, applicationSettings, wifiState, phoneState, setView }) => {
+const DashBar = ({ sensorSettings, applicationSettings, wifiState, phoneState, setView }) => {
 
     const [carData, setCarData] = useState({})
 
@@ -28,18 +28,18 @@ const DashBar = ({ canbusSettings, applicationSettings, wifiState, phoneState, s
         <div className={`dashbar ${applicationSettings.app.colorTheme.value}`} style={{ height: `${applicationSettings.interface.heightOSD.value}px` }}>
             <div className="dashbar__data">
                 <div className="dashbar__data__item">
-                    <p><b>{canbusSettings.messages[applicationSettings.dash_bar.value_1.value].label}:</b> <br />
-                    {carData[applicationSettings.dash_bar.value_1.value]}{canbusSettings.messages[applicationSettings.dash_bar.value_1.value].unit}</p>
+                    <p><b>{sensorSettings[applicationSettings.dash_bar.value_1.value].label}:</b> <br />
+                    {carData[applicationSettings.dash_bar.value_1.value]}{sensorSettings[applicationSettings.dash_bar.value_1.value].unit}</p>
                 </div>
 
                 <div className="dashbar__data__item">
-                    <p><b>{canbusSettings.messages[applicationSettings.dash_bar.value_2.value].label}:</b> <br />
-                    {carData[applicationSettings.dash_bar.value_2.value]}{canbusSettings.messages[applicationSettings.dash_bar.value_2.value].unit}</p>
+                    <p><b>{sensorSettings[applicationSettings.dash_bar.value_2.value].label}:</b> <br />
+                    {carData[applicationSettings.dash_bar.value_2.value]}{sensorSettings[applicationSettings.dash_bar.value_2.value].unit}</p>
                 </div>
 
                 <div className="dashbar__data__item">
-                    <p><b>{canbusSettings.messages[applicationSettings.dash_bar.value_3.value].label}:</b> <br />
-                    {carData[applicationSettings.dash_bar.value_3.value]}{canbusSettings.messages[applicationSettings.dash_bar.value_3.value].unit}</p>
+                    <p><b>{sensorSettings[applicationSettings.dash_bar.value_3.value].label}:</b> <br />
+                    {carData[applicationSettings.dash_bar.value_3.value]}{sensorSettings[applicationSettings.dash_bar.value_3.value].unit}</p>
                 </div>
             </div>
 

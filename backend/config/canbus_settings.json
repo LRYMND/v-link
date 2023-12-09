@@ -41,7 +41,7 @@
     "target_ids": [
         "0x7A"
     ],
-    "messages": {
+    "sensors": {
         "boost": {
             "parameter": [
                 "0x12",

@@ -1,30 +1,28 @@
 import { io } from "socket.io-client";
 
-console.log('Worker script is running');
-
-let canbusSettings;
+let sensorSettings;
 let carData
 
-// Connect to the settings namespace to retrieve canbusSettings
+// Connect to the settings namespace to retrieve sensorSettings
 const settingsChannel = io("ws://localhost:4001/settings");
 
 // Connect to the canbus namespace to receive continuous data stream
-const canbusChannel = io("ws://localhost:4001/canbus");
+const adcChannel = io("ws://localhost:4001/adc");
 
 // Function to handle incoming canbus settings
-const handleCanbusSettings = (settings) => {
-    canbusSettings = settings;
+const handlesensorSettings = (settings) => {
+    sensorSettings = settings;
     // Subscribe to the canbus namespace after receiving settings
-    canbusChannel.connect();
+    adcChannel.connect();
 };
 
 // Function to update car data
 const updateCarData = (data) => {
     const updatedData = {};
 
-    if (canbusSettings && canbusSettings.messages && data != null) {
-        Object.keys(canbusSettings.messages).forEach((key) => {
-            const message = canbusSettings.messages[key];
+    if (sensorSettings && data != null) {
+        Object.keys(sensorSettings).forEach((key) => {
+            const message = sensorSettings[key];
             const rtviId = message.rtvi_id;
             const regex = new RegExp(rtviId, 'g');
 
@@ -49,16 +47,16 @@ const postCarDataToMain = (carData) => {
 };
 
 // Listen for canbus settings
-settingsChannel.on("canbus", handleCanbusSettings);
+settingsChannel.on("sensors", handlesensorSettings);
 
 // Listen for continuous data stream from canbus namespace
-canbusChannel.on("data", (data) => {
+adcChannel.on("data", (data) => {
     carData = updateCarData(data);
     postCarDataToMain(carData);
 });
 
 // Send a request for canbus settings
-settingsChannel.emit("requestSettings", "canbus");
+settingsChannel.emit("requestSensors");
 
 
 

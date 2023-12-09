@@ -1,7 +1,7 @@
 {
   "name": "volvo-rtvi",
   "productName": "Volvo RTVI",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": false,
   "author": {
     "name": "Louis Raymond",
@@ -34,7 +34,8 @@
     "socket.io-client": "^4.7.2",
     "stream-browserify": "^3.0.0",
     "typescript": "^5.0.2",
-    "web-vitals": "^3.4.0"
+    "web-vitals": "^3.4.0",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
