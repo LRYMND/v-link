@@ -119,10 +119,10 @@ if __name__ == "__main__":
             choice = non_blocking_input("Start on Vite-Port 5173? (Y/N): ")
             if choice.lower() == 'y':
                 shared_state.isFlask = False
-
+                
     time.sleep(.1)
     rtvi.start_thread("Canbus")
-    time.sleep(.1)
+    time.sleep(1)
     rtvi.start_thread("Browser")
 
     rtvi.print_thread_states()

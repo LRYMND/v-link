@@ -8,16 +8,17 @@ from .shared.shared_state import shared_state
 
 class Config:
     def __init__(self):
-        self.settings = settings.load_settings("canbus")
-        self.refresh_rate = self.settings["timing"]["refresh_rate"]
-        self.interval = self.settings["timing"]["interval"]
+        self.canSettings = settings.load_settings("canbus")
+        self.refresh_rate = self.canSettings["timing"]["refresh_rate"]
+        self.interval = self.canSettings["timing"]["interval"]
+        self.timeout = self.canSettings["timing"]["timeout"]
         self.msg_hs = []
         self.msg_ls = []
 
         self.initialize_messages()
 
     def initialize_messages(self):
-        for key, message in self.settings['messages'].items():
+        for key, message in self.canSettings['messages'].items():
             req_id = int(message['req_id'], 16)
             rep_id = int(message['rep_id'], 16)
             target = int(message['target'], 16)
@@ -97,11 +98,15 @@ class CanBusThread(threading.Thread):
             msg = can.Message(arbitration_id=message[0][0], data=message[2], is_extended_id=True)
             self.can_bus.send(msg)
 
-            timeout = .01
-            data = None
-            data = self.can_bus.recv(timeout)
-            if(data):
-                self.filter(data, message)
+            timer = time.time()
+
+            while True:
+                current_time = time.time()
+                received = self.filter(self.can_bus.recv(.01), message)
+                
+                if(received): break
+                if current_time - timer >= self.config.timeout: break
+                
 
     def receive(self, messages):
         while not self._stop_event.set():
@@ -110,18 +115,20 @@ class CanBusThread(threading.Thread):
             for message in messages:
                 self.filter(data, message)
 
-    def filter(self, data, message):
-        if data.arbitration_id == message[1][0] and data.data[4] == message[2][4]:
-            value = (data.data[5] << 8) | data.data[6] if message[4] else data.data[5]
-            converted_value = eval(message[3], {'value': value})
 
-            data = message[5] + str(float(converted_value))
-            self.emit_data_to_frontend(data)
-            #print(data)
-            sys.stdout.flush()
-            return True
-        else:
-            return False
+    def filter(self, data, message):
+        if (data):
+            if data.arbitration_id == message[1][0] and data.data[4] == message[2][4]:
+                value = (data.data[5] << 8) | data.data[6] if message[4] else data.data[5]
+                converted_value = eval(message[3], {'value': value})
+
+                data = message[5] + str(float(converted_value))
+                self.emit_data_to_frontend(data)
+                #print(data)
+                sys.stdout.flush()
+                return True
+            else:
+                return False
 
     def run_can_bus(self):
         x = 0

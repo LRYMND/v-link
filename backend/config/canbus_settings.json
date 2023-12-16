@@ -2,7 +2,8 @@
     "version": "1.0",
     "timing": {
         "refresh_rate": 0.02,
-        "interval": 50
+        "interval": 50,
+        "timeout": 0.5
     },
     "canbus": {
         "interface": "socketcan",
