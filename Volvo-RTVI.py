@@ -3,7 +3,8 @@ import time
 import sys
 import os
 
-sys.path.append('/backend')
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from backend.server              import ServerThread
 from backend.canbus              import CanBusThread
 from backend.linbus              import LinBusThread
@@ -52,8 +53,6 @@ class RTVI:
             self.stop_thread(thread_name)
         else:
             self.start_thread(thread_name)
-
-        self.print_thread_states()
 
     def join_threads(self):
         for thread_name in self.threads:
@@ -119,7 +118,11 @@ if __name__ == "__main__":
             choice = non_blocking_input("Start on Vite-Port 5173? (Y/N): ")
             if choice.lower() == 'y':
                 shared_state.isFlask = False
-                
+
+            choice = non_blocking_input("Start in Kiosk mode? (Y/N): ")
+            if choice.lower() == 'n':
+                shared_state.isKiosk = False
+
     time.sleep(.1)
     rtvi.start_thread("Canbus")
     time.sleep(1)

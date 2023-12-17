@@ -114,10 +114,9 @@ const Home = ({
     switch (view) {
       case 'Carplay':
         return (
-          <div className='container'>
+          <div className='container' style={{overflow:'hidden'}}>
             {showOsd && phoneState &&
               <DashBar
-                className='dashbar'
                 canbusSettings={canbusSettings}
                 applicationSettings={applicationSettings}
                 phoneState={phoneState}

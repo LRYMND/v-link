@@ -55,6 +55,11 @@ cd /home/$USER/volvo-rtvi
 python3 Volvo-RTVI.py dev
 ```
 
+```
+Node v18.12.1
+NPM 8.19.2
+```
+
 ---
 
 ## Content

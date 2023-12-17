@@ -13,7 +13,7 @@ done
 while true; do
     read -p "Install Prerequisites? (Recommended) [Y/N]" yn
     case $yn in
-        [Yy]* ) sudo apt-get install ffmpeg; sudo apt-get install libudev-dev; break;;
+        [Yy]* ) sudo apt-get install ffmpeg; sudo apt-get install libudev-dev; sudo apt-get install libusb-dev; sudo apt-get install build-essential; break;;
         [Nn]* ) break;;
         * ) echo "Answer with Y or N";;
     esac
@@ -90,9 +90,22 @@ unzip $output_path/Volvo-RTVI.zip -d $output_path
 # Change to the directory
 cd $output_path
 
+while true; do
+    read -p "Create a virtual environment (recommended)? [Y/N]" yn
+    case $yn in
+        [Yy]* ) 
+            python3 -m venv venv
+            break;;
+        [Nn]* ) 
+            break;;
+        * ) 
+            echo "Answer with Y or N";;
+    esac
+done
+
 # Install requirements
 echo "Installing requirements..."
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 echo
 echo
 # Provide some feedback
@@ -108,7 +121,7 @@ while true; do
             sudo bash -c "cat > /etc/xdg/autostart/volvo-rtvi.desktop <<EOL
 [Desktop Entry]
 Name=Volvo RTVI
-Exec=python /home/$USER/volvo-rtvi/Volvo-RTVI.py
+Exec=python3 /home/$USER/volvo-rtvi/Volvo-RTVI.py
 Type=Application
 EOL"
             break;;

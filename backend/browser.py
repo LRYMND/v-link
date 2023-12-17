@@ -28,12 +28,13 @@ class BrowserThread(threading.Thread):
 
 
     def start_browser(self):
-        if shared_state.isDev:
+        if shared_state.isKiosk:
+            flags = "--window-size=800,480 --kiosk --enable-features=SharedArrayBuffer --autoplay-policy=no-user-gesture-required --disable-extensions  --remote-debugging-port=9222"
+            command = f"chromium-browser --app={self.url} {flags}"
+        else:
             flags = "--window-size=800,480 --disable-resize --enable-features=SharedArrayBuffer,OverlayScrollbar --autoplay-policy=no-user-gesture-required --disable-extensions"
             command = f"chromium-browser {self.url} {flags}"
-        else:
-            flags = "--window-size=800,480 --kiosk --enable-features=SharedArrayBuffer --autoplay-policy=no-user-gesture-required --disable-extensions"
-            command = f"chromium-browser --app={self.url} {flags}"
+
 
         self.browser = subprocess.Popen(command, shell=True)
         print(f"Chromium browser started with PID: {self.browser.pid}")

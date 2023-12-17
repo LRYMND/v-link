@@ -8,6 +8,7 @@ class SharedState:
         self.isDev = False
         self.vCan = False
         self.isFlask = True
+        self.isKiosk = True
 
         self.exit_event = threading.Event()
 

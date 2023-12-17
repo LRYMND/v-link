@@ -22,24 +22,24 @@ function App() {
   const [carplayState, setCarplayState] = useState(false);
 
   return (
-    <div className="container" style={{overflow:'hidden'}}>
-    <Splash 
-    versionNumber={versionNumber}
-    />
-    <Cardata/>
-    {applicationSettings ? 
-      <div className='carplay'>
-        
-        <Carplay
-          applicationSettings={applicationSettings}
-          phoneState={setPhoneState}
-          carplayState={setCarplayState}
-          setPhoneState={setPhoneState}
-          setCarplayState={setCarplayState}
-          view={view}
-          setView={setView}
-        />
-      </div> : <></>}
+    <div className="container" style={{ overflow: 'hidden' }}>
+      <Splash
+        versionNumber={versionNumber}
+      />
+      <Cardata />
+      {applicationSettings ?
+        <div className='carplay' style={{ overflow: 'hidden' }}>
+
+          <Carplay
+            applicationSettings={applicationSettings}
+            phoneState={setPhoneState}
+            carplayState={setCarplayState}
+            setPhoneState={setPhoneState}
+            setCarplayState={setCarplayState}
+            view={view}
+            setView={setView}
+          />
+        </div> : <></>}
       <Home
         applicationSettings={applicationSettings}
         setApplicationSettings={setApplicationSettings}
