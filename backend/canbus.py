@@ -103,10 +103,10 @@ class CanBusThread(threading.Thread):
             while True:
                 current_time = time.time()
                 received = self.filter(self.can_bus.recv(.01), message)
-                
+
                 if(received): break
                 if current_time - timer >= self.config.timeout: break
-                
+
 
     def receive(self, messages):
         while not self._stop_event.set():
