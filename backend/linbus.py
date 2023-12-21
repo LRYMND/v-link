@@ -5,14 +5,17 @@ import pyautogui
 
 class Config:
     # Constants
-    JOYSTICK_UP = 0x1
-    JOYSTICK_DOWN = 0x2
-    JOYSTICK_LEFT = 0x4
-    JOYSTICK_RIGHT = 0x8
-    BUTTON_BACK = 0x1
-    BUTTON_ENTER = 0x8
-    BUTTON_NEXT = 0x10
-    BUTTON_PREV = 0x2
+    JOYSTICK_UP = b'\x01'
+    JOYSTICK_DOWN = b'\x02'
+    JOYSTICK_LEFT = b'\x04'
+    JOYSTICK_RIGHT = b'\x08'
+    BUTTON_BACK = b'\x01'
+    BUTTON_ENTER = b'\x08'
+    BUTTON_NEXT = b'\x10'
+    BUTTON_PREV = b'\x02'
+
+    SYNC_ID = b'\x55'
+    SWM_ID = b'\x20'
 
     ON_CLICK_DURATION = 100
     OFF_CLICK_DURATION = 3000
@@ -43,6 +46,83 @@ class LinFrame:
     def reset(self):
         self.bytes = []
 
+    def computeChecksum(self):
+        # LIN V2 checksum includes the ID byte, V1 does not.
+        # startByteIndex = 0 if custom_defs.kUseLinChecksumVersion2 else 1
+        startByteIndex = 1
+        p = self.bytes[startByteIndex:]
+
+        # Exclude the checksum byte at the end of the frame.
+        num_bytes_to_checksum = len(p) - 1
+
+        # Sum bytes. We should not have 16-bit overflow here since the frame has a limited size.
+        # Convert bytes to integers before summing.
+        sum_value = sum(x if isinstance(x, int) else int.from_bytes(x, 'big') for x in p[:num_bytes_to_checksum])
+
+        # Keep adding the high and low bytes until no carry.
+        for _ in range(256):
+            high_byte = (sum_value >> 8) & 0xFF
+            if not high_byte:
+                break
+            sum_value = (sum_value & 0xFF) + high_byte
+
+        return (~sum_value) & 0xFF
+
+    def setLinIdChecksumBits(self, id_byte):
+        p1_at_b7 = bytes([0xFF])
+        p0_at_b6 = bytes([0x00])
+
+        # P1: id5, P0: id4
+        shifter = int.from_bytes(id_byte, 'big') << 2
+        p1_at_b7 = bytes([x ^ shifter & 0xFF for x in p1_at_b7])
+        p0_at_b6 = bytes([x ^ shifter & 0xFF for x in p0_at_b6])
+
+        # P1: id4, P0: id3
+        shifter += shifter
+        p1_at_b7 = bytes([x ^ shifter & 0xFF for x in p1_at_b7])
+
+        # P1: id3, P0: id2
+        shifter += shifter
+        p1_at_b7 = bytes([x ^ shifter & 0xFF for x in p1_at_b7])
+        p0_at_b6 = bytes([x ^ shifter & 0xFF for x in p0_at_b6])
+
+        # P1: id2, P0: id1
+        shifter += shifter
+        p0_at_b6 = bytes([x ^ shifter & 0xFF for x in p0_at_b6])
+
+        # P1: id1, P0: id0
+        shifter += shifter
+        p1_at_b7 = bytes([x ^ shifter & 0xFF for x in p1_at_b7])
+        p0_at_b6 = bytes([x ^ shifter & 0xFF for x in p0_at_b6])
+
+        result = (int.from_bytes(p1_at_b7, 'big') & 0b10000000) | (int.from_bytes(p0_at_b6, 'big') & 0b01000000) | (int.from_bytes(id_byte, 'big') & 0b00111111)
+        return result.to_bytes(1, 'big')
+    
+    def isValid(self):
+        n = len(self.bytes)
+
+        # Check frame size.
+        # One ID byte with optional 1-8 data bytes and 1 checksum byte.
+        # TODO: should we enforce only 1, 2, 4, or 8 data bytes? (total size 1, 3, 4, 6, or 10)
+        #
+        # TODO: should we pass through frames with ID only (n == 1, no response from slave).
+        if n != 1 and (n < 3 or n > 10):
+            return False
+
+        # Check ID byte checksum bits.
+        id_byte = self.bytes[0]
+        if id_byte != self.setLinIdChecksumBits(id_byte):
+            return False
+
+        # If not an ID only frame, check also the overall checksum.
+        #print(n)
+        # if n > 1:
+        #     if self.bytes[n - 1] != self.computeChecksum():
+        #         return False
+
+        # TODO: check protected id.
+        return True
+
 class LinBusThread(threading.Thread):
     def __init__(self):
         super(LinBusThread, self).__init__()
@@ -63,6 +143,7 @@ class LinBusThread(threading.Thread):
             while not self._stop_event.is_set():
                 self.currentMillis = int(round(time.time() * 1000))
                 self.read_lin_bus()
+                #self.read_lin_bus_from_file("/home/pi/volvo-rtvi/backend/log.bin")
                 self.timeout_button()
                 self.rti()
         except KeyboardInterrupt:
@@ -78,8 +159,8 @@ class LinBusThread(threading.Thread):
         if self.LINSerial.in_waiting > 0:
             b = self.LINSerial.read()
             n = self.linframe.num_bytes()
-
-            if b == 0x55 and n > 2 and self.linframe.get_byte(n - 1) == 0:
+            
+            if b == self.config.SYNC_ID and n > 2 and self.linframe.get_byte(n - 1) == b'\x00':
                 self.linframe.pop_byte()
                 self.handle_swm_frame()
                 self.linframe.reset()
@@ -88,8 +169,26 @@ class LinBusThread(threading.Thread):
             else:
                 self.linframe.append_byte(b)
 
+    def read_lin_bus_from_file(self, file_path):
+        with open(file_path, 'rb') as file:
+            b = file.read(1)
+            
+            while b:
+                n = self.linframe.num_bytes()
+                if b == self.config.SYNC_ID and n > 2 and self.linframe.get_byte(n - 1) == b'\x00':
+                    self.linframe.pop_byte()
+                    self.handle_swm_frame()
+                    self.linframe.reset()
+                elif n == self.linframe.kMaxBytes:
+                    self.linframe.reset()
+                else:
+                    self.linframe.append_byte(b)
+
+                # Read the next byte
+                b = file.read(1)
+
     def handle_swm_frame(self):
-        if self.linframe.get_byte(0) != 0x20:
+        if self.linframe.get_byte(0) != self.config.SWM_ID: 
             return
 
         if not self.linframe.isValid():
@@ -139,6 +238,7 @@ class LinBusThread(threading.Thread):
         if not self.on:
             return
 
+        print('clicking button')
         if button == self.config.BUTTON_ENTER:
             if not self.enableMouse:
                 pyautogui.press('space')
@@ -180,6 +280,8 @@ class LinBusThread(threading.Thread):
     def click_joystick(self, button):
         if not self.on:
             return
+        
+        print('emulating joystick')
 
         if button == self.config.JOYSTICK_UP:
             pyautogui.press('H')
@@ -211,13 +313,13 @@ class LinBusThread(threading.Thread):
             return
 
         if self.rtiStep == 0:
-            self.rti_print(0x40 if self.on else 0x46)
+            self.rti_print(b'\x40' if self.on else b'\x46')
             self.rtiStep += 1
         elif self.rtiStep == 1:
-            self.rti_print(0x20)
+            self.rti_print(b'\x20')
             self.rtiStep += 1
         elif self.rtiStep == 2:
-            self.rti_print(0x83)
+            self.rti_print(b'\x83')
             self.rtiStep = 0
 
         self.lastRtiWrite = self.currentMillis
