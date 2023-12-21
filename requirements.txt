@@ -6,4 +6,5 @@ python-socketio
 werkzeug
 pyautogui
 eventlet
+websocket-client
 adafruit-circuitpython-ads1x15

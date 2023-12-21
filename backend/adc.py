@@ -11,10 +11,14 @@ import busio
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 
-# Create the I2C bus
-i2c = busio.I2C(board.SCL, board.SDA)
-# Create the ADC object
-ads = ADS.ADS1115(i2c)
+i2c = None
+ads = None
+
+try:
+    i2c = busio.I2C(board.SCL, board.SDA)
+    ads = ADS.ADS1115(i2c)
+except Exception as e:
+    print(e)
 PULL_UP = 2000
 STEP = 0.5
 
@@ -32,9 +36,10 @@ class ADCThread(threading.Thread):
         self.temperature_data = None
 
     def run(self):
-        self.read_settings()
-        self.connect_to_socketio()
-        self.start_adc()
+        if (ads):
+            self.read_settings()
+            self.connect_to_socketio()
+            self.start_adc()
 
     def stop_thread(self):
         self._stop_event.set()
@@ -46,6 +51,7 @@ class ADCThread(threading.Thread):
         while not self._stop_event.is_set():
             self.read_sensor()
             time.sleep(.1)
+
 
     def read_settings(self):
         self.sensor_data = self.read_sensor_data_from_json()

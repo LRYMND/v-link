@@ -3,7 +3,7 @@ Road Traffic and Vehicle Infotainment
 
 ![TITLE IMAGE](repo/media/title2.jpg?raw=true "Title")  
 
-This is a react web-app to run natively on Mac/Linux and therefore also on a RaspberryPi. It's providing a fully functioning Carplay/AndroidAuto integration, an interface for canbus and linbus as well as an ADC to connect external sensors like a Bosch 0 261 340 482. The app is intended for Volvo P-chassis with a T5 engine (C30, V50, V70 II). However, the canbus codes can be easily adjusted with an exposed settings file in order to change the data.
+This is a react web-app to run natively on a RaspberryPi. It's providing a fully functioning Carplay/AndroidAuto integration as well as an interface for canbus and linbus. The app is intended for Volvo P-chassis with a T5 engine (C30, V50, V70 II). However, the canbus codes can be easily adjusted with an exposed settings file in order to change the data.
 
 ![PAGES IMAGE](repo/media/pages.jpg?raw=true "Pages")  
 
@@ -20,7 +20,10 @@ The project is based on the following repositories:
 * [volvo-vida](https://github.com/Tigo2000/Volvo-VIDA)
 
 Got any tips for improvement or need help?  
-Join our discussion on [Swedespeed](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)!
+
+[Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
+
+[RTVI Discord Server](https://discord.gg/NyGvFaRS)
 
 ### > System Requirements:
 ```
@@ -32,7 +35,7 @@ Python 3.9.2
 ### > How to use:
 Production:
 ```
-wget "https://github.com/LRYMND/volvo-rtvi/releases/download/v2.1.0/Installer.sh"
+wget "https://github.com/LRYMND/volvo-rtvi/releases/download/v2.0.0/Installer.sh"
 chmod +x Installer.sh
 sh Installer.sh
 
@@ -53,6 +56,11 @@ npm run vite
 
 cd /home/$USER/volvo-rtvi
 python3 Volvo-RTVI.py dev
+```
+
+```
+Node v18.12.1
+NPM 8.19.2
 ```
 
 ---
@@ -277,7 +285,9 @@ I am distancing myself from any damage that you might do to your car in case you
 (Outdated - Version 1.2.1)
 
 Got any tips for improvement or need help?  
-Join our discussion on [Swedespeed](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)!
+[Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
+
+[RTVI Discord Server](https://discord.gg/NyGvFaRS)
 
 ---
 

@@ -232,7 +232,7 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
 
   return (
     <div
-      style={{ height: '100%', width: '100%', touchAction: 'none' }}
+      style={{ height: '100%', width: '100%', touchAction: 'none', overflow: 'hidden' }}
       id={'main'}
       className={`app ${applicationSettings.app.colorTheme.value}`}
     >
@@ -277,12 +277,13 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
         onPointerCancel={sendTouchEvent}
         onPointerOut={sendTouchEvent}
         style={{
-          height: '100%',
+          height: height,
           display: view === "Carplay" ? 'flex' : 'none',
-          width: '100%',
+          width: width,
           padding: 0,
           margin: 0,
           marginTop: applicationSettings.interface.activateOSD.value ? applicationSettings.interface.heightOSD.value : 0,
+          overflow: 'hidden',
         }}
       >
         <canvas
@@ -290,7 +291,7 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
           id="video"
           style={
             isPlugged && view === "Carplay"
-              ? { height: '100%' }
+              ? { height: '100%', overflow: 'hidden' }
               : { display: 'none' }
           }
         />

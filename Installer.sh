@@ -13,7 +13,7 @@ done
 while true; do
     read -p "Install Prerequisites? (Recommended) [Y/N]" yn
     case $yn in
-        [Yy]* ) sudo apt-get install ffmpeg; sudo apt-get install libudev-dev; break;;
+        [Yy]* ) sudo apt-get install ffmpeg; sudo apt-get install libudev-dev; sudo apt-get install libusb-dev; sudo apt-get install build-essential; break;;
         [Nn]* ) break;;
         * ) echo "Answer with Y or N";;
     esac
@@ -93,7 +93,7 @@ cd $output_path
 # Install requirements
 requirements="/home/$USER/volvo-rtvi/backend/requirements.txt"
 echo "Installing requirements..."
-pip install -r $requirements
+pip3 install -r $requirements
 echo
 echo
 # Provide some feedback
@@ -109,7 +109,7 @@ while true; do
             sudo bash -c "cat > /etc/xdg/autostart/volvo-rtvi.desktop <<EOL
 [Desktop Entry]
 Name=Volvo RTVI
-Exec=python /home/$USER/volvo-rtvi/Volvo-RTVI.py
+Exec=python3 /home/$USER/volvo-rtvi/Volvo-RTVI.py
 Type=Application
 EOL"
             break;;

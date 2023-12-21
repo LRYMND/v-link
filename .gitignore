@@ -8,9 +8,7 @@ frontend/dist/
 .notes/
 .vite/
 .local/
-
-package/
-
+.dev/
 
 #files
 *.tgz

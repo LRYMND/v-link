@@ -3,7 +3,8 @@ import time
 import sys
 import os
 
-sys.path.append('/backend')
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from backend.server              import ServerThread
 from backend.adc                 import ADCThread
 from backend.canbus              import CanBusThread
@@ -122,14 +123,18 @@ if __name__ == "__main__":
             print("Starting VCAN...")
             rtvi.toggle_thread("VCan")
 
-            choice = non_blocking_input("Start on Vite-Port 5173? (Y/N): ")
-            if choice.lower() == 'y':
-                shared_state.isFlask = False
+        choice = non_blocking_input("Start on Vite-Port 5173? (Y/N): ")
+        if choice.lower() == 'y':
+            shared_state.isFlask = False
+
+        choice = non_blocking_input("Start in Kiosk mode? (Y/N): ")
+        if choice.lower() == 'n':
+            shared_state.isKiosk = False
 
     rtvi.start_thread("Canbus")
     time.sleep(.1)
     rtvi.start_thread("ADC")
-    time.sleep(.1)
+    time.sleep(3)
     rtvi.start_thread("Browser")
 
     rtvi.print_thread_states()
