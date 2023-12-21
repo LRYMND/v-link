@@ -22,6 +22,7 @@ The project is based on the following repositories:
 Got any tips for improvement or need help?  
 
 [Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
+
 [RTVI Discord Server](https://discord.gg/NyGvFaRS)
 
 ### > System Requirements:
@@ -284,7 +285,9 @@ I am distancing myself from any damage that you might do to your car in case you
 (Outdated - Version 1.2.1)
 
 Got any tips for improvement or need help?  
-Join our discussion on [Swedespeed](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)!
+[Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
+
+[RTVI Discord Server](https://discord.gg/NyGvFaRS)
 
 ---
 
