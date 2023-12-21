@@ -20,7 +20,9 @@ The project is based on the following repositories:
 * [volvo-vida](https://github.com/Tigo2000/Volvo-VIDA)
 
 Got any tips for improvement or need help?  
-Join our discussion on [Swedespeed](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)!
+
+[Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
+[RTVI Discord Server](https://discord.gg/NyGvFaRS)
 
 ### > System Requirements:
 ```
