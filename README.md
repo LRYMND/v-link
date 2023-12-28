@@ -23,7 +23,7 @@ Got any tips for improvement or need help?
 
 [Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
 
-[RTVI Discord Server](https://discord.gg/NyGvFaRS)
+[RTVI Discord Server](https://discord.gg/DM6948rvu3)
 
 ### > System Requirements:
 ```
@@ -287,7 +287,7 @@ I am distancing myself from any damage that you might do to your car in case you
 Got any tips for improvement or need help?  
 [Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
 
-[RTVI Discord Server](https://discord.gg/NyGvFaRS)
+[RTVI Discord Server](https://discord.gg/DM6948rvu3)
 
 ---
 
