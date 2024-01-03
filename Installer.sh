@@ -90,19 +90,6 @@ unzip $output_path/Volvo-RTVI.zip -d $output_path
 # Change to the directory
 cd $output_path
 
-while true; do
-    read -p "Create a virtual environment (recommended)? [Y/N]" yn
-    case $yn in
-        [Yy]* ) 
-            python3 -m venv venv
-            break;;
-        [Nn]* ) 
-            break;;
-        * ) 
-            echo "Answer with Y or N";;
-    esac
-done
-
 # Install requirements
 echo "Installing requirements..."
 pip3 install -r requirements.txt
