@@ -6,10 +6,6 @@ import Charts from './charts/Charts';
 
 import CarDataStore from '../../cardata/store/Datastore'
 
-const totalPages = 2; // Adjust the number of pages accordingly
-const containerWidth = 100 * totalPages; // Set the total width of all pages
-
-
 function Dashboard({ sensorSettings, applicationSettings }) {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const swipeContainerRef = useRef(null);
@@ -36,7 +32,7 @@ function Dashboard({ sensorSettings, applicationSettings }) {
 	}, []);
 
   function swipeLeft() {
-    if (currentPageIndex < 1) {
+    if (currentPageIndex < totalPages -1) {
       setCurrentPageIndex(currentPageIndex + 1);
     }
   }
