@@ -26,7 +26,7 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
     if (applicationSettings != null)
       setNewSettings(structuredClone(applicationSettings))
   }, [applicationSettings]);
-  
+
 
   /* Change Tabs */
   const [activeTab, setActiveTab] = useState(1);
@@ -35,6 +35,66 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
     setActiveTab(tabIndex);
   };
 
+  /* Add Settings */
+  const handleAddSetting = (key, currentSettings) => {
+    if (currentSettings.constants.chart_input_current < currentSettings.constants.chart_input_max) {
+      const newSetting = {
+        value: "rpm",
+        label: `Value ${currentSettings.constants.chart_input_current + 1}`,
+      };
+  
+      // Check if the key exists in the settings
+      if (currentSettings[key]) {
+        // Create a copy of the current settings for the key
+        const updatedSettingsForKey = {...currentSettings[key]};
+  
+        // Generate a unique ID for the new setting
+        const newSettingId = `value_${currentSettings.constants.chart_input_current + 1}`;
+        
+        // Add the new setting to the copied settings
+        updatedSettingsForKey[newSettingId] = newSetting;
+  
+        // Update the state with the new settings
+        setNewSettings({
+          ...currentSettings,
+          constants: {
+            ...currentSettings.constants,
+            chart_input_current: currentSettings.constants.chart_input_current + 1,
+          },
+          [key]: updatedSettingsForKey,
+        });
+      } else {
+        console.error(`Key "${key}" not found in settings.`);
+      }
+    }
+  };
+
+  /* Remove Settings */
+  const handleRemoveSetting = (key, currentSettings) => {
+    if (currentSettings.constants.chart_input_current > 1) {
+      // Create a copy of the current settings for the key
+      const updatedSettingsForKey = {...currentSettings[key]};
+  
+      // Identify the setting to remove (assuming the last one added)
+      const settingIdToRemove = `value_${currentSettings.constants.chart_input_current}`;
+  
+      // Remove the identified setting
+      delete updatedSettingsForKey[settingIdToRemove];
+  
+      // Update the state with the settings minus the removed one
+      setNewSettings({
+        ...currentSettings,
+        constants: {
+          ...currentSettings.constants,
+          chart_input_current: currentSettings.constants.chart_input_current - 1,
+        },
+        [key]: updatedSettingsForKey,
+      });
+    } else {
+      console.error("Cannot remove setting, minimum limit reached.");
+    }
+  };
+  
 
   /* Change Settings */
   const handleSettingChange = (key, name, newValue, newSettings) => {
@@ -45,7 +105,7 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
       (messageKey) => sensorSettings[messageKey].label === newValue
     );
 
-    if (key === 'carplay') {
+    if (key === 'carplay' || key === 'constants') {
       update[key][name] = newValue;
     } else {
       update[key][name].value = convertedValue || newValue;
@@ -83,7 +143,7 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
   }
 
   /* Render Settings */
-  function renderSetting(key, handleSettingChange, settingsObj) {
+  function renderSetting(key, settingsObj) {
     if (!settingsObj || !sensorSettings) return null;
 
     const { label, ...nestedObjects } = settingsObj[key];
@@ -93,17 +153,18 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
       if (nestedKey === "label") return null;
       let label, value, options, isBoolean;
 
-
-      if (key === "carplay") {
-        label = nestedKey;
-        value = nestedObj;
-        options = null;
-        isBoolean = typeof nestedObj === 'boolean';
-      } else {
-        label = nestedObj.label;
-        value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' || nestedKey === 'colorTheme' ? nestedObj.value : sensorSettings[nestedObj.value].label;
-        options = typeof value === 'number' || typeof value === 'boolean' ? null : nestedObj.options || Object.keys(sensorSettings).map(messageKey => sensorSettings[messageKey].label);
-        isBoolean = typeof value === 'boolean'; isBoolean = typeof value === 'boolean';
+      if (key != "constants") {
+        if (key === "carplay") {
+          label = nestedKey;
+          value = nestedObj;
+          options = null;
+          isBoolean = typeof nestedObj === 'boolean';
+        } else {
+          label = nestedObj.label;
+          value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' || nestedKey === 'colorTheme' || nestedKey === 'defaultDash' || nestedKey === 'startPage' ? nestedObj.value : sensorSettings[nestedObj.value].label;
+          options = typeof value === 'number' || typeof value === 'boolean' ? null : nestedObj.options || Object.keys(sensorSettings).map(messageKey => sensorSettings[messageKey].label);
+          isBoolean = typeof value === 'boolean'; isBoolean = typeof value === 'boolean';
+        }
       }
 
 
@@ -233,16 +294,16 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
 
                   {activeTab === 1 &&
                     <div className='scroller__container__content scrollbar-styles'>
-                      {renderSetting("app", handleSettingChange, newSettings)}
-                      {renderSetting("interface", handleSettingChange, newSettings)}
-                      {renderSetting("connections", handleSettingChange, newSettings)}
+
+                      {renderSetting("app", newSettings)}
+                      {renderSetting("connections", newSettings)}
 
                       <div className='setting-elements__row'>
                         <div className='setting-elements__row__item'>
                           <span>CAN Worker {canState ? "(Inactive)" : "(Active)"}</span>
                           <span className='setting-elements__row__divider'></span>
                           <span>
-                          <button className='round-button button-styles button-background' type='button' onClick={() => { handleCAN() }}>{canState ? "On" : "Off"}</button>
+                            <button className='round-button button-styles button-background' type='button' onClick={() => { handleCAN() }}>{canState ? "On" : "Off"}</button>
                           </span>
                         </div>
                       </div>
@@ -252,36 +313,48 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
                           <span>ADC Worker {adcState ? "(Inactive)" : "(Active)"}</span>
                           <span className='setting-elements__row__divider'></span>
                           <span>
-                          <button className='round-button button-styles button-background' type='button' onClick={() => { handleADC() }}>{adcState ? "On" : "Off"}</button>
+                            <button className='round-button button-styles button-background' type='button' onClick={() => { handleADC() }}>{adcState ? "On" : "Off"}</button>
                           </span>
                         </div>
                       </div>
 
-                      {renderSetting("dev", handleSettingChange, newSettings)}
+                      {renderSetting("dev", newSettings)}
                     </div>
                   }
 
                   {activeTab === 2 &&
                     <div className='scroller__container__content scrollbar-styles'>
-                      {renderSetting("visibility", handleSettingChange, newSettings)}
-                      {renderSetting("dash_bar", handleSettingChange, newSettings)}
-                      {renderSetting("dash_1", handleSettingChange, newSettings)}
-                      {renderSetting("dash_2", handleSettingChange, newSettings)}
-                      {renderSetting("charts", handleSettingChange, newSettings)}
+                      {/*renderSetting("visibility", newSettings)*/}
+                      {renderSetting("dash_bar", newSettings)}
+                      {renderSetting("dash_1", newSettings)}
+                      {renderSetting("charts", newSettings)}
+                      <div className='setting-elements__row'>
+                        <div className='setting-elements__row__item'>
+                          <span>Add/Remove Data</span>
+                          <span className='setting-elements__row__divider'></span>
+                          <div style={{display: "flex", flexDirection: "row", gap: "5px"}}>
+                            <button className='round-button button-styles button-background' type='button' onClick={() => { handleAddSetting("charts", newSettings) }}>+</button>
+                            <button className='round-button button-styles button-background' type='button' onClick={() => { handleRemoveSetting("charts", newSettings) }}>-</button>
+                          </div>
+                        </div>
+                      </div>
+                      {renderSetting("dash_3", newSettings)}
+                      {/*renderSetting("racedash", handleSettingChange, newSettings)*/}
+
                     </div>
                   }
 
                   {activeTab === 3 &&
                     <div className='scroller__container__content scrollbar-styles'>
-                      {renderSetting("comfort", handleSettingChange, newSettings)}
-                      {renderSetting("lights", handleSettingChange, newSettings)}
+                      {renderSetting("comfort", newSettings)}
+                      {renderSetting("lights", newSettings)}
                     </div>
                   }
 
 
                   {activeTab === 0 &&
                     <div className='scroller__container__content scrollbar-styles'>
-                      {renderSetting("carplay", handleSettingChange, newSettings)}
+                      {renderSetting("carplay", newSettings)}
                     </div>
                   }
                 </div>

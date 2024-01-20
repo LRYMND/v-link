@@ -10,32 +10,25 @@ export const RadialGauge = ({
     size = 100,
     arc = 270,
     globalRotation = 90,
-
     title = 'Gauge',
     unit = 'Units',
     currentValue,
     maxValue = 100,
-
     borderSize = 0,
     borderGap = 0,
-
-    progressRadius = 70,
+    progressOffset = -30,
     progressWidth = 5,
-
     bigTicks = 5,
     smallTicks = 4,
     heightBigTicks = 10,
     heightSmallTicks = 2,
     tickWidth = 1,
-
-    needleLength = 80,
+    needleOffset = -30,
     needleWidth = 2,
     pivotSize = 15,
-
-    limitRadius = 80,
+    limitOffset = -5,
     limitWidth = 2,
     limitStart = 70,
-
     borderColor = 'black',
     backgroundColor = 'black',
     progressBackgroundColor = 'grey',
@@ -63,138 +56,171 @@ export const RadialGauge = ({
         currentValue = maxValue;
     }
 
-    let percent1 = (currentValue / maxValue) * 100;
-    let percent2 = (limitStart / maxValue) * 100;
+    const percent1 = (currentValue / maxValue) * 100;
+    const percent2 = (limitStart / maxValue) * 100;
 
     smallTicks = (bigTicks) * (smallTicks + 1)
 
-    let cx = size                                                                       //Center
-    let cy = cx
+    // Center of Gauge
+    const cx = size / 2;
+    const cy = size / 2;
 
-    let rx1 = progressRadius                                                            //Radius of inner circle
-    let ry1 = rx1
+    // Radius of gauge
+    const radius = (size - (borderSize * 4)) / 2;
 
-    let rx2 = size - (heightBigTicks / 2) - borderSize - borderGap                      //Radius of big ticks
-    let ry2 = rx2
+    // Radius for progress circle
+    const radius_1 = radius + progressOffset;
 
-    let rx3 = size - (heightBigTicks - heightSmallTicks / 2) - borderSize - borderGap   //Radius of small ticks
-    let ry3 = rx3
+    //Radius for limit circle
+    const radius_2 = radius + limitOffset;
 
-    let rx4 = limitRadius                                                               //Radius of limit
-    let ry4 = rx4
+    //Radius big ticks
+    const radius_3 = (size - (heightBigTicks / 2) - borderSize - borderGap) / 2;
+
+    //Radius small ticks
+    const radius_4 = (size - (heightBigTicks - heightSmallTicks / 2) - borderSize - borderGap) / 2;
 
 
-    let t1 = 0                                                                          //Start angle (Userdefined)
-    let Δ = arc                                                                         //Sweep angle (Userdefined)
-    let φ = globalRotation                                                              //Global rotation (Userdefined)
-    let ε1 = Δ * (percent1 / 100)                                                       //Progress-End
-    let ε2 = Δ * (percent2 / 100)                                                       //Limit-Start
+    const t1 = 0;
+    let Δ = arc;
+    let φ = globalRotation;
+    let ε1 = Δ * (percent1 / 100);
+    let ε2 = Δ * (percent2 / 100);
+    const δ = (360 - Δ) / 2;
 
-    let δ = (360 - Δ) / 2                                                               //Orient gap to global rotation
-    φ = φ + δ
+    φ = φ + δ;
 
     Δ = Δ * π / 180;
     φ = φ * π / 180;
     ε1 = ε1 * π / 180;
     ε2 = ε2 * π / 180;
 
-    let arcBigTicks = Δ * rx2
-    let arcSmallTicks = Δ * rx3
+    const arcBigTicks = Δ * radius_3;
+    const arcSmallTicks = Δ * radius_4;
 
     Δ = Δ % (2 * π);
 
     const rotMatrix = f_rotate_matrix(φ);
 
-    //Progress Start
-    const [sX1, sY1] = (f_vec_add(f_matrix_times(rotMatrix, [rx1 * cos(t1), ry1 * sin(t1)]), [cx, cy]));
+    const computeCoordinates = (angle, radius) => {
+        const vector = [radius * cos(angle), radius * sin(angle)];
+        const rotatedVector = f_matrix_times(rotMatrix, vector);
+        return f_vec_add(rotatedVector, [cx, cy]);
+    };
 
 
-    //Background End
-    const [eX1, eY1] = (f_vec_add(f_matrix_times(rotMatrix, [rx1 * cos(t1 + Δ), ry1 * sin(t1 + Δ)]), [cx, cy]));
+    // Get start and end points for progress circle
+    const [circle1_sx, circle1_sy] = computeCoordinates(t1, radius_1);
+    const [circle1_ex1, circle1_ey1] = computeCoordinates(t1 + Δ, radius_1);
+
+    // Get end points for filler circle
+    const [circle1_ex2, circle1_ey2] = computeCoordinates(t1 + ε1, radius_1);
+
+    // Get start and end points for progress circle
+    const [circle2_sx, circle2_sy] = computeCoordinates(t1 + ε2, radius_2);
+    const [circle2_ex, circle2_ey] = computeCoordinates(t1 + Δ, radius_2);
+
+    // Get start and end points for big ticks
+    const [circle3_sx, circle3_sy] = computeCoordinates(t1, radius_3);
+    const [circle3_ex, circle3_ey] = computeCoordinates(t1 + Δ, radius_3);
+
+    // Get start and end points for big ticks
+    const [circle4_sx, circle4_sy] = computeCoordinates(t1, radius_4);
+    const [circle4_ex, circle4_ey] = computeCoordinates(t1 + Δ, radius_4);
+
+    // Get needle end point
+    const [needle_sx, needle_sy] = computeCoordinates(t1 + ε1, radius_2 + needleOffset);
+
+
     const fA1 = ((Δ > π) ? 1 : 0);
     const fS1 = ((Δ > 0) ? 1 : 0);
-
-
-    //Filler End
-    const [eX2, eY2] = (f_vec_add(f_matrix_times(rotMatrix, [rx1 * cos(t1 + ε1), ry1 * sin(t1 + ε1)]), [cx, cy]));
     const fA2 = ((ε1 > π) ? 1 : 0);
     const fS2 = ((ε1 > 0) ? 1 : 0);
-
-
-    //BigTicks
-    const [sX2, sY2] = (f_vec_add(f_matrix_times(rotMatrix, [rx2 * cos(t1), ry2 * sin(t1)]), [cx, cy]));
-    const [eX3, eY3] = (f_vec_add(f_matrix_times(rotMatrix, [rx2 * cos(t1 + Δ), ry2 * sin(t1 + Δ)]), [cx, cy]));
-
-
-    //SmallTicks
-    const [sX3, sY3] = (f_vec_add(f_matrix_times(rotMatrix, [rx3 * cos(t1), ry3 * sin(t1)]), [cx, cy]));
-    const [eX4, eY4] = (f_vec_add(f_matrix_times(rotMatrix, [rx3 * cos(t1 + Δ), ry3 * sin(t1 + Δ)]), [cx, cy]));
-
-
-    //Needle Endpoint
-    const [eX5, eY5] = (f_vec_add(f_matrix_times(rotMatrix, [needleLength * cos(t1 + ε1), needleLength * sin(t1 + ε1)]), [cx, cy]));
-
-
-    //Limit
-    const [sX4, sY4] = (f_vec_add(f_matrix_times(rotMatrix, [rx4 * cos(t1 + ε2), ry4 * sin(t1 + ε2)]), [cx, cy]));
-    const [eX6, eY6] = (f_vec_add(f_matrix_times(rotMatrix, [rx4 * cos(t1 + Δ), ry4 * sin(t1 + Δ)]), [cx, cy]));
     const fA3 = ((ε2 > Δ) ? 1 : 0);
     const fS3 = ((ε2 > 0) ? 1 : 0);
 
-
-
-    //Annotation 
-    const interval = maxValue / (bigTicks)
-    let values = [];
+    const interval = maxValue / bigTicks;
+    const values = [];
 
     for (let i = 0; i < bigTicks; i++) {
         values[i] = interval * i;
     }
 
-    // x,y start position
-    // rx,ry radius x and y
-    // x1,y1 end position
-    //<path d="M x,y A rx, ry, 0 1 1 x1, y1"/>
-
     return (
         <>
-
             <svg
-                height={size * 2}
-                width={size * 2}
+                height={size}
+                width={size}
             >
-                <circle cx={(cx)} cy={(cy)} r={(size)} fill={(borderColor)} />
-                <circle cx={(cx)} cy={(cy)} r={(size - borderSize)} fill={(backgroundColor)} />
-
-                <path className="base" strokeWidth={progressWidth} strokeLinecap="round" fill='none'
-                    stroke={(progressBackgroundColor)}
-                    d={`M ${sX1},${sY1} A ${(rx1)},${(ry1)}, ${φ / (2 * π) * 360},${fA1} ${fS1} ${eX1},${eY1}`}
+                <circle                             //Background Circle
+                    cx={cx}
+                    cy={cy}
+                    r={radius}
+                    fill={backgroundColor}
+                    stroke={borderColor}
+                    strokeWidth={borderSize}
                 />
 
-                <path className="filler" strokeWidth={progressWidth} strokeLinecap="round" fill='none'
-                    stroke={(progressFillerColor)}
-                    d={`M ${sX1},${sY1} A ${(rx1)},${(ry1)}, ${ε1 / (2 * π) * 360},${fA2} ${fS2} ${eX2},${eY2}`}
+                <path className="base"              //Progress Circle Base
+                    strokeWidth={progressWidth}
+                    strokeLinecap="round"
+                    fill='none'
+                    stroke={progressBackgroundColor}
+                    d={`M ${circle1_sx},${circle1_sy} A ${radius_1},${radius_1},${φ / (2 * π) * 360},${fA1} ${fS1} ${circle1_ex1},${circle1_ey1}`}
                 />
 
-                <path className="bigTicks" stroke-location="outside" strokeWidth={heightBigTicks} fill='none'
-                    stroke={(tickColor)} strokeDasharray={`${(tickWidth)} ${((arcBigTicks - ((tickWidth * bigTicks) + tickWidth)) / (bigTicks))}`}
-                    d={`M ${sX2},${sY2} A ${(rx2)},${(ry2)}, ${ε1 / (2 * π) * 360},${fA1} ${fS1} ${eX3},${eY3}`}
+                <path className="filler"            //Progress Circle Filler
+                    strokeWidth={progressWidth}
+                    strokeLinecap="round"
+                    fill='none'
+                    stroke={progressFillerColor}
+                    d={`M ${circle1_sx},${circle1_sy} A ${radius_1},${radius_1},${ε1 / (2 * π) * 360},${fA2} ${fS2} ${circle1_ex2},${circle1_ey2}`}
                 />
 
-                <path className="smallTicks" stroke-location="outside" strokeWidth={heightSmallTicks} fill='none'
-                    stroke={(tickColor)} strokeDasharray={`${(tickWidth)} ${((arcSmallTicks - ((tickWidth * smallTicks) + tickWidth)) / (smallTicks))}`}
-                    d={`M ${sX3},${sY3} A ${(rx3)},${(ry3)}, ${ε1 / (2 * π) * 360},${fA1} ${fS1} ${eX4},${eY4}`}
+                <path className="limit"             //Limit Circle
+                    stroke-location="outside"
+                    strokeWidth={limitWidth}
+                    fill='none'
+                    stroke={limitColor}
+                    d={`M ${circle2_sx},${circle2_sy} A ${radius_2},${radius_2},${ε2 / (2 * π) * 360},${fA3} ${fS3} ${circle2_ex},${circle2_ey}`}
                 />
 
-                <path className="limit" stroke-location="outside" strokeWidth={limitWidth} fill='none'
-                    stroke={(limitColor)}
-                    d={`M ${sX4},${sY4} A ${(rx4)},${(ry4)}, ${ε2 / (2 * π) * 360},${fA3} ${fS3} ${eX6},${eY6}`}
+                <path className="bigTicks"          //Big Ticks
+                    stroke-location="outside"
+                    strokeWidth={heightBigTicks}
+                    fill='none'
+                    stroke={tickColor} strokeDasharray={`${tickWidth} ${(arcBigTicks - ((tickWidth * bigTicks) + tickWidth)) / bigTicks}`}
+                    d={`M ${circle3_sx},${circle3_sy} A ${radius_3},${radius_3},${ε1 / (2 * π) * 360},${fA1} ${fS1} ${circle3_ex},${circle3_ey}`}
                 />
-                <line x1={(cx)} y1={(cy)} x2={(eX5)} y2={(eY5)} strokeWidth={(needleWidth)} stroke={(needleColor)}></line>
 
-                <text
+                <path className="smallTicks"        //Small Ticks
+                    stroke-location="outside"
+                    strokeWidth={heightSmallTicks}
+                    fill='none'
+                    stroke={tickColor}
+                    strokeDasharray={`${tickWidth} ${(arcSmallTicks - ((tickWidth * smallTicks) + tickWidth)) / smallTicks}`}
+                    d={`M ${circle4_sx},${circle4_sy} A ${radius_4},${radius_4},${ε1 / (2 * π) * 360},${fA1} ${fS1} ${circle4_ex},${circle4_ey}`}
+                />
+
+                <line                               //Indicator
+                    x1={cx}
+                    y1={cy}
+                    x2={needle_sx}
+                    y2={needle_sy}
+                    strokeWidth={needleWidth}
+                    stroke={needleColor}
+                />
+
+                <circle                             //Center
+                    cx={cx}
+                    cy={cy}
+                    r={pivotSize / 2}
+                    fill={pivotColor}
+                />
+
+                <text                               //Title Label
                     className="gauge_titleLabel"
-                    fill={(textColor1)}
+                    fill={textColor1}
                     fontSize="12px"
                     x="50%"
                     y="30%"
@@ -204,9 +230,9 @@ export const RadialGauge = ({
                     {`${title}`}
                 </text>
 
-                <text
+                <text                               //Unit Label
                     className="gauge_unitLabel"
-                    fill={(textColor1)}
+                    fill={textColor1}
                     fontSize="12px"
                     x="50%"
                     y="78%"
@@ -216,9 +242,9 @@ export const RadialGauge = ({
                     {`(${unit})`}
                 </text>
 
-                <text
+                <text                               //Value Label
                     className="gauge_valueLabel"
-                    fill={(textColor2)}
+                    fill={textColor2}
                     fontSize="20px"
                     x="50%"
                     y="70%"
@@ -227,11 +253,10 @@ export const RadialGauge = ({
                 >
                     {`${currentValue}`}
                 </text>
-
-                <circle cx={(cx)} cy={(cy)} r={(pivotSize / 2)} fill={(pivotColor)} />‍
             </svg>
         </>
     );
+
 };
 
 export default RadialGauge;

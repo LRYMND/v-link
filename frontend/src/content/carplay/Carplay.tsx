@@ -30,7 +30,7 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
   const RETRY_DELAY_MS = 30000
 
   const width = window.innerWidth
-  const height = applicationSettings.interface.activateOSD.value ? window.innerHeight - applicationSettings.interface.heightOSD.value : window.innerHeight;
+  const height = applicationSettings.app.activateDashbar.value ? window.innerHeight - applicationSettings.app.dashBarHeight.value : window.innerHeight;
 
   const config: Partial<DongleConfig> = {
     width,
@@ -80,8 +80,8 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
   const carplayWorker = useMemo(() => {
     const worker = new Worker(
       new URL('./worker/CarPlay.worker.ts', import.meta.url), {
-        type : 'module'
-      }
+      type: 'module'
+    }
     ) as CarPlayWorker
     const payload = {
       videoPort: videoChannel.port1,
@@ -96,7 +96,7 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
 
   const { processAudio, getAudioPlayer, startRecording, stopRecording } =
     useCarplayAudio(carplayWorker, micChannel.port2)
-  
+
   const clearRetryTimeout = useCallback(() => {
     if (retryTimeoutRef.current) {
       clearTimeout(retryTimeoutRef.current)
@@ -210,21 +210,21 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
 
   const handleKeyBindings = useCallback((event: KeyboardEvent) => {
     console.log(event.code);
-    if(Object.values(applicationSettings!.keyBindings).includes(event.code)) {
+    if (Object.values(applicationSettings!.keyBindings).includes(event.code)) {
       let action = Object.keys(applicationSettings!.keyBindings).find(key =>
         applicationSettings!.keyBindings[key] === event.code
       )
-      if(action !== undefined) {
+      if (action !== undefined) {
         console.log(`Matched ${event.code} to ${action}`);
         const command: KeyCommand = action as KeyCommand
-        carplayWorker.postMessage({ type: 'keyCommand', command})
+        carplayWorker.postMessage({ type: 'keyCommand', command })
       }
     }
-  }, [applicationSettings]); 
-  
+  }, [applicationSettings]);
+
   useEffect(() => {
     document.addEventListener('keydown', handleKeyBindings);
-  
+
     return () => {
       document.removeEventListener('keydown', handleKeyBindings);
     };
@@ -248,15 +248,18 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
           }}
         >
           {deviceFound === false && (
-            <>
-              <div className='connect'><h3>Connect phone or click to pair dongle.</h3>
-              <button className="button-styles nav-button" onClick={onClick} style={{ fill: 'var(--fillInactive)' }}>
-                <svg xmlns="http://www.w3.org/2000/svg" className="nav-icon">
-                  <use xlinkHref="/assets/svg/link.svg#link"></use>
-                </svg>
-              </button>
+            
+              <div className="connect">
+                <div className="column">
+                <h3>Connect phone or click to pair dongle.</h3>
+                <button className="button-styles nav-button" onClick={onClick} style={{ fill: 'var(--fillInactive)'}}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" height={"20px"} width={"40px"}>
+                    <use xlinkHref="/assets/svg/link.svg#link"></use>
+                  </svg>
+                </button>
+                </div>
+
               </div>
-            </>
           )}
           {deviceFound === true && (
             <RotatingLines
@@ -282,7 +285,7 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
           width: width,
           padding: 0,
           margin: 0,
-          marginTop: applicationSettings.interface.activateOSD.value ? applicationSettings.interface.heightOSD.value : 0,
+          marginTop: applicationSettings.app.activateDashbar.value ? applicationSettings.app.dashBarHeight.value : 0,
           overflow: 'hidden',
         }}
       >

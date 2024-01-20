@@ -1,11 +1,11 @@
 .topbar {
   display: flex;
+  position: absolute;
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
   top: 0;
-
-  height: 4rem;
+  
   width: 100%;
   background: var(--backgroundColor);
 

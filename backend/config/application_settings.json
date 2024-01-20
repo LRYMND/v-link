@@ -1,14 +1,5 @@
 {
   "version": "1.0",
-  "carplay": {
-    "label": "Advanced Settings",
-    "fps": 60,
-    "dpi": 140,
-    "width": 800,
-    "height": 480,
-    "lhd": 0,
-    "kiosk": true
-  },
   "app": {
     "label": "Application",
     "colorTheme": {
@@ -21,14 +12,53 @@
         "White"
       ]
     },
-    "windowWidth": {
-      "value": 800,
-      "label": "Window Width"
+    "startPage": {
+      "value": "Dashboard",
+      "label": "Page on StartUp",
+      "options": [
+        "Dashboard",
+        "Carplay",
+        "Settings"
+      ]
     },
-    "windowHeight": {
-      "value": 480,
-      "label": "Window Height"
+    "defaultDash": {
+      "value": "Classic",
+      "label": "Default Dashboard",
+      "options": [
+        "Classic",
+        "Race",
+        "Charts"
+      ]
+    },
+    "topBarHeight": {
+      "value": 55,
+      "label": "TopBar Height"
+    },
+    "navBarHeight": {
+      "value": 65,
+      "label": "NavBar Height"
+    },
+    "activateDashbar": {
+      "value": true,
+      "label": "DashBar"
+    },
+    "dashBarHeight": {
+      "value": 55,
+      "label": "DashBar Height"
+    },
+    "dashboardPadding": {
+      "value": 30,
+      "label": "Dashboard Padding"
     }
+  },
+  "carplay": {
+    "label": "Advanced Settings",
+    "fps": 60,
+    "dpi": 140,
+    "width": 800,
+    "height": 480,
+    "lhd": 0,
+    "kiosk": true
   },
   "keyBindings": {
     "left": "ArrowLeft",
@@ -43,8 +73,12 @@
     "next": "KeyN",
     "prev": "KeyV"
   },
+  "constants": {
+    "chart_input_max": 6,
+    "chart_input_current": 1
+  },
   "dash_1": {
-    "label": "Dashboard Page 1",
+    "label": "Classic Dash Settings",
     "gauge_1": {
       "value": "intake",
       "label": "Gauge Left"
@@ -70,58 +104,77 @@
       "label": "Value Right"
     }
   },
-  "dash_2": {
-    "label": "Dashboard Page 2",
-    "chart_1": {
-      "value": "lambda1",
-      "label": "Chart Top"
+  "dash_3": {
+    "label": "Race Dash Settings",
+    "progress_1": {
+      "value": "rpm",
+      "label": "Progress Bar"
     },
-    "chart_2": {
-      "value": "lambda2",
-      "label": "Chart Bottom"
+    "progress_2": {
+      "value": "boost",
+      "label": "Progress DataBox"
     },
     "value_1": {
-      "value": "boost",
-      "label": "Value Top"
+      "value": "voltage",
+      "label": "DataBox 1"
     },
     "value_2": {
       "value": "intake",
-      "label": "Value Middle"
+      "label": "DataBox 2"
     },
     "value_3": {
       "value": "coolant",
-      "label": "Value Bottom"
+      "label": "DataBox 3"
+    },
+    "value_4": {
+      "value": "speed",
+      "label": "DataBox 4"
+    },
+    "value_5": {
+      "value": "lambda1",
+      "label": "DataBox 5"
+    },
+    "value_6": {
+      "value": "lambda2",
+      "label": "DataBox 6"
     }
   },
   "charts": {
-    "label": "Chart Settings",
-    "chart_1_min": {
-      "value": 0.8,
-      "label": "Chart 1 Min."
+    "label": "Chart Dash Settings",
+    "length": {
+      "value": 100,
+      "label": "Length"
     },
-    "chart_1_max": {
-      "value": 1.2,
-      "label": "Chart 1 Max."
+    "value_1": {
+      "value": "rpm",
+      "label": "Value 1"
+    }
+  },
+  "racedash": {
+    "label": "Race-Dash Settings",
+    "big_ticks": {
+      "value": 10,
+      "label": "Major Ticks"
     },
-    "chart_1_interval": {
-      "value": 200,
-      "label": "Refresh Rate (ms)"
+    "small_ticks": {
+      "value": 3,
+      "label": "Minor Ticks"
     },
-    "chart_2_min": {
-      "value": 0,
-      "label": "Chart 2 Min."
-    },
-    "chart_2_max": {
+    "decimals": {
       "value": 2,
-      "label": "Chart 2 Max."
+      "label": "Decimals"
     },
-    "chart_2_interval": {
-      "value": 200,
-      "label": "Refresh Rate (ms)"
+    "progress_bars": {
+      "value": "50",
+      "label": "Resolution"
+    },
+    "progress_spacing": {
+      "value": "5",
+      "label": "Spacing"
     }
   },
   "dash_bar": {
-    "label": "DashBar",
+    "label": "DashBar Settings",
     "value_1": {
       "value": "boost",
       "label": "Value Left"
@@ -150,7 +203,7 @@
       "label": "Show Gauge #3"
     }
   },
-  "connections":{
+  "connections": {
     "label": "Connections",
     "activateCAN": {
       "value": true,
@@ -159,17 +212,6 @@
     "activateMMI": {
       "value": true,
       "label": "CarPlay Interface"
-    }
-  },
-  "interface":{
-    "label": "Interface",
-    "activateOSD": {
-      "value": true,
-      "label": "DashBar"
-    },
-    "heightOSD": {
-      "value": 35,
-      "label": "Dashbar Height"
     }
   },
   "comfort": {

@@ -1,25 +1,25 @@
-.output {
+.row {
     display: flex;
-    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
-    gap: 1rem;
+    flex-direction: row;
+    width: 100%;
+    margin-bottom: 10px;
+    flex-grow: 1;
+}
 
-    margin-bottom: -1rem;
-
-    &__label {
-        color: var(--textColorHover);
-    }
-
-    &__data {
-        color: var(--fillActive);
-    }
+.column {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: column;
+    flex:1 1 auto;
+    height: 100%;
+    margin-top: 1rem;
 }
 
 .nav-icon {
-    width: 2.2rem;
-    height: 2.2rem;
-
-    margin-top: 1rem;
+    margin-top: 10px;
     transition: fill 0.3s;
 
     &:hover {
@@ -39,32 +39,6 @@
     &--inactive {
         color: var(--fillInactive);
     }
-}
-
-.round-button {
-    flex: 1;
-    font-size: .8rem;
-    border-radius: 10px;
-    margin-bottom: .5rem;
-    height: 2rem;
-    background-color: var(--buttonBackground);
-    width: 100%;
-
-    &:hover {
-        background-color: var(--buttonBackgroundHover);
-    }
-}
-
-.square-button {
-    height: 2rem;
-    margin-right: 2px;
-    font-size: .7rem;
-}
-
-.nav-button {
-    background: none;
-    border: none;
-    width: 2rem;
 }
 
 .button-background {
@@ -115,6 +89,31 @@
         color: var(--textColorInactive);
         cursor: default;
     }
+}
+
+.round-button {
+    flex: 1;
+    font-size: .8rem;
+    border-radius: 10px;
+    margin-bottom: .5rem;
+    height: 2rem;
+    background-color: var(--buttonBackground);
+    width: 100%;
+
+    &:hover {
+        background-color: var(--buttonBackgroundHover);
+    }
+}
+
+.square-button {
+    height: 2rem;
+    margin-right: 2px;
+    font-size: .7rem;
+}
+
+.nav-button {
+    background: none;
+    border: none;
 }
 
 .scrollbar-styles {

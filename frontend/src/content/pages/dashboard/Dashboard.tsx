@@ -1,38 +1,44 @@
 import { useState, useEffect, useRef } from 'react';
 import './dashboard.scss';
 
-import Gauges from './gauges/Gauges';
+import Classic from './classic/Classic';
 import Charts from './charts/Charts';
+import Race from './race/Race';
 
 import CarDataStore from '../../cardata/store/Datastore'
 
-function Dashboard({ sensorSettings, applicationSettings }) {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+function Dashboard({ sensorSettings, applicationSettings, containerSize }) {
+
+  const padding = 30 //pixels
+  const components = [Classic, Race, Charts]; // Add more content as needed
+
+  const totalPages = components.length; // Calculate the total number of pages
+  const sliderWidth = totalPages * containerSize.width;
+
+  const index = components.findIndex(component => component.name === applicationSettings.app.defaultDash.value);
+
+  const [currentPageIndex, setCurrentPageIndex] = useState(index);
   const swipeContainerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
-
-  const totalPages = 2; // Adjust the number of pages accordingly
-  const containerWidth = 100 * totalPages; // Set the total width of all pages
-
   const [carData, setCarData] = useState({})
 
-	useEffect(() => {
-		const unsubscribe = CarDataStore.subscribe(
-			(event) => {
-				setCarData(event.carData)
-				//console.log(carData)
-			},
-		);
+  useEffect(() => {
+    const unsubscribe = CarDataStore.subscribe(
+      (event) => {
+        setCarData(event.carData)
+        //console.log(carData)
+      },
+    );
 
-		return () => {
-			unsubscribe();
-		};
-	}, []);
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   function swipeLeft() {
-    if (currentPageIndex < totalPages -1) {
+    if (currentPageIndex < totalPages - 1) {
       setCurrentPageIndex(currentPageIndex + 1);
     }
   }
@@ -70,18 +76,20 @@ function Dashboard({ sensorSettings, applicationSettings }) {
     <div
       style={{
         position: "relative",
-        width: "100%",
-        height: "100%",
+        width: `${containerSize.width - padding}px`,
+        height: `${containerSize.height}px`,
         overflow: "hidden",
       }}
+
+      className={`dashboard ${applicationSettings.app.colorTheme.value}`}
     >
       <div
         ref={swipeContainerRef}
         style={{
           display: "flex",
           flexDirection: "row",
-          width: `${containerWidth}%`,
-          height: "100%",
+          width: `${sliderWidth}px`,
+          height: `${containerSize.height}px`,
           transform: `translateX(-${(currentPageIndex * (100 / totalPages))}%)`,
           transition: "transform 0.5s ease-in-out",
         }}
@@ -90,29 +98,18 @@ function Dashboard({ sensorSettings, applicationSettings }) {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
-        <div
-          style={{
-            width: `${100 / totalPages}%`,
-          }}
-        >
-          <Gauges
-            sensorSettings={sensorSettings}
-            applicationSettings={applicationSettings}
-            carData={carData}
-          />
-        </div>
-        <div
-          style={{
-            width: `${100 / totalPages}%`,
-          }}
-        >
-          <Charts
-            sensorSettings={sensorSettings}
-            applicationSettings={applicationSettings}
-            carData={carData}
-            length={100}
-          />
-        </div>
+        {components.map((Content, index) => (
+          <div key={index} style={{ width: `${100 / totalPages}%` }}>
+            <div style={{ width: `${containerSize.width - padding}px`, height: `${containerSize.height - padding}px`}}>
+              <Content
+                sensorSettings={sensorSettings}
+                applicationSettings={applicationSettings}
+                carData={carData}
+                containerSize={containerSize}
+              />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

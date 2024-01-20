@@ -24,7 +24,7 @@ const TopBar = ({ applicationSettings, phoneState, wifiState }) => {
 
 
   return (
-    <div className={`topbar ${applicationSettings.app.colorTheme.value}`}>
+    <div className={`topbar ${applicationSettings.app.colorTheme.value}`} style={{ height: `${applicationSettings.app.topBarHeight.value}px` }}>
       <div className="topbar__info">
         <svg className={`status-icon status-icon--${(wifiState ? "active" : "inactive")}`}>
           <use xlinkHref="/assets/svg/wifi.svg#wifi"></use>
