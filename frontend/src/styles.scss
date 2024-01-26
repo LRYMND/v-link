@@ -1,10 +1,21 @@
+body {
+    background: var(--backgroundColor);
+    color: var(--textColorDefault);
+    font-size: 10pt;
+
+    user-select: none;
+}
+
+.label {
+    display: flex;
+}
+
 .row {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     flex-direction: row;
     width: 100%;
-    margin-bottom: 10px;
     flex-grow: 1;
 }
 
@@ -13,107 +24,160 @@
     justify-content: space-around;
     align-items: center;
     flex-direction: column;
-    flex:1 1 auto;
+    flex:1 1 0px;
     height: 100%;
-    margin-top: 1rem;
+    width: 100%;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.list {
+    margin-bottom: 7px;
+}
+
+.divider {
+    flex: 1 1 0px;
+    border-bottom: 1px solid var(--boxColorDefault);
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+.frame {
+    width: 100%;
+    flex: 0 1 100%;
+    display: flex;
+
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background-color: var(--boxColorDefault);
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    &__content {
+        margin: 10px;
+        flex: 1;
+        width: 100%;
+        height: calc(100% - 2rem);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.scroller {
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    border-radius: 10px;
+    background-color: var(--boxColorDark);
+
+    padding-left: 2.5vw;
+    padding-right: 2.5vw;
+
+    &__tab {
+        flex: 0 1 30%;
+        height: 50px;
+    
+        align-self: flex-end;
+        padding-left: 2.5vw;
+        margin-bottom: -10px;
+
+        line-height: 0.5vh;
+        gap: 5px;
+    
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+    }
 }
 
 .nav-icon {
-    margin-top: 10px;
     transition: fill 0.3s;
 
     &:hover {
-        fill: var(--fillHover);
+        fill: var(--themeLight);
     }
 }
 
 .status-icon {
-    margin-right: 1rem;
-    width: 1rem;
-    height: 1rem;
+    width: 20px;
+    height: 20px;
 
     &--active {
-        color: var(--fillActive);
+        color: var(--themeDefault);
     }
 
     &--inactive {
-        color: var(--fillInactive);
+        color: var(--boxColorLighter);
     }
 }
+.button {
+    flex: 0 1 30px;
+    font-size: .8rem;
+    
+    height: 100%;
+    width: 100%;
 
-.button-background {
-    background-color: var(--buttonBackground);
+    &__round{
+        border-radius: 10px;
+    }
+
+    &__square{
+        border-radius: 10px;
+    }
 
     &:hover {
-        background-color: var(--buttonBackgroundHover);
-    }
-
-    &:active {
-        background-color: var(--buttonBackgroundActive);
-    }
-
-    &:disabled {
-        background-color: var(--buttonBackgroundInactive);
-    }
-
-    &.inactive {
-        color: var(--textColor);
-        background-color: var(--buttonBackgroundHover);
-    }
-
-    &.active {
-        color: var(--textColorHover);
-        background-color: var(--scrollContentBackground);
+        background-color: var(--boxColorDark);
     }
 }
 
-.button-styles {
-    color: var(--textColor);
+.input-style {
     border: none;
     text-align: center;
-    padding-left: .5rem;
-    padding-right: .5rem;
     cursor: pointer;
 
+    color: var(--textColorDefault);
+    background-color: var(--boxColorDarker);
 
     &:hover {
-        color: var(--textColorHover);
+        color: var(--textColorLight);
+        background-color: var(--boxColorDark);
         cursor: pointer;
     }
 
     &:active {
-        color: var(--textColorActive);
+        background-color: var(--boxColorDarker);
     }
 
     &:disabled {
-        color: var(--textColorInactive);
+        color: var(--textColorDark);
+        background-color: var(--boxColorDark);
         cursor: default;
     }
-}
 
-.round-button {
-    flex: 1;
-    font-size: .8rem;
-    border-radius: 10px;
-    margin-bottom: .5rem;
-    height: 2rem;
-    background-color: var(--buttonBackground);
-    width: 100%;
-
-    &:hover {
-        background-color: var(--buttonBackgroundHover);
+    &.inactive {
+        color: var(--textColorDefault);
+        background-color: var(--boxColorDarker);
     }
-}
 
-.square-button {
-    height: 2rem;
-    margin-right: 2px;
-    font-size: .7rem;
+    &.active {
+        color: var(--textColorLight);
+        background-color: var(--boxColorDark);
+    }
 }
 
 .nav-button {
     background: none;
     border: none;
+
+    &:hover {
+        cursor: pointer;
+    }
 }
 
 .scrollbar-styles {
@@ -123,40 +187,25 @@
     }
 
     &::-webkit-scrollbar-track {
-        background-color: var(--scrollBarBackground);
+        background-color: var(--boxColorDarker);
         border-radius: 10px;
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: var(--fillActive);
+        background-color: var(--themeDefault);
         border-radius: 10px;
         min-height: 20px;
 
         &:active {
-            background-color: var(--fillHover);
+            background-color: var(--themeLight);
         }
     }
 }
 
-.dropdown {
-    height: 2rem;
-    width: 6rem;
-    color: var(--textColor);
-    background-color: var(--buttonBackground);
-
-    border: none;
-    border-radius: 10px;
-
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-}
-
 .input {
-    height: 2rem;
-    width: 5.7rem;
-    color: var(--textColor);
-    background-color: var(--buttonBackground);
+    height: 4vw;
+    width: 40%;
+    color: var(--textColorDefault);
 
     border: none;
     border-radius: 10px;
@@ -177,9 +226,9 @@ input[type=checkbox] {
     padding: .05rem;
 
     background-clip: content-box;
-    border: .1rem solid var(--textColor);
+    border: .1rem solid var(--textColorDefault);
     border-radius: 5px;
-    background-color: var(--sectionColor);
+    background-color: var(--boxColorDefault);
     margin-right: 2rem;
 
     color: #ffffff;
@@ -189,7 +238,7 @@ input[type=checkbox] {
     }
 
     &:checked {
-        background-color: var(--fillActive);
+        background-color: var(--themeDefault);
     }
 
     &:focus {
@@ -197,11 +246,11 @@ input[type=checkbox] {
     }
 
     &:disabled {
-        background-color: var(--buttonBackgroundInactive);
+        background-color: var(--boxColorDark);
         cursor: default;
     }
 
     &:disabled+span {
-        color: var(--textColorInactive);
+        color: var(--textColorDark);
     }
 }

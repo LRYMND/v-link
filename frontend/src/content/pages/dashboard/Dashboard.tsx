@@ -1,41 +1,30 @@
-import { useState, useEffect, useRef } from 'react';
-import './dashboard.scss';
+import { useState, useRef } from 'react';
+import { ApplicationSettings, Store } from '../../store/Store';
 
 import Classic from './classic/Classic';
-import Charts from './charts/Charts';
 import Race from './race/Race';
+import Charts from './charts/Charts';
 
-import CarDataStore from '../../cardata/store/Datastore'
+import './dashboard.scss';
 
-function Dashboard({ sensorSettings, applicationSettings, containerSize }) {
+function Dashboard() {
+  const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
+  const store = Store((state) => state);
 
-  const padding = 30 //pixels
   const components = [Classic, Race, Charts]; // Add more content as needed
 
   const totalPages = components.length; // Calculate the total number of pages
-  const sliderWidth = totalPages * containerSize.width;
+  const sliderWidth = totalPages * store.contentSize.width;
 
   const index = components.findIndex(component => component.name === applicationSettings.app.defaultDash.value);
 
-  const [currentPageIndex, setCurrentPageIndex] = useState(index);
   const swipeContainerRef = useRef(null);
+
+  const [currentPageIndex, setCurrentPageIndex] = useState(index);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
-  const [carData, setCarData] = useState({})
 
-  useEffect(() => {
-    const unsubscribe = CarDataStore.subscribe(
-      (event) => {
-        setCarData(event.carData)
-        //console.log(carData)
-      },
-    );
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
 
   function swipeLeft() {
     if (currentPageIndex < totalPages - 1) {
@@ -73,15 +62,12 @@ function Dashboard({ sensorSettings, applicationSettings, containerSize }) {
   }
 
   return (
-    <div
+    <div className={`dashboard ${applicationSettings.app.colorTheme.value}`}
       style={{
         position: "relative",
-        width: `${containerSize.width - padding}px`,
-        height: `${containerSize.height}px`,
-        overflow: "hidden",
+        width: `${store.contentSize.width}px`,
+        height: `${store.contentSize.height}px`,
       }}
-
-      className={`dashboard ${applicationSettings.app.colorTheme.value}`}
     >
       <div
         ref={swipeContainerRef}
@@ -89,8 +75,8 @@ function Dashboard({ sensorSettings, applicationSettings, containerSize }) {
           display: "flex",
           flexDirection: "row",
           width: `${sliderWidth}px`,
-          height: `${containerSize.height}px`,
-          transform: `translateX(-${(currentPageIndex * (100 / totalPages))}%)`,
+          height: `${store.contentSize.height}px`,
+          transform: `translateX(-${(currentPageIndex * ((sliderWidth / totalPages)))}px)`,
           transition: "transform 0.5s ease-in-out",
         }}
         onMouseDown={handleMouseDown}
@@ -99,14 +85,9 @@ function Dashboard({ sensorSettings, applicationSettings, containerSize }) {
         onMouseLeave={handleMouseUp}
       >
         {components.map((Content, index) => (
-          <div key={index} style={{ width: `${100 / totalPages}%` }}>
-            <div style={{ width: `${containerSize.width - padding}px`, height: `${containerSize.height - padding}px`}}>
-              <Content
-                sensorSettings={sensorSettings}
-                applicationSettings={applicationSettings}
-                carData={carData}
-                containerSize={containerSize}
-              />
+          <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent:'center', width: `${(sliderWidth / totalPages)}px` }}>
+            <div className='column' style={{width: `${store.contentSize.width - (applicationSettings.app.dashboardPadding.value * 2)}px`, height: `${store.contentSize.height}px`}}>
+              <Content/>
             </div>
           </div>
         ))}

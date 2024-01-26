@@ -1,36 +1,31 @@
 /* eslint-disable no-case-declarations */
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
-import { RotatingLines } from 'react-loader-spinner'
-import {
-  findDevice,
-  requestDevice,
-  DongleConfig,
-  CommandMapping,
-} from 'node-carplay/web'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { findDevice, requestDevice, DongleConfig, CommandMapping } from 'node-carplay/web'
+
 import { CarPlayWorker, KeyCommand } from './worker/types'
-import useCarplayAudio from './useCarplayAudio'
 import { useCarplayTouch } from './useCarplayTouch'
 import { InitEvent } from './worker/render/RenderEvents'
+import useCarplayAudio from './useCarplayAudio'
+
+import { RotatingLines } from 'react-loader-spinner'
+import { ApplicationSettings, Store } from '../store/Store';
 
 import "./../../styles.scss"
 import "./../../themes.scss"
-import './carplay.scss';
 
 const videoChannel = new MessageChannel()
 const micChannel = new MessageChannel()
 
-function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState, setCarplayState, view, setView }) {
+function Carplay() {
+
+  const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
+  const store = Store((state) => state);
+  const updateStore = Store((state) => state.updateStore);
+
   const RETRY_DELAY_MS = 30000
 
-  const width = window.innerWidth
-  const height = applicationSettings.app.activateDashbar.value ? window.innerHeight - applicationSettings.app.dashBarHeight.value : window.innerHeight;
+  const width = store.carplaySize.width;
+  const height =  store.carplaySize.height;
 
   const config: Partial<DongleConfig> = {
     width,
@@ -49,10 +44,6 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
   const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement | null>(
     null,
   )
-
-  useEffect(() => {
-    console.log("Application.tsx: ", applicationSettings)
-  }, []);
 
   const renderWorker = useMemo(() => {
     if (!canvasElement) return;
@@ -111,12 +102,12 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
       switch (type) {
         case 'plugged':
           setIsPlugged(true)
-          setPhoneState(true)
+          updateStore({phoneState: true})
           break
         case 'unplugged':
           setIsPlugged(false)
-          setPhoneState(false)
-          setCarplayState(false)
+          updateStore({phoneState: false})
+          updateStore({carplayState: false})
           break
         case 'requestBuffer':
           clearRetryTimeout()
@@ -142,7 +133,7 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
               break
             case CommandMapping.requestHostUI:
               console.log("minimizing carplay")
-              setView("Dashboard")
+              updateStore({view: "Dashboard"})
           }
           break
         case 'failure':
@@ -242,24 +233,31 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
             position: 'absolute',
             width: '100%',
             height: '100%',
-            display: view === "Carplay" ? 'flex' : 'none',
+            display: store.view === "Carplay" ? 'flex' : 'none',
             justifyContent: 'center',
             alignItems: 'center',
           }}
         >
           {deviceFound === false && (
-            
-              <div className="connect">
-                <div className="column">
+
+            <div style={{
+              color: "var(--textColorDefault)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+              <div className="column">
                 <h3>Connect phone or click to pair dongle.</h3>
-                <button className="button-styles nav-button" onClick={onClick} style={{ fill: 'var(--fillInactive)'}}>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" height={"20px"} width={"40px"}>
+                <p/>
+                <button className="button-styles nav-button" onClick={onClick} style={{ fill: 'var(--boxColorLighter)' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" height={"25px"} width={"100px"}>
                     <use xlinkHref="/assets/svg/link.svg#link"></use>
                   </svg>
                 </button>
-                </div>
-
               </div>
+
+            </div>
           )}
           {deviceFound === true && (
             <RotatingLines
@@ -281,11 +279,11 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
         onPointerOut={sendTouchEvent}
         style={{
           height: height,
-          display: view === "Carplay" ? 'flex' : 'none',
+          display: store.view === "Carplay" ? 'flex' : 'none',
           width: width,
           padding: 0,
           margin: 0,
-          marginTop: applicationSettings.app.activateDashbar.value ? applicationSettings.app.dashBarHeight.value : 0,
+          marginTop: applicationSettings.side_bars.topBarAlwaysOn.value ? applicationSettings.side_bars.topBarHeight.value : 0,
           overflow: 'hidden',
         }}
       >
@@ -293,7 +291,7 @@ function Carplay({ applicationSettings, phoneState, setPhoneState, carplayState,
           ref={canvasRef}
           id="video"
           style={
-            isPlugged && view === "Carplay"
+            isPlugged && store.view === "Carplay"
               ? { height: '100%', overflow: 'hidden' }
               : { display: 'none' }
           }

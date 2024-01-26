@@ -1,10 +1,17 @@
+import { CarData, ApplicationSettings, SensorSettings, Store } from '../../../store/Store';
+
 import ValueBox from './../../../components/ValueBox';
 import LineChart from '../../../components/LineChart'
 
 import "./../../../../styles.scss"
 import "./../../../../themes.scss"
 
-const Charts = ({ sensorSettings, applicationSettings, carData, containerSize }) => {
+const Charts = () => {
+
+    const carData = CarData((state) => state.carData);
+	const sensorSettings = SensorSettings((state) => state.sensorSettings);
+	const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
+    const store = Store((state) => state);
 
     const value = applicationSettings.constants.chart_input_current;
     const datasets = []
@@ -13,11 +20,11 @@ const Charts = ({ sensorSettings, applicationSettings, carData, containerSize })
         const key = "value_" + i
 
         datasets[i - 1] = {
-            label: sensorSettings[applicationSettings.charts[key].value].label,
-            color: 'var(--fillActive)',
-            yMin: sensorSettings[applicationSettings.charts[key].value].min_value,
-            yMax: sensorSettings[applicationSettings.charts[key].value].max_value,
-            data: carData[applicationSettings.charts[key].value],
+            label: sensorSettings[applicationSettings.dash_charts[key].value].label,
+            color: 'var(--themeDefault)',
+            yMin: sensorSettings[applicationSettings.dash_charts[key].value].min_value,
+            yMax: sensorSettings[applicationSettings.dash_charts[key].value].max_value,
+            data: carData[applicationSettings.dash_charts[key].value],
             interval: 100,  // Update with the desired interval in milliseconds
         }
     }
@@ -29,14 +36,18 @@ const Charts = ({ sensorSettings, applicationSettings, carData, containerSize })
                 <div className="column">
                     <ValueBox
                         key={`value_${index + i + 1}`}
-                        valueKey={applicationSettings.charts[`value_${index + i + 1}`].value}
+                        valueKey={applicationSettings.dash_charts[`value_${index + i + 1}`].value}
                         carData={carData}
                         sensorSettings={sensorSettings}
-                        height={45}
-						width={'80%'}
-						textColor={'var(--textColorDefault)'}
-						limitColor={'red'}
-						boxColor={'var(--buttonBackground)'}
+                        height={"10vh"}
+						textColorDefault={'var(--textColorDefault)'}
+						valueColor={'var(--themeDefault)'}
+						limitColor={'var(--themeAccent)'}
+                        labelSize={`calc(3vh * ${store.textScale}`}
+						valueSize={`calc(6vh * ${store.textScale}`}
+						boxColor={'var(--boxColorDarker)'}
+						borderColor={'var(--boxColorDark)'}
+						borderWidth={'.75vh'}
                     />
                 </div>
             ));
@@ -50,18 +61,18 @@ const Charts = ({ sensorSettings, applicationSettings, carData, containerSize })
             <div className='row'>
                 <LineChart
                     label="Line Chart"
-                    width={containerSize.width - applicationSettings.app.dashboardPadding.value}
-                    height={containerSize.height * 0.5}
+                    width={store.contentSize.width - applicationSettings.constants.padding}
+                    height={store.contentSize.height * 0.6}
                     padding={70}  // Update with the desired padding
                     tickCountX={5}  // Update with the desired number of X-axis ticks
                     tickCountY={5}  // Update with the desired number of Y-axis ticks
-                    length={applicationSettings.charts.length.value}
+                    length={applicationSettings.dash_charts.length.value}
                     datasets={datasets}
                     color_label={'var(--textColorDefault)'}
-                    color_xGrid={'var(--textColorInactive)'}
-                    color_yGrid={'var(--textColorInactive)'}
+                    color_xGrid={'var(--textColorDark)'}
+                    color_yGrid={'var(--textColorDark)'}
                     color_axis={'var(--textColorDefault)'}
-                    color_charts={'var(--fillActive)'}
+                    color_dash_charts={'var(--themeDefault)'}
                 />
             </div>
             {renderValueBoxes()}

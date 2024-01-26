@@ -30,21 +30,14 @@
         "Charts"
       ]
     },
-    "topBarHeight": {
-      "value": 55,
-      "label": "TopBar Height"
-    },
-    "navBarHeight": {
-      "value": 65,
-      "label": "NavBar Height"
-    },
-    "activateDashbar": {
-      "value": true,
-      "label": "DashBar"
-    },
-    "dashBarHeight": {
-      "value": 55,
-      "label": "DashBar Height"
+    "textSize": {
+      "value": "Default",
+      "label": "Text Size",
+      "options": [
+        "Small",
+        "Default",
+        "Large"
+      ]
     },
     "dashboardPadding": {
       "value": 30,
@@ -74,38 +67,55 @@
     "prev": "KeyV"
   },
   "constants": {
+    "padding": 30,
     "chart_input_max": 6,
     "chart_input_current": 1
   },
-  "dash_1": {
-    "label": "Classic Dash Settings",
+  "side_bars": {
+    "label": "SideBar Settings",
+
+    "topBarAlwaysOn": {
+      "value": true,
+      "label": "TopBar on CarPlay Page"
+    },
+    "topBarHeight": {
+      "value": 40,
+      "label": "TopBar Height"
+    },
+    "navBarHeight": {
+      "value": 65,
+      "label": "NavBar Height"
+    }
+  },
+  "dash_classic": {
+    "label": "Classic Dash",
     "gauge_1": {
       "value": "intake",
-      "label": "Gauge Left"
+      "label": "Gauge 1"
     },
     "gauge_2": {
       "value": "boost",
-      "label": "Gauge Middle"
+      "label": "Gauge 2"
     },
     "gauge_3": {
       "value": "coolant",
-      "label": "Gauge Right"
+      "label": "Gauge 3"
     },
     "value_1": {
       "value": "lambda1",
-      "label": "Value Left"
+      "label": "Value 1"
     },
     "value_2": {
       "value": "lambda2",
-      "label": "Value Middle"
+      "label": "Value 2"
     },
     "value_3": {
       "value": "voltage",
-      "label": "Value Right"
+      "label": "Value 3"
     }
   },
-  "dash_3": {
-    "label": "Race Dash Settings",
+  "dash_race": {
+    "label": "Race Dash",
     "progress_1": {
       "value": "rpm",
       "label": "Progress Bar"
@@ -116,31 +126,31 @@
     },
     "value_1": {
       "value": "voltage",
-      "label": "DataBox 1"
+      "label": "Value 1"
     },
     "value_2": {
       "value": "intake",
-      "label": "DataBox 2"
+      "label": "Value 2"
     },
     "value_3": {
       "value": "coolant",
-      "label": "DataBox 3"
+      "label": "Value 3"
     },
     "value_4": {
       "value": "speed",
-      "label": "DataBox 4"
+      "label": "Value 4"
     },
     "value_5": {
       "value": "lambda1",
-      "label": "DataBox 5"
+      "label": "Value 5"
     },
     "value_6": {
       "value": "lambda2",
-      "label": "DataBox 6"
+      "label": "Value 6"
     }
   },
-  "charts": {
-    "label": "Chart Dash Settings",
+  "dash_charts": {
+    "label": "Chart-Dash",
     "length": {
       "value": 100,
       "label": "Length"
@@ -150,68 +160,19 @@
       "label": "Value 1"
     }
   },
-  "racedash": {
-    "label": "Race-Dash Settings",
-    "big_ticks": {
-      "value": 10,
-      "label": "Major Ticks"
-    },
-    "small_ticks": {
-      "value": 3,
-      "label": "Minor Ticks"
-    },
-    "decimals": {
-      "value": 2,
-      "label": "Decimals"
-    },
-    "progress_bars": {
-      "value": "50",
-      "label": "Resolution"
-    },
-    "progress_spacing": {
-      "value": "5",
-      "label": "Spacing"
-    }
-  },
-  "dash_bar": {
-    "label": "DashBar Settings",
+  "dash_topbar":{
+    "label": "TopBar-Dash",
     "value_1": {
       "value": "boost",
-      "label": "Value Left"
+      "label": "Value 1"
     },
     "value_2": {
       "value": "intake",
-      "label": "Value Middle"
+      "label": "Value 2"
     },
     "value_3": {
       "value": "coolant",
-      "label": "Value Right"
-    }
-  },
-  "visibility": {
-    "label": "Show/Hide Elements",
-    "showGauge_1": {
-      "value": true,
-      "label": "Show Gauge #1"
-    },
-    "showGauge_2": {
-      "value": true,
-      "label": "Show Gauge #2"
-    },
-    "showGauge_3": {
-      "value": true,
-      "label": "Show Gauge #3"
-    }
-  },
-  "connections": {
-    "label": "Connections",
-    "activateCAN": {
-      "value": true,
-      "label": "CAN Interface"
-    },
-    "activateMMI": {
-      "value": true,
-      "label": "CarPlay Interface"
+      "label": "Value 3"
     }
   },
   "comfort": {

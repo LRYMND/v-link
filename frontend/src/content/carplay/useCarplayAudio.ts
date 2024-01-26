@@ -77,7 +77,7 @@ const useCarplayAudio = (
         const mic = new WebMicrophone(mediaStream, microphonePort)
         setMic(mic)
       } catch (err) {
-        console.error('Failed to init microphone', err)
+        console.warn('Failed to init microphone', err)
       }
     }
 

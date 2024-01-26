@@ -1,39 +1,37 @@
-import React, { useState, useEffect } from 'react';
-//import WifiModal from './modal/wifi/WifiModal';
-import useModal from './modal/useModal';
+import { useState } from 'react';
+import { ApplicationSettings, SensorSettings, Store } from '../../store/Store';
+
 import { io } from "socket.io-client";
+
+import SimpleButton from '../../components/SimpleButton'
+import SimpleInput from '../../components/SimpleInput'
+import SimpleSelect from '../../components/SimpleSelect'
+import SimpleLabel from '../../components/SimpleLabel'
+import SimpleCheckbox from '../../components/SimpleCheckbox'
 
 import "./../../../themes.scss"
 import "./../../../styles.scss"
-import './settings.scss';
 
 const settingsChannel = io("ws://localhost:4001/settings")
-const canbusChannel = io("ws://localhost:4001/canbus")
+const canChannel = io("ws://localhost:4001/canbus")
 const adcChannel = io("ws://localhost:4001/adc")
 const systemChannel = io("ws://localhost:4001/system")
 
-const Settings = ({ canState, adcState, sensorSettings, applicationSettings, versionNumber }) => {
+const Settings = () => {
+  const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
+  const sensorSettings = SensorSettings((state) => state.sensorSettings);
+  const store = Store((state) => state);
 
-  // Wifi state variables
-  const { wifiModalIsShowing, wifiModalToggle } = useModal();
+  const updateApplicationSettings = ApplicationSettings((state) => state.updateApplicationSettings);
 
-
-  // Settings state variables
-  const [newSettings, setNewSettings] = useState(structuredClone(applicationSettings));
-
-
-  useEffect(() => {
-    if (applicationSettings != null)
-      setNewSettings(structuredClone(applicationSettings))
-  }, [applicationSettings]);
-
-
-  /* Change Tabs */
+  const [currentSettings, setCurrentSettings] = useState(structuredClone(applicationSettings));
   const [activeTab, setActiveTab] = useState(1);
 
+  /* Switch Tabs */
   const handleTabChange = (tabIndex) => {
     setActiveTab(tabIndex);
   };
+
 
   /* Add Settings */
   const handleAddSetting = (key, currentSettings) => {
@@ -42,20 +40,15 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
         value: "rpm",
         label: `Value ${currentSettings.constants.chart_input_current + 1}`,
       };
-  
+
       // Check if the key exists in the settings
       if (currentSettings[key]) {
-        // Create a copy of the current settings for the key
-        const updatedSettingsForKey = {...currentSettings[key]};
-  
-        // Generate a unique ID for the new setting
+        const updatedSettingsForKey = { ...currentSettings[key] };
         const newSettingId = `value_${currentSettings.constants.chart_input_current + 1}`;
-        
-        // Add the new setting to the copied settings
         updatedSettingsForKey[newSettingId] = newSetting;
-  
+
         // Update the state with the new settings
-        setNewSettings({
+        setCurrentSettings({
           ...currentSettings,
           constants: {
             ...currentSettings.constants,
@@ -69,20 +62,16 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
     }
   };
 
+
   /* Remove Settings */
   const handleRemoveSetting = (key, currentSettings) => {
     if (currentSettings.constants.chart_input_current > 1) {
-      // Create a copy of the current settings for the key
-      const updatedSettingsForKey = {...currentSettings[key]};
-  
-      // Identify the setting to remove (assuming the last one added)
+      const updatedSettingsForKey = { ...currentSettings[key] };
       const settingIdToRemove = `value_${currentSettings.constants.chart_input_current}`;
-  
-      // Remove the identified setting
       delete updatedSettingsForKey[settingIdToRemove];
-  
-      // Update the state with the settings minus the removed one
-      setNewSettings({
+
+      // Update the state with the  minus the removed one
+      setCurrentSettings({
         ...currentSettings,
         constants: {
           ...currentSettings.constants,
@@ -94,35 +83,30 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
       console.error("Cannot remove setting, minimum limit reached.");
     }
   };
-  
+
 
   /* Change Settings */
-  const handleSettingChange = (key, name, newValue, newSettings) => {
-    let update = structuredClone(newSettings);
-
-    // Search for the key based on the label
+  const handleSettingChange = (key, name, newValue, currentSettings) => {
+    const newSettings = structuredClone(currentSettings);
     const convertedValue = Object.keys(sensorSettings).find(
       (messageKey) => sensorSettings[messageKey].label === newValue
     );
 
     if (key === 'carplay' || key === 'constants') {
-      update[key][name] = newValue;
+      newSettings[key][name] = newValue;
     } else {
-      update[key][name].value = convertedValue || newValue;
+      newSettings[key][name].value = convertedValue || newValue;
     }
 
-    setNewSettings(structuredClone(update));
+    setCurrentSettings(newSettings);
   };
 
 
   /* Save Settings */
   function saveSettings() {
-    settingsChannel.emit("saveSettings", "application", newSettings);
+    updateApplicationSettings(currentSettings)
+    settingsChannel.emit("saveSettings", "application", currentSettings);
   }
-
-  function openWifiModal() {
-    wifiModalToggle();
-  };
 
 
   /* I/O Functionality */
@@ -130,16 +114,9 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
     systemChannel.emit("systemTask", request);
   }
 
-  /* I/O Functionality */
-  function handleCAN() {
-    canbusChannel.emit("toggle");
-    canbusChannel.emit("requestStatus");
-  }
-
-  /* I/O Functionality */
-  function handleADC() {
-    adcChannel.emit("toggle");
-    adcChannel.emit("requestStatus");
+  function handleIO(channel) {
+    channel.emit("toggle");
+    channel.emit("requestStatus");
   }
 
   /* Render Settings */
@@ -147,7 +124,7 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
     if (!settingsObj || !sensorSettings) return null;
 
     const { label, ...nestedObjects } = settingsObj[key];
-    const labelParagraph = <h3>{label}</h3>;
+    const labelParagraph = label
 
     const nestedElements = Object.entries(nestedObjects).map(([nestedKey, nestedObj]) => {
       if (nestedKey === "label") return null;
@@ -161,12 +138,11 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
           isBoolean = typeof nestedObj === 'boolean';
         } else {
           label = nestedObj.label;
-          value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' || nestedKey === 'colorTheme' || nestedKey === 'defaultDash' || nestedKey === 'startPage' ? nestedObj.value : sensorSettings[nestedObj.value].label;
+          value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' || nestedKey === 'colorTheme' || nestedKey === 'defaultDash' || nestedKey === 'startPage' || nestedKey === 'textSize' ? nestedObj.value : sensorSettings[nestedObj.value].label;
           options = typeof value === 'number' || typeof value === 'boolean' ? null : nestedObj.options || Object.keys(sensorSettings).map(messageKey => sensorSettings[messageKey].label);
           isBoolean = typeof value === 'boolean'; isBoolean = typeof value === 'boolean';
         }
       }
-
 
       const handleChange = (event) => {
         const { name, value, checked, type } = event.target;
@@ -179,196 +155,341 @@ const Settings = ({ canState, adcState, sensorSettings, applicationSettings, ver
         }
       };
 
-
       return (
-        <div className='setting-elements__row' key={nestedKey}>
-          <div className='setting-elements__row__item'>
-            <span>{label}</span>
-            <span className='setting-elements__row__divider'></span>
-            <span>
-              {options ? (
-                <select className='dropdown' name={nestedKey} value={value} onChange={handleChange}>
-                  {options.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
+        <div className='list row' key={nestedKey}>
+          <SimpleLabel
+            textColor={'var(--textColorDefault)'}
+            text={label}
+            textSize={2.2}
+            textScale={store.textScale}
+          />
+
+          <span className='divider'></span>
+          <div className='column' style={{ flex: '0 0 40%', justifyContent: 'center' }}>
+            {options ? (
+              <SimpleSelect
+                name={nestedKey}
+                value={value}
+                options={options}
+                onChange={handleChange}
+                textSize={2.2}
+                textScale={store.textScale}
+                textColor={'var(--textColorDefault)'}
+                isActive={true}
+              />
+            ) : (
+              isBoolean ? (
+                <SimpleCheckbox
+                  name={nestedKey}
+                  checked={value}
+                  onChange={handleChange}
+                  colorActive={'var(--themeDefault)'}
+                  colorInactive={'var(--boxColorDark)'}
+                  borderColor={'var(--boxColorDarker)'}
+                  isActive={true}
+                />
               ) : (
-                isBoolean ? (
-                  <label className='toggle'>
-                    <input type='checkbox' name={nestedKey} checked={value} onChange={handleChange} />
-                    <span className='toggle__slider'></span>
-                  </label>
-                ) : (
-                  <input className='input' type='number' name={nestedKey} value={value} onChange={handleChange} />
-                )
-              )}
-            </span>
+                <SimpleInput
+                  type='number'
+                  name={nestedKey}
+                  value={value}
+                  onChange={handleChange}
+                  textSize={2.2}
+                  textScale={store.textScale}
+                  textColor={'var(--textColorDefault)'}
+                  isActive={true}
+                />
+              )
+            )}
           </div>
         </div>
       );
     });
 
-
     return (
       <>
-        {labelParagraph}
+        <SimpleLabel
+          textColor={'var(--textColorLight)'}
+          text={<h3> {labelParagraph} </h3>}
+          textSize={2.2}
+          textScale={store.textScale}
+        />
         {nestedElements}
       </>
     );
   }
 
+  const clickTest = () => {
+    console.log('Click :)');
+  };
+
 
   return (
     <>
-      <div className='spacer' />
-      <div className={`settings ${applicationSettings.app.colorTheme.value}`}>
+      <div className={`settings ${applicationSettings.app.colorTheme.value}`} style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
 
-        {/* 
-        <WifiModal isShowing={wifiModalIsShowing}
-          ssid={ssidSelected}
-          hide={wifiModalToggle}
-          settings={applicationSettings}
-          status={wifiStatus}
-          connect={connectWifi}
-          reset={resetWifiStatus}
-        />
-        */}
-
-        <div className='settings__body'>
-
-          <div className='section'>
-            <div className='section__1'>
-              <div className='settings__header'>
-                <h2>RTVI Settings</h2>
+        <div className='column' style={{ padding: '0px', height: '90%', justifyContent: 'space-around' }}>
+          <div className='row' style={{ height: '90%' }}>
+            <div className='column' style={{ gap: '20px' }}>
+              <div className='row' style={{ height: '10%' }}>
+                <h1>SETTINGS</h1>
               </div>
-              <div className='section__frame'>
-                <div className='section__frame__row'>
-                  <h3>Wireless Connections:</h3>
-                </div>
+              <div className='frame'>
+                <div className='column'>
+                  <div className='row'>
+                    <SimpleLabel
+                      textColor={'var(--textColorLight)'}
+                      text={<h3> Wireless Connections: </h3>}
+                      textSize={2.2}
+                      textScale={store.textScale}
+                    />
+                  </div>
 
-                <div className='section__frame__content'>
-                  <div className='scroller__container'>
-                    <div className='scroller__container__content scrollbar-styles'>
-                      Coming soon...
+                  <div className='row' style={{ marginBottom: '10%' }}>
+                    <div className='column'>
+                      <SimpleButton
+                        text={"Coming Soon"}
+                        textSize={2.2}
+                        textScale={store.textScale}
+                        textColor={'var(--textColorDefault)'}
+                        isActive={true}
+                        onClick={clickTest}
+                        backgroundColor={'var(--boxColorDark)'}
+                      />
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className='section__frame'>
-                <div className='section__frame__content'>
-                  <div className='section__frame__row'>
-                    <h3>I/O:</h3>
+
+              <div className='frame'>
+                <div className='column' style={{ gap: '0px', width: '100%', height: '90%', justifyContent: 'center' }}>
+                  <div className='row'>
+                    <SimpleLabel
+                      textColor={'var(--textColorLight)'}
+                      text={<h3> I/O: </h3>}
+                      textSize={2.2}
+                      textScale={store.textScale}
+                    />
                   </div>
 
-                  <div className='section__frame__row'>
-                    <div className='section__frame__column'>
-                      <button className='round-button button-styles button-background' type='button' onClick={() => { systemTask('reboot') }}>Reboot</button>
-                      <button className='round-button button-styles button-background' type='button' onClick={() => { systemTask('restart') }}>Restart</button>
+                  <div className='row' style={{ height: '50%', justifyContent: 'center' }}>
+                    <div className='column' style={{ gap: '10%' }}>
+                      <SimpleButton
+                        text={"Reboot"}
+                        textSize={2.2}
+                        textScale={store.textScale}
+                        textColor={'var(--textColorDefault)'}
+                        isActive={true}
+                        onClick={() => { systemTask('reboot') }}
+                        backgroundColor={'var(--boxColorDark)'}
+                      />
+                      <SimpleButton
+                        text={"Restart"}
+                        textSize={2.2}
+                        textScale={store.textScale}
+                        textColor={'var(--textColorDefault)'}
+                        isActive={true}
+                        onClick={() => { systemTask('restart') }}
+                        backgroundColor={'var(--boxColorDark)'}
+                      />
                     </div>
 
-
-                    <div className='section__frame__column'>
-                      <button className='round-button button-styles button-background' type='button' onClick={() => { systemTask('quit') }}>Quit</button>
-                      <button className='round-button button-styles button-background' type='button' onClick={() => { systemTask('reset') }}>Reset</button>
+                    <div className='column' style={{ gap: '10%' }}>
+                      <SimpleButton
+                        text={"Quit"}
+                        textSize={2.2}
+                        textScale={store.textScale}
+                        textColor={'var(--textColorDefault)'}
+                        isActive={true}
+                        onClick={() => { systemTask('quit') }}
+                        backgroundColor={'var(--boxColorDark)'}
+                      />
+                      <SimpleButton
+                        text={"Reset"}
+                        textSize={2.2}
+                        textScale={store.textScale}
+                        textColor={'var(--textColorDefault)'}
+                        isActive={true}
+                        onClick={() => { systemTask('reset') }}
+                        backgroundColor={'var(--boxColorDark)'}
+                      />
                     </div>
                   </div>
 
-
-                  <div className='section__frame__row'>
-                    <h4><i>v{versionNumber}</i></h4>
+                  <div className='row'>
+                    <label><i>v{store.version}</i></label>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className='section__2'>
-              <div className='section__frame'>
-                <div className='scroller__container'>
-                  <div className="tab">
-                    <button className={`square-button button-styles button-background ${activeTab === 1 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(1)}> General </button>
-                    <button className={`square-button button-styles button-background ${activeTab === 2 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(2)}> Customization </button>
-                    {/* <button className={`tab-button ${activeTab === 3 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(3)}> Vehicle </button> */}
-                    {applicationSettings.dev.advancedSettings.value ? <button className={`square-button button-styles button-background ${activeTab === 0 ? 'active' : 'inactive'}`} type='button' onClick={() => handleTabChange(0)}> Advanced </button> : <></>}
+            <div className='column' style={{ flex: '0 1 70%', gap: '10px' }}>
+              <div className='frame'>
+                <div className='row' style={{ marginTop: '10px', justifyContent:'flex-start'}}>
+                  <div className="scroller__tab">
+                    <SimpleButton
+                      height={'100%'}
+                      text={<b>GENERAL</b>}
+                      textSize={2.5}
+                      textScale={store.textScale}
+                      textColor={'var(--textColorLight)'}
+                      isActive={true}
+                      backgroundColor={activeTab === 1 ? 'var(--boxColorDark)' : 'var(--boxColorDarker)'}
+                      onClick={() => handleTabChange(1)}
+                    />
+
+                    <SimpleButton
+                      height={'100%'}
+                      text={<b>CUSTOMIZATION</b>}
+                      textSize={2.5}
+                      textScale={store.textScale}
+                      textColor={'var(--textColorLight)'}
+                      isActive={true}
+                      backgroundColor={activeTab === 2 ? 'var(--boxColorDark)' : 'var(--boxColorDarker)'}
+                      onClick={() => handleTabChange(2)}
+                    />
                   </div>
-
-                  {activeTab === 1 &&
-                    <div className='scroller__container__content scrollbar-styles'>
-
-                      {renderSetting("app", newSettings)}
-                      {renderSetting("connections", newSettings)}
-
-                      <div className='setting-elements__row'>
-                        <div className='setting-elements__row__item'>
-                          <span>CAN Worker {canState ? "(Inactive)" : "(Active)"}</span>
-                          <span className='setting-elements__row__divider'></span>
-                          <span>
-                            <button className='round-button button-styles button-background' type='button' onClick={() => { handleCAN() }}>{canState ? "On" : "Off"}</button>
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className='setting-elements__row'>
-                        <div className='setting-elements__row__item'>
-                          <span>ADC Worker {adcState ? "(Inactive)" : "(Active)"}</span>
-                          <span className='setting-elements__row__divider'></span>
-                          <span>
-                            <button className='round-button button-styles button-background' type='button' onClick={() => { handleADC() }}>{adcState ? "On" : "Off"}</button>
-                          </span>
-                        </div>
-                      </div>
-
-                      {renderSetting("dev", newSettings)}
-                    </div>
-                  }
-
-                  {activeTab === 2 &&
-                    <div className='scroller__container__content scrollbar-styles'>
-                      {/*renderSetting("visibility", newSettings)*/}
-                      {renderSetting("dash_bar", newSettings)}
-                      {renderSetting("dash_1", newSettings)}
-                      {renderSetting("charts", newSettings)}
-                      <div className='setting-elements__row'>
-                        <div className='setting-elements__row__item'>
-                          <span>Add/Remove Data</span>
-                          <span className='setting-elements__row__divider'></span>
-                          <div style={{display: "flex", flexDirection: "row", gap: "5px"}}>
-                            <button className='round-button button-styles button-background' type='button' onClick={() => { handleAddSetting("charts", newSettings) }}>+</button>
-                            <button className='round-button button-styles button-background' type='button' onClick={() => { handleRemoveSetting("charts", newSettings) }}>-</button>
-                          </div>
-                        </div>
-                      </div>
-                      {renderSetting("dash_3", newSettings)}
-                      {/*renderSetting("racedash", handleSettingChange, newSettings)*/}
-
-                    </div>
-                  }
-
-                  {activeTab === 3 &&
-                    <div className='scroller__container__content scrollbar-styles'>
-                      {renderSetting("comfort", newSettings)}
-                      {renderSetting("lights", newSettings)}
-                    </div>
-                  }
-
-
-                  {activeTab === 0 &&
-                    <div className='scroller__container__content scrollbar-styles'>
-                      {renderSetting("carplay", newSettings)}
-                    </div>
-                  }
                 </div>
 
-                <div className='section__frame__row'>
-                  <button className='round-button button-styles button-background' type='button' onClick={saveSettings}>Save</button>
+                <div className='row' style={{ height: '70%' }}>
+                  <div className='scroller column scrollbar-styles' style={{ justifyContent: 'flex-start' }}>
+                    {activeTab === 1 &&
+                      <>
+                        {renderSetting("app", currentSettings)}
+                        {renderSetting("side_bars", currentSettings)}
+                        <div className='list row'>
+                          <SimpleLabel
+                            textColor={'var(--textColorDefault)'}
+                            text={`CAN ${store.canState ? '(Inactive)' : '(Active)'}`}
+                            textSize={2.2}
+                            textScale={store.textScale}
+                          />
+                          <span className='divider'></span>
+                          <div className='row' style={{ flex: '0 0 40%', marginRight: '10px' }}>
+                            <SimpleButton
+                              text={store.canState ? "On" : "Off"}
+                              textSize={2.2}
+                              textScale={store.textScale}
+                              textColor={'var(--textColorDefault)'}
+                              isActive={true}
+                              onClick={() => { handleIO(canChannel) }}
+                              backgroundColor={'var(--boxColorDark)'}
+                            />
+                          </div>
+                        </div>
+
+                        <div className='list row'>
+                          <SimpleLabel
+                            textColor={'var(--textColorDefault)'}
+                            text={`ADC ${store.adcState ? '(Inactive)' : '(Active)'}`}
+                            textSize={2.2}
+                            textScale={store.textScale}
+                          />
+                          <span className='divider'></span>
+                          <div className='row' style={{ flex: '0 0 40%', marginRight: '10px' }}>
+                            <SimpleButton
+                              text={store.adcState ? "On" : "Off"}
+                              textSize={2.2}
+                              textScale={store.textScale}
+                              textColor={'var(--textColorDefault)'}
+                              isActive={true}
+                              onClick={() => { handleIO(adcChannel) }}
+                              backgroundColor={'var(--boxColorDark)'}
+                            />
+                          </div>
+                        </div>
+
+                        {/*renderSetting("dev", currentSettings)*/}
+                        <p />
+                      </>
+                    }
+
+                    {activeTab === 2 &&
+                      <>
+                        {renderSetting("dash_topbar", currentSettings)}
+                        {renderSetting("dash_classic", currentSettings)}
+                        {renderSetting("dash_race", currentSettings)}
+                        {renderSetting("dash_charts", currentSettings)}
+
+                        <div className='list row'>
+                          <SimpleLabel
+                            textColor={'var(--textColorDefault)'}
+                            text={'Add / Remove Data'}
+                            textSize={2.2}
+                            textScale={store.textScale}
+                          />
+                          <span className='divider'></span>
+                          <div className='row' style={{ flex: '0 0 40%', marginRight: '10px', gap: '10%' }}>
+                            <div className='input'>
+                              <SimpleButton
+                                text={"+"}
+                                textSize={2.5}
+                                textScale={store.textScale}
+                                textColor={'var(--textColorDefault)'}
+                                isActive={true}
+                                onClick={() => { handleAddSetting("dash_charts", currentSettings) }}
+                                backgroundColor={'var(--boxColorDark)'}
+                              />
+                            </div>
+                            <div className='input'>
+                              <SimpleButton
+                                text={"-"}
+                                textSize={2.5}
+                                textScale={store.textScale}
+                                textColor={'var(--textColorDefault)'}
+                                isActive={true}
+                                onClick={() => { handleRemoveSetting("dash_charts", currentSettings) }}
+                                backgroundColor={'var(--boxColorDark)'}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <p />
+                      </>
+                    }
+
+                    {activeTab === 3 &&
+                      <>
+                        {renderSetting("comfort", currentSettings)}
+                        {renderSetting("lights", currentSettings)}
+                        <p />
+                      </>
+                    }
+
+                    {activeTab === 0 &&
+                      <>
+                        {renderSetting("carplay", currentSettings)}
+                        <p />
+                      </>
+                    }
+                  </div>
+                </div>
+
+                <div className='row' style={{ marginTop: '10px', marginBottom: '10px' }}>
+                  <div className='column'>
+                    <SimpleButton
+                      text={<h3>Save</h3>}
+                      textSize={2.2}
+                      textScale={store.textScale}
+                      textColor={'var(--textColorLight)'}
+                      isActive={true}
+                      onClick={saveSettings}
+                      backgroundColor={'var(--boxColorDark)'}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <div className='spacer' />
     </>
   )
 };

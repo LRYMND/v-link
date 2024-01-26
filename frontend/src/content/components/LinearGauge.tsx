@@ -18,14 +18,14 @@ const LinearGauge = ({
     ticks = 2,
     smallTicks = 5,
     tickLength = 12,
-    progressThickness = 3,
+    progressColorThickness = 3,
     limitThickness = 10,
     decimals = 2,
-    textColorActive,
-    textColorDefault,
-    fillActive,
-    fillInactive,
-    sectionColor
+    progressColor,
+    textColor,
+    limitColor,
+    indicatorColor,
+    backgroundColor
 }) => {
     const SVG_NS = 'http://www.w3.org/2000/svg';
     const minValue = 0;
@@ -164,7 +164,7 @@ const LinearGauge = ({
                 y={0}
                 width={rectangleWidth}
                 height={height}
-                fill={isBeyondLimit ? 'red' : fillActive} // Set red color for rectangles beyond limitX
+                fill={isBeyondLimit ? limitColor : progressColor}
             />
         );
     });
@@ -192,12 +192,12 @@ const LinearGauge = ({
                     width={rect1_width}  // Adjust the width as needed
                     height={rect1_height}  // Adjust the height as needed
                     rx={10}  // Adjust the border-radius for rounded edges
-                    fill={sectionColor}  // Adjust the background color
+                    fill={backgroundColor}  // Adjust the background color
                 />
                 <text
                     x={label1_x}  // Adjust the x-coordinate for text position
                     y={label1_y}  // Adjust the y-coordinate for text position
-                    fill={(value2 > limitValue2 ? "red" : textColorDefault)}  // Adjust the text color
+                    fill={(value2 > limitValue2 ? limitColor : progressColor)}  // Adjust the text color
                     fontSize={rect1_height / 2}  // Adjust the font size
                     textAnchor="middle"
                 >
@@ -207,7 +207,7 @@ const LinearGauge = ({
                 <text
                     x={label2_x}  // Adjust the x-coordinate for text position
                     y={label2_y}  // Adjust the y-coordinate for text position
-                    fill={textColorDefault}  // Adjust the text color
+                    fill={textColor}  // Adjust the text color
                     fontSize={rect1_height / 4}  // Adjust the font size
                     textAnchor="middle"
                 >
@@ -230,7 +230,7 @@ const LinearGauge = ({
                 <text
                     x={rect1_x}  // Adjust the x-coordinate for text position
                     y={rect1_y}  // Adjust the y-coordinate for text position
-                    fill={(value1 > limitStart ? "red" : textColorDefault)}  // Adjust the text color
+                    fill={(value1 > limitStart ? limitColor : progressColor)}  // Adjust the text color
                     fontSize={rect1_height}  // Adjust the font size
                     textAnchor="end"
                 >
@@ -240,7 +240,7 @@ const LinearGauge = ({
                 <text
                     x={rect1_x}  // Adjust the x-coordinate for text position
                     y={rect1_y}  // Adjust the y-coordinate for text position
-                    fill={textColorDefault}  // Adjust the text color
+                    fill={progressColor}  // Adjust the text color
                     fontSize={rect1_height / 2}  // Adjust the font size
                     textAnchor="start"
                 >
@@ -283,7 +283,7 @@ const LinearGauge = ({
             // Use getPointAtLength with transformation applied manually
             const point = path.getPointAtLength(position);
             svgPoint.x = (point.x * ((width - offsetX) / viewBox.width)) + (offsetX / 2);
-            svgPoint.y = ((point.y + offsetY) * (((height - offsetY) / viewBox.height))) + ((offsetY / 2) - progressThickness);
+            svgPoint.y = ((point.y + offsetY) * (((height - offsetY) / viewBox.height))) + ((offsetY / 2) - progressColorThickness);
 
 
             // Determine if the tickmark is beyond the limit
@@ -311,8 +311,8 @@ const LinearGauge = ({
                     y1={svgPoint.y - tickLength}
                     x2={svgPoint.x}
                     y2={svgPoint.y} // Adjust the length of the tickmark as needed
-                    stroke={isBeyondLimit ? 'red' : fillInactive} // Set red color for tickmarks beyond limitX
-                    strokeWidth={isBeyondLimit ? limitThickness : progressThickness}
+                    stroke={isBeyondLimit ? limitColor : indicatorColor}
+                    strokeWidth={isBeyondLimit ? limitThickness : progressColorThickness}
                 />
             );
 
@@ -324,21 +324,21 @@ const LinearGauge = ({
 
 
                 for (let j = 1; j <= smallTicks; j++) {
-                    const smallTickPosition = position + (spacing * j) - (progressThickness + smallTicks);
+                    const smallTickPosition = position + (spacing * j) - (progressColorThickness + smallTicks);
 
                     const point2 = path.getPointAtLength(smallTickPosition);
                     svgPoint2.x = (point2.x * ((width - offsetX) / viewBox.width)) + (offsetX / 2);
-                    svgPoint2.y = (point2.y + offsetY) * (((height - offsetY) / viewBox.height)) + ((offsetY / 2) - progressThickness);
+                    svgPoint2.y = (point2.y + offsetY) * (((height - offsetY) / viewBox.height)) + ((offsetY / 2) - progressColorThickness);
 
                     const smallTick = (
                         <line
                             key={`small-tick-${i}-${j}`}
                             x1={svgPoint2.x}
-                            y1={svgPoint2.y - tickLength * 0.3 + (isBeyondLimit ? -progressThickness : 0)} // Adjust the length of the small tickmark as needed
+                            y1={svgPoint2.y - tickLength * 0.3 + (isBeyondLimit ? -progressColorThickness : 0)} // Adjust the length of the small tickmark as needed
                             x2={svgPoint2.x}
                             y2={svgPoint2.y} // Adjust the length of the small tickmark as needed
-                            stroke={isBeyondLimit ? 'red' : fillInactive}  // Set the color for small tickmarks
-                            strokeWidth={progressThickness} // Use the same strokeWidth as regular tickmarks
+                            stroke={isBeyondLimit ? limitColor : indicatorColor}  // Set the color for small tickmarks
+                            strokeWidth={progressColorThickness} // Use the same strokeWidth as regular tickmarks
                         />
                     );
 
@@ -353,7 +353,7 @@ const LinearGauge = ({
                     x={svgPoint.x}
                     y={svgPoint.y - tickLength - 3} // 10px above the tickmark
                     textAnchor="middle" // Center the text horizontally
-                    fill={isBeyondLimit ? 'red' : textColorDefault} // Set red color for labels beyond limitX
+                    fill={isBeyondLimit ? limitColor : textColor}
                 >
                     {mapValue(i - 1, 0, ticks - 1, minValue, maxValue).toFixed(decimals)} {/* Adjust toFixed as needed */}
                 </text>
@@ -368,7 +368,7 @@ const LinearGauge = ({
                 d={indicator}
                 transform={`translate(${(offsetX / 2)}, ${(offsetY)}) scale(${(width - offsetX) / viewBox.width}, ${(height - offsetY) / viewBox.height})`}
                 fill="none"
-                stroke="#ff0000"
+                stroke={limitColor}
                 strokeLinecap="round"
                 strokeWidth={`${limitThickness}`}
                 strokeDasharray={`${limitEnd - limitBegin} ${limitBegin}`}
@@ -381,8 +381,8 @@ const LinearGauge = ({
                 d={indicator}
                 transform={`translate(${(offsetX / 2)}, ${(offsetY)}) scale(${(width - offsetX) / viewBox.width}, ${(height - offsetY) / viewBox.height})`}
                 fill="none"
-                stroke={fillInactive}
-                strokeWidth={`${progressThickness}`}
+                stroke={indicatorColor}
+                strokeWidth={`${progressColorThickness}`}
             />
         )
 
@@ -419,7 +419,7 @@ const LinearGauge = ({
                             width={width}
                             height={height}
 
-                            fill={fillInactive}
+                            fill={backgroundColor}
                         />
                     </g>
 

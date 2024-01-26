@@ -1,71 +1,109 @@
-import { useState, useEffect } from 'react';
-
-import CarDataStore from '../cardata/store/Datastore'
+import { CarData, ApplicationSettings, SensorSettings, Store } from '../store/Store';
+import ValueBox from '../components/ValueBox';
 
 import "./../../styles.scss"
 import "./../../themes.scss"
-import "./dashbar.scss";
 
 
-const DashBar = ({ sensorSettings, applicationSettings, wifiState, phoneState, setView }) => {
+const DashBar = () => {
 
-    const [carData, setCarData] = useState({})
+    const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
+    const sensorSettings = SensorSettings((state) => state.sensorSettings);
+    const carData = CarData((state) => state.carData);
+    const store = Store((state) => state);
 
-    useEffect(() => {
-        const unsubscribe = CarDataStore.subscribe(
-            (event) => {
-                setCarData(event.carData)
-                //console.log(carData)
-            },
-        );
+    const updateStore = Store((state) => state.updateStore);
 
-        return () => {
-            unsubscribe();
-        };
-    }, []);
+    const textScale = 1;
 
     return (
-        <div className={`dashbar ${applicationSettings.app.colorTheme.value}`} style={{ height: `${applicationSettings.interface.heightOSD.value}px` }}>
-            <div className="dashbar__data">
-                <div className="dashbar__data__item">
-                    <p><b>{sensorSettings[applicationSettings.dash_bar.value_1.value].label}:</b> <br />
-                    {carData[applicationSettings.dash_bar.value_1.value]}{sensorSettings[applicationSettings.dash_bar.value_1.value].unit}</p>
+        <div className={`dashbar ${applicationSettings.app.colorTheme.value}`} style={{
+            height: `${applicationSettings.side_bars.topBarHeight.value}px`,
+            display: 'flex',
+            position: 'absolute',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            top: 0,
+            width: '100%',
+            background: 'var(--background-color)'
+        }}>
+            <div className='row' style={{ height: "100%" }}>
+                <div className='column'>
+                    <div className='row' style={{ justifyContent: 'center', gap: '15px' }}>
+                        <ValueBox
+                            valueKey={applicationSettings.dash_topbar.value_1.value}
+                            carData={carData}
+                            sensorSettings={sensorSettings}
+                            height={"70%"}
+                            textColorDefault={'var(--textColorDefault)'}
+                            valueColor={'var(--textColorDefault)'}
+                            limitColor={'var(--themeAccent)'}
+                            labelSize={`calc(1.75vh * ${textScale}`}
+                            valueSize={`calc(2.5vh * ${textScale}`}
+                            boxColor={'var(--backgroundColor)'}
+                            borderColor={'var(--boxColorDark)'}
+                            borderWidth={'0vh'}
+                            style={"column"}
+                        />
+                        <ValueBox
+                            valueKey={applicationSettings.dash_topbar.value_2.value}
+                            carData={carData}
+                            sensorSettings={sensorSettings}
+                            height={"70%"}
+                            textColorDefault={'var(--textColorDefault)'}
+                            valueColor={'var(--textColorDefault)'}
+                            limitColor={'var(--themeAccent)'}
+                            labelSize={`calc(1.75vh * ${textScale}`}
+                            valueSize={`calc(2.5vh * ${textScale}`}
+                            boxColor={'var(--backgroundColor)'}
+                            borderColor={'var(--boxColorDark)'}
+                            borderWidth={'0vh'}
+                            style={"column"}
+                        />
+                        <ValueBox
+                            valueKey={applicationSettings.dash_topbar.value_3.value}
+                            carData={carData}
+                            sensorSettings={sensorSettings}
+                            height={"70%"}
+                            textColorDefault={'var(--textColorDefault)'}
+                            valueColor={'var(--textColorDefault)'}
+                            limitColor={'var(--themeAccent)'}
+                            labelSize={`calc(1.75vh * ${textScale}`}
+                            valueSize={`calc(2.5vh * ${textScale}`}
+                            boxColor={'var(--backgroundColor)'}
+                            borderColor={'var(--boxColorDark)'}
+                            borderWidth={'0vh'}
+                            style={"column"}
+                        />
+                    </div>
                 </div>
-
-                <div className="dashbar__data__item">
-                    <p><b>{sensorSettings[applicationSettings.dash_bar.value_2.value].label}:</b> <br />
-                    {carData[applicationSettings.dash_bar.value_2.value]}{sensorSettings[applicationSettings.dash_bar.value_2.value].unit}</p>
+                <div className='column'>
+                    <svg viewBox="0 0 350.8 48.95" xmlns="http://www.w3.org/2000/svg">
+                        <use xlinkHref="/assets/svg/typo.svg#volvo"></use>
+                    </svg>
                 </div>
+                <div className='column'>
+                    <div className='row' style={{ justifyContent: 'center' }}>
+                        <div style={{ display: 'flex', gap: '20px' }}>
+                            <svg className={`status-icon status-icon--${(store.wifiState ? "active" : "inactive")}`}>
+                                <use xlinkHref="/assets/svg/wifi.svg#wifi"></use>
+                            </svg>
 
-                <div className="dashbar__data__item">
-                    <p><b>{sensorSettings[applicationSettings.dash_bar.value_3.value].label}:</b> <br />
-                    {carData[applicationSettings.dash_bar.value_3.value]}{sensorSettings[applicationSettings.dash_bar.value_3.value].unit}</p>
+                            <svg className={`status-icon status-icon--${(store.wifiState ? "active" : "inactive")}`}>
+                                <use xlinkHref="/assets/svg/bluetooth.svg#bluetooth"></use>
+                            </svg>
+
+                            <svg className={`status-icon status-icon--${(store.phoneState ? "active" : "inactive")}`}>
+                                <use xlinkHref="/assets/svg/phone.svg#phone"></use>
+                            </svg>
+
+                            <button className='input-style nav-button' type='button' onClick={() => updateStore({view: 'Dashboard'})}>
+                                <div>EXIT</div>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div className="dashbar__banner">
-                <svg className="dashbar__banner__graphic">
-                    <use xlinkHref="/assets/svg/volvo-typo.svg#volvo"></use>
-                </svg>
-            </div>
-
-            <div className="dashbar__info">
-                <svg className={`status-icon status-icon--${(wifiState ? "active" : "inactive")}`}>
-                    <use xlinkHref="/assets/svg/wifi.svg#wifi"></use>
-                </svg>
-
-                <svg className={`status-icon status-icon--${'inactive'}`}>
-                    <use xlinkHref="/assets/svg/bluetooth.svg#bluetooth"></use>
-                </svg>
-
-                <svg className={`status-icon status-icon--${(phoneState ? "active" : "inactive")}`}>
-                    <use xlinkHref="/assets/svg/phone.svg#phone"></use>
-                </svg>
-
-
-                <button className='button-styles nav-button' type='button' onClick={() => setView('Dashboard')}>
-                    <div>EXIT</div>
-                </button>
             </div>
         </div>
     );

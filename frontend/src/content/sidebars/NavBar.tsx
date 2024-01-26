@@ -1,19 +1,36 @@
+import { ApplicationSettings, Store } from '../store/Store';
+
+
 import "./../../styles.scss"
 import "./../../themes.scss"
-import "./navbar.scss";
 
-const NavBar = ({ applicationSettings, view, setView }) => {
+const NavBar = () => {
+
+	const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
+	const store = Store((state) => state);
+	const updateStore = Store((state) => state.updateStore);
+
 	const gradientId = 'gradient';
 
 	return (
-		<div className={`navbar ${applicationSettings.app.colorTheme.value}`} style={{ height: `${applicationSettings.app.navBarHeight.value}px` }}>
+		<div className={`navbar ${applicationSettings.app.colorTheme.value}`} style={{
+			height: `${applicationSettings.side_bars.navBarHeight.value}px`,
+			display: 'flex',
+			position: 'absolute',
+			flexDirection: 'column',
+			justifyContent: 'center',
+			alignItems: 'center',
+			bottom: 0,
+			width: '100%',
+			background: 'var(--background-color)'
+		}}>
 			<div className="row">
-				<svg height="20" width="100%" style={{ position: 'absolute', top: 5, left: 0 }}>
+				<svg height="2" width="100%">
 					<defs>
 						<linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
 							<stop offset="0%" stopColor="black" stopOpacity="1" />
-							<stop offset="33%" stopColor="var(--sectionColor)" stopOpacity="1" />
-							<stop offset="66%" stopColor="var(--sectionColor)" stopOpacity="1" />
+							<stop offset="33%" stopColor="var(--boxColorDefault)" stopOpacity="1" />
+							<stop offset="66%" stopColor="var(--boxColorDefault)" stopOpacity="1" />
 							<stop offset="100%" stopColor="black" stopOpacity="1" />
 						</linearGradient>
 					</defs>
@@ -24,32 +41,31 @@ const NavBar = ({ applicationSettings, view, setView }) => {
 						style={{ fill: `url(#${gradientId})` }}
 					/>
 				</svg>
+			</div>
+			<div className="row">
 				<div className="column">
-					{applicationSettings.connections.activateCAN.value ?
-						<button className="button-styles nav-button" onClick={() => setView('Dashboard')} style={{ fill: (view === 'Dashboard') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
-							<svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width={(applicationSettings.app.navBarHeight.value * 0.6)} height={(applicationSettings.app.navBarHeight.value * 0.6)}>
+						<button className="nav-button" onClick={() => updateStore({ view: 'Dashboard' })} style={{ fill: (store.view === 'Dashboard') ? 'var(--themeDefault)' : 'var(--boxColorLighter)' }}>
+							<svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width={(applicationSettings.side_bars.navBarHeight.value * 0.6)} height={(applicationSettings.side_bars.navBarHeight.value * 0.6)}>
 								<use xlinkHref="/assets/svg/gauge.svg#gauge"></use>
 							</svg>
 						</button>
-						: <></>}
 				</div>
 				<div className="column">
-					{applicationSettings.connections.activateMMI.value ?
-						<button className="button-styles nav-button" onClick={() => setView('Carplay')} style={{ fill: (view === 'Carplay') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
-							<svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width={(applicationSettings.app.navBarHeight.value * 0.6)} height={(applicationSettings.app.navBarHeight.value * 0.6)}>
-								<use xlinkHref="/assets/svg/carplay.svg#carplay"></use>
-							</svg>
-						</button>
-						: <></>}
+					<button className="nav-button" onClick={() => updateStore({ view: 'Carplay' })} style={{ fill: (store.view === 'Carplay') ? 'var(--themeDefault)' : 'var(--boxColorLighter)' }}>
+						<svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width={(applicationSettings.side_bars.navBarHeight.value * 0.6)} height={(applicationSettings.side_bars.navBarHeight.value * 0.6)}>
+							<use xlinkHref="/assets/svg/carplay.svg#carplay"></use>
+						</svg>
+					</button>
 				</div>
 				<div className="column">
-					<button className="button-styles nav-button" onClick={() => setView('Settings')} style={{ fill: (view === 'Settings') ? 'var(--fillActive)' : 'var(--fillInactive)' }}>
-						<svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width={(applicationSettings.app.navBarHeight.value * 0.6)} height={(applicationSettings.app.navBarHeight.value * 0.6)}>
+					<button className="nav-button" onClick={() => updateStore({ view: 'Settings' })} style={{ fill: (store.view === 'Settings') ? 'var(--themeDefault)' : 'var(--boxColorLighter)' }}>
+						<svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width={(applicationSettings.side_bars.navBarHeight.value * 0.6)} height={(applicationSettings.side_bars.navBarHeight.value * 0.6)}>
 							<use xlinkHref="/assets/svg/settings.svg#settings"></use>
 						</svg>
 					</button>
 				</div>
 			</div>
+
 		</div >
 	);
 };

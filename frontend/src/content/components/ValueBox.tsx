@@ -1,47 +1,50 @@
 const ValueBox = ({
-  textColor,
+  textColorDefault,
+  valueColor,
   limitColor,
   boxColor,
   borderColor,
   borderWidth,
   height,
-  width,
+  width = "100%",
+  unit = true,
   valueKey,
   carData,
-  sensorSettings
+  sensorSettings,
+  labelSize,
+  valueSize,
+  style='row'
 }) => {
   const value = carData[valueKey];
   const sensorSetting = sensorSettings[valueKey];
   const label = sensorSettings[valueKey].label
 
-  const getColorStyle = () => ({
-    color: `${value >= sensorSetting.limit_start ? limitColor : textColor}`,
-  });
-
   const boxStyle = {
     display: 'flex',
-    justifyContent: 'space-around',
-    flexDirection: 'column',
+    justifyContent: 'space-between',
+    //alignItems: 'center',
+    flexDirection: style,
     height: height,
     width: width,
     borderRadius: '10px',
     backgroundColor: boxColor,
-    border: `${borderWidth}px solid ${borderColor}`
+    border: `${borderWidth ? borderWidth : "1vh"} solid ${borderColor}`
   };
 
   const labelStyle = {
-    marginLeft: '.5rem',
-    marginTop: '.2rem',
-    height: '20%',
-    color: textColor,
+    alignSelf: 'flexStart',
+    marginLeft: '1%',
+    marginTop: '1%',
+    fontSize: `${labelSize ? labelSize : "3vh"}`,
+    color: textColorDefault,
   };
 
   const dataStyle = {
-    height: '80%',
+    alignSelf: 'center',
     marginLeft: 'auto',
-    marginRight: '1rem',
-    fontSize: `${height / 2}px`,
-    color: textColor,
+    marginRight: '5%',
+    fontSize: `${valueSize ? valueSize : "6vh"}`,
+    color: `${value >= sensorSetting.limit_start ? limitColor : valueColor}`,
   };
 
 
@@ -50,9 +53,9 @@ const ValueBox = ({
       <div className="value-box__label" style={labelStyle}>
         {label}:
       </div>
-      <div className="value-box__data" style={{ ...dataStyle, ...getColorStyle() }}>
+      <div className="value-box__data" style={{ ...dataStyle }}>
         {value}
-        {sensorSetting.unit}
+        {unit && (sensorSetting.unit)}
       </div>
     </div>
   );

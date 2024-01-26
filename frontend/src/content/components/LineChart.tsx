@@ -17,7 +17,7 @@ const LineChart = ({
     color_xGrid,
     color_yGrid,
     color_axis,
-    color_charts
+    color_dash_charts
 }) => {
     const [dataStreams, setDataStreams] = useState(
         datasets.map(dataset => Array.from({ length: length }, (_, index) => dataset.yMin))
@@ -86,7 +86,7 @@ const LineChart = ({
 
         return (
             <g key={datasetIndex}>
-                <path d={path} stroke={color_charts} strokeWidth="2" fill="none" />
+                <path d={path} stroke={color_dash_charts} strokeWidth="2" fill="none" />
                 <text
                     x={labelPosition.x}
                     y={labelPosition.y}
