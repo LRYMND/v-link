@@ -51,7 +51,8 @@
     "width": 800,
     "height": 480,
     "lhd": 0,
-    "kiosk": true
+    "kiosk": true,
+    "delay": 0
   },
   "keyBindings": {
     "left": "ArrowLeft",

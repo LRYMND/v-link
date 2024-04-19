@@ -26,6 +26,6 @@
 
     "typeRoots": ["types", "./node_modules/@types", "./node_modules/@webgpu/types"]
   },
-  "include": ["src", "types"],
+  "include": ["src", "types", "src/store"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

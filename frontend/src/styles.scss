@@ -32,6 +32,7 @@ body {
 }
 
 .list {
+    height: 5vh;
     margin-bottom: 7px;
 }
 
@@ -70,6 +71,9 @@ body {
 }
 
 .scroller {
+    height: 100%;
+    width: 100%;
+
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -78,6 +82,7 @@ body {
 
     padding-left: 2.5vw;
     padding-right: 2.5vw;
+    padding-top: 1vh;
 
     &__tab {
         flex: 0 1 30%;

@@ -42,7 +42,7 @@ export default defineConfig({
     base: '/',
     rollupOptions: {
       plugins: [
-        rollupNodePolyFill()
+        //rollupNodePolyFill()
       ]
     }
   },

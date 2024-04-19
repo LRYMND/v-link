@@ -13,7 +13,7 @@ This is a react web-app to run natively on a RaspberryPi. It's providing a fully
 
 The project is based on the following repositories:
 
-* [volvo-can-gauge](https://github.com/evy0311/Volvo-CAN-Gauge)
+* [volvo-can-gauge](https://github.com/Alfaa123/Volvo-CAN-Gauge)
 * [react-carplay](https://github.com/rhysmorgan134/react-carplay)
 * [volvo-crankshaft](https://github.com/laurynas/volvo_crankshaft)
 * [volve](https://github.com/LuukEsselbrugge/Volve)
@@ -108,7 +108,7 @@ Also:
 
 ### > Note:
 
-The app runs on a RPi3 as well as on a RPi4 with OS Bullseye, both on 32 and 64-bit.
+The app runs on a RPi4 and newer with OS Bullseye, both on 32 and 64-bit.
 
 ## 02 | Display Mod
 

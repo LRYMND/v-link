@@ -1,0 +1,71 @@
+import { useState, useEffect, } from "react";
+import { ApplicationSettings, Store } from '../../store/Store';
+
+import "./../../styles.scss"
+import "./../../themes.scss"
+
+const TopBar = () => {
+
+  const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
+  const store = Store((state) => state)
+
+  const [time, setDate] = useState(new Date());
+
+
+  function updateTime() {
+    setDate(new Date());
+  }
+
+  useEffect(() => {
+    const timer1 = setInterval(updateTime, 10000);
+
+    return function cleanup() {
+      clearInterval(timer1);
+    };
+  }, []);
+
+
+  return (
+    <div className={`topbar ${applicationSettings.app.colorTheme.value}`} style={{
+      height: `${applicationSettings.side_bars.topBarHeight.value}px`,
+      display: 'flex',
+      position: 'absolute',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      top: 0,
+      width: '100%',
+      background: 'var(--background-color)'
+    }}>
+      <div className='row' style={{ height: "100%", justifyContent: 'center' }}>
+        <div className='column'>
+          <div className='row' style={{ justifyContent: 'center' }}>
+            <div style={{ display: 'flex', alignItems:'center', gap: '20px' }}>
+              <svg className={`status-icon status-icon--${(store.wifiState ? "active" : "inactive")}`}>
+                <use xlinkHref="/assets/svg/wifi.svg#wifi"></use>
+              </svg>
+              <svg className={`status-icon status-icon--${'inactive'}`}>
+                <use xlinkHref="/assets/svg/bluetooth.svg#bluetooth"></use>
+              </svg>
+              <svg className={`status-icon status-icon--${(store.phoneState ? "active" : "inactive")}`}>
+                <use xlinkHref="/assets/svg/phone.svg#phone"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div className='column' style={{justifyContent: 'flex-start', flex:`0 1 50%`}}>
+          <svg viewBox="0 0 350.8 48.95" xmlns="http://www.w3.org/2000/svg">
+            <use xlinkHref="/assets/svg/banner.svg#volvo"></use>
+          </svg>
+        </div>
+        <div className='column'>
+          <h2 style={{ color: "var(--themeDefault)" }}>{time.toLocaleTimeString('sv-SV', { hour: '2-digit', minute: '2-digit' })} </h2>
+        </div>
+      </div>
+    </div>
+
+  );
+};
+
+
+export default TopBar;
