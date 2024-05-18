@@ -1,31 +1,22 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "useDefineForClassFields": true,
     "lib": ["dom", "dom.iterable", "esnext", "WebWorker"],
-    "module": "ESNext",
+    "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-
-    /* Bundler mode */
-    "allowJs": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true,
-
-    "typeRoots": ["types", "./node_modules/@types", "./node_modules/@webgpu/types"]
+    "types": ["@webgpu/types"],
+    "typeRoots": ["types", "node_modules/@types"]
   },
-  "include": ["src", "types", "src/store"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src", "types", "src/store"]
 }

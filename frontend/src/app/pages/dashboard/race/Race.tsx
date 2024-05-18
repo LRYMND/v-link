@@ -127,8 +127,6 @@ const Race = () => {
 						valueKey={applicationSettings.dash_race.value_6.value}
 						carData={carData}
 						sensorSettings={sensorSettings}
-						carData={carData}
-						sensorSettings={sensorSettings}
 						height={"10vh"}
 						textColorDefault={'var(--textColorDefault)'}
 						valueColor={'var(--themeDefault)'}

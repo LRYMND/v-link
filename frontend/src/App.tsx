@@ -19,7 +19,7 @@ import './App.css'
 function App() {
   const store = Store((state) => state);
   const startedUp = Store((state) => state.startedUp);
-  const settings = Store((state) => state.applicationSettings);
+  const settings = ApplicationSettings((state) => state.applicationSettings);
   const [commandCounter, setCommandCounter] = useState(0)
   const [keyCommand, setKeyCommand] = useState('')
 
@@ -30,9 +30,10 @@ function App() {
 
   const onKeyDown = (event: KeyboardEvent) => {
     console.log(event.code)
-    if (Object.values(settings!.app.keyBindings).includes(event.code)) {
-      const action = Object.keys(settings!.app.keyBindings).find(key =>
-        settings!.app.keyBindings[key] === event.code
+    console.log(settings)
+    if (Object.values(settings.keyBindings).includes(event.code)) {
+      const action = Object.keys(settings.keyBindings).find(key =>
+        settings.keyBindings[key] === event.code
       )
       if (action !== undefined) {
         setKeyCommand(action)

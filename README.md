@@ -1,67 +1,13 @@
-# Volvo RTVI System
-Road Traffic and Vehicle Infotainment
+![TITLE IMAGE](repo/images/banner.png?raw=true "Banner")  
 
-![TITLE IMAGE](repo/media/title2.jpg?raw=true "Title")  
+V-Link is a combination of an open source software and a custom hardware interface to enhance cars from the 2000s and 2010s, specifically the Volvo P1 platform. The hardware consists of a full CAN-Bus interface, along with an input for LIN-Bus as well as an ADC interface to connect aftermarket sensors for Oil Temperature etc. Further, it can be combined with the PiMost from ModernDayMods to connect it to the MOST network of the car (WIP).
 
-This is a react web-app to run natively on a RaspberryPi. It's providing a fully functioning Carplay/AndroidAuto integration as well as an interface for canbus and linbus. The app is intended for Volvo P-chassis with a T5 engine (C30, V50, V70 II). However, the canbus codes can be easily adjusted with an exposed settings file in order to change the data.
 
 ![PAGES IMAGE](repo/media/pages.jpg?raw=true "Pages")  
 
-> You can find a demo gif at the end of the readme.
+On the software side is an open-source web-app which runs natively on RaspberryPi OS. It provides a fully functioning Apple Carplay / Android Auto interface as well as connections to the CAN- and LIN-Bus to display vehicle data in real time. It is also possible to read up to 4 analog sensors, e.g. a retrofitted oil temperature sensor. The app can be controlled with the buttons on the steering wheel via LIN-Bus. This functionality is currently still limited but will be further updated and refined.
 
----
-
-The project is based on the following repositories:
-
-* [volvo-can-gauge](https://github.com/Alfaa123/Volvo-CAN-Gauge)
-* [react-carplay](https://github.com/rhysmorgan134/react-carplay)
-* [volvo-crankshaft](https://github.com/laurynas/volvo_crankshaft)
-* [volve](https://github.com/LuukEsselbrugge/Volve)
-* [volvo-vida](https://github.com/Tigo2000/Volvo-VIDA)
-
-Got any tips for improvement or need help?  
-
-[Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
-
-[RTVI Discord Server](https://discord.gg/NyGvFaRS)
-
-### > System Requirements:
-```
-Raspbian 11 Bullseye
-Chromium 116
-Python 3.9.2
-```
-
-### > How to use:
-Production:
-```
-wget "https://github.com/LRYMND/volvo-rtvi/releases/download/v2.0.0/Installer.sh"
-chmod +x Installer.sh
-sh Installer.sh
-
-cd /home/$USER/volvo-rtvi
-python3 Volvo-RTVI.py
-```
-
-Development:
-```
-git clone https://github.com/lrymnd/volvo-rtvi.git
-cd volvo-rtvi
-pip install -r requirements.txt
-cd frontend
-npm i & npm run build
-
-cd /home/$USER/volvo-rtvi/frontend
-npm run vite
-
-cd /home/$USER/volvo-rtvi
-python3 Volvo-RTVI.py dev
-```
-
-```
-Node v18.12.1
-NPM 8.19.2
-```
+The software is fully responsive so it will adapt to any screen size. Over the settings panel it‘s possible to change user settings as well as customize each gauge to show any sensor data. With an exposed settings file it is possible to adapt the CAN-Bus communication for other makes and models . Settings files for the  V50 1.6D and XC90 D5 are currently under investigation.
 
 ---
 
@@ -71,14 +17,10 @@ NPM 8.19.2
 <details open="open">
   <summary>Table of Contents</summary>
   <ol>
-    <li><a>| BOM</a></li>
-    <li><a>| Display Mod</a></li>
-    <li><a>| Raspberry PSU</a></li>
-    <li><a>| CAN Implementation</a></li>
+    <li><a>| VLink Setup</a></li>
+    <li><a>| DIY Setup</a></li>
     <li><a>| Wiring</a></li>
-    <li><a>| Set Up</a></li>
     <li><a>| Audio</a></li>
-    <li><a>| Extended Functionality</a></li>
     <li><a>| Roadmap</a></li>
     <li><a>| Disclaimer</a></li>
   </ol>
@@ -86,9 +28,37 @@ NPM 8.19.2
 
 ---
 
-## 01 | BOM
+## 01 | V-Link Setup
 
 Down below is a list of the required hardware. The display is optional but the one proposed has a much better resolution and also supports touch input with an additional panel. If you want to use the original display, you can find a way to do so in the repositories from laurynas, however, its highly recommended to go the extra mile.
+
+- OEM P1 RTI Display Unit
+- V-Link Hat
+- Raspberry Pi 4/5
+
+* [LCD Driver](https://de.aliexpress.com/item/4001175095149.html?spm=a2g0o.order_list.0.0.30e65c5fXw0Aa6&gatewayAdapt=glo2deu)
+* [LCD Display](https://de.aliexpress.com/item/32835602509.html?spm=a2g0o.order_list.0.0.30e65c5fXw0Aa6&gatewayAdapt=glo2deu)
+* [6.5" Touch Screen Module](https://www.ebay.de/itm/170981315406)
+* [Carlinkit Adapter](https://www.amazon.de/CarlinKit-Wireless-CarPlay-Aftermarket-Mirroring-Black/dp/B09ZPBL4HP/ref=sr_1_18_sspa?keywords=Carlinkit&qid=1662026978&sr=8-18-spons&psc=1&smid=AWLAK6Y9FEYBP&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUFLQVVHRlBSTkdIT0cmZW5jcnlwdGVkSWQ9QTA2NzUwNDAzTjhaUjJJQkQ1N0xXJmVuY3J5cHRlZEFkSWQ9QTAwNDAzNTMyNVdPTUdaM1VTQU8wJndpZGdldE5hbWU9c3BfbXRmJmFjdGlvbj1jbGlja1JlZGlyZWN0JmRvTm90TG9nQ2xpY2s9dHJ1ZQ==)
+
+
+![PAGES IMAGE](repo/images/components.png?raw=true "Components")  
+
+The V-Link Hat (1) is attached to the Raspberry (2) and builds the interface to the car. On this PCB you have terminals to hook up 12V, IGN, CAN etc. It also implements a safe shutdown functionality which gracefully turns off the raspberry once ignition is off and removes the power from the buck converter. In this state it draws a minimum of current so draining your cars battery won‘t be an issue. The LCD Touch Display (3) and the Carlinkit Adapter (4) are plugged into the HDMI / USB port of the raspberry and complete the setup.
+
+![PAGES IMAGE](repo/images/vlink.png?raw=true "V-Link Setup")  
+
+## 02 | DIY Setup
+
+It‘s possible to source every component as development board if you want to avoid the hat and build the circuit yourself. Going this route gives you a bit more flexibility but the setup and installation is a lot more challenging. It requires you to source all the components yourself and make sure that you set them up accordingly. There are even more options out there, e.g. the CarPiHAT, this was however the previous iteration before the new hardware was introduced.
+
+Down below you can find a schematic for this scenario. One component which is not readily available is the custom Raspberry Pi power controller. It ensures that the Raspberry boots when the ignition is turned on and  gracefully shuts off via „shutdown  -h“ when ignition is removed. In this state, it will also completely remove power from the buck converter, keeping the current at an absolute minium to ensure that the cars battery is not drained.
+
+The controller can be handsoldered on a simple through-hole PCB. The parts are pretty common and can be obtained over a number of shops for electrical components. There‘s also just one CAN Module listed, you can easily install a second if you want to.
+
+- OEM P1 RTI Display Unit
+- Raspberry PSU
+- Raspberry Pi
 
 * MCP2004 LIN Transceiver
 * [MCP2515 CAN Module](https://www.amazon.de/-/en/Intelligent-Electronics-Receiver-Controller-Development/dp/B07MY2D7TW/ref=sr_1_6?keywords=mcp2515&qid=1662026860&sr=8-6)
@@ -97,18 +67,14 @@ Down below is a list of the required hardware. The display is optional but the o
 * [6.5" Touch Screen Module](https://www.ebay.de/itm/170981315406)
 * [12V to 5V Buck Converter, 5A](https://www.amazon.de/gp/product/B071ZRXKJY/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&psc=1)
 * [12V 5A Fuse](https://www.amazon.de/Neuftech%C2%AE-Sicherungshalter-Flachsicherung-Sicherung-wasserdicht/dp/B00UX6NIQE/ref=asc_df_B00UX6NIQE/?tag=googshopde-21&linkCode=df0&hvadid=310359968785&hvpos=&hvnetw=g&hvrand=13883660999016731185&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9043309&hvtargid=pla-561148277227&psc=1&th=1&psc=1&tag=&ref=&adgrpid=62443302395&hvpone=&hvptwo=&hvadid=310359968785&hvpos=&hvnetw=g&hvrand=13883660999016731185&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9043309&hvtargid=pla-561148277227)
-
 * [Carlinkit Adapter](https://www.amazon.de/CarlinKit-Wireless-CarPlay-Aftermarket-Mirroring-Black/dp/B09ZPBL4HP/ref=sr_1_18_sspa?keywords=Carlinkit&qid=1662026978&sr=8-18-spons&psc=1&smid=AWLAK6Y9FEYBP&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUFLQVVHRlBSTkdIT0cmZW5jcnlwdGVkSWQ9QTA2NzUwNDAzTjhaUjJJQkQ1N0xXJmVuY3J5cHRlZEFkSWQ9QTAwNDAzNTMyNVdPTUdaM1VTQU8wJndpZGdldE5hbWU9c3BfbXRmJmFjdGlvbj1jbGlja1JlZGlyZWN0JmRvTm90TG9nQ2xpY2s9dHJ1ZQ==)
 
-Also:
+![PAGES IMAGE](repo/images/diy.png?raw=true "DIY Setup")  
 
-- Raspberry PSU
-- OEM P1 RTI Display Unit
-- Raspberry Pi
+---
 
-### > Note:
+## 03 | Wiring
 
-The app runs on a RPi4 and newer with OS Bullseye, both on 32 and 64-bit.
 
 ## 02 | Display Mod
 
@@ -203,11 +169,12 @@ logo.nologo vt.global_cursor_default=0
 
 ## 07 | Audio
 
-There are a couple of ways to use the raspberry as an audio source for your car speakers now. I propose a [small module](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/) from Lithuania with which you can mod your radio to add an aux port. There is also a Bluetooth version available but since the phone is already wirelessly connected to the Carlinkit adapter dongle, an aux-cable seems pretty clean and less prone to failure.
+The current solution for getting audio to work in cars, which don't have a factory aux, is a [small module](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/) from Lithuania.
+This module is a mod for the radio to add an aux port. There is also a Bluetooth version available but since the phone is already wirelessly connected to the Carlinkit adapter dongle, an aux-cable seems pretty clean and less prone to failure.
 
 ### > Note:
 
-This is no advertisement, just a clean and simple solution IMO.
+This is no advertisement, just a clean and simple solution IMO. And since MOST-Bus is supported through the PiMost from ModernDayMods, it might be possible to send audio over the MOST network in the future. This is still under investigation. Feel free to join the Discord Server if you want to participate in the development.
 
 ---
 
@@ -295,3 +262,90 @@ Want to support us?
 | [![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://www.buymeacoffee.com/lrymnd)  | [![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://www.buymeacoffee.com/tigo) |
 |---|---|
 | <center>(Louis)</center> | <center>(Tigo)</center> |
+
+---
+
+The project is based on the following repositories:
+
+* [volvo-can-gauge](https://github.com/Alfaa123/Volvo-CAN-Gauge)
+* [react-carplay](https://github.com/rhysmorgan134/react-carplay)
+* [volvo-crankshaft](https://github.com/laurynas/volvo_crankshaft)
+* [volve](https://github.com/LuukEsselbrugge/Volve)
+* [volvo-vida](https://github.com/Tigo2000/Volvo-VIDA)
+
+Got any tips for improvement or need help?  
+
+[Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
+
+[RTVI Discord Server](https://discord.gg/NyGvFaRS)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### > System Requirements:
+```
+Raspbian 11 Bullseye
+Chromium 116
+Python 3.9.2
+```
+
+### > How to use:
+Production:
+```
+wget "https://github.com/LRYMND/volvo-rtvi/releases/download/v2.0.0/Installer.sh"
+chmod +x Installer.sh
+sh Installer.sh
+
+cd /home/$USER/volvo-rtvi
+python3 Volvo-RTVI.py
+```
+
+Development:
+```
+git clone https://github.com/lrymnd/volvo-rtvi.git
+cd volvo-rtvi
+pip install -r requirements.txt
+cd frontend
+npm i & npm run build
+
+cd /home/$USER/volvo-rtvi/frontend
+npm run vite
+
+cd /home/$USER/volvo-rtvi
+python3 Volvo-RTVI.py dev
+```
+
+```
+Node v18.12.1
+NPM 8.19.2
+```
+
+---
+
+
+
+
+
+
+
+

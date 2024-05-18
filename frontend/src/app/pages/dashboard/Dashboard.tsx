@@ -30,7 +30,7 @@ function Dashboard() {
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
 
-
+  
   function swipeLeft() {
     if (currentPageIndex < totalPages - 1) {
       setCurrentPageIndex(currentPageIndex + 1);

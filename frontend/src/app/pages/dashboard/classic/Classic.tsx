@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { CarData, ApplicationSettings, SensorSettings, Store } from '../../../../store/Store';
 
 import RadialGauge from '../../../components/RadialGauge'

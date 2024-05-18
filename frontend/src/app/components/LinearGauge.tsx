@@ -148,11 +148,6 @@ const LinearGauge = ({
     }, [progress, tickPositions])
 
 
-
-
-
-
-
     // Create an array of rectangles
     const rectangles = Array.from({ length: numberOfRectangles }, (_, index) => {
         let rectangleWidth = (width / numberOfRectangles) - spacing
@@ -254,7 +249,7 @@ const LinearGauge = ({
     // Create the tick paths
     const tickPaths = () => {
         const large = tickPositions.ticksLarge.map((tick, index) => (
-            <>
+            <g key={`labeledTick-${index}`}>
                 <line
                     key={`bigTick-${index}`}
                     x1={tick.coordinate.x}
@@ -274,7 +269,7 @@ const LinearGauge = ({
                 >
                     {mapValue(index, 0, bigTicks - 1, minValue, maxValue).toFixed(decimals)}
                 </text>
-            </>
+            </g>
         ));
 
         const small = tickPositions.ticksSmall.map((tick, index) => (

@@ -25,11 +25,11 @@
     "@webgpu/types": "^0.1.40",
     "buffer": "^6.0.3",
     "events": "^3.3.0",
+    "http-proxy-middleware": "^2.0.6",
     "immer": "^10.0.3",
     "node-carplay": "github:rhysmorgan134/node-CarPlay",
     "pcm-player": "^0.0.16",
     "pcm-ringbuf-player": "github:lrymnd/pcm-ringbuf-player",
-    "http-proxy-middleware": "^2.0.6",
     "process": "^0.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -45,15 +45,12 @@
   },
   "devDependencies": {
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
-    "@types/react": "^18.2.15",
-    "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.3",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
-    "typescript": "^5.0.2",
     "vite": "^4.5.0"
   },
   "resolutions": {
