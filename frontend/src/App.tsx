@@ -53,7 +53,6 @@ function App() {
     <div style={{ overflow: 'hidden' }}>
 
       <Settings />
-      <Splash />
       <Cardata />
 
       {startedUp ?
