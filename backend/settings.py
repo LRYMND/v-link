@@ -4,7 +4,7 @@ import shutil
 
 def load_directory():
     # Specify the directory path
-    config_directory = os.path.expanduser("~/.config/volvo-rtvi")
+    config_directory = os.path.expanduser("~/.config/v-link")
 
     # Check if the directory exists, if not, create it
     if not os.path.exists(config_directory):

@@ -1,6 +1,6 @@
 ![TITLE IMAGE](repo/images/banner.png?raw=true "Banner")  
 ![PAGES IMAGE](repo/media/pages.jpg?raw=true "Pages")  
-The Volvo V-Link project aims to implement Apple CarPlay / Android Auto as well as live vehicle information in an OEM-like fashion. The backbone of the project is the RTVI app which runs natively on RaspberryPi OS. This enables full support of an operating system without the need of installing any 3rd party images which would limit the capabilites of the Raspberry. A custom made PCB builds the interface between the app and the car. Further information can be found down below.
+The Volvo V-Link project aims to implement Apple CarPlay / Android Auto as well as live vehicle information in an OEM-like fashion. The backbone of the project is the V-Link app which runs natively on RaspberryPi OS. This enables full support of an operating system without the need of installing any 3rd party images which would limit the capabilites of the Raspberry. A custom made PCB builds the interface between the app and the car. Further information can be found down below.
 
 ![PAGES IMAGE](repo/media/v_link.jpg?raw=true "V-Link") 
 
@@ -44,32 +44,57 @@ Chromium 116
 Python 3.9.2
 ```
 
+### > /boot/config.txt:
+*(Don't forget to copy the custom overlays from the devicetree folder of this repository to /boot/overlays!)*
+```
+#V-Link Config:
+
+#Enable GPIO 0&1
+disable_poe_fan=1
+force_eeprom_read=0
+
+#Enable devicetree overlays
+dtparam=i2c_arm=on
+dtparam=spi=on
+dtoverlay=v-link
+dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=22
+dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=24
+
+#Configure IGN logic
+dtoverlay=gpio-shutdown,active_low=0,gpio_pull=up,gpio_pin=1
+dtoverlay=gpio-poweroff,gpiopin=0
+
+#No Splash on boot
+disable_splash=1
+```
+
+
 ### > How to use:
 Production:
 ```
 #Download and Install
-wget "https://github.com/LRYMND/volvo-rtvi/releases/download/v2.0.0/Installer.sh"
+wget "https://github.com/LRYMND/v-link/releases/download/v2.0.0/Installer.sh"
 chmod +x Installer.sh
-sh Installer.sh
+./Installer.sh
 
 #Execute
-cd /home/$USER/volvo-rtvi
-python3 Volvo-RTVI.py
+cd /home/$USER/v-link
+python3 V-Link.py
 ```
 
 Development:
 ```
-git clone https://github.com/lrymnd/volvo-rtvi.git
-cd volvo-rtvi
+git clone https://github.com/lrymnd/v-link.git
+cd v-link
 pip install -r requirements.txt
 cd frontend
 npm i & npm run build
 
-cd /home/$USER/volvo-rtvi/frontend
+cd /home/$USER/v-link/frontend
 npm run vite
 
-cd /home/$USER/volvo-rtvi
-python3 Volvo-RTVI.py dev
+cd /home/$USER/v-link
+python3 V-Link.py dev
 ```
 
 ```
@@ -87,7 +112,9 @@ Mandatory:
 - V-Link Hat
 - Raspberry Pi 4/5
 - OEM P1 RTI Display Unit
-- Carlinkit Adapter (CPC200-CCPA)
+- Carlinkit Adapter
+
+ As of now, Carplay is working reliably on the CPC200-CCPA while Android Auto works better on the CPC200-CCPM Dongle. In theory, Android Auto should work con the CCPA version as well but we had mixed results. Keept his in mind when choosing your Carlinkit Adapter.
 
 Optional:
 
@@ -106,7 +133,7 @@ The V-Link Hat is attached to the Raspberry and builds the interface to the car.
 
 ## 03 | DIY Setup
 
-In case you want to build the whole circuit yourself, you can follow the old guide. It will provide you a bit more flexibility as you can customize it to your needs but it is also the more challenging approach. There are also other ways to go, like using other Raspberry HATs that provide CAN-Bus etc. but they are not documented here and will also not be supported. Keep in mind that development will focus around the V-Link HAT.
+In case you want to build the whole circuit yourself, you can follow the old guide. It will provide you a bit more flexibility as you can customize it to your needs but it is also the more challenging approach. There are also other ways to go, like using other Raspberry HATs that provide CAN-Bus etc. but they are not documented here and will also not be supported. Keep in mind that development will focus around the V-Link HAT. More infor on this setup can be found in the 2.0.0 branch.
 
 You will need the same components as described above but instead of the V-Link HAT you will need to get the following items:
 
@@ -242,7 +269,7 @@ The project is inspired by the following repositories:
 Got any tips for improvement or need help?  
 
 * [Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
-* [RTVI Discord Server](https://discord.gg/NyGvFaRS)
+* [V-Link Discord Server](https://discord.gg/NyGvFaRS)
 
 ---
 

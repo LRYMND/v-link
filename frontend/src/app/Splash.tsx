@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Store } from '../store/Store';
 
+import "./../styles.scss"
+import "./../themes.scss"
+
 const SplashScreen = () => {
   const [showSplash, setShowSplash] = useState(true);
   const store = Store((state) => state);
@@ -8,7 +11,7 @@ const SplashScreen = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       setShowSplash(false);
-    }, 1500);
+    }, 3000);
 
     return () => clearTimeout(timeout);
   }, []);
@@ -31,8 +34,18 @@ const SplashScreen = () => {
           textAlign: 'center',
           color: 'white',
         }}>
-          <h1>RTVI</h1>
-          <p>v {store.version}</p>
+
+          <div className='column'>
+            <div className='row' style={{ justifyContent: 'center'}}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" style={{ fill: 'white' }}>
+                <use xlinkHref="/assets/svg/moose.svg#moose"></use>
+                </svg>
+            </div>
+            <h1>V-LINK</h1>
+            <p>v {store.version}</p>
+          </div>
+
+
         </div>
       </div>
     )

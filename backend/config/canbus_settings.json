@@ -48,7 +48,7 @@
                 "0x12",
                 "0x9D"
             ],
-            "rtvi_id": "map:",
+            "vlink_id": "map:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -67,7 +67,7 @@
                 "0x10",
                 "0xCE"
             ],
-            "rtvi_id": "iat:",
+            "vlink_id": "iat:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -86,7 +86,7 @@
                 "0x10",
                 "0xD8"
             ],
-            "rtvi_id": "col:",
+            "vlink_id": "col:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -105,7 +105,7 @@
                 "0x10",
                 "0x0A"
             ],
-            "rtvi_id": "vol:",
+            "vlink_id": "vol:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -124,7 +124,7 @@
                 "0x10",
                 "0x34"
             ],
-            "rtvi_id": "ld1:",
+            "vlink_id": "ld1:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -143,7 +143,7 @@
                 "0x10",
                 "0x2C"
             ],
-            "rtvi_id": "ld2:",
+            "vlink_id": "ld2:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -162,7 +162,7 @@
                 "0x10",
                 "0x1D"
             ],
-            "rtvi_id": "rpm:",
+            "vlink_id": "rpm:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -181,7 +181,7 @@
                 "0x10",
                 "0xA5"
             ],
-            "rtvi_id": "spd:",
+            "vlink_id": "spd:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",

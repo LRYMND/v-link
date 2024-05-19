@@ -143,7 +143,6 @@ class LinBusThread(threading.Thread):
             while not self._stop_event.is_set():
                 self.currentMillis = int(round(time.time() * 1000))
                 self.read_lin_bus()
-                #self.read_lin_bus_from_file("/home/pi/volvo-rtvi/backend/log.bin")
                 self.timeout_button()
                 self.rti()
         except KeyboardInterrupt:

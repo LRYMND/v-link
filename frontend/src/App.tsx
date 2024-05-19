@@ -54,6 +54,7 @@ function App() {
 
       <Settings />
       <Cardata />
+      <Splash />
 
       {startedUp ?
         <>

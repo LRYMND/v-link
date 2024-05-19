@@ -23,8 +23,8 @@ const updateCarData = (data) => {
     if (sensorSettings && data != null) {
         Object.keys(sensorSettings).forEach((key) => {
             const message = sensorSettings[key];
-            const rtviId = message.rtvi_id;
-            const regex = new RegExp(rtviId, 'g');
+            const vlinkId = message.vlink_id;
+            const regex = new RegExp(vlinkId, 'g');
 
             if (regex.test(data)) {
                 const value = data.replace(regex, "");

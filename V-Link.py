@@ -14,7 +14,7 @@ from backend.browser             import BrowserThread
 from backend.dev.vcan            import VCanThread
 from backend.shared.shared_state import shared_state
 
-class RTVI:
+class VLINK:
     def __init__(self):
         self.exit_event = shared_state.exit_event
         self.threads = {
@@ -111,9 +111,9 @@ def non_blocking_input(prompt):
 
 
 if __name__ == "__main__":
-    rtvi = RTVI()
+    vlink = VLINK()
 
-    rtvi.start_thread("Server")
+    vlink.start_thread("Server")
 
     if len(sys.argv) > 1 and sys.argv[1] == "dev":
         shared_state.isDev = True
@@ -121,7 +121,7 @@ if __name__ == "__main__":
         if choice.lower() == 'y':
             shared_state.vCan = True
             print("Starting VCAN...")
-            rtvi.toggle_thread("VCan")
+            vlink.toggle_thread("VCan")
 
         choice = non_blocking_input("Start on Vite-Port 5173? (Y/N): ")
         if choice.lower() == 'y':
@@ -131,21 +131,21 @@ if __name__ == "__main__":
         if choice.lower() == 'n':
             shared_state.isKiosk = False
 
-    rtvi.start_thread("Canbus")
+    vlink.start_thread("Canbus")
     time.sleep(.1)
-    rtvi.start_thread("ADC")
+    vlink.start_thread("ADC")
     time.sleep(3)
-    rtvi.start_thread("Browser")
+    vlink.start_thread("Browser")
 
-    rtvi.print_thread_states()
+    vlink.print_thread_states()
 
     try:
         while(True):
-            rtvi.process_toggle_event()
-            rtvi.process_exit_event()
+            vlink.process_toggle_event()
+            vlink.process_exit_event()
             time.sleep(.1)
     except KeyboardInterrupt:
             print("\nExiting... Stopping threads.")
-            #rtvi.join_threads()
+            #vlink.join_threads()
             sys.exit(0)
     

@@ -41,7 +41,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
 
 
   const [isPlugged, setIsPlugged] = useState(false)
-  const [deviceFound, setDeviceFound] = useState<Boolean | null>(null)
+  const [deviceFound, setDeviceFound] = useState<Boolean | null>(false)
 
   const mainElem = useRef<HTMLDivElement>(null)
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)

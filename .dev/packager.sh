@@ -1,5 +1,7 @@
 #!/bin/bash
-echo "RTVI-Packager"
+cd /home/$USER/Development/v-link
+
+echo "VLINK-Packager"
 
 echo "Deleting old dist files..."
 rm -rf dist/ frontend/dist/
@@ -21,18 +23,18 @@ echo "Copying files..."
 cp -r frontend/dist/ dist/frontend/dist
 cp -r backend/ dist/
 
-cp Volvo-RTVI.py dist/Volvo-RTVI.py
+cp V-Link.py dist/V-Link.py
 cp requirements.txt dist/requirements.txt
 cp Installer.sh dist/Installer.sh
 echo "Done."
 
 echo "Creating Zip..."
 cd dist/
-zip -r Volvo-RTVI.zip Volvo-RTVI.py requirements.txt frontend/ backend/
+zip -r V-Link.zip V-Link.py requirements.txt frontend/ backend/
 echo "Done."
 
 echo "Cleaning up..."
-rm -rf Volvo-RTVI.py requirements.txt frontend/ backend/
+rm -rf V-Link.py requirements.txt frontend/ backend/
 
 cd ..
 

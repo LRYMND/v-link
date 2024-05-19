@@ -34,13 +34,13 @@ class Config:
             rep_id_bytes = [rep_id]
             scale = sensor['scale']
             is_16bit = sensor['is_16bit']
-            rtvi_id = sensor['rtvi_id']
+            vlink_id = sensor['vlink_id']
 
             refresh_rate = sensor['refresh_rate']
             if refresh_rate == "high":
-                self.msg_hs.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, rtvi_id))
+                self.msg_hs.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, vlink_id))
             elif refresh_rate == "low":
-                self.msg_ls.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, rtvi_id))
+                self.msg_ls.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, vlink_id))
 
 class CanBusThread(threading.Thread):
     def __init__(self):
@@ -124,7 +124,6 @@ class CanBusThread(threading.Thread):
 
                 data = message[5] + str(float(converted_value))
                 self.emit_data_to_frontend(data)
-                #print(data)
                 sys.stdout.flush()
                 return True
             else:

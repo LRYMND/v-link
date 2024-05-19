@@ -1,7 +1,7 @@
 {
     "sensors": {
         "pressure": {
-            "rtvi_id": "oilp:",
+            "vlink_id": "oilp:",
             "label": "Oil Pressure",
             "unit": "kPa",
             "min_value": 0,
@@ -15,7 +15,7 @@
             }
         },
         "temperature": {
-            "rtvi_id": "oilt:",
+            "vlink_id": "oilt:",
             "label": "Oil Temperature",
             "unit": "°C",
             "min_value": 0,

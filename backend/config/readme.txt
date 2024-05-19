@@ -19,7 +19,7 @@
 //  boost: {
 //      //CAN-Bus parameter:
 //      parameter: ['12', '9D'],            // Request parameter
-//      rtvi_id: "map:",                    // Identifier for rtvi app
+//      vlink_id: "map:",                   // Identifier for V-Link app
 //      req_id: req_id[0],                  // ID for the request message
 //      rep_id: rep_id[0],                  // ID for the expected reply
 //      action: command[3],                 // Type of operation
@@ -28,7 +28,7 @@
 //      refresh_rate: "high",               // Message interval ("low" || "high")
 //      scale: '((value - 101.0) * 0.01)',  // Formula to scale the response
 //      //UI parameter:
-//      label: "Boost",                     // Label for rtvi app
+//      label: "Boost",                     // Label for V-Link app
 //      max_value: 2,                       // Expected max. value for gauge setup
 //      limit_start: 1.5,                   // Start of redline for gauge setup
 //  },
