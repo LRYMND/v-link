@@ -1,3 +1,5 @@
+import { CarData, SensorSettings } from '../../store/Store';
+
 const cos = Math.cos;
 const sin = Math.sin;
 const π = Math.PI;
@@ -7,28 +9,31 @@ const f_rotate_matrix = (x => [[cos(x), -sin(x)], [sin(x), cos(x)]]);
 const f_vec_add = (([a1, a2], [b1, b2]) => [a1 + b1, a2 + b2]);
 
 export const RadialGauge = ({
+    sensor,
+
+    globalRotation = 90,
     size = 100,
     arc = 270,
-    globalRotation = 90,
-    title = 'Gauge',
-    unit = 'Units',
-    currentValue,
-    maxValue = 100,
+
     borderSize = 0,
     borderGap = 0,
+
     progressOffset = -30,
     progressWidth = 5,
-    bigTicks = 5,
-    smallTicks = 4,
-    heightBigTicks = 10,
-    heightSmallTicks = 2,
+
+    limitOffset = -5,
+    limitWidth = 2,
+
     tickWidth = 1,
+    smallTicks = 4,
+    heightSmallTicks = 2,
+    bigTicks = 5,
+    heightBigTicks = 10,
+
     needleOffset = -30,
     needleWidth = 2,
     pivotSize = 15,
-    limitOffset = -5,
-    limitWidth = 2,
-    limitStart = 70,
+
     borderColor = 'black',
     backgroundColor = 'black',
     progressBackgroundColor = 'grey',
@@ -41,6 +46,14 @@ export const RadialGauge = ({
     pivotColor = 'grey',
 }) => {
 
+    let value = CarData((state) => state.carData[sensor])
+    const label = SensorSettings((state) => state.sensorSettings[sensor].label);
+    const config = SensorSettings((state) => state.sensorSettings[sensor]);
+
+    const maxValue = config.max_value
+    const limitStart = config.limit_start
+
+
     if (arc > 359)
         arc = 359
     if (arc < 1)
@@ -49,14 +62,14 @@ export const RadialGauge = ({
     if (heightSmallTicks > heightBigTicks)
         heightSmallTicks = heightBigTicks
 
-    if (isNaN(currentValue))
-        currentValue = 0;
+    if (isNaN(value))
+        value = 0;
 
-    if (currentValue > maxValue) {
-        currentValue = maxValue;
+    if (value > maxValue) {
+        value = maxValue;
     }
 
-    const percent1 = (currentValue / maxValue) * 100;
+    const percent1 = (value / maxValue) * 100;
     const percent2 = (limitStart / maxValue) * 100;
 
     smallTicks = (bigTicks) * (smallTicks + 1)
@@ -227,7 +240,7 @@ export const RadialGauge = ({
                     dy="20px"
                     textAnchor="middle"
                 >
-                    {`${title}`}
+                    {`${label}`}
                 </text>
 
                 <text                               //Unit Label
@@ -239,7 +252,7 @@ export const RadialGauge = ({
                     dy="20px"
                     textAnchor="middle"
                 >
-                    {`(${unit})`}
+                    {`(${config.unit})`}
                 </text>
 
                 <text                               //Value Label
@@ -251,7 +264,7 @@ export const RadialGauge = ({
                     dy="20px"
                     textAnchor="middle"
                 >
-                    {`${currentValue}`}
+                    {`${value}`}
                 </text>
             </svg>
         </>

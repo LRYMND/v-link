@@ -207,6 +207,10 @@ function Carplay({ command, commandCounter }: CarplayProps) {
 
   const isLoading = !isPlugged
 
+  useEffect(() => {
+    console.log("isPlugged? ", isPlugged)
+  }, [isPlugged])
+
   return (
     <div
       style={{ height: '100%', width: '100%', touchAction: 'none', overflow: 'hidden' }}
@@ -276,7 +280,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
           id="video"
           style={
             isPlugged && store.view === "Carplay"
-              ? { height: '100%', overflow: 'hidden' }
+              ? { height: '100%', overflow: 'hidden', marginTop: applicationSettings.side_bars.topBarAlwaysOn.value ? applicationSettings.side_bars.topBarHeight.value : 0 }
               : { display: 'none' }
           }
         />

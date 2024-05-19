@@ -1,23 +1,30 @@
+import { CarData, SensorSettings } from '../../store/Store';
+
+
 const ValueBox = ({
+  sensor,
+  unit = true,
+
   textColorDefault,
   valueColor,
   limitColor,
   boxColor,
   borderColor,
+
   borderWidth = "1vh",
+  style = "row",
+
   height,
   width = "100%",
-  unit = true,
-  valueKey,
-  carData,
-  sensorSettings,
+
   labelSize = "3vh",
   valueSize = "6vh",
-  style = 'row'
 }) => {
-  const value = carData[valueKey];
-  const sensorSetting = sensorSettings[valueKey];
-  const label = sensorSetting.label;
+
+  const value = CarData((state) => state.carData[sensor])
+  const label = SensorSettings((state) => state.sensorSettings[sensor].label);
+  const config = SensorSettings((state) => state.sensorSettings[sensor]);
+
 
   return (
     <div className="value-box" style={{
@@ -44,10 +51,10 @@ const ValueBox = ({
         marginLeft: 'auto',
         marginRight: '5%',
         fontSize: valueSize,
-        color: value >= sensorSetting.limit_start ? limitColor : valueColor,
+        color: value >= config.limit_start ? limitColor : valueColor,
       }}>
         {value}
-        {unit && sensorSetting.unit}
+        {unit && config.unit}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { CarData, ApplicationSettings, SensorSettings, Store } from '../../store/Store';
+import { ApplicationSettings, Store } from '../../store/Store';
 import ValueBox from '../components/ValueBox';
 
 import "./../../styles.scss"
@@ -6,10 +6,7 @@ import "./../../themes.scss"
 
 
 const DashBar = () => {
-
     const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
-    const sensorSettings = SensorSettings((state) => state.sensorSettings);
-    const carData = CarData((state) => state.carData);
     const store = Store((state) => state);
 
     const updateStore = Store((state) => state.updateStore);
@@ -32,50 +29,65 @@ const DashBar = () => {
                 <div className='column'>
                     <div className='row' style={{ justifyContent: 'center', gap: '15px' }}>
                         <ValueBox
-                            valueKey={applicationSettings.dash_topbar.value_1.value}
-                            carData={carData}
-                            sensorSettings={sensorSettings}
-                            height={"70%"}
+                            sensor={applicationSettings.dash_topbar.value_1.value}
+                            unit={true}
+
                             textColorDefault={'var(--textColorDefault)'}
                             valueColor={'var(--textColorDefault)'}
                             limitColor={'var(--themeAccent)'}
-                            labelSize={`calc(1.75vh * ${textScale}`}
-                            valueSize={`calc(2.5vh * ${textScale}`}
                             boxColor={'var(--backgroundColor)'}
                             borderColor={'var(--boxColorDark)'}
+
                             borderWidth={'0vh'}
                             style={"column"}
+
+                            height={"70%"}
+                            width={"100%"}
+
+                            labelSize={`calc(1.75vh * ${textScale}`}
+                            valueSize={`calc(2.5vh * ${textScale}`}
                         />
+
                         <ValueBox
-                            valueKey={applicationSettings.dash_topbar.value_2.value}
-                            carData={carData}
-                            sensorSettings={sensorSettings}
-                            height={"70%"}
+                            sensor={applicationSettings.dash_topbar.value_2.value}
+                            unit={true}
+
                             textColorDefault={'var(--textColorDefault)'}
                             valueColor={'var(--textColorDefault)'}
                             limitColor={'var(--themeAccent)'}
-                            labelSize={`calc(1.75vh * ${textScale}`}
-                            valueSize={`calc(2.5vh * ${textScale}`}
                             boxColor={'var(--backgroundColor)'}
                             borderColor={'var(--boxColorDark)'}
+
                             borderWidth={'0vh'}
                             style={"column"}
+
+                            height={"70%"}
+                            width={"100%"}
+
+                            labelSize={`calc(1.75vh * ${textScale}`}
+                            valueSize={`calc(2.5vh * ${textScale}`}
                         />
+
                         <ValueBox
-                            valueKey={applicationSettings.dash_topbar.value_3.value}
-                            carData={carData}
-                            sensorSettings={sensorSettings}
-                            height={"70%"}
+                            sensor={applicationSettings.dash_topbar.value_3.value}
+                            unit={true}
+
                             textColorDefault={'var(--textColorDefault)'}
                             valueColor={'var(--textColorDefault)'}
                             limitColor={'var(--themeAccent)'}
-                            labelSize={`calc(1.75vh * ${textScale}`}
-                            valueSize={`calc(2.5vh * ${textScale}`}
                             boxColor={'var(--backgroundColor)'}
                             borderColor={'var(--boxColorDark)'}
+
                             borderWidth={'0vh'}
                             style={"column"}
+
+                            height={"70%"}
+                            width={"100%"}
+
+                            labelSize={`calc(1.75vh * ${textScale}`}
+                            valueSize={`calc(2.5vh * ${textScale}`}
                         />
+
                     </div>
                 </div>
                 <div className='column'>
@@ -98,7 +110,7 @@ const DashBar = () => {
                                 <use xlinkHref="/assets/svg/phone.svg#phone"></use>
                             </svg>
 
-                            <button className='input-style nav-button' type='button' onClick={() => updateStore({view: 'Dashboard'})}>
+                            <button className='input-style nav-button' type='button' onClick={() => updateStore({ view: 'Dashboard' })}>
                                 <div>EXIT</div>
                             </button>
                         </div>

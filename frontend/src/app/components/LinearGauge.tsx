@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
+import { CarData, SensorSettings } from '../../store/Store';
 
 const LinearGauge = ({
+    sensor1,
+    sensor2,
     svgMask,
     width,
     height,
@@ -8,13 +11,6 @@ const LinearGauge = ({
     numberOfRectangles,
     spacing,
     title = 'Gauge',
-    value1 = 0,
-    unit1 = 'Units',
-    limitStart,
-    maxValue,
-    value2 = 0,
-    unit2 = 'Units',
-    limitValue2,
     bigTicks = 2,
     smallTicks = 5,
     tickLength = 12,
@@ -28,7 +24,21 @@ const LinearGauge = ({
     backgroundColor
 }) => {
     const SVG_NS = 'http://www.w3.org/2000/svg';
+
+    const config1 = SensorSettings((state) => state.sensorSettings[sensor1]);
+    const config2 = SensorSettings((state) => state.sensorSettings[sensor2]);
+
+    const value1 = CarData((state) => state.carData[sensor1])
+    const unit1 = config1.unit
+    const limitStart = config1.limit_start
+
     const minValue = 0;
+    const maxValue = config1.max_value
+
+    const value2 = CarData((state) => state.carData[sensor2])
+    const unit2 = config2.unit
+    const limitValue2 = 1.0;
+
 
     const [svg, setSVG] = useState()
     const [ready, setReady] = useState(false)
@@ -48,6 +58,9 @@ const LinearGauge = ({
     const [tickLimit, setTickLimit] = useState(0)
 
     const [tickPositions, setTickPositions] = useState()
+
+
+
 
 
     // Function to remap an input to other value ranges.
@@ -122,12 +135,16 @@ const LinearGauge = ({
     // Set progress and limit coordinates
     useEffect(() => {
         if (indicator) {
+            try {
             const svgPoint = document.createElementNS(SVG_NS, 'svg').createSVGPoint();
-            const point = indicator.getPointAtLength(mapValue(value1, minValue, maxValue, 0, indicatorLength));
+            const point = indicator.getPointAtLength(mapValue((isNaN(value1) ? 0 : value1), minValue, maxValue, 0, indicatorLength));
             svgPoint.x = (point.x * (scale.x)) + (padding);
 
             setProgress(checkData(svgPoint.x))
             setProgressLimit(mapValue(limitStart, 0, maxValue, 0, indicator.getTotalLength()))
+        } catch(e) {
+            console.log(e)
+        }
         }
     }, [value1, value2, indicator, maxValue, indicatorLength, scale.x, padding, limitStart])
 

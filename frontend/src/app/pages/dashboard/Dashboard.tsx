@@ -19,7 +19,7 @@ function Dashboard() {
 
   const totalPages = components.length; // Calculate the total number of pages
   const sliderWidth = totalPages * store.contentSize.width;
-  const paginationSize = 20;
+  const paginationSize = 15;
 
   const index = components.findIndex(component => component.name === applicationSettings.app.defaultDash.value);
 
@@ -66,6 +66,18 @@ function Dashboard() {
     }
   }
 
+  
+  function handleDoubleClick(event) {
+    const clickX = event.clientX;
+    const windowWidth = window.innerWidth;
+
+    if (clickX < windowWidth / 2) {
+      swipeRight();
+    } else {
+      swipeLeft();
+    }
+  }
+
   return (
     <div className={`dashboard ${applicationSettings.app.colorTheme.value}`}
       style={{
@@ -88,6 +100,7 @@ function Dashboard() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onDoubleClick={handleDoubleClick}
       >
         {components.map((Content, index) => (
           <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent:'center', width: `${(sliderWidth / totalPages)}px` }}>

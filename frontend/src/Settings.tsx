@@ -61,7 +61,7 @@ const Settings = () => {
         //console.log("Resize Logic")
         const topBar = applicationSettings.side_bars.topBarHeight.value
         const navBar = applicationSettings.side_bars.navBarHeight.value
-        const config = (applicationSettings.side_bars.topBarAlwaysOn.value ? topBar + navBar : navBar)
+        const config = (applicationSettings.side_bars.topBarAlwaysOn.value ? topBar : 0)
 
         const newContentSize = { width: store.windowSize.width, height: (store.windowSize.height - (topBar + navBar)) };
         const newCarplaySize = { width: store.windowSize.width, height: store.windowSize.height - config };
@@ -94,16 +94,15 @@ const Settings = () => {
 
   /* Handle Interface Visibility */
   useEffect(() => {
-    if (store.view === 'Carplay' && applicationSettings != null) {
-      if (store.phoneState && (store.view === 'Carplay')) {
+      if (store.phoneState && (store.view === 'Carplay')  && applicationSettings != null) {
         updateStore({ interface: { topBar: false, navBar: false } })
 
         if (applicationSettings.side_bars.topBarAlwaysOn.value)
           updateStore({ interface: { dashBar: true } })
       }
-    } else {
-      updateStore({ interface: { dashBar: false, topBar: true, navBar: true, content: true, carplay: false } })
-    }
+      else {
+        updateStore({ interface: { dashBar: false, topBar: true, navBar: true, content: true, carplay: false } })
+      }
   }, [store.view, store.phoneState, applicationSettings]);
 
 

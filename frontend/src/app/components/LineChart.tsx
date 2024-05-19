@@ -1,17 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
+import { CarData, SensorSettings, ApplicationSettings } from '../../store/Store';
+
 import convert from 'color-convert';
 
 import "./../../themes.scss";
 import "./../../styles.scss";
 
 const LineChart = ({
-    label,
+    setCount,
     width,
     height,
     padding,
     tickCountX,
     tickCountY,
-    datasets,
     length,
     interval,
     color_xGrid,
@@ -20,6 +21,29 @@ const LineChart = ({
     color_dash_charts,
     backgroundColor
 }) => {
+
+    //const label = SensorSettings((state) => state.sensorSettings[sensor].label);
+    const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
+    const config = SensorSettings((state) => state.sensorSettings);
+    
+
+    const datasets = []
+
+    for (let i = 1; i <= setCount; i++) {
+        const key = "value_" + i
+
+        const value = CarData((state) => state.carData[applicationSettings.dash_charts[key].value])
+
+        datasets[i - 1] = {
+            label: config[applicationSettings.dash_charts[key].value].label,
+            color: 'var(--themeDefault)',
+            yMin: config[applicationSettings.dash_charts[key].value].min_value,
+            yMax: config[applicationSettings.dash_charts[key].value].max_value,
+            data: value,
+            interval: 100,  // Update with the desired interval in milliseconds
+        }
+    }
+
     const [ready, setReady] = useState(false)
 
     const [dataStreams, setDataStreams] = useState(datasets.map(dataset => Array.from({ length: length }, (_, index) => dataset.yMin)));
@@ -34,7 +58,6 @@ const LineChart = ({
     useEffect(() => {
         if (dataStreams) {
             const chartColors = generateColorVariations();
-            console.log(chartColors)
             setColorVariations(chartColors)
         }
     }, []);
