@@ -1,6 +1,6 @@
 ![TITLE IMAGE](repo/images/banner.png?raw=true "Banner")  
 ![PAGES IMAGE](repo/media/pages.jpg?raw=true "Pages")  
-The Volvo V-Link project aims to implement Apple CarPlay / Android Auto as well as live vehicle information in an OEM-like fashion. The backbone of the project is the V-Link app which runs natively on RaspberryPi OS. This enables full support of an operating system without the need of installing any 3rd party images which would limit the capabilites of the Raspberry. A custom made PCB builds the interface between the app and the car. Further information can be found down below.
+The Volvo V-Link project aims to implement Apple CarPlay / Android Auto as well as live vehicle information in an OEM-like fashion. The backbone of the project is the V-Link app which runs natively on RaspberryPi OS. This enables full support of an operating system without the need of installing any 3rd party images which would limit the capabilites of the Raspberry. A custom-made PCB builds the interface between the app and the car. Further information can be found down below.
 
 ![PAGES IMAGE](repo/media/v_link.jpg?raw=true "V-Link") 
 
@@ -55,8 +55,7 @@ force_eeprom_read=0
 
 #Enable devicetree overlays
 dtparam=i2c_arm=on
-dtparam=spi=on
-dtoverlay=v-link
+dtoverlay=vlink
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=22
 dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=24
 
@@ -73,7 +72,7 @@ disable_splash=1
 Production:
 ```
 #Download and Install
-wget "https://github.com/LRYMND/v-link/releases/download/v2.0.0/Installer.sh"
+wget "https://github.com/LRYMND/v-link/releases/download/v2.1.0/Installer.sh"
 chmod +x Installer.sh
 ./Installer.sh
 
@@ -114,7 +113,7 @@ Mandatory:
 - OEM P1 RTI Display Unit
 - Carlinkit Adapter
 
- As of now, Carplay is working reliably on the CPC200-CCPA while Android Auto works better on the CPC200-CCPM Dongle. In theory, Android Auto should work con the CCPA version as well but we had mixed results. Keept his in mind when choosing your Carlinkit Adapter.
+ As of now, Carplay is working reliably on the CPC200-CCPA while Android Auto works better on the CPC200-CCPM Dongle. In theory, Android Auto should work con the CCPA version as well but we had mixed results. Keep this in mind when choosing your Carlinkit Adapter.
 
 Optional:
 
@@ -127,13 +126,13 @@ If you want to use the original display, you can find a way to do so in the repo
 
 ![PAGES IMAGE](repo/images/vlink.png?raw=true "V-Link Setup")  
 
-The V-Link Hat is attached to the Raspberry and builds the interface to the car. On this PCB you have terminals to hook up 12V, IGN, CAN etc. It also implements a safe shutdown functionality which gracefully turns off the raspberry once ignition is off and removes power from the buck converter. In this state it draws a minimum of current so draining your cars battery won‘t be an issue. The LCD Touch Display and the Carlinkit Adapter are plugged into the HDMI / USB port of the raspberry and complete the setup.
+The V-Link Hat is attached to the Raspberry and builds the interface to the car. On this PCB you have terminals to hook up 12V, IGN, CAN etc. It also implements a safe shutdown functionality which gracefully turns off the Raspberry once ignition is off and removes power from the buck converter. In this state it draws a minimum of current so draining your cars battery won‘t be an issue. The LCD Touch Display and the Carlinkit Adapter are plugged into the HDMI / USB port of the raspberry and complete the setup.
 
 ---
 
 ## 03 | DIY Setup
 
-In case you want to build the whole circuit yourself, you can follow the old guide. It will provide you a bit more flexibility as you can customize it to your needs but it is also the more challenging approach. There are also other ways to go, like using other Raspberry HATs that provide CAN-Bus etc. but they are not documented here and will also not be supported. Keep in mind that development will focus around the V-Link HAT. More infor on this setup can be found in the 2.0.0 branch.
+In case you want to build the whole circuit yourself, you can follow the old guide. It will provide you a bit more flexibility as you can customize it to your needs but it is also the more challenging approach. There are also other ways to go, like using other Raspberry HATs that provide CAN-Bus etc. but they are not documented here and will also not be supported. Keep in mind that development will focus around the V-Link HAT. More info on this setup can be found in the 2.0.0 branch.
 
 You will need the same components as described above but instead of the V-Link HAT you will need to get the following items:
 
@@ -143,7 +142,7 @@ You will need the same components as described above but instead of the V-Link H
 * [12V to 5V Buck Converter, 5A](https://www.amazon.de/gp/product/B071ZRXKJY/ref=ppx_yo_dt_b_asin_title_o06_s00?ie=UTF8&psc=1)
 * [12V 5A Fuse](https://www.amazon.de/Neuftech%C2%AE-Sicherungshalter-Flachsicherung-Sicherung-wasserdicht/dp/B00UX6NIQE/ref=asc_df_B00UX6NIQE/?tag=googshopde-21&linkCode=df0&hvadid=310359968785&hvpos=&hvnetw=g&hvrand=13883660999016731185&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9043309&hvtargid=pla-561148277227&psc=1&th=1&psc=1&tag=&ref=&adgrpid=62443302395&hvpone=&hvptwo=&hvadid=310359968785&hvpos=&hvnetw=g&hvrand=13883660999016731185&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9043309&hvtargid=pla-561148277227)
 
-The only component that is not readily available is the custom Raspberry Pi power controller. It ensures that the Raspberry boots when the ignition is turned on and  gracefully shuts off via „shutdown  -h“ when ignition is removed. In this state, it will also completely remove power from the buck converter, keeping the current at an absolute minium to ensure that the cars battery is not drained.
+The only component that is not readily available is the custom Raspberry Pi power controller. It ensures that the Raspberry boots when the ignition is turned on and  gracefully shuts off via „shutdown  -h“ when ignition is removed. In this state, it will also completely remove power from the buck converter, keeping the current at an absolute minimum to ensure that the cars battery is not drained.
 
 The controller can be handsoldered on a simple through-hole PCB. The parts are pretty common and can be obtained over a number of shops for electrical components. Schematics as well as a gerber file can be found in the schematics folder of this repository. There is also just one CAN Module listed above but you can easily install a second one if you wanted to.
 
@@ -195,7 +194,7 @@ The easiest place to find the LIN Bus is the "ICM Connector A" behind the waterf
  ![ICM_CONNECTOR_IMAGE](repo/media/icm_connector.png?raw=true "LIN Connector")
 
 
-Connect RX, TX and CS from the MCP2004 to LIN_RX_PIN, LIN_TX_PIN and CS_PIN respectively. After testing, it turned out that it was not necessary to connect the Fault pin to the Arduino. In Laurynas' volvo_linbus repo, this fault pin is connected in the scheme but there is a typo in the code, so it's not used.
+Connect RX, TX and CS from the MCP2004 to LIN_RX_PIN, LIN_TX_PIN and CS_PIN, respectively. After testing, it turned out that it was not necessary to connect the Fault pin to the Arduino. In Laurynas' volvo_linbus repo, this fault pin is connected in the scheme but there is a typo in the code, so it's not used.
 
 ### > RTI folding mechanism
 
@@ -241,20 +240,20 @@ Make sure that you stress-relief all wiring connections and secure them properly
 
 ## 06 | Audio
 
-The current solution for getting audio to work in cars, which don't have a factory aux, is a [small module](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/) from Lithuania.
+The current solution for getting audio to work in cars, which don't have a factory aux port, is a [small module](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/) from Lithuania.
 This module is a mod for the radio to add an aux port. There is also a Bluetooth version available but since the phone is already wirelessly connected to the Carlinkit adapter dongle, an aux-cable seems pretty clean and less prone to failure.
 
 In the future we want to integrate MOST Bus into the project for a better audio quality and easier installation. Stay tuned.
 
 ### > Note:
 
-This is no advertisement, just a clean and simple solution IMO. And since MOST-Bus is supported through the PiMost from ModernDayMods, it might be possible to send audio over the MOST network in the future. This is still under investigation. Feel free to join the Discord Server if you want to participate in the development.
+This is no advertisement, just a clean and simple solution IMO. And since MOST-Bus is supported through the PiMost from ModernDayMods, it might be possible to send audio over the MOST network in the future. This is still under investigation. Feel free to join the Discord Server if you want to participate in development.
 
 ---
 
 ## 07 | Disclaimer
 
-I am distancing myself from any damage that you might do to your car in case you want to follow this guide. Eventually you will need to find other places to mount your components and different paths to route your cables, it's DIY after all!
+I distance myself from any damage that you might do to your car in case you want to follow this guide. Eventually you will need to find other places to mount your components and different paths to route your cables; it's DIY afterall!
 
 
 

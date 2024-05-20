@@ -111,7 +111,7 @@ while true; do
 done
 
 # Install requirements
-requirements="/home/$USER/V-Link/requirements.txt"
+requirements="/home/$USER/v-link/requirements.txt"
 echo "Installing requirements..."
 pip3 install -r $requirements
 echo
