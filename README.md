@@ -268,7 +268,7 @@ The project is inspired by the following repositories:
 Got any tips for improvement or need help?  
 
 * [Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
-* [V-Link Discord Server](https://discord.gg/NyGvFaRS)
+* [V-Link Discord Server](https://discord.gg/V4RQG6p8vM)
 
 ---
 
