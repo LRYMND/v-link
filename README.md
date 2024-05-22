@@ -1,4 +1,4 @@
-![TITLE IMAGE](repo/images/banner.png?raw=true "Banner")  
+![TITLE IMAGE](repo/media/banner.png?raw=true "Banner")  
 ![PAGES IMAGE](repo/media/pages.jpg?raw=true "Pages")  
 The Volvo V-Link project aims to implement Apple CarPlay / Android Auto as well as live vehicle information in an OEM-like fashion. The backbone of the project is the V-Link app which runs natively on RaspberryPi OS. This enables full support of an operating system without the need of installing any 3rd party images which would limit the capabilites of the Raspberry. A custom-made PCB builds the interface between the app and the car. Further information can be found down below.
 
@@ -47,7 +47,7 @@ Python 3.9.2
 ### > /boot/config.txt:
 *(Don't forget to copy the custom overlays from the devicetree folder of this repository to /boot/overlays!)*
 ```
-#V-Link Config:
+[V-LINK]
 
 #Enable GPIO 0&1
 disable_poe_fan=1
@@ -56,8 +56,8 @@ force_eeprom_read=0
 #Enable devicetree overlays
 dtparam=i2c_arm=on
 dtoverlay=vlink
-dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=22
-dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=24
+dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
+dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
 
 #Configure IGN logic
 dtoverlay=gpio-shutdown,active_low=0,gpio_pull=up,gpio_pin=1
@@ -101,6 +101,8 @@ Node v18.12.1
 NPM 8.19.2
 ```
 
+In order to test the hardware you can execute HWT.py (Requires V-Link Hat)
+
 ---
 
 ## 02 | V-Link Setup
@@ -124,9 +126,11 @@ Optional:
 
 If you want to use the original display, you can find a way to do so in the repositories from laurynas, however, its highly recommended to go the extra mile as it has a much better resolution and also supports touch input with an additional panel.
 
-![PAGES IMAGE](repo/images/vlink.png?raw=true "V-Link Setup")  
+![PAGES IMAGE](repo/media/vlink.png?raw=true "V-Link Setup")  
 
 The V-Link Hat is attached to the Raspberry and builds the interface to the car. On this PCB you have terminals to hook up 12V, IGN, CAN etc. It also implements a safe shutdown functionality which gracefully turns off the Raspberry once ignition is off and removes power from the buck converter. In this state it draws a minimum of current so draining your cars battery won‘t be an issue. The LCD Touch Display and the Carlinkit Adapter are plugged into the HDMI / USB port of the raspberry and complete the setup.
+
+Connect CAN1 to the highspeed- and CAN2 to the lowspeed bus. The serial connection is reserved to control the RTI mechanism. Over the ADC interface you can hook up to 4 external analog sensors. A preconfigured settings file for the "Bosch 0 261 230 482" is provided.
 
 ---
 
@@ -146,7 +150,7 @@ The only component that is not readily available is the custom Raspberry Pi powe
 
 The controller can be handsoldered on a simple through-hole PCB. The parts are pretty common and can be obtained over a number of shops for electrical components. Schematics as well as a gerber file can be found in the schematics folder of this repository. There is also just one CAN Module listed above but you can easily install a second one if you wanted to.
 
-![PAGES IMAGE](repo/images/diy.png?raw=true "DIY Setup")  
+![PAGES IMAGE](repo/media/diy.png?raw=true "DIY Setup")  
 
 ---
 
@@ -182,7 +186,7 @@ You need to make the following connections.
 
 ### > Steering Wheel Controls
 
-In order to implement the steering wheel controls, you need to connect the Raspberry to the LIN bus of your car. The app will convert the signals from the sw buttons to keyboard/mouse HID events. Also you will be able to control opening/closing of the RTI screen by sending serial events to the RTI screen module.
+In order to implement the steering wheel controls, you need to connect the Raspberry to the LIN bus of your car. The app will convert the signals from the sw buttons to keyboard/mouse HID events.
 
 The LIN Bus wire must be connected to pin 6 of the LIN bus transceiver labeled "Lbus".
 
