@@ -80,6 +80,7 @@ chmod +x Installer.sh
 cd /home/$USER/v-link
 python3 V-Link.py
 ```
+*(In case you are updating the app, please remove existing entries from "/etc/network/interfaces", "/etc/xdg/autostart/" and "/boot/config.txt" before installing a new version.)*
 
 Development:
 ```
