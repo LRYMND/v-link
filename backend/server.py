@@ -59,7 +59,7 @@ class ServerThread(threading.Thread):
         return response
 
     # Send notification when frontend connects via socket.io
-    @socketio.on('connect')
+    @socketio.on('connect', namespace='/')
     def handle_connect():
         print("Client connected")
 

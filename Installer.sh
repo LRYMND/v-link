@@ -115,17 +115,23 @@ if confirm_action "download overlay files from GitHub to /boot/overlays"; then
         https://github.com/LRYMND/v-link/raw/master/repo/dtoverlays/mcp2515-can2.dtbo
 fi
 
-# Step 7: Append lines to /boot/config.txt
-if confirm_action "append lines to /boot/config.txt"; then
-    sudo bash -c 'cat >> /boot/config.txt << EOF
+# Step 7: Append lines to /boot/config.txt or /boot/firmware/config.txt
+if confirm_action "append lines to config.txt"; then
+    if [ -f /boot/config.txt ]; then
+        CONFIG_PATH="/boot/config.txt"
+    else
+        CONFIG_PATH="/boot/firmware/config.txt"
+    fi
+
+    sudo bash -c "cat >> $CONFIG_PATH << EOF
 
 [V-LINK]
 
-#Enable GPIO 0&1
+# Enable GPIO 0&1
 disable_poe_fan=1
 force_eeprom_read=0
 
-#Enable devicetree overlays
+# Enable devicetree overlays
 dtparam=i2c_arm=on
 dtparam=spi=on
 
@@ -133,13 +139,13 @@ dtoverlay=vlink
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
 dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
 
-#Configure IGN logic
+# Configure IGN logic
 dtoverlay=gpio-shutdown,active_low=0,gpio_pull=up,gpio_pin=1
 dtoverlay=gpio-poweroff,gpiopin=0
 
-#No Splash on boot
+# No Splash on boot
 disable_splash=1
-EOF'
+EOF"
 fi
 
 # Step 8: Append lines to /etc/network/interfaces

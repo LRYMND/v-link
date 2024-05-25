@@ -1,14 +1,13 @@
 #directories
+.dev/
+
 node_modules/
 venv/
-backend/venv/
 dist/
 frontend/dist/
+__pycache__/
 
-.notes/
-.vite/
-.local/
-.dev/
+
 
 #files
 *.tgz
@@ -18,4 +17,3 @@ frontend/dist/
 *.py[cod]
 ._*
 create-package.sh
-

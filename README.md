@@ -80,7 +80,27 @@ chmod +x Installer.sh
 cd /home/$USER/v-link
 python3 V-Link.py
 ```
-*(In case you are updating the app, please remove existing entries from "/etc/network/interfaces", "/etc/xdg/autostart/" and "/boot/config.txt" before installing a new version.)*
+
+In case you are updating the app, please remove existing V-Link or RTVI entries from the following locations:
+```
+/etc/network/interfaces
+/etc/xdg/autostart/
+/home/$USER/.config
+
+/boot/config.txt (RaspberryPi 4)
+/boot/firmware/config.txt (RaspberryPi 5)
+```
+
+In case you get an error when installing the requirements activate the virtual environment and run this command:
+```
+pip install -r /home/$USER/v-link/requirements.txt
+```
+
+In order to test the hardware you can run this command:
+```
+python3 /home/$USER/v-link/HWT.py
+*(Requires V-Link Hat)*
+```
 
 Development:
 ```
@@ -108,7 +128,7 @@ In order to test the hardware you can execute HWT.py (Requires V-Link Hat)
 
 ## 02 | V-Link Setup
 
-Here you can find the list of the required hardware. The V-Link Hat is currently not being sold. If you are interested in how to get one I encourage you getting in contact via our Discord channel! The old method which involved more hardware and technical skill is documented further down below. 
+Here you can find a list of the required hardware. The V-Link Hat is currently not being sold. If you are interested in how to get one I encourage you getting in contact via our Discord channel! The old method which involved more hardware and technical skill is documented further down below. 
 
 Mandatory:
 - V-Link Hat
@@ -116,7 +136,7 @@ Mandatory:
 - OEM P1 RTI Display Unit
 - Carlinkit Adapter
 
- As of now, Carplay is working reliably on the CPC200-CCPA while Android Auto works better on the CPC200-CCPM Dongle. In theory, Android Auto should work con the CCPA version as well but we had mixed results. Keep this in mind when choosing your Carlinkit Adapter.
+ As of now, Carplay is working reliably on the CPC200-CCPA while Android Auto works better on the CPC200-CCPM Dongle. In theory, Android Auto should work on the CCPA version as well but we had mixed results. Keep this in mind when choosing your Carlinkit Adapter.
 
 Optional:
 
@@ -185,6 +205,14 @@ You need to make the following connections.
 ![EWD SCHEMATIC](repo/media/ewdschematic.jpg?raw=true "EWD Schematic")
 (Borrowed from the original Volvo Electronic Wiring Diagrams)
 
+### > Note:
+
+Make sure that you stress-relief all wiring connections and secure them properly with zip ties.
+
+---
+
+![WIRING IMAGE](repo/media/wiring.jpg?raw=true "Wiring")
+
 ### > Steering Wheel Controls
 
 In order to implement the steering wheel controls, you need to connect the Raspberry to the LIN bus of your car. The app will convert the signals from the sw buttons to keyboard/mouse HID events.
@@ -211,8 +239,8 @@ When ignition is turned on, the RTI screen automatically folds up and you can us
 
 ### > Using the SW Module
 
-Control folding mechanism:
 ```
+Control folding mechanism:
 | Button  | Function                  |
 | ------- | ------------------------- |
 | 'back'  | Hold down to close screen |
@@ -234,25 +262,16 @@ Holding down 'prev' button for 2 seconds toggles between normal and mouse mode. 
 
 To make life a bit easier, you can connect an USB extension cable to the Raspi and mount it to the removable tray behind the waterfall console. This way you can directly connect peripherals to it.
 
-
-### > Note:
-
-Make sure that you stress-relief all wiring connections and secure them properly with zip ties.
-
----
-
-![WIRING IMAGE](repo/media/wiring.jpg?raw=true "Wiring")
-
 ## 06 | Audio
 
 The current solution for getting audio to work in cars, which don't have a factory aux port, is a [small module](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/) from Lithuania.
 This module is a mod for the radio to add an aux port. There is also a Bluetooth version available but since the phone is already wirelessly connected to the Carlinkit adapter dongle, an aux-cable seems pretty clean and less prone to failure.
 
-In the future we want to integrate MOST Bus into the project for a better audio quality and easier installation. Stay tuned.
-
 ### > Note:
 
 This is no advertisement, just a clean and simple solution IMO. And since MOST-Bus is supported through the PiMost from ModernDayMods, it might be possible to send audio over the MOST network in the future. This is still under investigation. Feel free to join the Discord Server if you want to participate in development.
+
+In the future we want to integrate MOST Bus into the project for a better audio quality and easier installation. Stay tuned.
 
 ---
 
