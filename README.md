@@ -158,8 +158,8 @@ The connections below are the bare minimum for the app to function properly:
 ```
 | Connection  | CEM Connector | Pin | HAT     |
 | ----------- | ------------- | --- | ------- |
-| CAN-H       | B             | 11  | CAN 1 H |
-| CAN-L       | B             | 12  | CAN 1 L |
+| CAN-H HS    | B             | 11  | CAN 1 H |
+| CAN-L HS    | B             | 12  | CAN 1 L |
 | GND         | A             | 28  | GND     |
 | IGN         | A             | 17  | IGN     |
 | 12V         | E             | 21  | VBAT    |
@@ -174,7 +174,7 @@ The connections below are the bare minimum for the app to function properly:
 
 ### > 4.2 Steering Wheel Controls (WIP)
 
-In order to implement the steering wheel controls, you need to connect the HAT to the LIN bus of your car. The app will convert the signals from the sw buttons to keyboard/mouse HID events.
+In order to implement the steering wheel controls, you need to connect the HAT to the LIN bus of your car. The app will convert the signals from the steering wheel buttons to keyboard/mouse HID events.
 
 The easiest place to find the LIN Bus is the "ICM Connector A" behind the waterfall. Either connect a DuPont wire to the associated pin or disassemble the ICM and solder a small wire to it.
 
@@ -205,7 +205,7 @@ Connect RTI_TX_PIN to the Serial pin of the HAT. Again, either use a DuPont wire
 
 ![RTI_CONNECTOR_IMAGE](repo/media/rti_connector.jpg?raw=true "RTI Connector")
 
-When ignition is turned on, the RTI screen automatically folds up and you can use the joystick on the back of the steering wheel to navigate through CarPlay. When clicking on the 'Enter' button on the back of the steering wheel, the Arduino sends an ASCII 'space' event (spacebar) to navigate the app. (CarPlay requires this instead of a left click or a return/enter)
+When ignition is turned on, the RTI screen automatically folds up and you can use the joystick on the back of the steering wheel to navigate through CarPlay. When clicking on the 'Enter' button on the back of the steering wheel, the Raspberry sends an ASCII 'space' event (spacebar) to navigate the app. (CarPlay requires this instead of a left click or a return/enter)
 
 ---
 
@@ -219,18 +219,16 @@ Also, to make life a bit easier, you can connect an USB extension cable to the R
 
 ## 05 | Audio
 
-The current solution for getting audio to work in cars, which don't have a factory aux port, is a [small module](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/) from Lithuania.
+The current solution for getting audio to work in cars that don't have a factory aux port is a [small module](https://www.tindie.com/products/justtech/aux-input-volvo-v50-s40-c30-c70-xc90/) from Lithuania.
 This module is a mod for the radio to add an aux port. There is also a Bluetooth version available but since the phone is already wirelessly connected to the Carlinkit adapter dongle, an aux-cable seems pretty clean and less prone to failure.
 
 ### > Note:
 
 This is no advertisement, just a clean and simple solution IMO. And since MOST-Bus is supported through the PiMost from ModernDayMods, it might be possible to send audio over the MOST network in the future. This is still under investigation. Feel free to join the Discord Server if you want to participate in development.
 
-In the future we want to integrate MOST Bus into the project for a better audio quality and easier installation. Stay tuned.
-
 ## 06 | Disclaimer
 
-I distance myself from any damage that you might do to your car in case you want to follow this guide. Eventually you will need to find other places to mount your components and different paths to route your cables; it's DIY afterall!
+The use of this soft- and hardware is at your own risk. The author and distributor of this project is not responsible for any damage, personal injury, or any other loss resulting from the use or misuse of the setup described above. By using this setup, you agree to accept full responsibility for any consequences that arise from its use. It’s DIY after all!
 
 ## 07 | Roadmap
 
