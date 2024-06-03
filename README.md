@@ -21,6 +21,7 @@ Want to join development, got any tips for improvement or need help?
     <li><a>| Wiring</a></li>
     <li><a>| Audio</a></li>
     <li><a>| Disclaimer</a></li>
+    <li><a>| Known Issues</a></li>
     <li><a>| Roadmap</a></li>
   </ol>
 </details>
@@ -140,7 +141,7 @@ The V-Link Hat is attached to the Raspberry and builds the interface to the car.
 
 ### > DIY Instructions
 
-In case you want to avoid the HAT and build the setup from scratch, please refer to branch 2.0.0 which includes the old schematics and installation instructions!
+In case you want to avoid the HAT and build the setup from scratch, please refer to branch 2.0.0 which includes the old schematics and installation instructions.
 
 
 ## 03 | Display Mod
@@ -230,15 +231,26 @@ This is no advertisement, just a clean and simple solution IMO. And since MOST-B
 
 The use of this soft- and hardware is at your own risk. The author and distributor of this project is not responsible for any damage, personal injury, or any other loss resulting from the use or misuse of the setup described above. By using this setup, you agree to accept full responsibility for any consequences that arise from its use. It’s DIY after all!
 
-## 07 | Roadmap
+## 07 | Known Issues
 
-- [x] Reimplement LIN interface
-- [x] Integrate ADC functionality
-- [x] Improve hardware and installation
-- [ ] 3D-printed display mount
-- [ ] Improve wiring to the car
-- [ ] Integrate DTC functionality
-- [ ] Integrate MOST-bus
+- In a few cases, CarPlay will connect but the stream is not visible. Restarting the app resolves this.
+- In a few cases, CAN bus communication is not working right away. Restarting the app resolves this.
+- The LIN interface on the HAT is currently not functioning. A fix is in the making.
+- Minor scaling issues in the UI thag will be addressed over time.
+
+
+## 08 | Roadmap
+
+- [x] Exposed setting files
+- [x] Fully responsive UI
+- [x] Implement LIN
+- [x] Implement ADC
+- [x] Custom hardware interface
+- [x] 3D-printed display mount
+- [ ] Preconfiguration for different engines
+- [ ] Improved wiring to the car
+- [ ] Implement DTCs
+- [ ] Implement MOST
 
 ---
 
