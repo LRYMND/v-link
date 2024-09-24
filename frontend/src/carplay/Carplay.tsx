@@ -164,6 +164,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
   }, []);
 
   useEffect(() => {
+    console.log("posting", command)
     carplayWorker.postMessage({ type: 'keyCommand', command: command })
   }, [commandCounter]);
 

@@ -30,11 +30,12 @@ function App() {
 
   const onKeyDown = (event: KeyboardEvent) => {
     console.log(event.code)
-    console.log(settings)
-    if (Object.values(settings.keyBindings).includes(event.code)) {
-      const action = Object.keys(settings.keyBindings).find(key =>
-        settings.keyBindings[key] === event.code
+    console.log(settings.keyBindings)
+    if (Object.values(settings!.keyBindings).includes(event.code)) {
+      const action = Object.keys(settings!.keyBindings).find(key =>
+        settings!.keyBindings[key] === event.code
       )
+      console.log(action)
       if (action !== undefined) {
         setKeyCommand(action)
         setCommandCounter(prev => prev + 1)
