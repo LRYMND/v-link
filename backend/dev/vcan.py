@@ -8,9 +8,9 @@ import os
 
 from ..shared.shared_state import shared_state
 
-class VCanThread(threading.Thread):
+class VCANThread(threading.Thread):
     def __init__(self):
-        super(VCanThread, self).__init__()
+        super(VCANThread, self).__init__()
         self._stop_event = threading.Event()
         self.daemon = True
         self.can_bus = None

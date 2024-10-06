@@ -11,6 +11,7 @@ import SimpleCheckbox from '../../components/SimpleCheckbox'
 
 import "./../../../themes.scss"
 import "./../../../styles.scss"
+import { Console } from 'console';
 
 const settingsChannel = io("ws://localhost:4001/settings")
 const canChannel = io("ws://localhost:4001/canbus")
@@ -27,11 +28,14 @@ const Settings = () => {
   const [currentSettings, setCurrentSettings] = useState(structuredClone(applicationSettings));
   const [activeTab, setActiveTab] = useState(1);
 
+  // Countdown Effect
+  const [countdown, setCountdown] = useState(null);
+  const [isCountingDown, setIsCountingDown] = useState(false);
+
   /* Switch Tabs */
   const handleTabChange = (tabIndex) => {
     setActiveTab(tabIndex);
   };
-
 
   /* Add Settings */
   const handleAddSetting = (key, currentSettings) => {
@@ -107,6 +111,21 @@ const Settings = () => {
     settingsChannel.emit("saveSettings", "application", currentSettings);
   }
 
+  /* Test RTI function */
+  const toggleRTI = () => {
+    if (isCountingDown) {
+      // Stop countdown and reset
+      setIsCountingDown(false);
+      setCountdown(null);
+    } else {
+      // Start countdown
+      setIsCountingDown(true);
+      setCountdown(15); // Start countdown at 15 seconds
+    }
+    // Optionally emit the "toggleRTI" event here if needed
+    console.log("Toggling RTI Screen");
+    systemChannel.emit("rti");
+  };
 
 
   /* I/O Functionality */
@@ -485,7 +504,18 @@ const Settings = () => {
                       textScale={store.textScale}
                       textColor={'var(--textColorLight)'}
                       isActive={true}
-                      onClick={() => {saveSettings()}}
+                      onClick={() => { saveSettings() }}
+                      backgroundColor={'var(--boxColorDark)'}
+                    />
+                  </div>
+                  <div className='column'>
+                    <SimpleButton
+                      text={<h3>{store.rtiState ? "Close" :  "Open"}</h3>}
+                      textSize={2.2}
+                      textScale={store.textScale}
+                      textColor={'var(--textColorLight)'}
+                      isActive={true}
+                      onClick={() => { toggleRTI() }}
                       backgroundColor={'var(--boxColorDark)'}
                     />
                   </div>

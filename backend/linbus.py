@@ -123,9 +123,9 @@ class LinFrame:
         # TODO: check protected id.
         return True
 
-class LinBusThread(threading.Thread):
+class LINBusThread(threading.Thread):
     def __init__(self):
-        super(LinBusThread, self).__init__()
+        super(LINBusThread, self).__init__()
         
         self._stop_event = threading.Event()
         self.daemon = True
@@ -219,11 +219,11 @@ class LinBusThread(threading.Thread):
         if button == self.config.BUTTON_ENTER:
             if not self.on and click_duration > self.config.ON_CLICK_DURATION:
                 self.manualOn = True
-                self.turn_on()
+                self.rti_on()
         elif button == self.config.BUTTON_BACK:
             if click_duration > self.config.OFF_CLICK_DURATION:
                 self.manualOn = False
-                self.turn_off()
+                self.rti_off()
         elif button == self.config.BUTTON_PREV:
             if click_duration > self.config.SWITCH_MOUSE_CLICK_DURATION:
                 if self.enableMouse:
@@ -301,37 +301,15 @@ class LinBusThread(threading.Thread):
         pyautogui.moveRel(dx * self.mouseSpeed, dy * self.mouseSpeed)
         self.mouseSpeed += self.config.MOUSE_SPEEDUP
 
-    def turn_on(self):
-        self.on = True
+    def rti_on(self):
+        shared_state.rtiStatus = True
 
-    def turn_off(self):
-        self.on = False
-
-    def rti(self):
-        if self.since(self.lastRtiWrite) < self.config.RTI_INTERVAL:
-            return
-
-        if self.rtiStep == 0:
-            self.rti_print(b'\x40' if self.on else b'\x46')
-            self.rtiStep += 1
-        elif self.rtiStep == 1:
-            self.rti_print(b'\x20')
-            self.rtiStep += 1
-        elif self.rtiStep == 2:
-            self.rti_print(b'\x83')
-            self.rtiStep = 0
-
-        self.lastRtiWrite = self.currentMillis
-
-    def rti_print(self, byte):
-        self.RTISerial.write(byte.to_bytes(1, byteorder='big'))
-
-    def since(self, timestamp):
-        return self.currentMillis - timestamp
+    def rti_off(self):
+        shared_state.rtiStatus = False
 
 # Example usage
 if __name__ == "__main__":
-    lin_bus_thread = LinBusThread()
+    lin_bus_thread = LINBusThread()
     lin_bus_thread.start()
 
     try:

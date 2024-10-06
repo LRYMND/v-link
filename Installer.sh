@@ -115,7 +115,14 @@ if confirm_action "download overlay files from GitHub to /boot/overlays"; then
         https://github.com/LRYMND/v-link/raw/master/repo/dtoverlays/mcp2515-can2.dtbo
 fi
 
-# Step 7: Append lines to /boot/config.txt or /boot/firmware/config.txt
+# Step 7: Enable UART3
+if confirm_action "enable RTI serial connection"; then
+    raspi-gpio get 4,5
+	raspi-gpio set 4,5 a4
+    raspi-gpio get 4,5
+fi
+
+# Step 8: Append lines to /boot/config.txt or /boot/firmware/config.txt
 if confirm_action "append lines to config.txt"; then
     if [ -f /boot/config.txt ]; then
         CONFIG_PATH="/boot/config.txt"
@@ -136,6 +143,7 @@ dtparam=i2c_arm=on
 dtparam=spi=on
 
 dtoverlay=vlink
+dtoverlay=uart3
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
 dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
 
@@ -148,7 +156,7 @@ disable_splash=1
 EOF"
 fi
 
-# Step 8: Append lines to /etc/network/interfaces
+# Step 9: Append lines to /etc/network/interfaces
 if confirm_action "append lines to /etc/network/interfaces"; then
     sudo bash -c 'cat >> /etc/network/interfaces << EOF
 
@@ -161,7 +169,7 @@ iface can1 can static
 EOF'
 fi
 
-# Step 9: Prompt to reboot the system
+# Step 10: Prompt to reboot the system
 if confirm_action "reboot the system now"; then
     sudo reboot
 else

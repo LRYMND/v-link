@@ -127,7 +127,18 @@ class ServerThread(threading.Thread):
     # Toggle linbus stream
     @socketio.on('toggle', namespace='/linbus')
     def handle_toggle_request():
-        print('toggle')
+        print('toggle lin')
+
+    # Toggle RTI Test
+    @socketio.on('rti', namespace='/system')
+    def handle_toggle_request():
+        if shared_state.rtiStatus == True:
+            shared_state.rtiStatus = False
+        else:
+            shared_state.rtiStatus = True
+
+        socketio.emit('rti', shared_state.rtiStatus, namespace='/system')
+        print('toggle rti')
 
     @socketio.on('systemTask', namespace='/system')
     def handle_system_task(args):

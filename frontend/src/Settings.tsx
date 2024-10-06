@@ -5,6 +5,8 @@ import { ApplicationSettings, SensorSettings, Store, useTestStore } from './stor
 const canbusChannel = io("ws://localhost:4001/canbus")
 const adcChannel = io("ws://localhost:4001/adc")
 const settingsChannel = io("ws://localhost:4001/settings")
+const systemChannel = io("ws://localhost:4001/system")
+
 
 const Settings = () => {
 
@@ -94,15 +96,15 @@ const Settings = () => {
 
   /* Handle Interface Visibility */
   useEffect(() => {
-      if (store.phoneState && (store.view === 'Carplay')  && applicationSettings != null) {
-        updateStore({ interface: { topBar: false, navBar: false } })
+    if (store.phoneState && (store.view === 'Carplay') && applicationSettings != null) {
+      updateStore({ interface: { topBar: false, navBar: false } })
 
-        if (applicationSettings.side_bars.topBarAlwaysOn.value)
-          updateStore({ interface: { dashBar: true } })
-      }
-      else {
-        updateStore({ interface: { dashBar: false, topBar: true, navBar: true, content: true, carplay: false } })
-      }
+      if (applicationSettings.side_bars.topBarAlwaysOn.value)
+        updateStore({ interface: { dashBar: true } })
+    }
+    else {
+      updateStore({ interface: { dashBar: false, topBar: true, navBar: true, content: true, carplay: false } })
+    }
   }, [store.view, store.phoneState, applicationSettings]);
 
 
@@ -136,6 +138,11 @@ const Settings = () => {
       updateStore({ adcState: data });
     };
 
+    const handleRTIStatus = (data) => {
+      console.log("RTI-status received from socket:", data);
+      updateStore({ rtiState: data });
+    };
+
     // Add event listeners for settings and status updates
     settingsChannel.on("application", function (eventData) {
       // Call the first function
@@ -143,10 +150,12 @@ const Settings = () => {
       // Call the second function
       handleTestStore(eventData);
     });
+
     //settingsChannel.on("application", handleAppSettings);
     settingsChannel.on("sensors", handleSensorSettings);
     canbusChannel.on("status", handleCANStatus);
     adcChannel.on("status", handleADCStatus);
+    systemChannel.on("rti", handleRTIStatus)
 
     // Request initial data
     settingsChannel.emit("requestSettings", "application");
@@ -160,6 +169,7 @@ const Settings = () => {
       settingsChannel.off("sensors", handleSensorSettings);
       canbusChannel.off("status", handleCANStatus);
       adcChannel.off("status", handleADCStatus);
+      systemChannel.off("rti", handleRTIStatus)
     };
   }, []);
 

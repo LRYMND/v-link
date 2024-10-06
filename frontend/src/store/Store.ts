@@ -118,6 +118,7 @@ const Store = create((set) => ({
   streamState: false,
   canState: false,
   adcState: false,
+  rtiState: false,
   textScale: 'Default',
   updateStore: (newData) =>
     set((state) => ({ ...state, ...newData })),

@@ -42,9 +42,9 @@ class Config:
             elif refresh_rate == "low":
                 self.msg_ls.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, vlink_id))
 
-class CanBusThread(threading.Thread):
+class CANBusThread(threading.Thread):
     def __init__(self):
-        super(CanBusThread, self).__init__()
+        super(CANBusThread, self).__init__()
         self._stop_event = threading.Event()
         self.daemon = True
         self.client = socketio.Client()

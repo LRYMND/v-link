@@ -5,25 +5,28 @@ import os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from backend.server              import ServerThread
-from backend.adc                 import ADCThread
-from backend.canbus              import CanBusThread
-from backend.linbus              import LinBusThread
+from backend.dev.vcan            import VCANThread
 from backend.browser             import BrowserThread
+from backend.server              import ServerThread
 
-from backend.dev.vcan            import VCanThread
+from backend.adc                 import ADCThread
+from backend.rti                 import RTIThread
+from backend.canbus              import CANBusThread
+from backend.linbus              import LINBusThread
+
 from backend.shared.shared_state import shared_state
 
 class VLINK:
     def __init__(self):
         self.exit_event = shared_state.exit_event
         self.threads = {
-            "VCan":     VCanThread(),
+            "VCAN":     VCANThread(),
             "Browser":  BrowserThread(),
             "Server":   ServerThread(),
-            "Canbus":   CanBusThread(),
-            #"Linbus":  LinBusThread(),
+            "CANBus":   CANBusThread(),
+            "LINBus":   LINBusThread(),
             "ADC":      ADCThread(),
+            "RTI":      RTIThread(),
         }
 
 
@@ -70,7 +73,7 @@ class VLINK:
 
     def process_toggle_event(self):
         if shared_state.toggle_can.is_set():
-            self.toggle_thread("Canbus")
+            self.toggle_thread("CANBus")
             shared_state.toggle_can.clear()
             
         if shared_state.toggle_adc.is_set():
@@ -121,7 +124,7 @@ if __name__ == "__main__":
         if choice.lower() == 'y':
             shared_state.vCan = True
             print("Starting VCAN...")
-            vlink.toggle_thread("VCan")
+            vlink.toggle_thread("VCAN")
 
         choice = non_blocking_input("Start on Vite-Port 5173? (Y/N): ")
         if choice.lower() == 'y':
@@ -131,7 +134,11 @@ if __name__ == "__main__":
         if choice.lower() == 'n':
             shared_state.isKiosk = False
 
-    vlink.start_thread("Canbus")
+    vlink.start_thread("CANBus")
+    time.sleep(.1)
+    vlink.start_thread("RTI")
+    time.sleep(.1)
+    #vlink.start_thread("LINBus")
     time.sleep(.1)
     vlink.start_thread("ADC")
     time.sleep(3)
