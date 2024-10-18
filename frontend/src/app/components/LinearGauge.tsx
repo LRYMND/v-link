@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
-import { CarData, SensorSettings } from '../../store/Store';
+import { DATA } from '../../store/Store';
+import { useSettings } from '../../Settings';
 
 const LinearGauge = ({
     sensor1,
+    type1,
     sensor2,
+    type2,
     svgMask,
     width,
     height,
@@ -25,18 +27,20 @@ const LinearGauge = ({
 }) => {
     const SVG_NS = 'http://www.w3.org/2000/svg';
 
-    const config1 = SensorSettings((state) => state.sensorSettings[sensor1]);
-    const config2 = SensorSettings((state) => state.sensorSettings[sensor2]);
+    const value1 = DATA((state) => state.data[sensor1])
+    const settings1 = useSettings(type1)['settings']['sensors'][sensor1];
 
-    const value1 = CarData((state) => state.carData[sensor1])
-    const unit1 = config1.unit
-    const limitStart = config1.limit_start
+    const value2 = DATA((state) => state.data[sensor2])
+    const settings2 = useSettings(type2)['settings']['sensors'][sensor2];
+
+
+    const unit1 = settings1.unit
+    const limitStart = settings1.limit_start
 
     const minValue = 0;
-    const maxValue = config1.max_value
+    const maxValue = settings1.max_value
 
-    const value2 = CarData((state) => state.carData[sensor2])
-    const unit2 = config2.unit
+    const unit2 = settings2.unit
     const limitValue2 = 1.0;
 
 

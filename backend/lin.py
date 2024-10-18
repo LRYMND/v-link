@@ -123,9 +123,9 @@ class LinFrame:
         # TODO: check protected id.
         return True
 
-class LINBusThread(threading.Thread):
+class LINThread(threading.Thread):
     def __init__(self):
-        super(LINBusThread, self).__init__()
+        super(LINThread, self).__init__()
         
         self._stop_event = threading.Event()
         self.daemon = True
@@ -309,7 +309,7 @@ class LINBusThread(threading.Thread):
 
 # Example usage
 if __name__ == "__main__":
-    lin_bus_thread = LINBusThread()
+    lin_bus_thread = LINThread()
     lin_bus_thread.start()
 
     try:

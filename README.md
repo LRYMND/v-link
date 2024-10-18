@@ -235,7 +235,6 @@ The use of this soft- and hardware is at your own risk. The author and distribut
 
 - In a few cases, CarPlay will connect but the stream is not visible. Restarting the app resolves this.
 - In a few cases, CAN bus communication is not working right away. Restarting the app resolves this.
-- The LIN interface on the HAT is currently not functioning. A fix is in the making.
 - Minor scaling issues in the UI thag will be addressed over time.
 
 
@@ -245,6 +244,7 @@ The use of this soft- and hardware is at your own risk. The author and distribut
 - [x] Fully responsive UI
 - [x] Implement LIN
 - [x] Implement ADC
+- [x] Implement RTI
 - [x] Custom hardware interface
 - [x] 3D-printed display mount
 - [ ] Preconfiguration for different engines
@@ -275,37 +275,3 @@ The use of this soft- and hardware is at your own risk. The author and distribut
 | [![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://www.buymeacoffee.com/lrymnd)  | [![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://www.buymeacoffee.com/tigo) |
 |---|---|
 | <center>(Louis)</center> | <center>(Tigo)</center> |
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

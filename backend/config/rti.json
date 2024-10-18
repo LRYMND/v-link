@@ -1,0 +1,16 @@
+{
+    "type": "interface",
+    "name": "rti",
+    "iface": "i2c",
+    "channel": "",
+    "bitrate": 0,
+    "timing": {
+        "timeout": 0.1
+    },
+    "commands": {
+        "brighness_levels": {
+        },
+        "actions": {
+        }
+    }
+}

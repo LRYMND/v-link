@@ -3,12 +3,12 @@ import {
     useMemo,
   } from 'react'
 import { CANWorker, ADCWorker } from './worker/types'
-import { CarData } from './../store/Store';
+import { DATA } from './../store/Store';
 
 
 function Cardata () {
 
-  const updateCarData = CarData((state) => state.updateCarData);
+  const update = DATA((state) => state.update);
 
     
     const canWorker = useMemo(() => {
@@ -33,13 +33,13 @@ function Cardata () {
         canWorker.onmessage = (event) => {
           const { type, message } = event.data;
           const newData = { [type]: message };
-          updateCarData(newData.message)
+          update(newData.message)
         };
 
         adcWorker.onmessage = (event) => {
           const { type, message } = event.data;
           const newData = { [type]: message };
-          updateCarData(newData.message)
+          update(newData.message)
         };
     
         return () => {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { ApplicationSettings, Store } from '../../../../store/Store';
+import { APP } from '../../../../store/Store';
 
 import RadialGauge from '../../../components/RadialGauge'
 import ValueBox from '../../../components/ValueBox'
@@ -10,23 +10,22 @@ import "./../../../../themes.scss"
 
 
 const Classic = () => {
-	const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
-	const store = Store((state) => state);
+	const userSettings = APP((state) => state);
 
 	const gaugeSize = 0.65 // 0.1 - 1.0 -> Percentage of parent div height
 	const gauges = 3
 	const [size, setSize] = useState(0);
 
 	useEffect(() => {
-		const width = (store.contentSize.width - (applicationSettings.app.dashboardPadding.value * 2)) / gauges
-		const height = (store.contentSize.height * gaugeSize)
+		const width = (userSettings.contentSize.width - (userSettings.app.dashboardPadding.value * 2)) / gauges
+		const height = (userSettings.contentSize.height * gaugeSize)
 
 		if (width <= height) {
 			setSize(width)
 		} else if (width >= height) {
 			setSize(height)
 		}
-	}, [store.contentSize, applicationSettings.app.dashboardPadding.value])
+	}, [userSettings.contentSize, userSettings.app.dashboardPadding.value])
 
 
 	return (
@@ -34,7 +33,7 @@ const Classic = () => {
 			<div className="row">
 				<div className="column">
 					<RadialGauge
-						sensor={applicationSettings.dash_classic.gauge_1.value}
+						sensor={userSettings.dash_classic.gauge_1.value}
 
 						globalRotation={90}
 						size={size * 0.9}
@@ -71,7 +70,7 @@ const Classic = () => {
 				</div>
 				<div className="column">
 				<RadialGauge
-						sensor={applicationSettings.dash_classic.gauge_2.value}
+						sensor={userSettings.dash_classic.gauge_2.value}
 
 						globalRotation={90}
 						size={size * 0.9}
@@ -108,7 +107,7 @@ const Classic = () => {
 				</div>
 				<div className="column">
 				<RadialGauge
-						sensor={applicationSettings.dash_classic.gauge_3.value}
+						sensor={userSettings.dash_classic.gauge_3.value}
 
 						globalRotation={90}
 						size={size * 0.9}
@@ -148,7 +147,7 @@ const Classic = () => {
 			<div className="row">
 				<div className="column">
 					<ValueBox
-						sensor={applicationSettings.dash_classic.value_1.value}
+						sensor={userSettings.dash_classic.value_1.value}
 						unit={true}
 
 						textColorDefault={'var(--textColorDefault)'}
@@ -163,13 +162,13 @@ const Classic = () => {
 						height={"10vh"}
 						width={"100%"}
 
-						labelSize={`calc(3vh * ${store.textScale}`}
-						valueSize={`calc(6vh * ${store.textScale}`}
+						labelSize={`calc(3vh * ${userSettings.textScale}`}
+						valueSize={`calc(6vh * ${userSettings.textScale}`}
 					/>
 				</div>
 				<div className="column">
 				<ValueBox
-						sensor={applicationSettings.dash_classic.value_2.value}
+						sensor={userSettings.dash_classic.value_2.value}
 						unit={true}
 
 						textColorDefault={'var(--textColorDefault)'}
@@ -184,13 +183,13 @@ const Classic = () => {
 						height={"10vh"}
 						width={"100%"}
 
-						labelSize={`calc(3vh * ${store.textScale}`}
-						valueSize={`calc(6vh * ${store.textScale}`}
+						labelSize={`calc(3vh * ${userSettings.textScale}`}
+						valueSize={`calc(6vh * ${userSettings.textScale}`}
 					/>
 				</div>
 				<div className="column">
 				<ValueBox
-						sensor={applicationSettings.dash_classic.value_3.value}
+						sensor={userSettings.dash_classic.value_3.value}
 						unit={true}
 
 						textColorDefault={'var(--textColorDefault)'}
@@ -205,8 +204,8 @@ const Classic = () => {
 						height={"10vh"}
 						width={"100%"}
 
-						labelSize={`calc(3vh * ${store.textScale}`}
-						valueSize={`calc(6vh * ${store.textScale}`}
+						labelSize={`calc(3vh * ${userSettings.textScale}`}
+						valueSize={`calc(6vh * ${userSettings.textScale}`}
 					/>
 				</div>
 			</div >

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ApplicationSettings, SensorSettings, Store } from '../../../store/Store';
+import { APP, SensorSettings } from '../../../store/Store';
 
 import { io } from "socket.io-client";
 
@@ -16,16 +16,15 @@ import { Console } from 'console';
 const settingsChannel = io("ws://localhost:4001/settings")
 const canChannel = io("ws://localhost:4001/canbus")
 const adcChannel = io("ws://localhost:4001/adc")
-const systemChannel = io("ws://localhost:4001/system")
+const sysChannel = io("ws://localhost:4001/sys")
 
 const Settings = () => {
-  const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
-  const sensorSettings = SensorSettings((state) => state.sensorSettings);
-  const store = Store((state) => state);
+  const settings = SensorSettings((state) => state.settings);
+  const userSettings = APP((state) => state);
 
-  const updateApplicationSettings = ApplicationSettings((state) => state.updateApplicationSettings);
+  const updateSettings = APP((state) => state.updateSettings);
 
-  const [currentSettings, setCurrentSettings] = useState(structuredClone(applicationSettings));
+  const [currentSettings, setCurrentSettings] = useState(structuredClone(userSettings));
   const [activeTab, setActiveTab] = useState(1);
 
   // Countdown Effect
@@ -92,8 +91,8 @@ const Settings = () => {
   /* Change Settings */
   const handleSettingChange = (key, name, newValue, currentSettings) => {
     const newSettings = structuredClone(currentSettings);
-    const convertedValue = Object.keys(sensorSettings).find(
-      (messageKey) => sensorSettings[messageKey].label === newValue
+    const convertedValue = Object.keys(settings).find(
+      (messageKey) => settings[messageKey].label === newValue
     );
 
     if (key === 'carplay' || key === 'constants') {
@@ -107,7 +106,7 @@ const Settings = () => {
 
   /* Save Settings */
   function saveSettings() {
-    updateApplicationSettings(currentSettings);
+    updateSettings(currentSettings);
     settingsChannel.emit("saveSettings", "application", currentSettings);
   }
 
@@ -124,23 +123,23 @@ const Settings = () => {
     }
     // Optionally emit the "toggleRTI" event here if needed
     console.log("Toggling RTI Screen");
-    systemChannel.emit("rti");
+    sysChannel.emit("rti");
   };
 
 
   /* I/O Functionality */
   function systemTask(request) {
-    systemChannel.emit("systemTask", request);
+    sysChannel.emit("systemTask", request);
   }
 
   function handleIO(channel) {
     channel.emit("toggle");
-    channel.emit("requestStatus");
+    channel.emit("status");
   }
 
   /* Render Settings */
   function renderSetting(key, settingsObj) {
-    if (!settingsObj || !sensorSettings) return null;
+    if (!settingsObj || !settings) return null;
 
     const { label, ...nestedObjects } = settingsObj[key];
     const labelParagraph = label
@@ -157,8 +156,8 @@ const Settings = () => {
           isBoolean = typeof nestedObj === 'boolean';
         } else {
           label = nestedObj.label;
-          value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' || nestedKey === 'colorTheme' || nestedKey === 'defaultDash' || nestedKey === 'startPage' || nestedKey === 'textSize' ? nestedObj.value : sensorSettings[nestedObj.value].label;
-          options = typeof value === 'number' || typeof value === 'boolean' ? null : nestedObj.options || Object.keys(sensorSettings).map(messageKey => sensorSettings[messageKey].label);
+          value = typeof nestedObj.value === 'number' || typeof nestedObj.value === 'boolean' || nestedKey === 'colorTheme' || nestedKey === 'defaultDash' || nestedKey === 'startPage' || nestedKey === 'textSize' ? nestedObj.value : settings[nestedObj.value].label;
+          options = typeof value === 'number' || typeof value === 'boolean' ? null : nestedObj.options || Object.keys(settings).map(messageKey => settings[messageKey].label);
           isBoolean = typeof value === 'boolean'; isBoolean = typeof value === 'boolean';
         }
       }
@@ -180,7 +179,7 @@ const Settings = () => {
             textColor={'var(--textColorDefault)'}
             text={label}
             textSize={2.2}
-            textScale={store.textScale}
+            textScale={userSettings.textScale}
           />
 
           <span className='divider'></span>
@@ -192,7 +191,7 @@ const Settings = () => {
                 options={options}
                 onChange={handleChange}
                 textSize={2.2}
-                textScale={store.textScale}
+                textScale={userSettings.textScale}
                 textColor={'var(--textColorDefault)'}
                 isActive={true}
               />
@@ -214,7 +213,7 @@ const Settings = () => {
                   value={value}
                   onChange={handleChange}
                   textSize={2.2}
-                  textScale={store.textScale}
+                  textScale={userSettings.textScale}
                   textColor={'var(--textColorDefault)'}
                   isActive={true}
                 />
@@ -231,7 +230,7 @@ const Settings = () => {
           textColor={'var(--textColorLight)'}
           text={<h3> {labelParagraph} </h3>}
           textSize={2.2}
-          textScale={store.textScale}
+          textScale={userSettings.textScale}
         />
         {nestedElements}
       </>
@@ -245,7 +244,7 @@ const Settings = () => {
 
   return (
     <>
-      <div className={`settings ${applicationSettings.app.colorTheme.value}`} style={{
+      <div className={`settings ${userSettings.app.colorTheme.value}`} style={{
         width: '100%',
         height: '100%',
         display: 'flex',
@@ -266,7 +265,7 @@ const Settings = () => {
                       textColor={'var(--textColorLight)'}
                       text={<h3> Wireless Connections: </h3>}
                       textSize={2.2}
-                      textScale={store.textScale}
+                      textScale={userSettings.textScale}
                     />
                   </div>
 
@@ -275,7 +274,7 @@ const Settings = () => {
                       <SimpleButton
                         text={"Coming Soon"}
                         textSize={2.2}
-                        textScale={store.textScale}
+                        textScale={userSettings.textScale}
                         textColor={'var(--textColorDefault)'}
                         isActive={false}
                         onClick={clickTest}
@@ -294,7 +293,7 @@ const Settings = () => {
                       textColor={'var(--textColorLight)'}
                       text={<h3> I/O: </h3>}
                       textSize={2.2}
-                      textScale={store.textScale}
+                      textScale={userSettings.textScale}
                     />
                   </div>
 
@@ -303,7 +302,7 @@ const Settings = () => {
                       <SimpleButton
                         text={"Reboot"}
                         textSize={2.2}
-                        textScale={store.textScale}
+                        textScale={userSettings.textScale}
                         textColor={'var(--textColorDefault)'}
                         isActive={true}
                         onClick={() => { systemTask('reboot') }}
@@ -312,7 +311,7 @@ const Settings = () => {
                       <SimpleButton
                         text={"Restart"}
                         textSize={2.2}
-                        textScale={store.textScale}
+                        textScale={userSettings.textScale}
                         textColor={'var(--textColorDefault)'}
                         isActive={true}
                         onClick={() => { systemTask('restart') }}
@@ -324,7 +323,7 @@ const Settings = () => {
                       <SimpleButton
                         text={"Quit"}
                         textSize={2.2}
-                        textScale={store.textScale}
+                        textScale={userSettings.textScale}
                         textColor={'var(--textColorDefault)'}
                         isActive={true}
                         onClick={() => { systemTask('quit') }}
@@ -333,7 +332,7 @@ const Settings = () => {
                       <SimpleButton
                         text={"Reset"}
                         textSize={2.2}
-                        textScale={store.textScale}
+                        textScale={userSettings.textScale}
                         textColor={'var(--textColorDefault)'}
                         isActive={true}
                         onClick={() => { systemTask('reset') }}
@@ -343,7 +342,7 @@ const Settings = () => {
                   </div>
 
                   <div className='row'>
-                    <label><i>v{store.version}</i></label>
+                    <label><i>v{userSettings.version}</i></label>
                   </div>
                 </div>
               </div>
@@ -356,7 +355,7 @@ const Settings = () => {
                       height={'100%'}
                       text={<b>GENERAL</b>}
                       textSize={2.5}
-                      textScale={store.textScale}
+                      textScale={userSettings.textScale}
                       textColor={activeTab === 1 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
                       isActive={true}
                       backgroundColor={activeTab === 1 ? 'var(--boxColorDark)' : 'var(--boxColorDarker)'}
@@ -367,7 +366,7 @@ const Settings = () => {
                       height={'100%'}
                       text={<b>CUSTOMIZATION</b>}
                       textSize={2.5}
-                      textScale={store.textScale}
+                      textScale={userSettings.textScale}
                       textColor={activeTab === 2 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
                       isActive={true}
                       backgroundColor={activeTab === 2 ? 'var(--boxColorDark)' : 'var(--boxColorDarker)'}
@@ -389,16 +388,16 @@ const Settings = () => {
                             <div className='list row'>
                               <SimpleLabel
                                 textColor={'var(--textColorDefault)'}
-                                text={`CAN ${store.canState ? '(Inactive)' : '(Active)'}`}
+                                text={`CAN ${userSettings.canState ? '(Inactive)' : '(Active)'}`}
                                 textSize={2.2}
-                                textScale={store.textScale}
+                                textScale={userSettings.textScale}
                               />
                               <span className='divider'></span>
                               <div className='row' style={{ flex: '0 0 40%', marginRight: '10px', height: '5vh' }}>
                                 <SimpleButton
-                                  text={store.canState ? "On" : "Off"}
+                                  text={userSettings.canState ? "On" : "Off"}
                                   textSize={2.2}
-                                  textScale={store.textScale}
+                                  textScale={userSettings.textScale}
                                   textColor={'var(--textColorDefault)'}
                                   isActive={true}
                                   onClick={() => { handleIO(canChannel) }}
@@ -410,16 +409,16 @@ const Settings = () => {
                             <div className='list row'>
                               <SimpleLabel
                                 textColor={'var(--textColorDefault)'}
-                                text={`ADC ${store.adcState ? '(Inactive)' : '(Active)'}`}
+                                text={`ADC ${userSettings.adcState ? '(Inactive)' : '(Active)'}`}
                                 textSize={2.2}
-                                textScale={store.textScale}
+                                textScale={userSettings.textScale}
                               />
                               <span className='divider'></span>
                               <div className='row' style={{ flex: '0 0 40%', marginRight: '10px', height: '5vh' }}>
                                 <SimpleButton
-                                  text={store.adcState ? "On" : "Off"}
+                                  text={userSettings.adcState ? "On" : "Off"}
                                   textSize={2.2}
-                                  textScale={store.textScale}
+                                  textScale={userSettings.textScale}
                                   textColor={'var(--textColorDefault)'}
                                   isActive={true}
                                   onClick={() => { handleIO(adcChannel) }}
@@ -445,7 +444,7 @@ const Settings = () => {
                                 textColor={'var(--textColorDefault)'}
                                 text={'Add / Remove Data'}
                                 textSize={2.2}
-                                textScale={store.textScale}
+                                textScale={userSettings.textScale}
                               />
                               <span className='divider'></span>
                               <div className='row' style={{ flex: '0 0 40%', marginRight: '10px', gap: '10%', height: '5vh' }}>
@@ -453,7 +452,7 @@ const Settings = () => {
                                   <SimpleButton
                                     text={"+"}
                                     textSize={2.5}
-                                    textScale={store.textScale}
+                                    textScale={userSettings.textScale}
                                     textColor={'var(--textColorDefault)'}
                                     isActive={true}
                                     onClick={() => { handleAddSetting("dash_charts", currentSettings) }}
@@ -464,7 +463,7 @@ const Settings = () => {
                                   <SimpleButton
                                     text={"-"}
                                     textSize={2.5}
-                                    textScale={store.textScale}
+                                    textScale={userSettings.textScale}
                                     textColor={'var(--textColorDefault)'}
                                     isActive={true}
                                     onClick={() => { handleRemoveSetting("dash_charts", currentSettings) }}
@@ -501,7 +500,7 @@ const Settings = () => {
                     <SimpleButton
                       text={<h3>Save</h3>}
                       textSize={2.2}
-                      textScale={store.textScale}
+                      textScale={userSettings.textScale}
                       textColor={'var(--textColorLight)'}
                       isActive={true}
                       onClick={() => { saveSettings() }}
@@ -510,9 +509,9 @@ const Settings = () => {
                   </div>
                   <div className='column'>
                     <SimpleButton
-                      text={<h3>{store.rtiState ? "Close" :  "Open"}</h3>}
+                      text={<h3>{userSettings.rtiState ? "Close" :  "Open"}</h3>}
                       textSize={2.2}
-                      textScale={store.textScale}
+                      textScale={userSettings.textScale}
                       textColor={'var(--textColorLight)'}
                       isActive={true}
                       onClick={() => { toggleRTI() }}

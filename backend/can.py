@@ -8,7 +8,7 @@ from .shared.shared_state import shared_state
 
 class Config:
     def __init__(self):
-        self.canSettings = settings.load_settings("canbus")
+        self.canSettings = settings.load_settings("can")
         self.refresh_rate = self.canSettings["timing"]["refresh_rate"]
         self.interval = self.canSettings["timing"]["interval"]
         self.timeout = self.canSettings["timing"]["timeout"]
@@ -42,9 +42,9 @@ class Config:
             elif refresh_rate == "low":
                 self.msg_ls.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, vlink_id))
 
-class CANBusThread(threading.Thread):
+class CANThread(threading.Thread):
     def __init__(self):
-        super(CANBusThread, self).__init__()
+        super(CANThread, self).__init__()
         self._stop_event = threading.Event()
         self.daemon = True
         self.client = socketio.Client()
@@ -78,7 +78,7 @@ class CANBusThread(threading.Thread):
         current_retry = 0
         while not self.client.connected and current_retry < max_retries:
             try:
-                self.client.connect('http://localhost:4001', namespaces=['/canbus'])
+                self.client.connect('http://localhost:4001', namespaces=['/can'])
             except Exception as e:
                 print(f"Socket.IO connection failed. Retry {current_retry}/{max_retries}. Error: {e}")
                 time.sleep(.5)
@@ -91,7 +91,7 @@ class CANBusThread(threading.Thread):
 
     def emit_data_to_frontend(self, data):
         if self.client and self.client.connected:
-            self.client.emit('data', data, namespace='/canbus')
+            self.client.emit('data', data, namespace='/can')
 
     def request(self, sensors):
         for message in sensors:

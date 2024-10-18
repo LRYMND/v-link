@@ -58,7 +58,7 @@ class ADCThread(threading.Thread):
 
         for i, (sensor_name, sensor_details) in enumerate(self.sensor_data["sensors"].items()):
             channel = sensor_details["channel"]
-            analog_in_instance = AnalogIn(ads, getattr(ADS, channel.upper()))
+            analog_in_instance = AnalogIn(ads, getattr(ADS, channel))
             self.channels.append(analog_in_instance)
 
 
@@ -102,7 +102,7 @@ class ADCThread(threading.Thread):
         
         return interpolated_value
 
-    def read_sensor_data_from_json(self, filename="adc_settings.json"):
+    def read_sensor_data_from_json(self, filename="adc.json"):
         config_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config')
         file_path = os.path.join(config_folder, filename)
         with open(file_path, "r") as file:

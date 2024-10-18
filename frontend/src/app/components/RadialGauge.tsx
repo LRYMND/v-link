@@ -1,4 +1,5 @@
-import { CarData, SensorSettings } from '../../store/Store';
+import { DATA } from '../../store/Store';
+import { useSettings } from '../../Settings';
 
 const cos = Math.cos;
 const sin = Math.sin;
@@ -10,6 +11,7 @@ const f_vec_add = (([a1, a2], [b1, b2]) => [a1 + b1, a2 + b2]);
 
 export const RadialGauge = ({
     sensor,
+    type,
 
     globalRotation = 90,
     size = 100,
@@ -46,12 +48,11 @@ export const RadialGauge = ({
     pivotColor = 'grey',
 }) => {
 
-    let value = CarData((state) => state.carData[sensor])
-    const label = SensorSettings((state) => state.sensorSettings[sensor].label);
-    const config = SensorSettings((state) => state.sensorSettings[sensor]);
+    let value = DATA((state) => state.data[sensor])
+    const settings = useSettings(type)['settings']['sensors'][sensor];
 
-    const maxValue = config.max_value
-    const limitStart = config.limit_start
+    const maxValue = settings.max_value
+    const limitStart = settings.limit_start
 
 
     if (arc > 359)
@@ -252,7 +253,7 @@ export const RadialGauge = ({
                     dy="20px"
                     textAnchor="middle"
                 >
-                    {`(${config.unit})`}
+                    {`(${settings.unit})`}
                 </text>
 
                 <text                               //Value Label

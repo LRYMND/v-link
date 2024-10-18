@@ -14,22 +14,26 @@ class SharedState:
 
 
         #Thread States:
-        self.toggle_adc = threading.Event()
+        self.toggle_app = threading.Event()
+
         self.toggle_can = threading.Event()
         self.toggle_lin = threading.Event()
+        self.toggle_adc = threading.Event()
         self.toggle_rti = threading.Event()
-        self.toggle_browser = threading.Event()
 
         self.exit_event = threading.Event()
 
         self.THREAD_STATES = {
-            "VCAN":     False,
-            "Browser":  False,
-            "Server":   False,
-            "CANBus":   False,
-            "LINBus":   False,
-            "ADC":      False,
-            "RTI":      False,
+            "server":   False,
+            
+            "app":      False,
+            "mmi":      False,
+            "can":      False,
+            "lin":      False,
+            "adc":      False,
+            "rti":      False,
+
+            "vcan":     False,
         }
 
 shared_state = SharedState()

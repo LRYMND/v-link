@@ -1,21 +1,23 @@
-import { ApplicationSettings, Store } from '../../store/Store';
+import { APP } from '../../store/Store';
+
 import ValueBox from '../components/ValueBox';
 
 import "./../../styles.scss"
 import "./../../themes.scss"
 
 
+
+
 const DashBar = () => {
-    const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
-    const store = Store((state) => state);
 
-    const updateStore = Store((state) => state.updateStore);
+    const app = APP((state) => state)
+    const system = app.system
+    const topbar = app.settings.dash_topbar
 
-    const textScale = 1;
 
     return (
-        <div className={`dashbar ${applicationSettings.app.colorTheme.value}`} style={{
-            height: `${applicationSettings.side_bars.topBarHeight.value}px`,
+        <div className={`dashbar ${app.settings.general.colorTheme.value}`} style={{
+            height: `${app.settings.side_bars.topBarHeight.value}px`,
             display: 'flex',
             position: 'absolute',
             flexDirection: 'row',
@@ -29,7 +31,9 @@ const DashBar = () => {
                 <div className='column'>
                     <div className='row' style={{ justifyContent: 'center', gap: '15px' }}>
                         <ValueBox
-                            sensor={applicationSettings.dash_topbar.value_1.value}
+                            sensor={topbar.value_1.value}
+                            type={topbar.value_1.type}
+
                             unit={true}
 
                             textColorDefault={'var(--textColorDefault)'}
@@ -44,12 +48,14 @@ const DashBar = () => {
                             height={"70%"}
                             width={"100%"}
 
-                            labelSize={`calc(1.75vh * ${textScale}`}
-                            valueSize={`calc(2.5vh * ${textScale}`}
+                            labelSize={`calc(1.75vh * ${system.textScale}`}
+                            valueSize={`calc(2.5vh * ${system.textScale}`}
                         />
 
                         <ValueBox
-                            sensor={applicationSettings.dash_topbar.value_2.value}
+                            sensor={topbar.value_2.value}
+                            type={topbar.value_2.type}
+
                             unit={true}
 
                             textColorDefault={'var(--textColorDefault)'}
@@ -64,12 +70,14 @@ const DashBar = () => {
                             height={"70%"}
                             width={"100%"}
 
-                            labelSize={`calc(1.75vh * ${textScale}`}
-                            valueSize={`calc(2.5vh * ${textScale}`}
+                            labelSize={`calc(1.75vh * ${system.textScale}`}
+                            valueSize={`calc(2.5vh * ${system.textScale}`}
                         />
 
                         <ValueBox
-                            sensor={applicationSettings.dash_topbar.value_3.value}
+                            sensor={topbar.value_3.value}
+                            type={topbar.value_3.type}
+
                             unit={true}
 
                             textColorDefault={'var(--textColorDefault)'}
@@ -84,8 +92,8 @@ const DashBar = () => {
                             height={"70%"}
                             width={"100%"}
 
-                            labelSize={`calc(1.75vh * ${textScale}`}
-                            valueSize={`calc(2.5vh * ${textScale}`}
+                            labelSize={`calc(1.75vh * ${system.textScale}`}
+                            valueSize={`calc(2.5vh * ${system.textScale}`}
                         />
 
                     </div>
@@ -98,19 +106,19 @@ const DashBar = () => {
                 <div className='column'>
                     <div className='row' style={{ justifyContent: 'center' }}>
                         <div style={{ display: 'flex', gap: '20px' }}>
-                            <svg className={`status-icon status-icon--${(store.wifiState ? "active" : "inactive")}`}>
+                            <svg className={`status-icon status-icon--${(system.wifiState ? "active" : "inactive")}`}>
                                 <use xlinkHref="/assets/svg/wifi.svg#wifi"></use>
                             </svg>
 
-                            <svg className={`status-icon status-icon--${(store.wifiState ? "active" : "inactive")}`}>
+                            <svg className={`status-icon status-icon--${(system.wifiState ? "active" : "inactive")}`}>
                                 <use xlinkHref="/assets/svg/bluetooth.svg#bluetooth"></use>
                             </svg>
 
-                            <svg className={`status-icon status-icon--${(store.phoneState ? "active" : "inactive")}`}>
+                            <svg className={`status-icon status-icon--${(system.phoneState ? "active" : "inactive")}`}>
                                 <use xlinkHref="/assets/svg/phone.svg#phone"></use>
                             </svg>
 
-                            <button className='input-style nav-button' type='button' onClick={() => updateStore({ view: 'Dashboard' })}>
+                            <button className='input-style nav-button' type='button' onClick={() => app.update({system: { view: 'Dashboard' }})}>
                                 <div>EXIT</div>
                             </button>
                         </div>

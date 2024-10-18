@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Store } from '../store/Store';
+import { APP } from '../store/Store';
+
 
 import "./../styles.scss"
 import "./../themes.scss"
 
 const SplashScreen = () => {
   const [showSplash, setShowSplash] = useState(true);
-  const store = Store((state) => state);
+  const app = APP((state) => state)
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -42,7 +43,7 @@ const SplashScreen = () => {
                 </svg>
             </div>
             <h1>V-LINK</h1>
-            <p>v {store.version}</p>
+            <p>v {app.system.version}</p>
           </div>
 
 

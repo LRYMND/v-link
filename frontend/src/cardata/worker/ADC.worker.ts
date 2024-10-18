@@ -1,28 +1,23 @@
 import { io } from "socket.io-client";
 
-let sensorSettings;
-let carData
+let settings;
 
-// Connect to the settings namespace to retrieve sensorSettings
-const settingsChannel = io("ws://localhost:4001/settings");
-
-// Connect to the canbus namespace to receive continuous data stream
+// Connect to the adc namespace to receive continuous data stream
 const adcChannel = io("ws://localhost:4001/adc");
 
-// Function to handle incoming canbus settings
-const handlesensorSettings = (settings) => {
-    sensorSettings = settings;
-    // Subscribe to the canbus namespace after receiving settings
+// Function to handle incoming adc settings
+const handlesensorSettings = (data) => {
+    settings = data.sensors;
     adcChannel.connect();
 };
 
 // Function to update car data
-const updateCarData = (data) => {
+const update = (data) => {
     const updatedData = {};
 
-    if (sensorSettings && data != null) {
-        Object.keys(sensorSettings).forEach((key) => {
-            const message = sensorSettings[key];
+    if (settings && data != null) {
+        Object.keys(settings).forEach((key) => {
+            const message = settings[key];
             const vlinkId = message.vlink_id;
             const regex = new RegExp(vlinkId, 'g');
 
@@ -32,31 +27,30 @@ const updateCarData = (data) => {
             }
         });
     }
-    
     return updatedData;
 };
 
 // Function to post updated car data to the main thread
-const postCarDataToMain = (carData) => {
+const postCarDataToMain = (data) => {
     const message = {
         type: 'message',
-        message: carData
+        message: data
       };
 
     postMessage(message);
 };
 
-// Listen for canbus settings
-settingsChannel.on("sensors", handlesensorSettings);
+// Listen for adc settings
+adcChannel.on("settings", handlesensorSettings);
 
-// Listen for continuous data stream from canbus namespace
+// Listen for continuous data stream from adc namespace
 adcChannel.on("data", (data) => {
-    carData = updateCarData(data);
-    postCarDataToMain(carData);
+    data = update(data);
+    postCarDataToMain(data);
 });
 
-// Send a request for canbus settings
-settingsChannel.emit("requestSensors");
+// Send a request for adc settings
+adcChannel.emit("load");
 
 
 

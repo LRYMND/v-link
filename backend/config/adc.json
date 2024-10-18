@@ -1,4 +1,7 @@
 {
+    "type": "data",
+    "name": "adc",
+
     "sensors": {
         "pressure": {
             "vlink_id": "oilp:",

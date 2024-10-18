@@ -14,7 +14,7 @@ from .shared.shared_state   import shared_state
 
 # Flask configuration
 server = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist'), static_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist', 'assets'), static_url_path='/assets')
-server.config['SECRET_KEY'] = 'your_secret_key'
+server.config['SECRET_KEY'] = 'v-link'
 CORS(server, resources={r"/*": {"origins": "*"}})
 
 # Socket.io configuration
@@ -63,103 +63,81 @@ class ServerThread(threading.Thread):
     def handle_connect():
         print("Client connected")
 
-    # Return settings object to frontend via socket.io
-    @socketio.on('requestSettings', namespace='/settings')
-    def handle_request_settings(args):
-        socketio.emit(args, settings.load_settings(args), namespace='/settings')
+    # Define modules
+    modules = ["app", "mmi", "can", "lin", "adc", "rti"]
 
-    # Save settings object from frontend to .config directory
-    @socketio.on('saveSettings', namespace='/settings')
-    def handle_save_settings(args, data):
-        print('settings saving for: ' + args)
-        settings.save_settings(args, data)
-        socketio.emit(args, settings.load_settings(args), namespace='/settings')
+    # Create event handler
+    def register_socketio(module):
+        namespace = f'/{module}'
+        toggle_attr = f'toggle_{module}'
 
-    # Return filtered sensor object to frontend via socket.io
-    @socketio.on('requestSensors', namespace='/settings')
-    def handle_request_settings():
-        sensors = {}
-        sensors.update(settings.load_settings("canbus").get("sensors"))
-        sensors.update(settings.load_settings("adc").get("sensors"))
+        # Emit module Data
+        def emit_data(data):
+            socketio.emit('data', data, namespace=namespace)
 
-        sensor_keys = [sensors[sensor_key].keys() for sensor_key in sensors]
-        common_keys = set(sensor_keys[0]).intersection(*sensor_keys[1:])
-        sensors = {
-                sensor_key: {key: sensors[sensor_key][key] for key in common_keys}
-                for sensor_key in sensors
-        }
-        socketio.emit('sensors', sensors, namespace='/settings')
+        # Save module settings
+        def save_settings(data):
+            print('saving settings for: ' + module)
+            settings.save_settings(module, data)
 
-   # Return CAN status to frontend via socket.io
-    @socketio.on('requestStatus', namespace='/canbus')
-    def emit_can_status():
-        #socketio.emit('status', shared_state.THREAD_STATES["Canbus"], namespace='/canbus')
-        print('status request') 
+        # Emit module settings
+        def load_settings():
+            print(f'emitting settings for {module}')
+            socketio.emit('settings', settings.load_settings(module), namespace=namespace)
 
-    # Return ADC status to frontend via socket.io
-    @socketio.on('requestStatus', namespace='/adc')
-    def emit_adc_status():
-        #socketio.emit('status', shared_state.THREAD_STATES["ADC"], namespace='/adc')
-        print('status request')
+        # Emit module status
+        def emit_state():
+            print(f'emitting state for {module}: ', shared_state.THREAD_STATES[module])
+            socketio.emit('state', shared_state.THREAD_STATES[module], namespace=namespace)
 
-    # Return CAN data via socket.io
-    @socketio.on('data', namespace='/canbus')
-    def handle_can_data(data):
-        socketio.emit('data', data, namespace='/canbus')
+        # Toggle module status
+        def toggle_state():
+            getattr(shared_state, toggle_attr).set()
+            socketio.emit('state', shared_state.THREAD_STATES[module], namespace=namespace)
+            print(f'toggle {module}: ', shared_state.THREAD_STATES[module])
 
-    # Return ADC data via socket.io
-    @socketio.on('data', namespace='/adc')
-    def handle_adc_data(data):
-        socketio.emit('data', data, namespace='/adc')
 
-     # Toggle adc stream
-    @socketio.on('toggle', namespace='/adc')
-    def handle_toggle_request():
-        shared_state.toggle_adc.set()
-        socketio.emit('status', shared_state.THREAD_STATES["ADC"], namespace='/adc')
+        load_settings.__name__  = f'load_settings_{module}'
+        save_settings.__name__  = f'save_settings_{module}'
+        emit_state.__name__     = f'emit_status_{module}'
+        toggle_state.__name__   = f'handle_toggle_{module}'
+        emit_data.__name__      = f'handle_data_{module}'
 
-    # Toggle canbus stream
-    @socketio.on('toggle', namespace='/canbus')
-    def handle_toggle_request():
-        shared_state.toggle_can.set()
-        socketio.emit('status', shared_state.THREAD_STATES["Canbus"], namespace='/canbus')
 
-    # Toggle linbus stream
-    @socketio.on('toggle', namespace='/linbus')
-    def handle_toggle_request():
-        print('toggle lin')
 
-    # Toggle RTI Test
-    @socketio.on('rti', namespace='/system')
-    def handle_toggle_request():
-        if shared_state.rtiStatus == True:
-            shared_state.rtiStatus = False
-        else:
-            shared_state.rtiStatus = True
+        socketio.on_event('load', load_settings, namespace=namespace)
+        socketio.on_event('save', save_settings, namespace=namespace)
+        socketio.on_event('ping', emit_state, namespace=namespace)
+        socketio.on_event('toggle', toggle_state, namespace=namespace)
+        socketio.on_event('data', emit_data, namespace=namespace)
+        
 
-        socketio.emit('rti', shared_state.rtiStatus, namespace='/system')
-        print('toggle rti')
+    # Register modules
+    for module in modules:
+        register_socketio(module)
 
-    @socketio.on('systemTask', namespace='/system')
+
+    # Handle IO tasks
+    @socketio.on('systemTask', namespace='/sys')
     def handle_system_task(args):
         if   args == 'reboot':
             subprocess.run("sudo reboot -h now", shell=True)
         elif args == 'reset':
-            settings.reset_settings("application")
-            socketio.emit("application", settings.load_settings("application"), namespace='/settings')
+            settings.reset_settings("app")
+            socketio.emit("application", settings.load_settings("app"), namespace='/settings')
         elif args == 'quit':
             shared_state.exit_event.set()
         elif args == 'restart':
             shared_state.toggle_can.set()
             shared_state.toggle_adc.set()
-            shared_state.toggle_browser.set()
+            shared_state.toggle_app.set()
             
 
             time.sleep(5)
             
             shared_state.toggle_can.set()
             shared_state.toggle_adc.set()
-            shared_state.toggle_browser.set()
+            shared_state.toggle_app.set()
 
         else:
             print('Unknown action:', args)

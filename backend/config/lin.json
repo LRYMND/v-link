@@ -1,0 +1,14 @@
+{
+    "type": "interface",
+    "name": "lin",
+
+    "channel": "",
+    "bitrate": 0,
+    "timing": {
+        "timeout": 0.1
+    },
+    "commands": {
+        "actions": {
+        }
+    }
+}

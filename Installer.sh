@@ -156,7 +156,19 @@ disable_splash=1
 EOF"
 fi
 
-# Step 9: Append lines to /etc/network/interfaces
+# Step 9: Change hardware acceleration driver in /boot/config.txt
+if confirm_action "update hardware acceleration for HDMI control"; then
+    CONFIG_FILE="/boot/config.txt"
+    
+    if grep -q "dtoverlay=vc4-kms-v3d" "$CONFIG_FILE"; then
+        sudo sed -i 's/dtoverlay=vc4-kms-v3d/dtoverlay=vc4-fkms-v3d/' "$CONFIG_FILE"
+        echo "Replaced vc4-kms-v3d with vc4-fkms-v3d in $CONFIG_FILE"
+    else
+        echo "Error: Line 'dtoverlay=vc4-kms-v3d' not found in $CONFIG_FILE. Screen won't turn off in retracted position."
+    fi
+fi
+
+# Step 10: Append lines to /etc/network/interfaces
 if confirm_action "append lines to /etc/network/interfaces"; then
     sudo bash -c 'cat >> /etc/network/interfaces << EOF
 
@@ -169,11 +181,11 @@ iface can1 can static
 EOF'
 fi
 
-# Step 10: Prompt to reboot the system
+# Step 11: Prompt to reboot the system
 if confirm_action "reboot the system now"; then
     sudo reboot
 else
-    echo "Reboot was skipped. Please reboot manually to apply changes."
+    echo "Reboot was skipped. Please reboot manually to apply all changes."
 fi
 
 echo "All Done"

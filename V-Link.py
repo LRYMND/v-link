@@ -6,13 +6,13 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from backend.dev.vcan            import VCANThread
-from backend.browser             import BrowserThread
-from backend.server              import ServerThread
 
+from backend.server              import ServerThread
+from backend.app                 import APPThread
 from backend.adc                 import ADCThread
 from backend.rti                 import RTIThread
-from backend.canbus              import CANBusThread
-from backend.linbus              import LINBusThread
+from backend.can                 import CANThread
+from backend.lin                 import LINThread
 
 from backend.shared.shared_state import shared_state
 
@@ -20,13 +20,15 @@ class VLINK:
     def __init__(self):
         self.exit_event = shared_state.exit_event
         self.threads = {
-            "VCAN":     VCANThread(),
-            "Browser":  BrowserThread(),
-            "Server":   ServerThread(),
-            "CANBus":   CANBusThread(),
-            "LINBus":   LINBusThread(),
-            "ADC":      ADCThread(),
-            "RTI":      RTIThread(),
+            "server":   ServerThread(),
+
+            "app":      APPThread(),
+            "can":      CANThread(),
+            "lin":      LINThread(),
+            "adc":      ADCThread(),
+            "rti":      RTIThread(),
+
+            "vcan":     VCANThread(),
         }
 
 
@@ -73,22 +75,22 @@ class VLINK:
 
     def process_toggle_event(self):
         if shared_state.toggle_can.is_set():
-            self.toggle_thread("CANBus")
+            self.toggle_thread("can")
             shared_state.toggle_can.clear()
             
         if shared_state.toggle_adc.is_set():
-            self.toggle_thread("ADC")
+            self.toggle_thread("adc")
             shared_state.toggle_adc.clear()
 
-        if shared_state.toggle_browser.is_set():
-            self.toggle_thread("Browser")
-            shared_state.toggle_browser.clear()
+        if shared_state.toggle_app.is_set():
+            self.toggle_thread("app")
+            shared_state.toggle_app.clear()
 
 
     def process_exit_event(self):
         if self.exit_event.is_set():
             self.exit_event.clear()
-            shared_state.toggle_browser.set()
+            shared_state.toggle_app.set()
             time.sleep(1)
             sys.exit(0)
 
@@ -116,7 +118,7 @@ def non_blocking_input(prompt):
 if __name__ == "__main__":
     vlink = VLINK()
 
-    vlink.start_thread("Server")
+    vlink.start_thread("server")
 
     if len(sys.argv) > 1 and sys.argv[1] == "dev":
         shared_state.isDev = True
@@ -124,7 +126,7 @@ if __name__ == "__main__":
         if choice.lower() == 'y':
             shared_state.vCan = True
             print("Starting VCAN...")
-            vlink.toggle_thread("VCAN")
+            vlink.toggle_thread("vcan")
 
         choice = non_blocking_input("Start on Vite-Port 5173? (Y/N): ")
         if choice.lower() == 'y':
@@ -134,15 +136,15 @@ if __name__ == "__main__":
         if choice.lower() == 'n':
             shared_state.isKiosk = False
 
-    vlink.start_thread("CANBus")
+    vlink.start_thread("can")
     time.sleep(.1)
-    vlink.start_thread("RTI")
+    vlink.start_thread("rti")
     time.sleep(.1)
-    #vlink.start_thread("LINBus")
+    #vlink.start_thread("lin")
     time.sleep(.1)
-    vlink.start_thread("ADC")
+    vlink.start_thread("adc")
     time.sleep(3)
-    vlink.start_thread("Browser")
+    vlink.start_thread("app")
 
     vlink.print_thread_states()
 

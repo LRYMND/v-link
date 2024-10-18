@@ -16,7 +16,7 @@ class RTIThread(threading.Thread):
         self.rti()
 
         while not self._stop_event.is_set():
-            if(shared_state.toggle_browser.is_set()):
+            if(shared_state.toggle_app.is_set()):
                 self._stop_event.set()
                 self.stop_thread()
             time.sleep(.1)

@@ -1,13 +1,12 @@
 import { useState, useEffect, } from "react";
-import { ApplicationSettings, Store } from '../../store/Store';
+import { APP } from '../../store/Store';
 
 import "./../../styles.scss"
 import "./../../themes.scss"
 
 const TopBar = () => {
 
-  const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
-  const store = Store((state) => state)
+  const app = APP((state) => state)
 
   const [time, setDate] = useState(new Date());
 
@@ -26,8 +25,8 @@ const TopBar = () => {
 
 
   return (
-    <div className={`topbar ${applicationSettings.app.colorTheme.value}`} style={{
-      height: `${applicationSettings.side_bars.topBarHeight.value}px`,
+    <div className={`topbar ${app.settings.general.colorTheme.value}`} style={{
+      height: `${app.settings.side_bars.topBarHeight.value}px`,
       display: 'flex',
       position: 'absolute',
       flexDirection: 'row',
@@ -41,13 +40,13 @@ const TopBar = () => {
         <div className='column'>
           <div className='row' style={{ justifyContent: 'center' }}>
             <div style={{ display: 'flex', alignItems:'center', gap: '20px' }}>
-              <svg className={`status-icon status-icon--${(store.wifiState ? "active" : "inactive")}`}>
+              <svg className={`status-icon status-icon--${(app.system.wifiState ? "active" : "inactive")}`}>
                 <use xlinkHref="/assets/svg/wifi.svg#wifi"></use>
               </svg>
               <svg className={`status-icon status-icon--${'inactive'}`}>
                 <use xlinkHref="/assets/svg/bluetooth.svg#bluetooth"></use>
               </svg>
-              <svg className={`status-icon status-icon--${(store.phoneState ? "active" : "inactive")}`}>
+              <svg className={`status-icon status-icon--${(app.system.phoneState ? "active" : "inactive")}`}>
                 <use xlinkHref="/assets/svg/phone.svg#phone"></use>
               </svg>
             </div>

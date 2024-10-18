@@ -1,28 +1,23 @@
 import { io } from "socket.io-client";
 
-let sensorSettings;
-let carData
-
-// Connect to the settings namespace to retrieve sensorSettings
-const settingsChannel = io("ws://localhost:4001/settings");
+let settings;
 
 // Connect to the canbus namespace to receive continuous data stream
-const canbusChannel = io("ws://localhost:4001/canbus");
+const canChannel = io("ws://localhost:4001/can");
 
 // Function to handle incoming canbus settings
-const handlesensorSettings = (settings) => {
-    sensorSettings = settings;
-    // Subscribe to the canbus namespace after receiving settings
-    canbusChannel.connect();
+const handlesensorSettings = (data) => {
+    settings = data.sensors;
+    canChannel.connect();
 };
 
 // Function to update car data
-const updateCarData = (data) => {
+const update = (data) => {
     const updatedData = {};
 
-    if (sensorSettings && data != null) {
-        Object.keys(sensorSettings).forEach((key) => {
-            const message = sensorSettings[key];
+    if (settings && data != null) {
+        Object.keys(settings).forEach((key) => {
+            const message = settings[key];
             const vlinkId = message.vlink_id;
             const regex = new RegExp(vlinkId, 'g');
 
@@ -32,31 +27,30 @@ const updateCarData = (data) => {
             }
         });
     }
-    
     return updatedData;
 };
 
 // Function to post updated car data to the main thread
-const postCarDataToMain = (carData) => {
+const postCarDataToMain = (data) => {
     const message = {
         type: 'message',
-        message: carData
+        message: data
       };
 
     postMessage(message);
 };
 
 // Listen for canbus settings
-settingsChannel.on("sensors", handlesensorSettings);
+canChannel.on("settings", handlesensorSettings);
 
 // Listen for continuous data stream from canbus namespace
-canbusChannel.on("data", (data) => {
-    carData = updateCarData(data);
-    postCarDataToMain(carData);
+canChannel.on("data", (data) => {
+    data = update(data);
+    postCarDataToMain(data);
 });
 
 // Send a request for canbus settings
-settingsChannel.emit("requestSensors");
+canChannel.emit("load");
 
 
 

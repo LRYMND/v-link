@@ -1,5 +1,7 @@
 {
-    "version": "1.0",
+    "type": "data",
+    "name": "can",
+
     "timing": {
         "refresh_rate": 0.02,
         "interval": 50,

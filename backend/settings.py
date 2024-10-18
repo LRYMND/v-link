@@ -10,7 +10,7 @@ def load_directory():
     if not os.path.exists(config_directory):
         try:
             os.makedirs(config_directory)
-            print(f"Created directory at: '{config_directory}'")
+            #print(f"Created directory at: '{config_directory}'")
         except Exception as e:
             print(f"Error creating directory: {e}")
             return None
@@ -22,14 +22,14 @@ def load_settings(setting):
     config_directory = load_directory()
 
     # Specify the file path
-    default_settings_file = setting + "_settings.json"
+    default_settings_file = setting + ".json"
     destination_path = os.path.join(config_directory, default_settings_file)
 
     # Load or create the settings file
     if not os.path.exists(destination_path):
         try:
             shutil.copyfile(os.path.join(os.path.dirname(__file__), "config", default_settings_file), destination_path)
-            print(f"Created settings file at: '{destination_path}'")
+            #print(f"Created settings file at: '{destination_path}'")
         except Exception as e:
             print(f"Error copying default settings file: {e}")
             return None
@@ -38,7 +38,7 @@ def load_settings(setting):
     try:
         with open(destination_path, 'r') as file:
             data = json.load(file)
-            print(setting + "-settings loaded.")
+            #print(setting + "-settings loaded.")
             return data
     except Exception as e:
         print(f"Error loading settings from '{destination_path}': {e}")
@@ -49,14 +49,14 @@ def save_settings(setting, data):
     config_directory = load_directory()
 
     # Specify the file path
-    default_settings_file = setting + "_settings.json"
+    default_settings_file = setting + ".json"
     destination_path = os.path.join(config_directory, default_settings_file)
 
     # Save the settings to the JSON file
     try:
         with open(destination_path, 'w') as file:
             json.dump(data, file, indent=4)
-            print(setting + "-settings saved.")
+            #print(setting + "-settings saved.")
     except Exception as e:
         print(f"Error saving settings to '{destination_path}': {e}")
 
@@ -66,12 +66,12 @@ def reset_settings(setting):
     config_directory = load_directory()
 
     # Specify the file paths
-    default_settings_file = setting + "_settings.json"
+    default_settings_file = setting + ".json"
     destination_path = os.path.join(config_directory, default_settings_file)
 
     # Reset the settings to the original state
     try:
         shutil.copyfile(os.path.join(os.path.dirname(__file__), "config", default_settings_file), destination_path)
-        print(f"Reset {setting}-settings to the original state.")
+        #print(f"Reset {setting}-settings to the original state.")
     except Exception as e:
         print(f"Error resetting settings: {e}")

@@ -1,4 +1,4 @@
-import { ApplicationSettings, Store } from '../store/Store';
+import { APP } from '../store/Store';
 
 import Dashboard from './pages/dashboard/Dashboard';
 import Settings from './pages/settings/Settings';
@@ -7,8 +7,7 @@ import "./../themes.scss";
 import "./../styles.scss";
 
 const Content = () => {
-  const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
-  const store = Store((state) => state);
+  const userSettings = APP((state) => state);
 
   const viewMap = {
     Carplay: () => <></>,
@@ -17,20 +16,20 @@ const Content = () => {
   };
 
   const renderView = () => {
-    const Component = viewMap[store.view] || Dashboard;
+    const Component = viewMap[userSettings.view] || Dashboard;
     return <Component />;
   };
 
   return (
     <>
-      {store.startedUp ? (
+      {userSettings.startedUp ? (
         <div className='content' style={{
-          height: `${store.contentSize.height}px`,
-          width: `${store.contentSize.width}px`,
+          height: `${userSettings.contentSize.height}px`,
+          width: `${userSettings.contentSize.width}px`,
           marginTop: `${
-            store.view === "carplay" && applicationSettings.side_bars.topBarAlwaysOn.value
-              ? applicationSettings.app.dashBarHeight.value
-              : applicationSettings.side_bars.topBarHeight.value
+            userSettings.view === "carplay" && userSettings.side_bars.topBarAlwaysOn.value
+              ? userSettings.app.dashBarHeight.value
+              : userSettings.side_bars.topBarHeight.value
           }px`,
           background: 'var(--backgroundColor)',
           fontFamily: 'Helvetica',

@@ -1,6 +1,8 @@
 {
-  "version": "1.0",
-  "app": {
+  "type": "system",
+  "name": "app",
+
+  "general": {
     "label": "Application",
     "colorTheme": {
       "value": "Green",
@@ -43,29 +45,6 @@
       "value": 30,
       "label": "Dashboard Padding"
     }
-  },
-  "carplay": {
-    "label": "Advanced Settings",
-    "fps": 60,
-    "dpi": 140,
-    "width": 800,
-    "height": 480,
-    "lhd": 0,
-    "kiosk": true,
-    "delay": 0
-  },
-  "keyBindings": {
-    "left": "ArrowLeft",
-    "right": "ArrowRight",
-    "selectDown": "Space",
-    "selectUp": "ArrowUp",
-    "back": "Backspace",
-    "down": "ArrowDown",
-    "home": "KeyH",
-    "play": "KeyP",
-    "pause": "KeyO",
-    "next": "KeyN",
-    "prev": "KeyV"
   },
   "constants": {
     "padding": 30,
@@ -164,14 +143,17 @@
   "dash_topbar":{
     "label": "TopBar-Dash",
     "value_1": {
-      "value": "boost",
+      "type": "adc",
+      "value": "pressure",
       "label": "Value 1"
     },
     "value_2": {
+      "type": "can",
       "value": "intake",
       "label": "Value 2"
     },
     "value_3": {
+      "type": "can",
       "value": "coolant",
       "label": "Value 3"
     }

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 
-import { ApplicationSettings, Store } from './store/Store';
+import { APP, MMI } from './store/Store';
+import { Settings } from './Settings'
 
-import Settings from './Settings'
+import { shallow } from 'zustand/shallow'
 
 import Splash from './app/Splash'
 import Content from './app/Content'
@@ -16,24 +17,30 @@ import DashBar from './app/sidebars/DashBar';
 
 import './App.css'
 
+
 function App() {
-  const store = Store((state) => state);
-  const startedUp = Store((state) => state.startedUp);
-  const settings = ApplicationSettings((state) => state.applicationSettings);
+
+  const app = APP((state) => state.system, shallow)
+  const mmi = MMI((state) => state, shallow)
+
   const [commandCounter, setCommandCounter] = useState(0)
   const [keyCommand, setKeyCommand] = useState('')
 
   useEffect(() => {
+    console.log("mmi")
+  }, [mmi]);
+
+  useEffect(() => {
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [settings]);
+  }, []);
 
   const onKeyDown = (event: KeyboardEvent) => {
     console.log(event.code)
-    console.log(settings.keyBindings)
-    if (Object.values(settings!.keyBindings).includes(event.code)) {
-      const action = Object.keys(settings!.keyBindings).find(key =>
-        settings!.keyBindings[key] === event.code
+    console.log(mmi.settings.keyBindings)
+    if (Object.values(mmi.settings!.keyBindings).includes(event.code)) {
+      const action = Object.keys(mmi.settings!.keyBindings).find(key =>
+        mmi.settings!.keyBindings[key] === event.code
       )
       console.log(action)
       if (action !== undefined) {
@@ -52,23 +59,21 @@ function App() {
 
   return (
     <div style={{ overflow: 'hidden' }}>
+        <Settings />
+        <Cardata />
+        <Splash />
 
-      <Settings />
-      <Cardata />
-      <Splash />
+        {app.initialized ?
+          <>
+            {app.interface.dashBar && (<DashBar />)}
+            {/*app.system.topBar && (<TopBar />)*/}
 
-      {startedUp ?
-        <>
-          {store.interface.dashBar && (<DashBar />)}
 
-          {store.interface.topBar && (<TopBar />)}
+            <Carplay commandCounter={commandCounter} command={keyCommand} />
 
-          <Carplay commandCounter={commandCounter} command={keyCommand} />
-
-          {store.interface.content && (<Content />)}
-
-          {store.interface.navBar && (<NavBar />)}
-        </> : <></>}
+            {/*app.system.interface.content && (<Content />)*/}
+            {app.interface.navBar && (<NavBar />)}
+          </> : <></>}
     </div>
   )
 }

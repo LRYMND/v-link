@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { CarData, SensorSettings, ApplicationSettings } from '../../store/Store';
+import { DATA, SensorSettings, APP } from '../../store/Store';
 
 import convert from 'color-convert';
 
@@ -22,9 +22,9 @@ const LineChart = ({
     backgroundColor
 }) => {
 
-    //const label = SensorSettings((state) => state.sensorSettings[sensor].label);
-    const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
-    const config = SensorSettings((state) => state.sensorSettings);
+    //const label = SensorSettings((state) => state.settings[sensor].label);
+    const userSettings = APP((state) => state.userSettings);
+    const config = SensorSettings((state) => state.settings);
     
 
     const datasets = []
@@ -32,13 +32,13 @@ const LineChart = ({
     for (let i = 1; i <= setCount; i++) {
         const key = "value_" + i
 
-        const value = CarData((state) => state.carData[applicationSettings.dash_charts[key].value])
+        const value = DATA((state) => state.data[userSettings.dash_charts[key].value])
 
         datasets[i - 1] = {
-            label: config[applicationSettings.dash_charts[key].value].label,
+            label: config[userSettings.dash_charts[key].value].label,
             color: 'var(--themeDefault)',
-            yMin: config[applicationSettings.dash_charts[key].value].min_value,
-            yMax: config[applicationSettings.dash_charts[key].value].max_value,
+            yMin: config[userSettings.dash_charts[key].value].min_value,
+            yMax: config[userSettings.dash_charts[key].value].max_value,
             data: value,
             interval: 100,  // Update with the desired interval in milliseconds
         }

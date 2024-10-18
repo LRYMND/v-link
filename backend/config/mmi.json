@@ -1,23 +1,27 @@
 {
+    "type": "system",
+    "name": "mmi",
+    "label": "Carplay Settings",
+
     "audioTransferMode": false,
-    "bindings": {
+    "keyBindings": {
+        "left": "ArrowLeft",
+        "right": "ArrowRight",
+        "selectDown": "Space",
+        "selectUp": "ArrowUp",
         "back": "Backspace",
         "down": "ArrowDown",
         "home": "KeyH",
-        "left": "ArrowLeft",
-        "next": "KeyM",
-        "pause": "KeyO",
         "play": "KeyP",
-        "prev": "KeyN",
-        "right": "ArrowRight",
-        "selectDown": "Space"
-    },
+        "pause": "KeyO",
+        "next": "KeyN",
+        "prev": "KeyV"
+      },
     "boxName": "nodePlay",
     "dpi": 160,
     "format": 5,
-    "fps": 20,
+    "fps": 60,
     "hand": 0,
-    "height": 640,
     "iBoxVersion": 2,
     "kiosk": true,
     "mediaDelay": 300,
@@ -37,5 +41,8 @@
     "phoneWorkMode": 2,
     "piMost": false,
     "width": 800,
+    "height": 480,
+    "delay": 0,
+    "lhd": 0,
     "wifiType": "5ghz"
 }

@@ -6,7 +6,7 @@ import subprocess
 import signal
 from .shared.shared_state import shared_state
 
-class BrowserThread(threading.Thread):
+class APPThread(threading.Thread):
     def __init__(self):
         super().__init__()
         self.url = f"http://localhost:{4001 if shared_state.isFlask else 5173}"
@@ -17,14 +17,14 @@ class BrowserThread(threading.Thread):
         self.start_browser()
 
         while not self._stop_event.is_set():
-            if(shared_state.toggle_browser.is_set()):
+            if(shared_state.toggle_app.is_set()):
                 self._stop_event.set()
                 self.stop_thread()
             time.sleep(.1)
 
     def stop_thread(self):
         self.close_browser()
-        shared_state.toggle_browser.clear()
+        shared_state.toggle_app.clear()
 
 
     def start_browser(self):

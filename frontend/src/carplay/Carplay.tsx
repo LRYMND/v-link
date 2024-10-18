@@ -8,7 +8,7 @@ import { useCarplayTouch } from './useCarplayTouch'
 import { InitEvent } from './worker/render/RenderEvents'
 
 import { RotatingLines } from 'react-loader-spinner'
-import { ApplicationSettings, Store } from './../store/Store';
+import { APP, MMI } from './../store/Store';
 
 import "./../styles.scss"
 import "./../themes.scss"
@@ -25,20 +25,19 @@ interface CarplayProps {
 
 function Carplay({ command, commandCounter }: CarplayProps) {
 
-  const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
-  const store = Store((state) => state);
-  const updateStore = Store((state) => state.updateStore);
+  const applicationSettings = APP((state) => state.settings);
+  const systemSettings = APP((state) => state.system);
+  const mmiSettings = MMI((state) => state.settings);
 
-  const width = store.carplaySize.width;
-  const height = store.carplaySize.height;
+  const width = systemSettings.carplaySize.width;
+  const height = systemSettings.carplaySize.height;
 
   const config = {
-    fps: applicationSettings.carplay.fps,
+    fps: mmiSettings.fps,
     width: width,
     height: height,
-    mediaDelay: applicationSettings.carplay.delay
+    mediaDelay: mmiSettings.delay
   }
-
 
   const [isPlugged, setIsPlugged] = useState(false)
   const [deviceFound, setDeviceFound] = useState<Boolean | null>(false)
@@ -103,12 +102,12 @@ function Carplay({ command, commandCounter }: CarplayProps) {
       switch (type) {
         case 'plugged':
           setIsPlugged(true)
-          updateStore({ phoneState: true })
+          systemSettings.update({ phoneState: true })
           break
         case 'unplugged':
           setIsPlugged(false)
-          updateStore({ phoneState: false })
-          updateStore({ carplayState: false })
+          systemSettings.update({ phoneState: false })
+          systemSettings.update({ carplayState: false })
           break
         case 'requestBuffer':
           clearRetryTimeout()
@@ -133,7 +132,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
               stopRecording()
               break
             case CommandMapping.requestHostUI:
-              updateStore({ view: "Dashboard" })
+              applicationSettings.update({ view: "Dashboard" })
           }
           break
         case 'failure':
@@ -174,7 +173,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
       if (device) {
         console.log('starting in check')
         setDeviceFound(true)
-        updateStore({streamState: true})
+        systemSettings.update({streamState: true})
         carplayWorker.postMessage({ type: 'start', payload: { config } })
       } else {
         setDeviceFound(false)
@@ -224,7 +223,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
             position: 'absolute',
             width: '100%',
             height: '100%',
-            display: store.view === "Carplay" ? 'flex' : 'none',
+            display: systemSettings.view === "Carplay" ? 'flex' : 'none',
             justifyContent: 'center',
             alignItems: 'center',
           }}
@@ -280,7 +279,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
           ref={canvasRef}
           id="video"
           style={
-            isPlugged && store.view === "Carplay"
+            isPlugged && systemSettings.view === "Carplay"
               ? { height: '100%', overflow: 'hidden', marginTop: applicationSettings.side_bars.topBarAlwaysOn.value ? applicationSettings.side_bars.topBarHeight.value : 0 }
               : { display: 'none' }
           }

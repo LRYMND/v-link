@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { ApplicationSettings, Store } from '../../../store/Store';
+import { APP } from '../../../store/Store';
 
 import Classic from './classic/Classic';
 import Race from './race/Race';
@@ -12,8 +12,7 @@ import '../../../styles.scss';
 import '../../../themes.scss';
 
 function Dashboard() {
-  const applicationSettings = ApplicationSettings((state) => state.applicationSettings);
-  const store = Store((state) => state);
+  const userSettings = APP((state) => state);
 
   // Component mapping by name
   const componentMap = {
@@ -24,11 +23,11 @@ function Dashboard() {
 
   const components = [Classic, Race, Charts]; // Array of component functions
   const totalPages = components.length; // Calculate the total number of pages
-  const sliderWidth = totalPages * store.contentSize.width;
+  const sliderWidth = totalPages * userSettings.contentSize.width;
   const paginationSize = 15;
 
   // Find the index of the component based on the default dashboard value from settings
-  const componentName = applicationSettings.app.defaultDash.value;
+  const componentName = userSettings.app.defaultDash.value;
   const defaultComponentIndex = components.findIndex(
     (component) => componentMap[componentName] === component
   );
@@ -87,11 +86,11 @@ function Dashboard() {
   }
 
   return (
-    <div className={`dashboard ${applicationSettings.app.colorTheme.value}`}
+    <div className={`dashboard ${userSettings.app.colorTheme.value}`}
       style={{
         position: "relative",
-        width: `${store.contentSize.width}px`,
-        height: `${store.contentSize.height}px`,
+        width: `${userSettings.contentSize.width}px`,
+        height: `${userSettings.contentSize.height}px`,
       }}
     >
       <div
@@ -100,7 +99,7 @@ function Dashboard() {
           display: "flex",
           flexDirection: "row",
           width: `${sliderWidth}px`,
-          height: `${store.contentSize.height - paginationSize}px`,
+          height: `${userSettings.contentSize.height - paginationSize}px`,
           transform: `translateX(-${(currentPageIndex * ((sliderWidth / totalPages)))}px)`,
           transition: "transform 0.5s ease-in-out",
         }}
@@ -112,7 +111,7 @@ function Dashboard() {
       >
         {components.map((Component, index) => (
           <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: `${(sliderWidth / totalPages)}px` }}>
-            <div className='column' style={{ width: `${store.contentSize.width - (applicationSettings.app.dashboardPadding.value * 2)}px`, height: `${store.contentSize.height}px` }}>
+            <div className='column' style={{ width: `${userSettings.contentSize.width - (userSettings.app.dashboardPadding.value * 2)}px`, height: `${userSettings.contentSize.height}px` }}>
               <Component />
             </div>
           </div>
