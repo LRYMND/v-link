@@ -21,14 +21,10 @@ import './App.css'
 function App() {
 
   const app = APP((state) => state.system, shallow)
-  const mmi = MMI((state) => state, shallow)
+  const mmi = MMI((state) => state.settings, shallow)
 
   const [commandCounter, setCommandCounter] = useState(0)
   const [keyCommand, setKeyCommand] = useState('')
-
-  useEffect(() => {
-    console.log("mmi")
-  }, [mmi]);
 
   useEffect(() => {
     document.addEventListener('keydown', onKeyDown)
@@ -36,22 +32,24 @@ function App() {
   }, []);
 
   const onKeyDown = (event: KeyboardEvent) => {
-    console.log(event.code)
-    console.log(mmi.settings.keyBindings)
-    if (Object.values(mmi.settings!.keyBindings).includes(event.code)) {
-      const action = Object.keys(mmi.settings!.keyBindings).find(key =>
-        mmi.settings!.keyBindings[key] === event.code
-      )
-      console.log(action)
-      if (action !== undefined) {
-        setKeyCommand(action)
-        setCommandCounter(prev => prev + 1)
-        if (action === 'selectDown') {
-          console.log('select down')
-          setTimeout(() => {
-            setKeyCommand('selectUp')
-            setCommandCounter(prev => prev + 1)
-          }, 200)
+    if (mmi != null) {
+      console.log(event.code)
+      console.log(mmi.keyBindings)
+      if (Object.values(mmi!.keyBindings).includes(event.code)) {
+        const action = Object.keys(mmi!.keyBindings).find(key =>
+          mmi!.keyBindings[key] === event.code
+        )
+        console.log(action)
+        if (action !== undefined) {
+          setKeyCommand(action)
+          setCommandCounter(prev => prev + 1)
+          if (action === 'selectDown') {
+            console.log('select down')
+            setTimeout(() => {
+              setKeyCommand('selectUp')
+              setCommandCounter(prev => prev + 1)
+            }, 200)
+          }
         }
       }
     }
@@ -59,21 +57,21 @@ function App() {
 
   return (
     <div style={{ overflow: 'hidden' }}>
-        <Settings />
-        <Cardata />
-        <Splash />
+      <Settings />
+      <Cardata />
+      <Splash />
 
-        {app.initialized ?
-          <>
-            {app.interface.dashBar && (<DashBar />)}
-            {/*app.system.topBar && (<TopBar />)*/}
+      {app.initialized ?
+        <>
+          {app.interface.dashBar && (<DashBar />)}
+          {app.interface.topBar && (<TopBar />)}
 
 
-            <Carplay commandCounter={commandCounter} command={keyCommand} />
+          <Carplay commandCounter={commandCounter} command={keyCommand} />
 
-            {/*app.system.interface.content && (<Content />)*/}
-            {app.interface.navBar && (<NavBar />)}
-          </> : <></>}
+          {app.interface.content && (<Content />)}
+          {app.interface.navBar && (<NavBar />)}
+        </> : <></>}
     </div>
   )
 }

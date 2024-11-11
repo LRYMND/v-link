@@ -20,6 +20,9 @@ CORS(server, resources={r"/*": {"origins": "*"}})
 # Socket.io configuration
 socketio = SocketIO(server, cors_allowed_origins="*", async_mode='eventlet')
 
+# Define modules
+modules = ["app", "mmi", "can", "lin", "adc", "rti"]
+
 class ServerThread(threading.Thread):
 
     def __init__(self):
@@ -63,8 +66,7 @@ class ServerThread(threading.Thread):
     def handle_connect():
         print("Client connected")
 
-    # Define modules
-    modules = ["app", "mmi", "can", "lin", "adc", "rti"]
+
 
     # Create event handler
     def register_socketio(module):
@@ -77,24 +79,21 @@ class ServerThread(threading.Thread):
 
         # Save module settings
         def save_settings(data):
-            print('saving settings for: ' + module)
             settings.save_settings(module, data)
 
         # Emit module settings
         def load_settings():
-            print(f'emitting settings for {module}')
             socketio.emit('settings', settings.load_settings(module), namespace=namespace)
 
         # Emit module status
         def emit_state():
-            print(f'emitting state for {module}: ', shared_state.THREAD_STATES[module])
             socketio.emit('state', shared_state.THREAD_STATES[module], namespace=namespace)
 
         # Toggle module status
         def toggle_state():
+            print('toggle')
             getattr(shared_state, toggle_attr).set()
-            socketio.emit('state', shared_state.THREAD_STATES[module], namespace=namespace)
-            print(f'toggle {module}: ', shared_state.THREAD_STATES[module])
+            socketio.emit('state', not shared_state.THREAD_STATES[module], namespace=namespace)
 
 
         load_settings.__name__  = f'load_settings_{module}'
@@ -108,8 +107,9 @@ class ServerThread(threading.Thread):
         socketio.on_event('load', load_settings, namespace=namespace)
         socketio.on_event('save', save_settings, namespace=namespace)
         socketio.on_event('ping', emit_state, namespace=namespace)
-        socketio.on_event('toggle', toggle_state, namespace=namespace)
         socketio.on_event('data', emit_data, namespace=namespace)
+
+        socketio.on_event('toggle', toggle_state, namespace=namespace)
         
 
     # Register modules
@@ -131,13 +131,17 @@ class ServerThread(threading.Thread):
             shared_state.toggle_can.set()
             shared_state.toggle_adc.set()
             shared_state.toggle_app.set()
-            
-
-            time.sleep(5)
-            
-            shared_state.toggle_can.set()
-            shared_state.toggle_adc.set()
-            shared_state.toggle_app.set()
-
+        elif args == 'rti':
+            shared_state.rtiStatus = not shared_state.rtiStatus
+            socketio.emit('state', shared_state.rtiStatus, namespace="/rti")
+            if (shared_state.rtiStatus):
+                os.system("vcgencmd display_power 1")
+            else:
+                os.system("vcgencmd display_power 0")
+        elif args == 'hdmi':
+            if (shared_state.rtiStatus):
+                os.system("vcgencmd display_power 1")
+            else:
+                os.system("vcgencmd display_power 0")
         else:
             print('Unknown action:', args)

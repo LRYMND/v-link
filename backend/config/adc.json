@@ -11,7 +11,7 @@
             "max_value": 10,
             "limit_start": 9,
             "ntc": false,
-            "channel": "P0",
+            "channel": "P1",
             "characteristic": {
                 "0.5": 0,
                 "4.5": 1000
@@ -25,7 +25,7 @@
             "max_value": 140,
             "limit_start": 120,
             "ntc": true,
-            "channel": "P1",
+            "channel": "P0",
             "characteristic": {
                 "44864": -40,
                 "33676": -35,

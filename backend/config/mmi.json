@@ -1,5 +1,5 @@
 {
-    "type": "system",
+    "type": "interface",
     "name": "mmi",
     "label": "Carplay Settings",
 

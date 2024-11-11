@@ -1,5 +1,4 @@
-import { DATA } from '../../store/Store';
-import { useSettings } from '../../Settings';
+import { DATA, APP } from '../../store/Store';
 
 const cos = Math.cos;
 const sin = Math.sin;
@@ -47,10 +46,16 @@ export const RadialGauge = ({
     textColor2 = 'white',
     pivotColor = 'grey',
 }) => {
-
+    
+    // Load Settings
     let value = DATA((state) => state.data[sensor])
-    const settings = useSettings(type)['settings']['sensors'][sensor];
-
+    const modules = APP((state) => state.modules);
+  
+    // Load interface config based on type
+    const store = modules[type];
+    const settings = store ? store((state) => state.settings.sensors[sensor]) : {};
+    const label = settings.label
+  
     const maxValue = settings.max_value
     const limitStart = settings.limit_start
 

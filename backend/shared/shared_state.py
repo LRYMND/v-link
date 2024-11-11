@@ -8,10 +8,12 @@ class SharedState:
         #Global Variables
         self.isDev = False
         self.vCan = False
+
         self.isFlask = True
         self.isKiosk = True
-        self.rtiStatus = True
 
+        self.rtiStatus = False
+        self.hdmiStatus = False
 
         #Thread States:
         self.toggle_app = threading.Event()
@@ -25,9 +27,8 @@ class SharedState:
 
         self.THREAD_STATES = {
             "server":   False,
-            
             "app":      False,
-            "mmi":      False,
+            
             "can":      False,
             "lin":      False,
             "adc":      False,

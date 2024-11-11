@@ -11,26 +11,20 @@ class RTIThread(threading.Thread):
         super().__init__()
         self.rti_serial = serial.Serial('/dev/ttyAMA1', baudrate = 2400, timeout = 1)
         self._stop_event = threading.Event()
+        self.daemon = True
 
     def run(self):
-        self.rti()
-
-        while not self._stop_event.is_set():
-            if(shared_state.toggle_app.is_set()):
-                self._stop_event.set()
-                self.stop_thread()
-            time.sleep(.1)
-
+        self.run_rti()
+        
     def stop_thread(self):
-        shared_state.toggle_rti.clear()
+        self._stop_event.set()
 
     def write(self, byte):
         self.rti_serial.write(byte.to_bytes(1, 'big'))
         time.sleep(0.1)
 
-
-    def rti(self):
-        while True:
+    def run_rti(self):
+        while not self._stop_event.is_set():
             if shared_state.rtiStatus == True:
                 self.write(0x40)
             if shared_state.rtiStatus == False:
@@ -38,3 +32,4 @@ class RTIThread(threading.Thread):
             
             self.write(0x20)
             self.write(0x83)
+        os.system("vcgencmd display_power 0")

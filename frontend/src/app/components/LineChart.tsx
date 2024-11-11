@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { DATA, SensorSettings, APP } from '../../store/Store';
+import { DATA, APP } from '../../store/Store';
 
 import convert from 'color-convert';
 
 import "./../../themes.scss";
 import "./../../styles.scss";
+import App from '../../App';
 
 const LineChart = ({
     setCount,
@@ -22,23 +23,29 @@ const LineChart = ({
     backgroundColor
 }) => {
 
-    //const label = SensorSettings((state) => state.settings[sensor].label);
-    const userSettings = APP((state) => state.userSettings);
-    const config = SensorSettings((state) => state.settings);
-    
+    // Load Settings
+    const Modules = APP((state) => state.modules);
+    const settings = APP((state) => state.settings);
+    const data = DATA((state) => state.data);
+
 
     const datasets = []
 
     for (let i = 1; i <= setCount; i++) {
         const key = "value_" + i
 
-        const value = DATA((state) => state.data[userSettings.dash_charts[key].value])
+        const sensor = settings.dash_charts[key].value                                      // Get sensor (e.g. 'rpm')
+        const value = data[settings.dash_charts[key].value]                                 // Read corresponding live value
 
+        const type = settings.dash_charts[key].type                                         // Get sensor type (e.g. 'can')
+        const config = Modules[type]((state) => state.settings.sensors[sensor]);            // Load sensor configuration
+
+        /* Build dataset based on sensors */
         datasets[i - 1] = {
-            label: config[userSettings.dash_charts[key].value].label,
+            label: config.label,
             color: 'var(--themeDefault)',
-            yMin: config[userSettings.dash_charts[key].value].min_value,
-            yMax: config[userSettings.dash_charts[key].value].max_value,
+            yMin: config.min_value,
+            yMax: config.max_value,
             data: value,
             interval: 100,  // Update with the desired interval in milliseconds
         }
@@ -93,21 +100,21 @@ const LineChart = ({
         const saturationStep = -10;  // -100 to 100
         const brightnessStep = 5;  //    0 to 100
         color_dash_charts = color_dash_charts.replace(/#/g, '');
-    
+
         const hsbColor = convert.hex.hsv(color_dash_charts);
         const variations: string[] = [];
-    
+
         for (let i = 0; i < dataStreams.length; i++) {
             const modifiedHsbColor = [
                 (hsbColor[0] + i * hueStep) % 360,
                 Math.min(100, Math.max(0, hsbColor[1] + saturationStep * i)),
                 Math.min(100, Math.max(0, hsbColor[2] + brightnessStep * i))
             ];
-    
+
             const variationColor = '#' + convert.hsv.hex(modifiedHsbColor);
             variations.push(variationColor);
         }
-    
+
         return variations;
     };
 
@@ -203,7 +210,7 @@ const LineChart = ({
 
     return (
 
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", backgroundColor:`${backgroundColor}`}}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", backgroundColor: `${backgroundColor}` }}>
             {ready ?
                 <div className="chart">
                     <svg width={width} height={height}>

@@ -8,15 +8,15 @@ import "./../../../../styles.scss"
 import "./../../../../themes.scss"
 
 const Charts = () => {
-    const userSettings = APP((state) => state);
+    const app = APP((state) => state);
 
-    const setCount = userSettings.constants.chart_input_current;
+    const setCount = app.settings.constants.chart_input_current;
 
     const [themeDefault, setThemeDefault] = useState()
     const [ready, setReady] = useState(false)
 
     useEffect(() => {
-        const theme = document.querySelector(`.${userSettings.app.colorTheme.value}`);
+        const theme = document.querySelector(`.${app.settings.general.colorTheme.value}`);
         const computedStyles = getComputedStyle(theme);
         setThemeDefault(computedStyles.getPropertyValue('--themeDefault'));
         setReady(true)
@@ -37,7 +37,8 @@ const Charts = () => {
                     boxes.push(
                         <div key={`value_${currentIndex + 1}`} className="column">
                             <ValueBox
-                                sensor={userSettings.dash_charts[`value_${currentIndex + 1}`]?.value}
+                                sensor={app.settings.dash_charts[`value_${currentIndex + 1}`]?.value}
+                                type={app.settings.dash_charts[`value_${currentIndex + 1}`]?.type}
                                 unit={true}
 
                                 textColorDefault={'var(--textColorDefault)'}
@@ -52,8 +53,8 @@ const Charts = () => {
                                 height={"10vh"}
                                 width={"100%"}
 
-                                labelSize={`calc(3vh * ${userSettings.textScale})`}
-                                valueSize={`calc(6vh * ${userSettings.textScale})`}
+                                labelSize={`calc(3vh * ${app.settings.textScale})`}
+                                valueSize={`calc(6vh * ${app.settings.textScale})`}
                             />
                         </div>
                     );
@@ -73,12 +74,12 @@ const Charts = () => {
                     <div className='row'>
                         <LineChart
                             setCount={setCount}
-                            width={userSettings.contentSize.width - userSettings.constants.padding}
-                            height={userSettings.contentSize.height * 0.6}
+                            width={app.system.contentSize.width - app.settings.constants.padding}
+                            height={app.system.contentSize.height * 0.6}
                             padding={70}  // Update with the desired padding
                             tickCountX={5}  // Update with the desired number of X-axis ticks
                             tickCountY={5}  // Update with the desired number of Y-axis ticks
-                            length={userSettings.dash_charts.length.value}
+                            length={app.settings.dash_charts.length.value}
                             backgroundColor={'var(--backgroundColor)'}
                             color_label={'var(--textColorDefault)'}
                             color_xGrid={'var(--textColorDark)'}

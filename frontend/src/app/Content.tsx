@@ -7,7 +7,7 @@ import "./../themes.scss";
 import "./../styles.scss";
 
 const Content = () => {
-  const userSettings = APP((state) => state);
+  const app = APP((state) => state);
 
   const viewMap = {
     Carplay: () => <></>,
@@ -16,20 +16,20 @@ const Content = () => {
   };
 
   const renderView = () => {
-    const Component = viewMap[userSettings.view] || Dashboard;
+    const Component = viewMap[app.system.view] || Dashboard;
     return <Component />;
   };
 
   return (
     <>
-      {userSettings.startedUp ? (
+      {app.system.startedUp ? (
         <div className='content' style={{
-          height: `${userSettings.contentSize.height}px`,
-          width: `${userSettings.contentSize.width}px`,
+          height: `${app.system.contentSize.height}px`,
+          width: `${app.system.contentSize.width}px`,
           marginTop: `${
-            userSettings.view === "carplay" && userSettings.side_bars.topBarAlwaysOn.value
-              ? userSettings.app.dashBarHeight.value
-              : userSettings.side_bars.topBarHeight.value
+            app.system.view === "carplay" && app.settings.side_bars.dashBar.value
+              ? app.settings.dashBarHeight.value
+              : app.settings.side_bars.topBarHeight.value
           }px`,
           background: 'var(--backgroundColor)',
           fontFamily: 'Helvetica',

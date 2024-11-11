@@ -25,18 +25,17 @@ interface CarplayProps {
 
 function Carplay({ command, commandCounter }: CarplayProps) {
 
-  const applicationSettings = APP((state) => state.settings);
-  const systemSettings = APP((state) => state.system);
-  const mmiSettings = MMI((state) => state.settings);
+  const app = APP((state) => state);
+  const mmi = MMI((state) => state);
 
-  const width = systemSettings.carplaySize.width;
-  const height = systemSettings.carplaySize.height;
+  const width = app.system.carplaySize.width
+  const height = app.system.carplaySize.height
 
   const config = {
-    fps: mmiSettings.fps,
+    fps: mmi.settings.fps,
     width: width,
     height: height,
-    mediaDelay: mmiSettings.delay
+    mediaDelay: mmi.settings.delay
   }
 
   const [isPlugged, setIsPlugged] = useState(false)
@@ -102,12 +101,12 @@ function Carplay({ command, commandCounter }: CarplayProps) {
       switch (type) {
         case 'plugged':
           setIsPlugged(true)
-          systemSettings.update({ phoneState: true })
+          app.update({system : { phoneState: true }})
           break
         case 'unplugged':
           setIsPlugged(false)
-          systemSettings.update({ phoneState: false })
-          systemSettings.update({ carplayState: false })
+          app.update({system: { phoneState: false }})
+          app.update({system: { carplayState: false }})
           break
         case 'requestBuffer':
           clearRetryTimeout()
@@ -132,7 +131,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
               stopRecording()
               break
             case CommandMapping.requestHostUI:
-              applicationSettings.update({ view: "Dashboard" })
+              app.update({system: { view: "Dashboard" }})
           }
           break
         case 'failure':
@@ -163,7 +162,6 @@ function Carplay({ command, commandCounter }: CarplayProps) {
   }, []);
 
   useEffect(() => {
-    console.log("posting", command)
     carplayWorker.postMessage({ type: 'keyCommand', command: command })
   }, [commandCounter]);
 
@@ -173,7 +171,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
       if (device) {
         console.log('starting in check')
         setDeviceFound(true)
-        systemSettings.update({streamState: true})
+        app.update({system: {streamState: true }})
         carplayWorker.postMessage({ type: 'start', payload: { config } })
       } else {
         setDeviceFound(false)
@@ -208,14 +206,14 @@ function Carplay({ command, commandCounter }: CarplayProps) {
   const isLoading = !isPlugged
 
   useEffect(() => {
-    console.log("isPlugged? ", isPlugged)
+    console.log("Phone connected? ", isPlugged)
   }, [isPlugged])
 
   return (
     <div
       style={{ height: '100%', width: '100%', touchAction: 'none', overflow: 'hidden' }}
       id={'main'}
-      className={`app ${applicationSettings.app.colorTheme.value}`}
+      className={`app ${app.settings.general.colorTheme.value}`}
     >
       {isLoading && (
         <div
@@ -223,7 +221,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
             position: 'absolute',
             width: '100%',
             height: '100%',
-            display: systemSettings.view === "Carplay" ? 'flex' : 'none',
+            display: app.system.view === "Carplay" ? 'flex' : 'none',
             justifyContent: 'center',
             alignItems: 'center',
           }}
@@ -279,8 +277,8 @@ function Carplay({ command, commandCounter }: CarplayProps) {
           ref={canvasRef}
           id="video"
           style={
-            isPlugged && systemSettings.view === "Carplay"
-              ? { height: '100%', overflow: 'hidden', marginTop: applicationSettings.side_bars.topBarAlwaysOn.value ? applicationSettings.side_bars.topBarHeight.value : 0 }
+            isPlugged && app.system.view === "Carplay"
+              ? { height: '100%', overflow: 'hidden', marginTop: app.settings.side_bars.dashBar.value ? app.settings.side_bars.topBarHeight.value : 0 }
               : { display: 'none' }
           }
         />

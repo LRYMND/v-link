@@ -58,8 +58,10 @@ class VLINK:
     def toggle_thread(self, thread_name):
         if shared_state.THREAD_STATES[thread_name]:
             self.stop_thread(thread_name)
+            print('stop thread')
         else:
             self.start_thread(thread_name)
+            print('start thrad')
 
         self.print_thread_states()
 
@@ -77,10 +79,18 @@ class VLINK:
         if shared_state.toggle_can.is_set():
             self.toggle_thread("can")
             shared_state.toggle_can.clear()
+        
+        if shared_state.toggle_lin.is_set():
+            self.toggle_thread("lin")
+            shared_state.toggle_lin.clear()
             
         if shared_state.toggle_adc.is_set():
             self.toggle_thread("adc")
             shared_state.toggle_adc.clear()
+        
+        if shared_state.toggle_rti.is_set():
+            self.toggle_thread("rti")
+            shared_state.toggle_rti.clear()
 
         if shared_state.toggle_app.is_set():
             self.toggle_thread("app")
@@ -90,7 +100,10 @@ class VLINK:
     def process_exit_event(self):
         if self.exit_event.is_set():
             self.exit_event.clear()
+            shared_state.rtiStatus = False
+            time.sleep(5)
             shared_state.toggle_app.set()
+            os.system("vcgencmd display_power 0")
             time.sleep(1)
             sys.exit(0)
 
@@ -140,7 +153,7 @@ if __name__ == "__main__":
     time.sleep(.1)
     vlink.start_thread("rti")
     time.sleep(.1)
-    #vlink.start_thread("lin")
+    vlink.start_thread("lin")
     time.sleep(.1)
     vlink.start_thread("adc")
     time.sleep(3)
@@ -155,6 +168,7 @@ if __name__ == "__main__":
             time.sleep(.1)
     except KeyboardInterrupt:
             print("\nExiting... Stopping threads.")
+            os.system("vcgencmd display_power 0")
             #vlink.join_threads()
             sys.exit(0)
     

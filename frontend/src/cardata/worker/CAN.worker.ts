@@ -36,7 +36,6 @@ const postCarDataToMain = (data) => {
         type: 'message',
         message: data
       };
-
     postMessage(message);
 };
 

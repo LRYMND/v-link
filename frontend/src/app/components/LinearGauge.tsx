@@ -1,5 +1,5 @@
-import { DATA } from '../../store/Store';
-import { useSettings } from '../../Settings';
+import { useState, useEffect } from 'react';
+import { DATA, APP } from '../../store/Store';
 
 const LinearGauge = ({
     sensor1,
@@ -27,11 +27,17 @@ const LinearGauge = ({
 }) => {
     const SVG_NS = 'http://www.w3.org/2000/svg';
 
+    // Load Settings
     const value1 = DATA((state) => state.data[sensor1])
-    const settings1 = useSettings(type1)['settings']['sensors'][sensor1];
-
     const value2 = DATA((state) => state.data[sensor2])
-    const settings2 = useSettings(type2)['settings']['sensors'][sensor2];
+    const modules = APP((state) => state.modules);
+    
+    // Load interface config based on type
+    const store1 = modules[type1];
+    const settings1 = store1 ? store1((state) => state.settings.sensors[sensor1]) : {};
+
+    const store2 = modules[type2];
+    const settings2 = store2 ? store2((state) => state.settings.sensors[sensor2]) : {};
 
 
     const unit1 = settings1.unit

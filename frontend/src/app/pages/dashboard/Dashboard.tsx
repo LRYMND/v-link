@@ -12,7 +12,8 @@ import '../../../styles.scss';
 import '../../../themes.scss';
 
 function Dashboard() {
-  const userSettings = APP((state) => state);
+  const app = APP((state) => state);
+
 
   // Component mapping by name
   const componentMap = {
@@ -23,11 +24,11 @@ function Dashboard() {
 
   const components = [Classic, Race, Charts]; // Array of component functions
   const totalPages = components.length; // Calculate the total number of pages
-  const sliderWidth = totalPages * userSettings.contentSize.width;
+  const sliderWidth = totalPages * app.system.contentSize.width;
   const paginationSize = 15;
 
   // Find the index of the component based on the default dashboard value from settings
-  const componentName = userSettings.app.defaultDash.value;
+  const componentName = app.settings.general.defaultDash.value;
   const defaultComponentIndex = components.findIndex(
     (component) => componentMap[componentName] === component
   );
@@ -86,11 +87,11 @@ function Dashboard() {
   }
 
   return (
-    <div className={`dashboard ${userSettings.app.colorTheme.value}`}
+    <div className={`dashboard ${app.settings.general.colorTheme.value}`}
       style={{
         position: "relative",
-        width: `${userSettings.contentSize.width}px`,
-        height: `${userSettings.contentSize.height}px`,
+        width: `${app.system.contentSize.width}px`,
+        height: `${app.system.contentSize.height}px`,
       }}
     >
       <div
@@ -99,7 +100,7 @@ function Dashboard() {
           display: "flex",
           flexDirection: "row",
           width: `${sliderWidth}px`,
-          height: `${userSettings.contentSize.height - paginationSize}px`,
+          height: `${app.system.contentSize.height - paginationSize}px`,
           transform: `translateX(-${(currentPageIndex * ((sliderWidth / totalPages)))}px)`,
           transition: "transform 0.5s ease-in-out",
         }}
@@ -111,7 +112,7 @@ function Dashboard() {
       >
         {components.map((Component, index) => (
           <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: `${(sliderWidth / totalPages)}px` }}>
-            <div className='column' style={{ width: `${userSettings.contentSize.width - (userSettings.app.dashboardPadding.value * 2)}px`, height: `${userSettings.contentSize.height}px` }}>
+            <div className='column' style={{ width: `${app.system.contentSize.width - (app.settings.general.dashboardPadding.value * 2)}px`, height: `${app.system.contentSize.height}px` }}>
               <Component />
             </div>
           </div>

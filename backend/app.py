@@ -43,14 +43,13 @@ class APPThread(threading.Thread):
 
     def close_browser(self):
         if self.browser:
-            print(f"Closing Chromium")
+            print(f"Closing App...")
             try:
                 # Use subprocess to run a command that kills the process and its children
                 subprocess.run(['pkill', '-P', str(self.browser.pid)])
                 self.browser.wait()
-                print("Chromium browser closed.")
             except subprocess.CalledProcessError:
                 # Handle possible exceptions
-                print("Failed to close Chromium browser.")
+                print("Failed to close App.")
         else:
             print("Chromium process not found.")

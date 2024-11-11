@@ -144,7 +144,6 @@ class LINThread(threading.Thread):
                 self.currentMillis = int(round(time.time() * 1000))
                 self.read_lin_bus()
                 self.timeout_button()
-                self.rti()
         except KeyboardInterrupt:
             print("LIN bus thread terminated by user.")
         finally:

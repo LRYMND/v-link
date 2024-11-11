@@ -13,21 +13,43 @@ const DATA = create((set) => ({
 const APP = create((set) => ({
   system: {
     version: '2.2.0',
+    view: 'Carplay',
+
     initialized: false,
     startedUp: false,
-    view: 'Carplay',
-    windowSize: { width: 800, height: 480 },
-    contentSize: { width: 800, height: 480 },
-    carplaySize: { width: 800, height: 400 },
-    interface: { dashBar: true, topBar: false, navBar: true, content: false, carplay: false },
-    wifiState: 'inactive',
-    btState: 'inactive',
+
+    windowSize: {
+      width: 800,
+      height: 480 },
+    contentSize: {
+      width: 800,
+      height: 480
+    },
+    carplaySize: {
+      width: 800,
+      height: 460
+    },
+
+    interface: {
+      dashBar: true,
+      topBar: true,
+      navBar: true,
+      content: true,
+      carplay: false
+    },
+
+    wifiState: false,
+    btState: false,
+    
     phoneState: false,
     carplayState: false,
     streamState: false,
+
     canState: false,
+    linState: false,
     adcState: false,
     rtiState: false,
+
     textScale: 'Default',
   },
   settings: {},
