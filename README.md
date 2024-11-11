@@ -235,7 +235,7 @@ The use of this soft- and hardware is at your own risk. The author and distribut
 
 - In a few cases, CarPlay will connect but the stream is not visible. Restarting the app resolves this.
 - In a few cases, CAN bus communication is not working right away. Restarting the app resolves this.
-- Minor scaling issues in the UI thag will be addressed over time.
+- Minor scaling issues in the UI that will be addressed over time.
 
 
 ## 08 | Roadmap
