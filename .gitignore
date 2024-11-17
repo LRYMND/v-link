@@ -6,7 +6,7 @@ venv/
 dist/
 frontend/dist/
 __pycache__/
-dev/
+
 
 
 #files
