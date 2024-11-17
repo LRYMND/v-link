@@ -11,6 +11,10 @@ import { RenderEvent } from './render/RenderEvents'
 import { RingBuffer } from 'ringbuf.js'
 import { createAudioPlayerKey } from './utils'
 
+//This shouldn't be here, try to fix vite.config.ts.....
+import { Buffer } from 'buffer';
+self.Buffer = Buffer;
+
 let carplayWeb: CarplayWeb | null = null
 let videoPort: MessagePort | null = null
 let microphonePort: MessagePort | null = null

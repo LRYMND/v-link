@@ -18,8 +18,7 @@ import DashBar from './app/sidebars/DashBar';
 import './App.css'
 
 
-function App() {
-
+function App() {  
   const app = APP((state) => state.system, shallow)
   const mmi = MMI((state) => state.settings, shallow)
 
