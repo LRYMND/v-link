@@ -38,7 +38,7 @@ def load_settings(setting):
     try:
         with open(destination_path, 'r') as file:
             data = json.load(file)
-            #print(setting + "-settings loaded.")
+            print(setting + "-settings loaded.")
             return data
     except Exception as e:
         print(f"Error loading settings from '{destination_path}': {e}")

@@ -1,30 +1,15 @@
 import threading
 import time
+import sys
 import serial
 import pyautogui
+from . import settings
 from .shared.shared_state import shared_state
 
 class Config:
-    # Constants
-    JOYSTICK_UP = b'\x01'
-    JOYSTICK_DOWN = b'\x02'
-    JOYSTICK_LEFT = b'\x04'
-    JOYSTICK_RIGHT = b'\x08'
-    BUTTON_BACK = b'\x01'
-    BUTTON_ENTER = b'\x08'
-    BUTTON_NEXT = b'\x10'
-    BUTTON_PREV = b'\x02'
+    def __init__(self):
+        self.linSettings = settings.load_settings("lin")
 
-    SYNC_ID = b'\x55'
-    SWM_ID = b'\x20'
-
-    ON_CLICK_DURATION = 100
-    OFF_CLICK_DURATION = 3000
-    SWITCH_MOUSE_CLICK_DURATION = 2000
-    CLICK_TIMEOUT = 300
-    MOUSE_BASE_SPEED = 8
-    MOUSE_SPEEDUP = 3
-    RTI_INTERVAL = 100
 
 class LinFrame:
     kMaxBytes = 8
@@ -35,11 +20,11 @@ class LinFrame:
     def append_byte(self, b):
         self.bytes.append(b)
 
-    def pop_byte(self):
-        return self.bytes.pop()
-
     def get_byte(self, index):
         return self.bytes[index]
+
+    def pop_byte(self):
+        return self.bytes.pop()
 
     def num_bytes(self):
         return len(self.bytes)
@@ -47,109 +32,75 @@ class LinFrame:
     def reset(self):
         self.bytes = []
 
-    def computeChecksum(self):
-        # LIN V2 checksum includes the ID byte, V1 does not.
-        # startByteIndex = 0 if custom_defs.kUseLinChecksumVersion2 else 1
-        startByteIndex = 1
-        p = self.bytes[startByteIndex:]
+    def is_valid(self):
+        return len(self.bytes) >= 6
 
-        # Exclude the checksum byte at the end of the frame.
-        num_bytes_to_checksum = len(p) - 1
+class ButtonHandler:
+    def __init__(self):
+        self.config = Config()
+        self.frame_count = 0
+        self.last_button_name = None
+        self.last_button_time = None
+        print(self.config.linSettings)
+        self.frame_threshold = self.config.linSettings["frame_threshold"]
 
-        # Sum bytes. We should not have 16-bit overflow here since the frame has a limited size.
-        # Convert bytes to integers before summing.
-        sum_value = sum(x if isinstance(x, int) else int.from_bytes(x, 'big') for x in p[:num_bytes_to_checksum])
+        # Convert button and joystick commands from hex strings to bytes and store in dictionaries
+        self.button_codes = {
+            bytes.fromhex("".join(cmd.replace("0x", "") for cmd in command)): name
+            for name, command in self.config.linSettings["commands"]["button"].items()
+        }
+        self.joystick_codes = {
+            bytes.fromhex("".join(cmd.replace("0x", "") for cmd in command)): name
+            for name, command in self.config.linSettings["commands"]["joystick"].items()
+        }
 
-        # Keep adding the high and low bytes until no carry.
-        for _ in range(256):
-            high_byte = (sum_value >> 8) & 0xFF
-            if not high_byte:
-                break
-            sum_value = (sum_value & 0xFF) + high_byte
+    def handle_button_press(self, frame_data):
+        # Look up button name using both button and joystick mappings
+        button_name = self.button_codes.get(frame_data) or self.joystick_codes.get(frame_data)
 
-        return (~sum_value) & 0xFF
+        if button_name:
+            # Check if the button is the same as the last one pressed
+            if button_name == self.last_button_name:
+                self.frame_count += 1
+            else:
+                self.frame_count = 1
+                self.last_button_name = button_name
 
-    def setLinIdChecksumBits(self, id_byte):
-        p1_at_b7 = bytes([0xFF])
-        p0_at_b6 = bytes([0x00])
+            # Check if the frame count exceeds the threshold
+            if self.frame_count >= self.frame_threshold:
+                return button_name, True
+            return button_name, False
+        else:
+            # Reset frame count if no button is detected
+            self.frame_count = 0
+            self.last_button_name = None
 
-        # P1: id5, P0: id4
-        shifter = int.from_bytes(id_byte, 'big') << 2
-        p1_at_b7 = bytes([x ^ shifter & 0xFF for x in p1_at_b7])
-        p0_at_b6 = bytes([x ^ shifter & 0xFF for x in p0_at_b6])
-
-        # P1: id4, P0: id3
-        shifter += shifter
-        p1_at_b7 = bytes([x ^ shifter & 0xFF for x in p1_at_b7])
-
-        # P1: id3, P0: id2
-        shifter += shifter
-        p1_at_b7 = bytes([x ^ shifter & 0xFF for x in p1_at_b7])
-        p0_at_b6 = bytes([x ^ shifter & 0xFF for x in p0_at_b6])
-
-        # P1: id2, P0: id1
-        shifter += shifter
-        p0_at_b6 = bytes([x ^ shifter & 0xFF for x in p0_at_b6])
-
-        # P1: id1, P0: id0
-        shifter += shifter
-        p1_at_b7 = bytes([x ^ shifter & 0xFF for x in p1_at_b7])
-        p0_at_b6 = bytes([x ^ shifter & 0xFF for x in p0_at_b6])
-
-        result = (int.from_bytes(p1_at_b7, 'big') & 0b10000000) | (int.from_bytes(p0_at_b6, 'big') & 0b01000000) | (int.from_bytes(id_byte, 'big') & 0b00111111)
-        return result.to_bytes(1, 'big')
-    
-    def isValid(self):
-        n = len(self.bytes)
-
-        # Check frame size.
-        # One ID byte with optional 1-8 data bytes and 1 checksum byte.
-        # TODO: should we enforce only 1, 2, 4, or 8 data bytes? (total size 1, 3, 4, 6, or 10)
-        #
-        # TODO: should we pass through frames with ID only (n == 1, no response from slave).
-        if n != 1 and (n < 3 or n > 10):
-            return False
-
-        # Check ID byte checksum bits.
-        id_byte = self.bytes[0]
-        if id_byte != self.setLinIdChecksumBits(id_byte):
-            return False
-
-        # If not an ID only frame, check also the overall checksum.
-        #print(n)
-        # if n > 1:
-        #     if self.bytes[n - 1] != self.computeChecksum():
-        #         return False
-
-        # TODO: check protected id.
-        return True
+        return None, False
 
 class LINThread(threading.Thread):
-    def __init__(self):
+    def __init__(self, mode="live", file_path=None):
         super(LINThread, self).__init__()
+        self.config = Config()
+        self.linframe = LinFrame()
+        self.button_handler = ButtonHandler()
+        self.mode = mode
+        self.file_path = file_path
 
-        if(shared_state.rpiModel == 5):
-            self.LINSerial = serial.Serial(port="/dev/ttyAMA0", baudrate=9600, timeout=1)
-        else:
-            self.LINSerial = serial.Serial(port="/dev/ttyS0", baudrate=9600, timeout=1)
+        if mode == "live":
+            if(shared_state.rpiModel == 5):
+                self.LINSerial = serial.Serial(port="/dev/ttyAMA0", baudrate=9600, timeout=1)
+            else:
+                self.LINSerial = serial.Serial(port="/dev/ttyS0", baudrate=9600, timeout=1)
 
         self._stop_event = threading.Event()
         self.daemon = True
         self.linframe = LinFrame()
-        self.config = Config()
 
-        self.currentMillis = self.lastRtiWrite = self.buttonDownAt = self.lastButtonAt = self.lastJoystickButtonAt = 0
-        self.on = self.enableMouse = self.manualOn = False
-        self.currentButton = self.currentJoystickButton = 0
-        self.mouseSpeed = self.config.MOUSE_BASE_SPEED
-        self.rtiStep = 0
-
-    def run(self):
+    def run_lin_bus(self):
         try:
             while not self._stop_event.is_set():
-                self.currentMillis = int(round(time.time() * 1000))
-                self.read_lin_bus()
-                self.timeout_button()
+                if self.LINSerial.in_waiting > 0:
+                    self.process_incoming_byte(self.LINSerial.read(1))
         except KeyboardInterrupt:
             print("LIN bus thread terminated by user.")
         finally:
@@ -159,162 +110,129 @@ class LINThread(threading.Thread):
         print("Stopping LIN bus thread.")
         self._stop_event.set()
 
-    def read_lin_bus(self):
-        if self.LINSerial.in_waiting > 0:
-            b = self.LINSerial.read()
-            n = self.linframe.num_bytes()
-            
-            if b == self.config.SYNC_ID and n > 2 and self.linframe.get_byte(n - 1) == b'\x00':
-                self.linframe.pop_byte()
-                self.handle_swm_frame()
-                self.linframe.reset()
-            elif n == self.linframe.kMaxBytes:
-                self.linframe.reset()
-            else:
-                self.linframe.append_byte(b)
+    def read_from_file(self):
+        print("Replaying LIN bus data from file...")
+        try:
+            with open(self.file_path, "r") as file:
+                for line in file:
+                    frame_data = [int(byte, 16) for byte in line.strip().split()]
+                    for byte in frame_data:
+                        self.process_incoming_byte(byte.to_bytes(1, 'big'))
+                    time.sleep(0.1)
+        except KeyboardInterrupt:
+            print("Replay terminated.")
 
-    def read_lin_bus_from_file(self, file_path):
-        with open(file_path, 'rb') as file:
-            b = file.read(1)
-            
-            while b:
-                n = self.linframe.num_bytes()
-                if b == self.config.SYNC_ID and n > 2 and self.linframe.get_byte(n - 1) == b'\x00':
-                    self.linframe.pop_byte()
-                    self.handle_swm_frame()
-                    self.linframe.reset()
-                elif n == self.linframe.kMaxBytes:
-                    self.linframe.reset()
-                else:
-                    self.linframe.append_byte(b)
+    def process_incoming_byte(self, byte):
+        n = self.linframe.num_bytes()
 
-                # Read the next byte
-                b = file.read(1)
+        # Access SYNC_ID from linSettings and convert it to bytes
+        sync_id = bytes.fromhex(self.config.linSettings["sync_id"][2:])
+        
+        # Check if the incoming byte matches SYNC_ID and conditions for handling the frame
+        if byte == sync_id and n > 2 and self.linframe.get_byte(n - 1) == b'\x00':
+            self.linframe.pop_byte()
+            self.handle_swm_frame()
+            self.linframe.reset()
+        elif n == self.linframe.kMaxBytes:
+            self.linframe.reset()
+        else:
+            self.linframe.append_byte(byte)
 
     def handle_swm_frame(self):
-        if self.linframe.get_byte(0) != self.config.SWM_ID: 
+        # Check SWM_ID in frame against linSettings
+        swm_id = bytes.fromhex(self.config.linSettings["swm_id"][2:])
+        
+        if self.linframe.get_byte(0) != swm_id:
+            return 
+        
+        zero_code = bytes.fromhex(self.linSettings["zero_code"][2:])
+        
+        # If the zero code is matched, return
+        if self.linframe.get_byte(5) == zero_code:
+            return 
+
+        if not self.linframe.is_valid():
             return
 
-        if not self.linframe.isValid():
-            return
-
+        # Handle buttons if the frame is valid
         self.handle_buttons()
-        self.handle_joystick()
+        self.linframe.reset()
 
     def handle_buttons(self):
-        button = self.linframe.get_byte(2)
+        # Concatenate bytes to form the frame data
+        frame_data = b"".join(self.linframe.get_byte(i) for i in range(5))
+        checksum = self.linframe.get_byte(5)
+        
+        # Format the frame data for printing/logging
+        formatted_frame_data = " ".join(f"{byte:02X}" for byte in frame_data) + f" {checksum.hex().upper()}"
 
-        if not button:
-            return
-
-        if button != self.currentButton:
-            self.release_button(self.currentButton, self.since(self.buttonDownAt))
-            self.click_button(button)
-
-            self.currentButton = button
-            self.buttonDownAt = self.currentMillis
-
-        self.lastButtonAt = self.currentMillis
-
-    def timeout_button(self):
-        if self.currentButton and self.since(self.lastButtonAt) > self.config.CLICK_TIMEOUT:
-            self.release_button(self.currentButton, self.since(self.buttonDownAt))
-
-    def release_button(self, button, click_duration):
-        if button == self.config.BUTTON_ENTER:
-            if not self.on and click_duration > self.config.ON_CLICK_DURATION:
-                self.manualOn = True
-                self.rti_on()
-        elif button == self.config.BUTTON_BACK:
-            if click_duration > self.config.OFF_CLICK_DURATION:
-                self.manualOn = False
-                self.rti_off()
-        elif button == self.config.BUTTON_PREV:
-            if click_duration > self.config.SWITCH_MOUSE_CLICK_DURATION:
-                if self.enableMouse:
-                    self.enableMouse = False
-                else:
-                    self.enableMouse = True
-
-        self.currentButton = 0
-
-    def click_button(self, button):
-        if not self.on:
-            return
-
-        print('clicking button')
-        if button == self.config.BUTTON_ENTER:
-            if not self.enableMouse:
-                pyautogui.press('space')
-            else:
-                pyautogui.click()
-        elif button == self.config.BUTTON_BACK:
-            pyautogui.press('backspace')
-        elif button == self.config.BUTTON_PREV:
-            pyautogui.press('v')
-        elif button == self.config.BUTTON_NEXT:
-            pyautogui.press('n')
-
-    def handle_joystick(self):
-        if not self.on:
-            return
-
-        button = self.linframe.get_byte(1)
-        self.timeout_joystick_button()
-
-        if button != self.currentJoystickButton:
-            self.currentJoystickButton = button
-            self.mouseSpeed = self.config.MOUSE_BASE_SPEED
-
-            if not self.enableMouse:
-                self.click_joystick(button)
-
-        if not self.enableMouse:
-            return
-
-        if button == self.config.JOYSTICK_UP:
-            self.move_mouse(0, -1)
-        elif button == self.config.JOYSTICK_DOWN:
-            self.move_mouse(0, 1)
-        elif button == self.config.JOYSTICK_LEFT:
-            self.move_mouse(-1, 0)
-        elif button == self.config.JOYSTICK_RIGHT:
-            self.move_mouse(1, 0)
-
-    def click_joystick(self, button):
-        if not self.on:
+        # Check if frame_data matches IGN_KEY_ON from linSettings
+        ign_key_on = bytes.fromhex("".join(self.config.linSettings["ign_on"]))
+        if frame_data == ign_key_on:
             return
         
-        print('emulating joystick')
+        # Get the button name and action activation status
+        button_name, activate_action = self.button_handler.handle_button_press(frame_data)
+        
+        if button_name:
+            if button_name == "BTN_BACK":
+                self.shutdown_frame_count += 1
+                # Access shutdown threshold from linSettings
+                shutdown_threshold = self.config.linSettings["shutdown_threshold"]
 
-        if button == self.config.JOYSTICK_UP:
-            pyautogui.press('H')
-        elif button == self.config.JOYSTICK_DOWN:
-            pyautogui.press('down')
-        elif button == self.config.JOYSTICK_LEFT:
-            pyautogui.press('left')
-        elif button == self.config.JOYSTICK_RIGHT:
-            pyautogui.press('right')
+                if self.shutdown_frame_count >= shutdown_threshold:
+                    if shared_state.rtiStatus:
+                        # Stop RTI thread if running
+                        shared_state.rtiStatus = False
+                        print('[STOP RTI]')
+                    self.shutdown_frame_count = 0
+            else:
+                # Reset shutdown frame count if a different button is pressed
+                self.shutdown_frame_count = 0
 
-        self.lastJoystickButtonAt = self.currentMillis
+            # Perform button actions if action activation is required
+            if activate_action:
+                self.execute_action(button_name)
+                # Uncomment the line below for debugging/logging purposes
+                # print(f"[{formatted_frame_data}] Activated: {button_name}")
+        else:
+            # Log unrecognized frames
+            print(f"Unrecognized frame: {formatted_frame_data}")
 
-    def timeout_joystick_button(self):
-        if self.currentJoystickButton and self.since(self.lastJoystickButtonAt) > self.config.CLICK_TIMEOUT:
-            self.currentJoystickButton = 0
+    def execute_action(self, button_name):
+        match button_name:
+            case "BTN_ENTER":
+                print('Enter')
+                if not shared_state.rtiStatus:
+                    # Start RTI thread here
+                    shared_state.rtiStatus = True
+                    print('[START RTI]')
+            case "BTN_BACK":
+                print('Back')
+            case "BTN_NEXT":
+                print('Next')
+            case "BTN_PREV":
+                print('Previous')
+            case "BTN_VOL_UP":
+                print('Volume up')
+            case "BTN_VOL_DOWN":
+                print('Volume down')
+            case "BTN_UP":
+                print('Joystick up')
+            case "BTN_DOWN":
+                print('Joystick down')
+            case "BTN_LEFT":
+                print('Joystick left')
+            case "BTN_RIGHT":
+                print('Joystick right')
 
-    def move_mouse(self, dx, dy):
-        pyautogui.moveRel(dx * self.mouseSpeed, dy * self.mouseSpeed)
-        self.mouseSpeed += self.config.MOUSE_SPEEDUP
-
-    def rti_on(self):
-        shared_state.rtiStatus = True
-
-    def rti_off(self):
-        shared_state.rtiStatus = False
 
 # Example usage
 if __name__ == "__main__":
-    lin_bus_thread = LINThread()
+    mode = "live" if len(sys.argv) == 1 else "replay"
+    file_path = sys.argv[1] if mode == "replay" else None
+
+    lin_bus_thread = LINThread(mode=mode, file_path=file_path)
     lin_bus_thread.start()
 
     try:
