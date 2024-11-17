@@ -38,6 +38,9 @@ function Carplay({ command, commandCounter }: CarplayProps) {
     mediaDelay: mmi.settings.delay
   }
 
+
+  console.log(config)
+
   const [isPlugged, setIsPlugged] = useState(false)
   const [deviceFound, setDeviceFound] = useState<Boolean | null>(false)
 

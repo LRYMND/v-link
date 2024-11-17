@@ -1,0 +1,13 @@
+Metadata-Version: 2.0
+Name: python3-xlib
+Version: 0.15
+Summary: Python3 X Library
+Home-page: https://github.com/LiuLang/python3-xlib
+Author: LiuLang
+Author-email: gsushzhsosgsu@gmail.com
+License: GPLv2
+Platform: UNKNOWN
+
+python3-xlib is python3 version of python-xlib.
+
+

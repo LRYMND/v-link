@@ -1,6 +1,6 @@
 # backend/ __init__.py
 
-print("Initializing backend...")
+print("Starting V-Link")
 
 # Import modules
 

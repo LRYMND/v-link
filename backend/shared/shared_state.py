@@ -6,6 +6,7 @@ import threading
 class SharedState:
     def __init__(self):
         #Global Variables
+        self.rpiModel = 5
         self.isDev = False
         self.vCan = False
 

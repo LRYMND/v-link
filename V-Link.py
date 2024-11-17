@@ -18,6 +18,7 @@ from backend.shared.shared_state import shared_state
 
 class VLINK:
     def __init__(self):
+        self.detect_rpi()
         self.exit_event = shared_state.exit_event
         self.threads = {
             "server":   ServerThread(),
@@ -30,6 +31,23 @@ class VLINK:
 
             "vcan":     VCANThread(),
         }
+
+    def detect_rpi(self):
+        try:
+            with open("/proc/device-tree/model", "r") as f:
+                model = f.read().strip()
+                for i in range(3, 6):
+                    if "Raspberry Pi " + str(i) in model:
+                        shared_state.rpiModel = i
+                        print("Raspberry Pi " + str(i) + " detected.")
+                        break
+
+                    elif i == 5:
+                        "Device not Recognized, using config for Raspberry Pi 4."
+                        shared_state.rpiModel = 4
+
+        except FileNotFoundError:
+            return "Not running on a Raspberry Pi or file at /proc/device-tree/model not found."
 
 
     def start_thread(self, thread_name):
@@ -130,7 +148,6 @@ def non_blocking_input(prompt):
 
 if __name__ == "__main__":
     vlink = VLINK()
-
     vlink.start_thread("server")
 
     if len(sys.argv) > 1 and sys.argv[1] == "dev":

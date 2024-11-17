@@ -2,6 +2,7 @@ import threading
 import time
 import serial
 import pyautogui
+from .shared.shared_state import shared_state
 
 class Config:
     # Constants
@@ -126,12 +127,17 @@ class LinFrame:
 class LINThread(threading.Thread):
     def __init__(self):
         super(LINThread, self).__init__()
-        
+
+        if(shared_state.rpiModel == 5):
+            self.LINSerial = serial.Serial(port="/dev/ttyAMA0", baudrate=9600, timeout=1)
+        else:
+            self.LINSerial = serial.Serial(port="/dev/ttyS0", baudrate=9600, timeout=1)
+
         self._stop_event = threading.Event()
         self.daemon = True
         self.linframe = LinFrame()
         self.config = Config()
-        self.LINSerial = serial.Serial(port="/dev/ttyS0", baudrate=9600, timeout=1)
+
         self.currentMillis = self.lastRtiWrite = self.buttonDownAt = self.lastButtonAt = self.lastJoystickButtonAt = 0
         self.on = self.enableMouse = self.manualOn = False
         self.currentButton = self.currentJoystickButton = 0
