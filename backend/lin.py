@@ -3,6 +3,7 @@ import time
 import sys
 import serial
 import pyautogui
+from pathlib import Path
 from . import settings
 from .shared.shared_state import shared_state
 
@@ -78,13 +79,14 @@ class ButtonHandler:
         return None, False
 
 class LINThread(threading.Thread):
-    def __init__(self, mode="live", file_path=None):
+    def __init__(self, mode="replay", file_path=(Path(__file__).parent / "lin_bus_dump.txt")):
         super(LINThread, self).__init__()
         self.config = Config()
         self.linframe = LinFrame()
         self.button_handler = ButtonHandler()
         self.mode = mode
         self.file_path = file_path
+        self.LINSerial = None
 
         if mode == "live":
             if(shared_state.rpiModel == 5):
@@ -96,19 +98,27 @@ class LINThread(threading.Thread):
         self.daemon = True
         self.linframe = LinFrame()
 
-    def run_lin_bus(self):
-        try:
-            while not self._stop_event.is_set():
-                if self.LINSerial.in_waiting > 0:
-                    self.process_incoming_byte(self.LINSerial.read(1))
-        except KeyboardInterrupt:
-            print("LIN bus thread terminated by user.")
-        finally:
-            self.LINSerial.close()
+    def run(self):
+                if self.mode == "live":
+                    self.read_from_serial()
+                elif self.mode == "replay":
+                    self.read_from_file()
 
     def stop_thread(self):
         print("Stopping LIN bus thread.")
         self._stop_event.set()
+
+    def read_from_serial(self):
+        print("Starting live LIN bus data collection...")
+        try:
+            while True:
+                if self.LINSerial.in_waiting > 0:
+                    self.process_incoming_byte(self.LINSerial.read(1))
+        except KeyboardInterrupt:
+            print("Live data collection terminated.")
+        finally:
+            if self.LINSerial.is_open:
+                self.LINSerial.close()
 
     def read_from_file(self):
         print("Replaying LIN bus data from file...")
@@ -145,7 +155,7 @@ class LINThread(threading.Thread):
         if self.linframe.get_byte(0) != swm_id:
             return 
         
-        zero_code = bytes.fromhex(self.linSettings["zero_code"][2:])
+        zero_code = bytes.fromhex(self.config.linSettings["zero_code"][2:])
         
         # If the zero code is matched, return
         if self.linframe.get_byte(5) == zero_code:
@@ -167,7 +177,7 @@ class LINThread(threading.Thread):
         formatted_frame_data = " ".join(f"{byte:02X}" for byte in frame_data) + f" {checksum.hex().upper()}"
 
         # Check if frame_data matches IGN_KEY_ON from linSettings
-        ign_key_on = bytes.fromhex("".join(self.config.linSettings["ign_on"]))
+        ign_key_on = bytes.fromhex("".join(cmd.replace("0x", "") for cmd in self.config.linSettings["ign_on"]))
         if frame_data == ign_key_on:
             return
         
@@ -229,11 +239,11 @@ class LINThread(threading.Thread):
 
 # Example usage
 if __name__ == "__main__":
-    mode = "live" if len(sys.argv) == 1 else "replay"
-    file_path = sys.argv[1] if mode == "replay" else None
+    mode =  "replay"
+    file_path = "lin_bus_dump.txt"
 
     lin_bus_thread = LINThread(mode=mode, file_path=file_path)
-    lin_bus_thread.start()
+    lin_bus_thread.run()
 
     try:
         while True:

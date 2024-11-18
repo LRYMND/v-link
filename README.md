@@ -1,5 +1,6 @@
 ![TITLE IMAGE](repo/media/banner.png?raw=true "Banner")  
-![PAGES IMAGE](repo/media/pages.jpg?raw=true "Pages")  
+![PAGES IMAGE](repo/media/pages.jpg?raw=true "Pages")
+  
 The Volvo V-Link project aims to implement Apple CarPlay / Android Auto as well as live vehicle information in an OEM-like fashion. The backbone of the project is the V-Link app which runs natively on RaspberryPi OS. This enables full support of an operating system without the need of installing any 3rd party images which would limit the capabilites of the Raspberry. A custom-made PCB builds the interface between the app and the car. Further information can be found down below.
 
 ![PAGES IMAGE](repo/media/v_link.jpg?raw=true "V-Link") 
