@@ -80,13 +80,15 @@ fi
 # Step 4: Install Volvo V-Link
 if confirm_action "install Boosted Moose V-Link now"; then
     # Step 4.1: Install dependencies
-    sudo apt-get install -y ffmpeg libudev-dev libusb-dev build-essential
+    sudo apt-get install -y ffmpeg libudev-dev libusb-dev build-essential ydotool
     # Step 4.2: Create udev rules
     echo "Creating udev rules"
     USB_RULE_FILE=/etc/udev/rules.d/52-v-link-usb.rules
     SERIAL_RULE_FILE=/etc/udev/rules.d/52-v-link-serial.rules
+    UINPUT_RULE_FILE=/etc/udev/rules.d/52-v-link-uinput.rules
     echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="1314", ATTR{idProduct}=="152*", MODE="0660", GROUP="plugdev"' | sudo tee $USB_RULE_FILE
     echo 'KERNEL=="ttyS0", MODE="0660", GROUP="plugdev"' | sudo tee $SERIAL_RULE_FILE
+    echo 'KERNEL=="uinput", MODE="0660", GROUP="plugdev"' | sudo tee $UINPUT_RULE_FILE
 
     if [[ $? -eq 0 ]]; then
         echo -e "Permissions created\n"

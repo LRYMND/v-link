@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { APP, MMI, CAN, LIN, ADC, RTI } from './store/Store';
+import { ExtraConfig } from './carplay/Config'
 
 const modules = {
   app: APP,
-  mmi: MMI,
+  //mmi: MMI,
   can: CAN,
   lin: LIN,
   adc: ADC,
@@ -12,10 +13,6 @@ const modules = {
 };
 
 const socket = {};
-
-const system = io('ws://localhost:4001/sys');
-system.emit("systemTask", "rti");
-
 
 Object.keys(modules).forEach(module => {
   socket[module] = io(`ws://localhost:4001/${module}`);

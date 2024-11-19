@@ -13,6 +13,8 @@
     "ign_on": ["0x50", "0x0E", "0x00", "0xF1"],
     "frame_threshold": 4,
     "shutdown_threshold": 10,
+    "mouse_speed": 8,
+    "mouse_multiplier": 3,
 
     "commands": {
         "button": {

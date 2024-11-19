@@ -28,6 +28,8 @@ const useCarplayAudio = (
       let player = audioPlayers.get(audioKey)
       if (player) return player
       player = new PcmPlayer(format.frequency, format.channel)
+      console.log(player)
+
       audioPlayers.set(audioKey, player)
       player.volume(defaultAudioVolume)
       player.start()
@@ -58,6 +60,7 @@ const useCarplayAudio = (
             break
           case AudioCommand.AudioMediaStart:
           case AudioCommand.AudioOutputStart:
+            console.log(audio)
             const mediaPlayer = getAudioPlayer(audio)
             mediaPlayer.volume(defaultAudioVolume)
             break

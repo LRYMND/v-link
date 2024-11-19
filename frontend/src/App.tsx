@@ -22,6 +22,7 @@ function App() {
   const app = APP((state) => state.system, shallow)
   const mmi = MMI((state) => state.settings, shallow)
 
+  const [receivingVideo, setReceivingVideo] = useState(false)
   const [commandCounter, setCommandCounter] = useState(0)
   const [keyCommand, setKeyCommand] = useState('')
 
@@ -31,12 +32,12 @@ function App() {
   }, []);
 
   const onKeyDown = (event: KeyboardEvent) => {
-    if (mmi != null) {
+    console.log(event.code)
       console.log(event.code)
-      console.log(mmi.keyBindings)
-      if (Object.values(mmi!.keyBindings).includes(event.code)) {
-        const action = Object.keys(mmi!.keyBindings).find(key =>
-          mmi!.keyBindings[key] === event.code
+      console.log(mmi.bindings)
+      if (Object.values(mmi!.bindings).includes(event.code)) {
+        const action = Object.keys(mmi!.bindings).find(key =>
+          mmi!.bindings[key] === event.code
         )
         console.log(action)
         if (action !== undefined) {
@@ -51,7 +52,6 @@ function App() {
           }
         }
       }
-    }
   }
 
   return (
@@ -66,7 +66,7 @@ function App() {
           {app.interface.topBar && (<TopBar />)}
 
 
-          <Carplay commandCounter={commandCounter} command={keyCommand} />
+          <Carplay receivingVideo={receivingVideo} setReceivingVideo={setReceivingVideo} commandCounter={commandCounter} command={keyCommand} />
 
           {app.interface.content && (<Content />)}
           {app.interface.navBar && (<NavBar />)}

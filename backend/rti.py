@@ -37,4 +37,3 @@ class RTIThread(threading.Thread):
             
             self.write(0x20)
             self.write(0x83)
-        os.system("vcgencmd display_power 0")

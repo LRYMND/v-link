@@ -2,7 +2,7 @@ import threading
 import time
 import sys
 import serial
-import pyautogui
+import uinput
 from pathlib import Path
 from . import settings
 from .shared.shared_state import shared_state
@@ -35,6 +35,7 @@ class LinFrame:
 
     def is_valid(self):
         return len(self.bytes) >= 6
+
 
 class ButtonHandler:
     def __init__(self):
@@ -78,6 +79,7 @@ class ButtonHandler:
 
         return None, False
 
+
 class LINThread(threading.Thread):
     def __init__(self, mode="replay", file_path=(Path(__file__).parent / "lin_bus_dump.txt")):
         super(LINThread, self).__init__()
@@ -87,6 +89,21 @@ class LINThread(threading.Thread):
         self.mode = mode
         self.file_path = file_path
         self.LINSerial = None
+        self.mouseSpeed = self.config.linSettings["mouse_speed"]
+
+        # Initialize uinput device for mouse and keyboard
+        self.device = uinput.Device([
+            uinput.REL_X,        # Relative X axis (horizontal movement)
+            uinput.REL_Y,        # Relative Y axis (vertical movement)
+            uinput.BTN_LEFT,     # Left mouse button
+            uinput.BTN_RIGHT,    # Right mouse button
+            uinput.KEY_BACKSPACE,
+            uinput.KEY_N,
+            uinput.KEY_V,
+            uinput.KEY_F1,
+            uinput.KEY_F2,
+            uinput.KEY_ENTER
+        ])
 
         if mode == "live":
             if(shared_state.rpiModel == 5):
@@ -99,10 +116,10 @@ class LINThread(threading.Thread):
         self.linframe = LinFrame()
 
     def run(self):
-                if self.mode == "live":
-                    self.read_from_serial()
-                elif self.mode == "replay":
-                    self.read_from_file()
+        if self.mode == "live":
+            self.read_from_serial()
+        elif self.mode == "replay":
+            self.read_from_file()
 
     def stop_thread(self):
         print("Stopping LIN bus thread.")
@@ -194,7 +211,6 @@ class LINThread(threading.Thread):
                     if shared_state.rtiStatus:
                         # Stop RTI thread if running
                         shared_state.rtiStatus = False
-                        print('[STOP RTI]')
                     self.shutdown_frame_count = 0
             else:
                 # Reset shutdown frame count if a different button is pressed
@@ -210,36 +226,53 @@ class LINThread(threading.Thread):
             print(f"Unrecognized frame: {formatted_frame_data}")
 
     def execute_action(self, button_name):
-        match button_name:
-            case "BTN_ENTER":
-                print('Enter')
-                if not shared_state.rtiStatus:
-                    # Start RTI thread here
-                    shared_state.rtiStatus = True
-                    print('[START RTI]')
-            case "BTN_BACK":
-                print('Back')
-            case "BTN_NEXT":
-                print('Next')
-            case "BTN_PREV":
-                print('Previous')
-            case "BTN_VOL_UP":
-                print('Volume up')
-            case "BTN_VOL_DOWN":
-                print('Volume down')
-            case "BTN_UP":
-                print('Joystick up')
-            case "BTN_DOWN":
-                print('Joystick down')
-            case "BTN_LEFT":
-                print('Joystick left')
-            case "BTN_RIGHT":
-                print('Joystick right')
+        try:
+            match button_name:
+                case "BTN_ENTER":
+                    print('Enter')
+                    if not shared_state.rtiStatus:
+                        shared_state.rtiStatus = True
+                    self.device.emit(uinput.KEY_ENTER, 1)  # Simulate pressing 'Enter'
+                case "BTN_BACK":
+                    print('Back')
+                    self.device.emit(uinput.KEY_BACKSPACE, 1)  # Simulate pressing backspace
+                case "BTN_NEXT":
+                    print('Next')
+                    self.device.emit(uinput.KEY_N, 1)  # Simulate pressing 'n'
+                case "BTN_PREV":
+                    print('Previous')
+                    self.device.emit(uinput.KEY_V, 1)  # Simulate pressing 'v'
+                case "BTN_VOL_UP":
+                    print('Volume up')
+                    self.device.emit(uinput.KEY_F1, 1)  # Simulate volume up (e.g., F1)
+                case "BTN_VOL_DOWN":
+                    print('Volume down')
+                    self.device.emit(uinput.KEY_F2, 1)  # Simulate volume down (e.g., F2)
+                case "BTN_UP":
+                    print('Joystick up')
+                    self.move_mouse(0, -1)
+                case "BTN_DOWN":
+                    print('Joystick down')
+                    self.move_mouse(0, 1)
+                case "BTN_LEFT":
+                    print('Joystick left')
+                    self.move_mouse(-1, 0)
+                case "BTN_RIGHT":
+                    print('Joystick right')
+                    self.move_mouse(1, 0)
+        except Exception as e:
+            print(f"Error in action: {e}")
+
+    def move_mouse(self, dx, dy):
+        # Move mouse relative to current position using uinput
+        self.device.emit(uinput.REL_X, dx * self.mouseSpeed)
+        self.device.emit(uinput.REL_Y, dy * self.mouseSpeed)
+        self.mouseSpeed += self.config.linSettings["mouse_multiplier"]
 
 
 # Example usage
 if __name__ == "__main__":
-    mode =  "replay"
+    mode = "replay"
     file_path = "lin_bus_dump.txt"
 
     lin_bus_thread = LINThread(mode=mode, file_path=file_path)
@@ -255,4 +288,3 @@ if __name__ == "__main__":
     finally:
         lin_bus_thread.stop_thread()
         lin_bus_thread.join()
-

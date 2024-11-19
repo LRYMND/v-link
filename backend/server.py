@@ -42,7 +42,23 @@ class ServerThread(threading.Thread):
             self.server.stop()
             self.server = None  # Reset self.server to avoid AttributeError
 
+    @staticmethod
+    def toggle_hdmi():
+        # Set commands based on Raspberry Pi model
+        print("toggling")
+        hdmi_on, hdmi_off = (
+            ("wlr-randr --output HDMI-A-1 --on", "wlr-randr --output HDMI-A-1 --off")
+            if shared_state.rpiModel == 5
+            else ("vcgencmd display_power 1", "vcgencmd display_power 0")
+        )
 
+        if  not shared_state.hdmiStatus or not shared_state.rtiStatus:
+            print("off")
+            os.system(hdmi_off)
+        else:
+            print("on")
+            os.system(hdmi_on)
+        
     # Add custom headers to all responses
     @server.after_request
     def after_request(response):
@@ -133,15 +149,13 @@ class ServerThread(threading.Thread):
             shared_state.toggle_app.set()
         elif args == 'rti':
             shared_state.rtiStatus = not shared_state.rtiStatus
+            shared_state.hdmiStatus = shared_state.rtiStatus
+            print("hdmi status", shared_state.hdmiStatus)
+            print("rti status", shared_state.rtiStatus)
             socketio.emit('state', shared_state.rtiStatus, namespace="/rti")
-            if (shared_state.rtiStatus):
-                os.system("vcgencmd display_power 1")
-            else:
-                os.system("vcgencmd display_power 0")
+            ServerThread.toggle_hdmi()
         elif args == 'hdmi':
-            if (shared_state.rtiStatus):
-                os.system("vcgencmd display_power 1")
-            else:
-                os.system("vcgencmd display_power 0")
+            shared_state.hdmiStatus = not shared_state.hdmiStatus
+            ServerThread.toggle_hdmi()
         else:
             print('Unknown action:', args)

@@ -38,8 +38,10 @@
     "react-spinners-kit": "^1.9.1",
     "sass": "^1.69.5",
     "socket.io-client": "^4.7.2",
+    "socketmost": "^2.0.6",
     "stream-browserify": "^3.0.0",
     "typescript": "^5.0.2",
+    "util": "^0.12.5",
     "web-vitals": "^3.4.0",
     "zustand": "^4.4.7"
   },
