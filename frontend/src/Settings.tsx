@@ -59,53 +59,34 @@ export const Settings = () => {
   }, [store['app'].system.initialized]);
 
 
-  /* Handle Content Resize */
-  /*
-  useEffect(() => {
-    const handleResize = () => {
-      if (store['app'].system.initialized) {
-        //console.log('Resize Logic')
-        const topBar = store['app'].settings.side_bars.topBarHeight.value
-        const navBar = store['app'].settings.side_bars.navBarHeight.value
-        const config = (store['app'].settings.side_bars.dashBar.value ? topBar : 0)
-
-        const newContentSize = { width: store['app'].system.windowSize.width, height: (store['app'].system.windowSize.height - (topBar + navBar)) };
-        const newCarplaySize = { width: store['app'].system.windowSize.width, height: store['app'].system.windowSize.height - config };
-
-        store['app'].update({system: {
-          startedUp: true,
-          contentSize: newContentSize,
-          carplaySize: newCarplaySize,
-        }})
-      }
-    };
-
-    handleResize();
-  }, [store['app'].system.initialized])
-  */
-
-
   /* Handle Text Resize */
-  /*
+  
   useEffect(() => {
-    if (initialized) {
-      const multiplier: useStore('app'].user.app.textSize.options = {
-        'Small': .75,
-        'Default': 1,
-        'Large': 1.25,
-      };
 
-      updateStore({ textScale: multiplier[useStore('app'].user.app.textSize.value] })
+    if (store['app'].system.initialized) {
+
+      // Define the text size multiplier options
+      const multiplier = {
+        Small: 0.75,
+        Default: 1,
+        Large: 1.25,
+      };
+      // Access the current text size value
+      const textSize = store['app'].settings.general.textSize.value;
+
+      // Validate and compute the multiplier
+      const textScale = multiplier[textSize] ?? 1; // Default to 1 if the value is invalid
+      store['app'].update({system: {textScale: textScale}})
     }
-  }, [user, initialized])
+  }, [store['app'].system.initialized, store['app'].settings.general])
 
 
   /* Handle Interface Visibility */
   useEffect(() => {
-    if (store.app.system.phoneState && (store.app.system.view === 'Carplay') && store.app != null) {
-      store.app.update({ system: { interface: { topBar: false, navBar: false } } })
-      if (store.app.settings.side_bars.dashBar.value)
-        store.app.update({ system: { interface: { dashBar: true } } })
+    if (store['app'].system.phoneState && (store['app'].system.view === 'Carplay') && store.app != null) {
+      store['app'].update({ system: { interface: { topBar: false, navBar: false } } })
+      if (store['app'].settings.side_bars.dashBar.value)
+        store['app'].update({ system: { interface: { dashBar: true } } })
     } else {
       store['app'].update({ system: { interface: { dashBar: false, topBar: true, navBar: true, content: true, carplay: false } } })
     }

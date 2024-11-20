@@ -43,7 +43,6 @@ class ButtonHandler:
         self.frame_count = 0
         self.last_button_name = None
         self.last_button_time = None
-        print(self.config.linSettings)
         self.frame_threshold = self.config.linSettings["frame_threshold"]
 
         # Convert button and joystick commands from hex strings to bytes and store in dictionaries
@@ -81,13 +80,11 @@ class ButtonHandler:
 
 
 class LINThread(threading.Thread):
-    def __init__(self, mode="replay", file_path=(Path(__file__).parent / "lin_bus_dump.txt")):
+    def __init__(self):
         super(LINThread, self).__init__()
         self.config = Config()
         self.linframe = LinFrame()
         self.button_handler = ButtonHandler()
-        self.mode = mode
-        self.file_path = file_path
         self.LINSerial = None
         self.mouseSpeed = self.config.linSettings["mouse_speed"]
 
@@ -100,25 +97,27 @@ class LINThread(threading.Thread):
             uinput.KEY_BACKSPACE,
             uinput.KEY_N,
             uinput.KEY_V,
-            uinput.KEY_F1,
-            uinput.KEY_F2,
-            uinput.KEY_ENTER
+            uinput.KEY_G,
+            uinput.KEY_B,
+            uinput.KEY_SPACE
         ])
-
-        if mode == "live":
-            if(shared_state.rpiModel == 5):
-                self.LINSerial = serial.Serial(port="/dev/ttyAMA0", baudrate=9600, timeout=1)
-            else:
-                self.LINSerial = serial.Serial(port="/dev/ttyS0", baudrate=9600, timeout=1)
 
         self._stop_event = threading.Event()
         self.daemon = True
         self.linframe = LinFrame()
 
     def run(self):
-        if self.mode == "live":
-            self.read_from_serial()
-        elif self.mode == "replay":
+        if not shared_state.vLin:
+            print("bla")
+            try:
+                if(shared_state.rpiModel == 5):
+                    self.LINSerial = serial.Serial(port="/dev/ttyAMA0", baudrate=9600, timeout=1)
+                else:
+                    self.LINSerial = serial.Serial(port="/dev/ttyS0", baudrate=9600, timeout=1)
+                self.read_from_serial()
+            except Exception as e:
+                print(e)
+        else:
             self.read_from_file()
 
     def stop_thread(self):
@@ -126,11 +125,9 @@ class LINThread(threading.Thread):
         self._stop_event.set()
 
     def read_from_serial(self):
-        print("Starting live LIN bus data collection...")
         try:
-            while True:
-                if self.LINSerial.in_waiting > 0:
-                    self.process_incoming_byte(self.LINSerial.read(1))
+            while not self._stop_event.is_set():
+                self.process_incoming_byte(self.LINSerial.read(1))
         except KeyboardInterrupt:
             print("Live data collection terminated.")
         finally:
@@ -140,8 +137,10 @@ class LINThread(threading.Thread):
     def read_from_file(self):
         print("Replaying LIN bus data from file...")
         try:
-            with open(self.file_path, "r") as file:
+            with open(Path(__file__).parent / "dev/lin_test.txt", "r") as file:
                 for line in file:
+                    if self._stop_event.is_set():
+                        break
                     frame_data = [int(byte, 16) for byte in line.strip().split()]
                     for byte in frame_data:
                         self.process_incoming_byte(byte.to_bytes(1, 'big'))
@@ -228,26 +227,29 @@ class LINThread(threading.Thread):
     def execute_action(self, button_name):
         try:
             match button_name:
+                # Emulate the SWC module as keyboard.
+                # These configurations need to stay hardcoded.
+                # It's possible to configure the actions through the app.
                 case "BTN_ENTER":
                     print('Enter')
                     if not shared_state.rtiStatus:
                         shared_state.rtiStatus = True
-                    self.device.emit(uinput.KEY_ENTER, 1)  # Simulate pressing 'Enter'
+                    self.device.emit(uinput.KEY_SPACE, 1)
                 case "BTN_BACK":
                     print('Back')
-                    self.device.emit(uinput.KEY_BACKSPACE, 1)  # Simulate pressing backspace
+                    self.device.emit(uinput.KEY_BACKSPACE, 1)
                 case "BTN_NEXT":
                     print('Next')
-                    self.device.emit(uinput.KEY_N, 1)  # Simulate pressing 'n'
+                    self.device.emit(uinput.KEY_N, 1)
                 case "BTN_PREV":
                     print('Previous')
-                    self.device.emit(uinput.KEY_V, 1)  # Simulate pressing 'v'
+                    self.device.emit(uinput.KEY_V, 1)
                 case "BTN_VOL_UP":
                     print('Volume up')
-                    self.device.emit(uinput.KEY_F1, 1)  # Simulate volume up (e.g., F1)
+                    self.device.emit(uinput.KEY_G, 1)
                 case "BTN_VOL_DOWN":
                     print('Volume down')
-                    self.device.emit(uinput.KEY_F2, 1)  # Simulate volume down (e.g., F2)
+                    self.device.emit(uinput.KEY_B, 1)
                 case "BTN_UP":
                     print('Joystick up')
                     self.move_mouse(0, -1)
@@ -268,23 +270,3 @@ class LINThread(threading.Thread):
         self.device.emit(uinput.REL_X, dx * self.mouseSpeed)
         self.device.emit(uinput.REL_Y, dy * self.mouseSpeed)
         self.mouseSpeed += self.config.linSettings["mouse_multiplier"]
-
-
-# Example usage
-if __name__ == "__main__":
-    mode = "replay"
-    file_path = "lin_bus_dump.txt"
-
-    lin_bus_thread = LINThread(mode=mode, file_path=file_path)
-    lin_bus_thread.run()
-
-    try:
-        while True:
-            # Your main loop logic here
-            pass
-
-    except KeyboardInterrupt:
-        print("Script terminated by user.")
-    finally:
-        lin_bus_thread.stop_thread()
-        lin_bus_thread.join()

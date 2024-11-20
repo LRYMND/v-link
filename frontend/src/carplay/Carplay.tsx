@@ -32,10 +32,10 @@ function Carplay({ command, commandCounter }: CarplayProps) {
   const height = app.system.carplaySize.height
 
   const config = {
-    fps: mmi.settings.fps,
+    fps: mmi.config.fps,
     width: width,
     height: height,
-    mediaDelay: mmi.settings.delay
+    mediaDelay: mmi.config.delay
   }
 
   const [isPlugged, setIsPlugged] = useState(false)

@@ -1,7 +1,8 @@
 import { create } from 'zustand';
+/*
 import { Stream } from "socketmost/dist/modules/Messages";
 import { DongleConfig } from 'node-carplay/node'
-/*
+
 export enum HandDriveType {
   LHD = 0,
   RHD = 1,
@@ -36,6 +37,7 @@ const DEFAULT_CONFIG = {
     },
   },
 }
+*/
 
 
 const DEFAULT_BINDINGS = {
@@ -46,14 +48,16 @@ const DEFAULT_BINDINGS = {
   down: 'ArrowDown',
   home: 'KeyH',
   play: 'KeyP',
-  pause: 'KeyO',
-  next: 'KeyM',
-  prev: 'KeyN'
+  pause: 'KeyS',
+  next: 'KeyN',
+  prev: 'KeyV'
 }
 
 const EXTRA_CONFIG = {
-  ...DEFAULT_CONFIG,
+  //...DEFAULT_CONFIG,
   kiosk: true,
+  delay: 300,
+  fps: 60,
   camera: '',
   microphone: '',
   piMost: false,
@@ -62,28 +66,21 @@ const EXTRA_CONFIG = {
   most: {},
   canConfig: {}
 }
-*/
-// Initialize store with default values (like EXTRA_CONFIG in index.ts)
+
 const MMI = create<MMIStore>((set) => ({
-  settings: "test", //EXTRA_CONFIG,
+  bindings: DEFAULT_BINDINGS,
+  config: EXTRA_CONFIG,
   saveSettings: (settings) => {
-    // Here, we ensure all settings are properly merged before saving
     const mergedSettings: MMIConfig = {
       //...DEFAULT_CONFIG,
-      ...settings, // Merge incoming settings with defaults
-      bindings: settings.bindings || DEFAULT_BINDINGS, // Ensure bindings are set
+      ...settings,
+      bindings: settings.bindings || DEFAULT_BINDINGS,
     };
-
     set({ settings: mergedSettings });
-    // socket.emit('saveSettings', mergedSettings); // Optionally send updated settings back to the server
   },
   getSettings: () => {
-    // Simulate fetching settings from a backend or service
-    // socket.emit('getSettings'); // Fetch settings from server if applicable
   },
   stream: (stream) => {
-    // Handle streaming data if applicable
-    // socket.emit('stream', stream);
   },
 }));
 
@@ -137,7 +134,7 @@ const APP = create((set) => ({
     adcState: false,
     rtiState: false,
 
-    textScale: 'Default',
+    textScale: 1,
   },
   settings: {},
   modules: {},
@@ -149,57 +146,6 @@ const APP = create((set) => ({
       modules: { ...state.modules, ...newData.modules }
     })),
 }));
-
-/*
-interface MMI {
-  settings: null | ExtraConfig,
-  saveSettings: (settings: ExtraConfig) => void
-  getSettings: () => void
-  stream: (stream: Stream) => void
-}
-  */
-
-/*
-export const useCarplayStore = create<MMI>()((set) =>({
-  settings: null,
-  saveSettings: (settings) => {
-    set(() => ({settings: settings}))
-    //socket.emit('saveSettings', settings)
-  },
-  getSettings: () => {
-    //socket.emit('getSettings')
-  },
-  stream: (stream) => {
-    //socket.emit('stream', stream)
-  }
-}))
-*/
-
-/*
-const MMI = create((set) => ({
-  settings: null as ExtraConfig | null,
-  system: {
-    kiosk: undefined,
-    camera: undefined,
-    microphone: undefined,
-    piMost: undefined,
-    canbus: undefined,
-    bindings: undefined,
-    most: undefined,
-    canConfig: undefined,
-  },
-  
-  settings: {},
-  update: (newData) =>
-    set((state) => ({
-      ...state,
-      system: { ...state.system, ...newData.system },
-      settings: { ...state.settings, ...newData.settings }
-    })),
-    
-}))
-*/
-
 
 
 

@@ -53,8 +53,8 @@ const Charts = () => {
                                 height={"10vh"}
                                 width={"100%"}
 
-                                labelSize={`calc(3vh * ${app.settings.textScale})`}
-                                valueSize={`calc(6vh * ${app.settings.textScale})`}
+                                labelSize={`calc(3vh * ${app.system.textScale})`}
+                                valueSize={`calc(6vh * ${app.system.textScale})`}
                             />
                         </div>
                     );

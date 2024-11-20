@@ -82,13 +82,13 @@ if confirm_action "install Boosted Moose V-Link now"; then
     # Step 4.1: Install dependencies
     sudo apt-get install -y ffmpeg libudev-dev libusb-dev build-essential ydotool
     # Step 4.2: Create udev rules
-    echo "Creating udev rules"
-    USB_RULE_FILE=/etc/udev/rules.d/52-v-link-usb.rules
-    SERIAL_RULE_FILE=/etc/udev/rules.d/52-v-link-serial.rules
-    UINPUT_RULE_FILE=/etc/udev/rules.d/52-v-link-uinput.rules
-    echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="1314", ATTR{idProduct}=="152*", MODE="0660", GROUP="plugdev"' | sudo tee $USB_RULE_FILE
-    echo 'KERNEL=="ttyS0", MODE="0660", GROUP="plugdev"' | sudo tee $SERIAL_RULE_FILE
-    echo 'KERNEL=="uinput", MODE="0660", GROUP="plugdev"' | sudo tee $UINPUT_RULE_FILE
+    echo "Creating combined udev rule"
+    RULE_FILE=/etc/udev/rules.d/42-v-link.rules
+
+    # Write all rules into a single file
+    echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="1314", ATTR{idProduct}=="152*", MODE="0660", GROUP="plugdev"' | sudo tee $RULE_FILE
+    echo 'KERNEL=="ttyS0", MODE="0660", GROUP="plugdev"' | sudo tee -a $RULE_FILE
+    echo 'KERNEL=="uinput", MODE="0660", GROUP="plugdev"' | sudo tee -a $RULE_FILE
 
     if [[ $? -eq 0 ]]; then
         echo -e "Permissions created\n"
@@ -96,18 +96,37 @@ if confirm_action "install Boosted Moose V-Link now"; then
         echo -e "Unable to create permissions\n"
     fi
 
-    # Step 4.3: Download the file
+        # Step 4.3: Add uinput to /etc/modules
+    echo "Enabling uinput"
+    sudo bash -c 'cat >> /etc/systemd/system/uinput.service <<EOF
+[Unit]
+Description=Load uinput module at startup
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/modprobe uinput
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
+EOF'
+
+    sudo systemctl enable uinput.service && systemctl start uinput.service && systemctl daemon-reload
+
+
+    # Step 4.4: Download the file
     download_url="https://github.com/LRYMND/v-link/releases/download/v2.1.0/V-Link.zip"
     output_path="/home/$USER/v-link"
     echo "Downloading files to: $output_path"
     mkdir -p $output_path
     curl -L $download_url --output $output_path/V-Link.zip
 
-    # Step 4.4: Unzip the contents
+    # Step 4.5: Unzip the contents
     echo "Unzipping the contents..."
     unzip $output_path/V-Link.zip -d $output_path
 
-    # Step 4.5: Setup virtual environment
+    # Step 4.6: Setup virtual environment
     cd $output_path
     if [ -d "venv" ]; then
         echo "Virtual environment already exists."
@@ -118,7 +137,7 @@ if confirm_action "install Boosted Moose V-Link now"; then
         . venv/bin/activate
     fi
 
-    # Step 4.6: Install requirements
+    # Step 4.7: Install requirements
     requirements="$output_path/requirements.txt"
     echo "Installing requirements..."
     pip3 install -r $requirements
@@ -138,11 +157,11 @@ if confirm_action "install the custom DTOverlays? (Required for V-Link HAT)"; th
 
     # Download the overlays to the determined directory
     sudo wget -O "$OVERLAY_DIR/vlink.dtbo" \
-        https://github.com/LRYMND/v-link/raw/master/repo/dtoverlays/vlink.dtbo
+        https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/vlink.dtbo
     sudo wget -O "$OVERLAY_DIR/mcp2515-can1.dtbo" \
-        https://github.com/LRYMND/v-link/raw/master/repo/dtoverlays/mcp2515-can1.dtbo
+        https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/mcp2515-can1.dtbo
     sudo wget -O "$OVERLAY_DIR/mcp2515-can2.dtbo" \
-        https://github.com/LRYMND/v-link/raw/master/repo/dtoverlays/mcp2515-can2.dtbo
+        https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/mcp2515-can2.dtbo
 
     echo "Adding autostart entries for CAN at /etc/network/interfaces."
     sudo bash -c 'cat >> /etc/network/interfaces <<EOF
@@ -215,6 +234,7 @@ dtoverlay=gpio-poweroff,gpiopin=0
 
 # No Splash on boot
 disable_splash=1
+dtoverlay=vc4-fkms-v3d
 EOF'
     fi
 fi

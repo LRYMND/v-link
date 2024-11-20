@@ -9,6 +9,7 @@ class SharedState:
         self.rpiModel = 5
         self.isDev = False
         self.vCan = False
+        self.vLin = False
 
         self.isFlask = True
         self.isKiosk = True

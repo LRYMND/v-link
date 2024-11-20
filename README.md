@@ -1,11 +1,10 @@
-![TITLE IMAGE](repo/media/banner.png?raw=true "Banner")  
-![PAGES IMAGE](repo/media/pages.jpg?raw=true "Pages")
+![TITLE IMAGE](resources/media/banner.jpg?raw=true "Banner")  
   
-The Volvo V-Link project aims to implement Apple CarPlay / Android Auto as well as live vehicle information in an OEM-like fashion. The backbone of the project is the V-Link app which runs natively on RaspberryPi OS. This enables full support of an operating system without the need of installing any 3rd party images which would limit the capabilites of the Raspberry. A custom-made PCB builds the interface between the app and the car. Further information can be found down below.
+## Welcome to the Boosted Moose V-Link project!
 
-![PAGES IMAGE](repo/media/v_link.jpg?raw=true "V-Link") 
+Let's face it. MMIs from the 2000s suck. This project aims to implement live vehicle data as well as AndroidAuto/Apple CarPlay in an OEM like fashion and enhance the driving experience of retro cars. The heart of this project is the open source V-Link app. It's running natively on Raspberry Pi OS which enables full support of an OS without the restrictions of 3rd party images. A custom made HAT builds the bridge between the Raspberry Pi and the car and works plug and play with the app.
 
-Want to join development, got any tips for improvement or need help?  
+This project is in ongoing development. Do you want to participate, got any tips for improvement or need help?  
 
 * [Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
 * [V-Link Discord Server](https://discord.gg/V4RQG6p8vM)
@@ -16,8 +15,8 @@ Want to join development, got any tips for improvement or need help?
 <details open="open">
   <summary>Table of Contents</summary>
   <ol>
-    <li><a>| Installation</a></li>
-    <li><a>| V-Link Setup</a></li>
+    <li><a>| App Installation</a></li>
+    <li><a>| HAT Setup</a></li>
     <li><a>| Display Mod</a></li>
     <li><a>| Wiring</a></li>
     <li><a>| Audio</a></li>
@@ -29,21 +28,24 @@ Want to join development, got any tips for improvement or need help?
 
 ---
 
-## 01 | Installation
+## 01 | App Installation
 
 ### > System Requirements:
 ```
-Raspbian 11 Bullseye
-Chromium 116
-Python 3.9.2
+Running on Raspberry Pi 3/4/5
+Raspberry Pi OS 12 (Bookworm)
 ```
+
+For the best user experience a RPi 4 or 5 is recommended.
 
 ---
 
 ### > Run the App:
+
+When using the Installer, all prerequisites and resources should be downloaded automatically.
 ```
 #Download and Install
-wget "https://github.com/LRYMND/v-link/releases/download/v2.1.0/Installer.sh"
+wget "https://github.com/LRYMND/v-link/releases/download/v2.2.0/Installer.sh"
 chmod +x Installer.sh
 ./Installer.sh
 
@@ -56,8 +58,9 @@ python3 /home/$USER/v-link/V-Link.py
 
 #### When updating the app, please remove any entries from these locations:
 ```
-/etc/network/interfaces
+/etc/udev/rules.d/
 /etc/xdg/autostart/
+/etc/network/interfaces
 /home/$USER/.config
 
 /boot/config.txt (RaspberryPi 4)
@@ -75,6 +78,8 @@ pip install -r /home/$USER/v-link/requirements.txt
 ```
 git clone https://github.com/lrymnd/v-link.git
 cd v-link
+python -m venv venv
+source /home/$USER/v-link/venv/bin/activate
 pip install -r requirements.txt
 cd frontend
 npm i & npm run build
@@ -91,7 +96,30 @@ Node v18.12.1
 NPM 8.19.2
 ```
 
-#### Entries in /boot/config.txt:
+#### Entries in /boot/config.txt (Raspberry Pi 3/4):
+
+```
+[V-LINK]
+
+#Enable GPIO 0&1
+disable_poe_fan=1
+force_eeprom_read=0
+
+#Enable devicetree overlays
+dtparam=i2c_arm=on
+dtoverlay=vlink
+dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
+dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
+
+#Configure IGN logic
+dtoverlay=gpio-shutdown,active_low=0,gpio_pull=up,gpio_pin=1
+dtoverlay=gpio-poweroff,gpiopin=0
+
+#No Splash on boot
+disable_splash=1
+```
+
+#### Entries in /boot/firmware/config.txt (Raspberry Pi 5):
 
 ```
 [V-LINK]
@@ -115,39 +143,58 @@ disable_splash=1
 ```
 *(Don't forget to copy the custom overlays from the devicetree folder of this repository to /boot/overlays!)*
 
-## 02 | V-Link Setup
+#### Further Setup:
 
-Here you can find a list of the required hardware. The V-Link Hat is currently not being sold. If you are interested in how to get one I encourage you getting in contact via our Discord channel! The old method which involved more hardware and technical skill is documented further down below. 
+When installing everything manually you need to set up certain features. Below you can find a list of commands to enable all necessary ports and access rights:
 
-#### Mandatory:
-- V-Link Hat
-- Raspberry Pi 4/5
+Enabling CAN:
+```
+sudo ip link set can1 type can bitrate 500000
+sudo ip link set up can1
+
+sudo ip link set can2 type can bitrate 125000
+sudo ip link set up can2
+```
+
+Enabling uinput:
+```
+sudo modprobeuinput
+```
+
+Rules for /etc/udev/rules.d/42-vlink.rules:
+```
+SUBSYSTEM=="usb", ATTR{idVendor}=="1314", ATTR{idProduct}=="152*", MODE="0660", GROUP="plugdev"
+KERNEL=="ttyS0", MODE="0660", GROUP="plugdev"
+KERNEL=="uinput", MODE="0660", GROUP="plugdev"
+```
+
+## 02 | HAT Setup
+
+The V-Link HAT is attached to the Raspberry and builds the interface to the car. On this PCB you have terminals to hook up 12V, IGN, CAN etc. It also implements a safe shutdown functionality which gracefully turns off the Raspberry once ignition is off. In this state it draws a minimum of current so draining your cars battery won‘t be an issue. The LCD Touch Display and the Carlinkit Adapter are plugged into the HDMI / USB port of the raspberry and complete the setup.
+
+![INSTALLATION](resources/schematics/installation.png?raw=true "Installation")  
+
+Here you can find a list of the required hardware. The V-Link HAT is currently only being sold in small batches to interested ones. If you are interested in how to get one I encourage you getting in contact via Discord! The old method which involved more hardware and technical skill is archived in the 2.0.0 branch of this repo. 
+
+#### Mandatory Hardware:
+- V-Link HAT
+- Raspberry Pi 3/4/5
 - OEM P1 RTI Display Unit
 - Carlinkit Adapter
 
- As of now, Carplay is working reliably on the CPC200-CCPA while Android Auto works better on the CPC200-CCPM Dongle. In theory, Android Auto should work on the CCPA version as well but we had mixed results. Keep this in mind when choosing your Carlinkit Adapter.
+ As of now, Carplay is working reliably on the CPC200-CCPA while AndroidAuto works better on the CPC200-CCPM Dongle. In theory, Android Auto should work on the CCPA version as well but we had mixed results. Keep this in mind when choosing your Carlinkit Adapter.
 
-#### Optional:
+## 03 | Display Mod
+
+We currently investigate the possibility of using the OEM LCD unit, however it's recommended to go the extra mile as the proposed display has a much better resolution and supports touch input with an additional panel. The HAT comes with a dedicated 5V pin on the power terminal to run the LCD.
 
 * [LCD Driver](https://de.aliexpress.com/item/4001175095149.html?spm=a2g0o.order_list.0.0.30e65c5fXw0Aa6&gatewayAdapt=glo2deu)
 * [LCD Display](https://de.aliexpress.com/item/32835602509.html?spm=a2g0o.order_list.0.0.30e65c5fXw0Aa6&gatewayAdapt=glo2deu)
 * [6.5" Touch Screen Module](https://www.ebay.de/itm/170981315406)
 
+In order to mod your display you need to disassemble the case and take the OEM components out. Afterwards mount the new Screen in place. A custom 3D-printable bracket for easy installation can be found in the /resources folder. Be aware the the LCD from aliexpress come in different thickness, sadly it's not easy to determine which one you're getting one but if you have the option go for the slimmest variant.
 
-If you want to use the original display, you can find a way to do so in the repositories from laurynas, however, its highly recommended to go the extra mile as it has a much better resolution and also supports touch input with an additional panel.
-
-![PAGES IMAGE](repo/schematics/installation_new.png?raw=true "V-Link Setup")  
-
-The V-Link Hat is attached to the Raspberry and builds the interface to the car. On this PCB you have terminals to hook up 12V, IGN, CAN etc. It also implements a safe shutdown functionality which gracefully turns off the Raspberry once ignition is off. In this state it draws a minimum of current so draining your cars battery won‘t be an issue. The LCD Touch Display and the Carlinkit Adapter are plugged into the HDMI / USB port of the raspberry and complete the setup.
-
-### > DIY Instructions
-
-In case you want to avoid the HAT and build the setup from scratch, please refer to branch 2.0.0 which includes the old schematics and installation instructions.
-
-
-## 03 | Display Mod
-
-In order to mod your display to get a better resolution and touch support, you need to disassemble the case and take the OEM components out. Afterwards mount the new Screen in place. A custom 3D-printable bracket for easy installation is currently in the making!
+![DISPLAY MOUNT](resources/media/display_mount.jpg?raw=true "Display Mount")
 
 ## 04 | Wiring
 
@@ -155,7 +202,12 @@ In order to mod your display to get a better resolution and touch support, you n
 
 One way to connect the HAT to the car is to wire it to the CEM. You can solder - or better re-crimp - the wires directly to the connector. That way you aren't splicing any harnesses and the mod can be undone without damaging anything. The idea is to have an additional harness to the HAT. Keep in mind to choose appropriate diameters for you wire so they can carry the load and still fit in the connector. This is especially critical with the CAN wiring. In the future we want to make this a bit more easy.
 
-The connections below are the bare minimum for the app to function properly:
+![HAT SCHEMATIC](resources/schematics/layout.png?raw=true "HAT Schematic")
+
+![EWD SCHEMATIC](resources/schematics/cem.png?raw=true "EWD Schematic")
+(Borrowed from the original Volvo Electronic Wiring Diagrams)
+
+The connections below are the bare minimum for the app to function properly on the Volvo P1 platform:
 
 ```
 | Connection  | CEM Connector | Pin | HAT     |
@@ -167,20 +219,11 @@ The connections below are the bare minimum for the app to function properly:
 | 12V         | E             | 21  | VBAT    |
 ```
 
-![HAT SCHEMATIC](repo/schematics/hat_1.0.jpg?raw=true "HAT Schematic")
-
-![EWD SCHEMATIC](repo/media/ewdschematic.jpg?raw=true "EWD Schematic")
-(Borrowed from the original Volvo Electronic Wiring Diagrams)
-
-
-
 ### > 4.2 Steering Wheel Controls (WIP)
 
-In order to implement the steering wheel controls, you need to connect the HAT to the LIN bus of your car. The app will convert the signals from the steering wheel buttons to keyboard/mouse HID events.
+In order to implement the steering wheel controls, you need to connect the HAT to the LIN bus of your car. The app will convert the signals from the steering wheel buttons to keyboard/mouse HID events. The easiest place to find the LIN Bus is the "ICM Connector A" behind the waterfall. Either connect a DuPont wire to the associated pin or disassemble the ICM and solder a small wire to it.
 
-The easiest place to find the LIN Bus is the "ICM Connector A" behind the waterfall. Either connect a DuPont wire to the associated pin or disassemble the ICM and solder a small wire to it.
-
- ![ICM_CONNECTOR_IMAGE](repo/media/icm_connector.jpg?raw=true "LIN Connector")
+ ![ICM_CONNECTOR_IMAGE](resources/schematics/icm.png?raw=true "LIN Connector")
 
 #### Control folding mechanism:
 ```
@@ -197,7 +240,7 @@ The easiest place to find the LIN Bus is the "ICM Connector A" behind the waterf
 | 'Joystick' | Navigate    | Control mouse      |
 ```
 
-Holding down 'prev' button for 2 seconds toggles between normal and mouse mode. The button mappings, timeouts etc can be adjusted in the settings file.
+Holding down 'prev' button for 2 seconds toggles between normal and mouse mode. The button mappings can be adjusted in the app.
 
 ---
 
@@ -205,9 +248,9 @@ Holding down 'prev' button for 2 seconds toggles between normal and mouse mode. 
 
 Connect RTI_TX_PIN to the Serial pin of the HAT. Again, either use a DuPont wire or solder directly to the RTI PCB/connector. Don't forget to also connect pin 7 (GND) to a common grounding point.
 
-![RTI_CONNECTOR_IMAGE](repo/media/rti_connector.jpg?raw=true "RTI Connector")
+![RTI_CONNECTOR_IMAGE](resources/schematics/rti.png?raw=true "RTI Connector")
 
-When ignition is turned on, the RTI screen automatically folds up and you can use the joystick on the back of the steering wheel to navigate through CarPlay. When clicking on the 'Enter' button on the back of the steering wheel, the Raspberry sends an ASCII 'space' event (spacebar) to navigate the app. (CarPlay requires this instead of a left click or a return/enter)
+When ignition is turned on, the RTI screen automatically folds up. You can fold it back down through the app or the dedicated steering wheel button. Keep in mind, if your steering wheel module is not connected, you will not be able to bring the screen back up without restarting your car. The LCD will be automatically turned off in the hidden state to save power.
 
 ---
 
@@ -217,7 +260,7 @@ The HAT has an input for up to 4 analog sensors. A preconfigured settings file f
 
 Also, to make life a bit easier, you can connect an USB extension cable to the Raspi and mount it to the removable tray behind the waterfall console. This way you can directly connect peripherals to it.
 
-![USB IMAGE](repo/media/usb.jpg?raw=true "USB")
+![USB IMAGE](resources/media/usb.jpg?raw=true "USB")
 
 ## 05 | Audio
 
@@ -254,9 +297,6 @@ The use of this soft- and hardware is at your own risk. The author and distribut
 - [ ] Implement MOST
 
 ---
-
-![CARPLAY](repo/media/carplay.jpg?raw=true "Carplay") 
-
 #### The project is inspired by the following repositories:
 
 * [volvo-can-gauge](https://github.com/Alfaa123/Volvo-CAN-Gauge)

@@ -5,7 +5,15 @@
   "constants": {
     "padding": 30,
     "chart_input_max": 6,
-    "chart_input_current": 1
+    "chart_input_current": 1,
+
+    "keymap": {
+      "options": [
+        "Classic",
+        "Race",
+        "Charts"
+      ]
+    }
   },
 
   "general": {
@@ -189,6 +197,62 @@
       "type": "can",
       "value": "coolant",
       "label": "Value 3"
+    }
+  },
+
+  "bindings": {
+    "title": "Key Map",
+    "type": "interface",
+
+    "left": {
+      "type": "lin",
+      "value": "ArrowLeft",
+      "label": "Left"
+    },
+    "right": {
+      "type": "lin",
+      "value": "ArrowRight",
+      "label": "Right"
+    },
+    "selectDown": {
+      "type": "lin",
+      "value": "Space",
+      "label": "Select"
+    },
+    "back": {
+      "type": "lin",
+      "value": "Backspace",
+      "label": "Back"
+    },
+    "down": {
+      "type": "lin",
+      "value": "ArrowDown",
+      "label": "Down"
+    },
+    "home": {
+      "type": "lin",
+      "value": "KeyH",
+      "label": "Home"
+    },
+    "play": {
+      "type": "lin",
+      "value": "KeyP",
+      "label": "Play"
+    },
+    "pause": {
+      "type": "lin",
+      "value": "KeyO",
+      "label": "Pause"
+    },
+    "next": {
+      "type": "lin",
+      "value": "KeyN",
+      "label": "Next"
+    },
+    "previous": {
+      "type": "lin",
+      "value": "KeyV",
+      "label": "Previous"
     }
   },
 

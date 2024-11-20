@@ -79,7 +79,7 @@ class VLINK:
             print('stop thread')
         else:
             self.start_thread(thread_name)
-            print('start thrad')
+            print('start thread')
 
         self.print_thread_states()
 
@@ -120,8 +120,14 @@ class VLINK:
             self.exit_event.clear()
             shared_state.rtiStatus = False
             time.sleep(5)
+
             shared_state.toggle_app.set()
-            os.system("vcgencmd display_power 0")
+
+            #if(shared_state.rpiModel == 5):
+            #    os.system("vcgencmd display_power 0")
+            #else:
+            #    os.system("wlr-randr --output HDMI-A-1 --off")
+            
             time.sleep(1)
             sys.exit(0)
 
@@ -158,6 +164,10 @@ if __name__ == "__main__":
             print("Starting VCAN...")
             vlink.toggle_thread("vcan")
 
+        choice = non_blocking_input("Replay LIN-Commands? (Y/N): ")
+        if choice.lower() == 'y':
+            shared_state.vLin = True
+
         choice = non_blocking_input("Start on Vite-Port 5173? (Y/N): ")
         if choice.lower() == 'y':
             shared_state.isFlask = False
@@ -185,7 +195,7 @@ if __name__ == "__main__":
             time.sleep(.1)
     except KeyboardInterrupt:
             print("\nExiting... Stopping threads.")
-            os.system("vcgencmd display_power 0")
+            #os.system("vcgencmd display_power 0")
             #vlink.join_threads()
             sys.exit(0)
     

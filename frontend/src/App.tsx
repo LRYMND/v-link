@@ -20,7 +20,7 @@ import './App.css'
 
 function App() {  
   const app = APP((state) => state.system, shallow)
-  const mmi = MMI((state) => state.settings, shallow)
+  const mmi = MMI((state) => state, shallow)
 
   const [receivingVideo, setReceivingVideo] = useState(false)
   const [commandCounter, setCommandCounter] = useState(0)
@@ -60,7 +60,7 @@ function App() {
       <Cardata />
       <Splash />
 
-      {app.initialized ?
+      {app.startedUp ?
         <>
           {app.interface.dashBar && (<DashBar />)}
           {app.interface.topBar && (<TopBar />)}

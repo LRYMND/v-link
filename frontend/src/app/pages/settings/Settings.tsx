@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { APP } from '../../../store/Store';
 
 import { io } from "socket.io-client";
@@ -8,10 +8,10 @@ import SimpleInput from '../../components/SimpleInput'
 import SimpleSelect from '../../components/SimpleSelect'
 import SimpleLabel from '../../components/SimpleLabel'
 import SimpleCheckbox from '../../components/SimpleCheckbox'
+import SimpleModal from '../../components/SimpleModal';
 
 import "./../../../themes.scss"
 import "./../../../styles.scss"
-import { Console } from 'console';
 
 const appChannel = io("ws://localhost:4001/app")
 const sysChannel = io("ws://localhost:4001/sys")
@@ -33,15 +33,10 @@ const Settings = () => {
 
 
   const [currentSettings, setCurrentSettings] = useState(structuredClone(settings));
-  const [currentSystem, setCurrentSystem] = useState(structuredClone(system));
   const [activeTab, setActiveTab] = useState(1);
 
-  const [forceUpdate, setForceUpdate] = useState(false);
-
-
-  // Countdown Effect
-  const [countdown, setCountdown] = useState(null);
-  const [isCountingDown, setIsCountingDown] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState<ReactNode>(null); // State for modal content
 
   // Create combined data store for dropdown
   const dataStores = {}
@@ -55,6 +50,17 @@ const Settings = () => {
   /* Switch Tabs */
   const handleTabChange = (tabIndex) => {
     setActiveTab(tabIndex);
+  };
+
+  /* Open Modal */
+  const openModal = () => {  
+    // Open the modal with dynamic content
+    setModalContent(
+      <div>
+        <p><strong>Press a Key or ESC.</strong>.</p>
+      </div>
+    );
+    setIsModalOpen(true);
   };
 
   /* Add Settings */
@@ -110,14 +116,20 @@ const Settings = () => {
 
 
   /* Change Settings */
-  const handleSettingChange = (key, newStore, name, targetSetting, currentSettings) => {
+  const handleSettingChange = (selectStore, key, name, targetSetting, currentSettings) => {
+    console.log(selectStore, key, name, targetSetting, currentSettings, dataStores)
     const newSettings = structuredClone(currentSettings);
-    const convertedValue = Object.keys(dataStores[newStore]).find(
-      (messageKey) => dataStores[newStore][messageKey].label === targetSetting
-    );
+    let convertedValue
+      if(selectStore != 'app') {
+        convertedValue = Object.keys(dataStores[selectStore]).find(
+        (messageKey) => dataStores[selectStore][messageKey].label === targetSetting
+      );
+      newSettings[key][name].value = convertedValue || targetSetting;
+      newSettings[key][name].type = selectStore;
+    } else {
+      newSettings[key][name].value = targetSetting
+    }
 
-    newSettings[key][name].value = convertedValue || targetSetting;
-    newSettings[key][name].type = newStore;
     setCurrentSettings(newSettings);
   };
 
@@ -164,11 +176,10 @@ const Settings = () => {
 
     if (!settingsObj) return null;
 
-    // Get label, type and nested options from setting block
+    // Get label, type, and nested options from setting block
     const { title, type, ...nestedSettings } = settingsObj[key];
 
     const nestedElements = Object.entries(nestedSettings).map(([setting, content]) => {
-
       let value, label;
       const dataOptions = {}
 
@@ -187,26 +198,58 @@ const Settings = () => {
         value = content.value                                    // NO?  Grab value from "system"-store
       }
 
-
-      // Get dropdown options
-      const options = (typeof value === 'number' || typeof value === 'boolean')   //Check if value is a number or boolean
-        ? null                                                                    //Yes? set value to null
-        : (content.options || Object.keys(dataOptions).map((key) =>               //No?  set value to content.options or grab the sensors from dataOptions
+      // Get options
+      //Check if value is a number or boolean
+      const dropdown = (typeof value === 'number' || typeof value === 'boolean' || key === 'bindings') 
+        ? null                                                                    //Yes? Return null
+        : (content.options || Object.keys(dataOptions).map((key) =>               //No?  Create dropdown from options
           key
-        ))
-               
+        ))              
       // Check for boolean setting
       const isBoolean = typeof value === 'boolean';                               // Checks if the setting is a boolean.
+      const isBinding = key === 'bindings'
 
       const handleChange = (event) => {
         const { name, value, checked, type } = event.target;                      // Grab info from the handler
+        console.log(name, value, checked, type)
         const newValue = type === 'checkbox' ? checked :                          // Check if type is a boolean
                          type === 'number' ? Number(value) : value;               // Check if type is a number
 
-        const newStore = dataOptions[newValue]                                    // Define store for selected setting. E.g. "Boost" -> "Oil Pressure" requires a change from "can" to "adc" store.
-        const targetSetting = isBoolean ? checked : newValue                      // Handle targetSetting based on type
+        console.log(dataOptions)
+        console.log(newValue)
 
-        handleSettingChange(key, newStore, name, targetSetting, settingsObj);     // Execute change of settings
+        //const newStore = dataOptions[newValue]                                    // Define store for selected setting. E.g. "Boost" -> "Oil Pressure" requires a change from "can" to "adc" store.
+        let selectStore
+        if (Object.keys(dataOptions).length > 1) {
+          selectStore = dataOptions[newValue]
+        } else {
+          selectStore = "app"
+        }
+
+        const targetSetting = isBoolean ? checked : newValue                      // Handle targetSetting based on type
+        console.log(selectStore, key, name, targetSetting, currentSettings)
+
+        handleSettingChange(selectStore, key, name, targetSetting, settingsObj);     // Execute change of settings
+      };
+
+      /*
+      const handleBinding = () => {
+        console.log("Press key to change binding")
+      };
+      */
+
+      const handleBinding = (setting) => {
+        openModal();
+        // Define the key press handler
+        const handleKeyPress = (event) => {
+          const pressedKey = event.code; // Get the key code
+          if(event.code != 'Escape') handleSettingChange("app", "bindings", setting, pressedKey, settingsObj);
+          setIsModalOpen(false); // Close the modal
+          document.removeEventListener('keydown', handleKeyPress); // Clean up listener
+        };
+      
+        // Add event listener for key press
+        document.addEventListener('keydown', handleKeyPress);
       };
 
       return (
@@ -220,11 +263,11 @@ const Settings = () => {
 
           <span className='divider'></span>
           <div className='column' style={{ flex: '0 0 40%', justifyContent: 'center', alignItems: 'center' }}>
-            {options ? (
+            {dropdown ? (
               <SimpleSelect
                 name={setting}
                 value={value}
-                options={options}
+                options={dropdown}
                 onChange={handleChange}
                 textSize={2.2}
                 textScale={system.textScale}
@@ -242,18 +285,28 @@ const Settings = () => {
                   borderColor={'var(--boxColorDarker)'}
                   isActive={true}
                 />
-              ) : (
-                <SimpleInput
-                  type='number'
-                  name={setting}
-                  value={value}
-                  onChange={handleChange}
-                  textSize={2.2}
-                  textScale={system.textScale}
-                  textColor={'var(--textColorDefault)'}
-                  isActive={true}
+              ) :
+              isBinding ? (
+                <SimpleButton
+                text={value}
+                textSize={2.2}
+                textScale={system.textScale}
+                textColor={'var(--textColorDefault)'}
+                isActive={true}
+                onClick={() => { handleBinding(setting)}}
+                backgroundColor={'var(--boxColorDarker)'}
                 />
-              )
+              ) :
+                <SimpleInput
+                type='number'
+                name={setting}
+                value={value}
+                onChange={handleChange}
+                textSize={2.2}
+                textScale={system.textScale}
+                textColor={'var(--textColorDefault)'}
+                isActive={true}
+              />
             )}
           </div>
         </div>
@@ -282,6 +335,10 @@ const Settings = () => {
 
   return (
     <>
+      <SimpleModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        {modalContent}
+      </SimpleModal>
+
       <div className={`settings ${settings.general.colorTheme.value}`} style={{
         width: '100%',
         height: '100%',
@@ -404,7 +461,7 @@ const Settings = () => {
                       height={'100%'}
                       text={<b>DATA</b>}
                       textSize={2.5}
-                      textScale={settings.textScale}
+                      textScale={system.textScale}
                       textColor={activeTab === 2 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
                       isActive={true}
                       backgroundColor={activeTab === 2 ? 'var(--boxColorDark)' : 'var(--boxColorDarker)'}
@@ -415,7 +472,7 @@ const Settings = () => {
                       height={'100%'}
                       text={<b>INTERFACE</b>}
                       textSize={2.5}
-                      textScale={settings.textScale}
+                      textScale={system .textScale}
                       textColor={activeTab === 3 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
                       isActive={true}
                       backgroundColor={activeTab === 3 ? 'var(--boxColorDark)' : 'var(--boxColorDarker)'}
@@ -576,8 +633,7 @@ const Settings = () => {
 
                         {activeTab === 3 &&
                           <>
-                            {/*renderSetting("mmi", currentSettings)*/}
-                            Hallo
+                            {renderSetting("bindings", currentSettings)}
                             <p />
                           </>
                         }
