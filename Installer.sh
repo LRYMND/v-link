@@ -80,7 +80,7 @@ fi
 # Step 4: Install Volvo V-Link
 if confirm_action "install Boosted Moose V-Link now"; then
     # Step 4.1: Install dependencies
-    sudo apt-get install -y ffmpeg libudev-dev libusb-dev build-essential ydotool
+    sudo apt-get install -y ffmpeg libudev-dev libusb-dev build-essential
     # Step 4.2: Create udev rules
     echo "Creating combined udev rule"
     RULE_FILE=/etc/udev/rules.d/42-v-link.rules
@@ -155,6 +155,10 @@ if confirm_action "install the custom DTOverlays? (Required for V-Link HAT)"; th
         OVERLAY_DIR="/boot/overlays"
     fi
 
+    # Renaming pwrkey service so ign logic works:
+    echo "Renaming /etc/xdg/autostart/pwrkey.desktop to pwrkey.desktop.backup"
+    sudo mv /etc/xdg/autostart/pwrkey.desktop /etc/xdg/autostart/pwrkey.desktop.backup
+
     # Download the overlays to the determined directory
     sudo wget -O "$OVERLAY_DIR/vlink.dtbo" \
         https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/vlink.dtbo
@@ -210,31 +214,58 @@ dtoverlay=gpio-poweroff,gpiopin=0
 disable_splash=1
 EOF'
 
-    else
-        sudo bash -c 'cat >> /boot/config.txt <<EOF
+    elif [[ "$rpiModel" -eq 4 ]]; then
+        sudo bash -c 'cat >> /boot/firmware/config.txt <<EOF
 
-[V-LINK]
+[V-LINK RPi4]
 
-# Enable GPIO 0&1
+#Enable GPIO 0&1
 disable_poe_fan=1
 force_eeprom_read=0
 
-# Enable devicetree overlays
-dtparam=i2c_arm=on
+#Enable devicetree overlays
 dtparam=spi=on
+enable_uart=1
+dtparam=i2c_arm=on
 
 dtoverlay=vlink
 dtoverlay=uart3
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
 dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
 
-# Configure IGN logic
+#Configure IGN logic
 dtoverlay=gpio-shutdown,active_low=0,gpio_pull=up,gpio_pin=1
 dtoverlay=gpio-poweroff,gpiopin=0
 
-# No Splash on boot
+#No Splash on boot
 disable_splash=1
-dtoverlay=vc4-fkms-v3d
+EOF'
+
+    else
+        sudo bash -c 'cat >> /boot/firmware/config.txt <<EOF
+
+[V-LINK RPi3]
+
+#Enable GPIO 0&1
+disable_poe_fan=1
+force_eeprom_read=0
+
+#Enable devicetree overlays
+dtparam=spi=on
+enable_uart=1
+dtparam=i2c_arm=on
+
+dtoverlay=vlink
+dtoverlay=uart3
+dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
+dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
+
+#Configure IGN logic
+dtoverlay=gpio-shutdown,active_low=0,gpio_pull=up,gpio_pin=1
+dtoverlay=gpio-poweroff,gpiopin=0
+
+#No Splash on boot
+disable_splash=1
 EOF'
     fi
 fi

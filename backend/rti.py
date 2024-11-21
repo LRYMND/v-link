@@ -12,8 +12,10 @@ class RTIThread(threading.Thread):
 
         if(shared_state.rpiModel == 5):
             self.rti_serial = serial.Serial('/dev/ttyAMA2', baudrate = 2400, timeout = 1)
-        else:
-            self.rti_serial = serial.Serial('/dev/ttyAMA1', baudrate = 2400, timeout = 1)
+        elif (shared_state.rpiModel == 4):
+            self.rti_serial = serial.Serial('/dev/ttyAMA3', baudrate = 2400, timeout = 1)
+        elif (shared_state.rpiModel == 3):
+            self.rti_serial = serial.Serial('/dev/ttyS0', baudrate = 2400, timeout = 1)
 
         self._stop_event = threading.Event()
         self.daemon = True

@@ -62,9 +62,7 @@ python3 /home/$USER/v-link/V-Link.py
 /etc/xdg/autostart/
 /etc/network/interfaces
 /home/$USER/.config
-
-/boot/config.txt (RaspberryPi 4)
-/boot/firmware/config.txt (RaspberryPi 5)
+/boot/firmware/config.txt
 ```
 
 #### In case you get an error when installing the requirements run these commands:
@@ -96,16 +94,19 @@ Node v18.12.1
 NPM 8.19.2
 ```
 
-#### Entries in /boot/config.txt (Raspberry Pi 3/4):
+#### Entries in /boot/firmware/config.txt:
 
 ```
-[V-LINK]
+[V-LINK RPi3]
 
 #Enable GPIO 0&1
 disable_poe_fan=1
 force_eeprom_read=0
 
 #Enable devicetree overlays
+dtoverlay=disable-bt
+enable_uart=1
+
 dtparam=i2c_arm=on
 dtoverlay=vlink
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
@@ -119,18 +120,46 @@ dtoverlay=gpio-poweroff,gpiopin=0
 disable_splash=1
 ```
 
-#### Entries in /boot/firmware/config.txt (Raspberry Pi 5):
-
 ```
-[V-LINK]
+[V-LINK RPi4]
 
 #Enable GPIO 0&1
 disable_poe_fan=1
 force_eeprom_read=0
 
 #Enable devicetree overlays
+dtparam=spi=on
+enable_uart=1
 dtparam=i2c_arm=on
+
 dtoverlay=vlink
+dtoverlay=uart3
+dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
+dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
+
+#Configure IGN logic
+dtoverlay=gpio-shutdown,active_low=0,gpio_pull=up,gpio_pin=1
+dtoverlay=gpio-poweroff,gpiopin=0
+
+#No Splash on boot
+disable_splash=1
+```
+
+```
+[V-LINK RPi5]
+
+#Enable GPIO 0&1
+disable_poe_fan=1
+force_eeprom_read=0
+
+#Enable devicetree overlays
+dtparam=spi=on
+enable_uart=1
+dtparam=i2c_arm=on
+
+dtoverlay=vlink
+dtparam=uart0=on
+dtoverlay=uart2-pi5
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
 dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
 
@@ -158,7 +187,7 @@ sudo ip link set up can2
 
 Enabling uinput:
 ```
-sudo modprobeuinput
+sudo modprobe uinput
 ```
 
 Rules for /etc/udev/rules.d/42-vlink.rules:
@@ -170,19 +199,23 @@ KERNEL=="uinput", MODE="0660", GROUP="plugdev"
 
 ## 02 | HAT Setup
 
-The V-Link HAT is attached to the Raspberry and builds the interface to the car. On this PCB you have terminals to hook up 12V, IGN, CAN etc. It also implements a safe shutdown functionality which gracefully turns off the Raspberry once ignition is off. In this state it draws a minimum of current so draining your cars battery won‘t be an issue. The LCD Touch Display and the Carlinkit Adapter are plugged into the HDMI / USB port of the raspberry and complete the setup.
-
-![INSTALLATION](resources/schematics/installation.png?raw=true "Installation")  
-
 Here you can find a list of the required hardware. The V-Link HAT is currently only being sold in small batches to interested ones. If you are interested in how to get one I encourage you getting in contact via Discord! The old method which involved more hardware and technical skill is archived in the 2.0.0 branch of this repo. 
 
-#### Mandatory Hardware:
+#### Hardware:
 - V-Link HAT
 - Raspberry Pi 3/4/5
 - OEM P1 RTI Display Unit
 - Carlinkit Adapter
 
- As of now, Carplay is working reliably on the CPC200-CCPA while AndroidAuto works better on the CPC200-CCPM Dongle. In theory, Android Auto should work on the CCPA version as well but we had mixed results. Keep this in mind when choosing your Carlinkit Adapter.
+##### CarPlay / AndroidAuto:
+As of now, Carplay is working reliably on the CPC200-CCPA while AndroidAuto works better on the CPC200-CCPM Dongle. In theory, Android Auto should work on the CCPA version as well but we had mixed results. Keep this in mind when choosing your Carlinkit Adapter.
+
+##### Raspberry Pi 3:
+The Raspberry Pi 3 comes with only two UART ports. In order to use the RTI functionality you will need to place a jumper between GPIO4 and GPIO14 and short them together. Your GPIO pins won't be damaged through this and the signal arrives at the terminal of the HAT.
+
+![INSTALLATION](resources/schematics/installation.png?raw=true "Installation")  
+
+The V-Link HAT is attached to the Raspberry and builds the interface to the car. On this PCB you have terminals to hook up 12V, IGN, CAN etc. It also implements a safe shutdown functionality which gracefully turns off the Raspberry once ignition is off. In this state it draws a minimum of current so draining your cars battery won‘t be an issue. The LCD Touch Display and the Carlinkit Adapter are plugged into the HDMI / USB port of the raspberry and complete the setup.
 
 ## 03 | Display Mod
 
@@ -246,7 +279,7 @@ Holding down 'prev' button for 2 seconds toggles between normal and mouse mode. 
 
 ### > 4.3 RTI folding mechanism
 
-Connect RTI_TX_PIN to the Serial pin of the HAT. Again, either use a DuPont wire or solder directly to the RTI PCB/connector. Don't forget to also connect pin 7 (GND) to a common grounding point.
+Connect Pin 4 from the RTI to the RTI pin of the HAT. Again, either use a DuPont wire or solder directly to the RTI PCB/connector.
 
 ![RTI_CONNECTOR_IMAGE](resources/schematics/rti.png?raw=true "RTI Connector")
 
