@@ -2,6 +2,8 @@ import os
 import json
 import shutil
 
+from backend.shared.shared_state import shared_state
+
 def load_directory():
     # Specify the directory path
     config_directory = os.path.expanduser("~/.config/v-link")
@@ -38,7 +40,7 @@ def load_settings(setting):
     try:
         with open(destination_path, 'r') as file:
             data = json.load(file)
-            print(setting + "-settings loaded.")
+            if(shared_state.verbose): print(setting + "-settings loaded.")
             return data
     except Exception as e:
         print(f"Error loading settings from '{destination_path}': {e}")

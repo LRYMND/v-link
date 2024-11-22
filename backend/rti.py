@@ -24,6 +24,8 @@ class RTIThread(threading.Thread):
         self.run_rti()
         
     def stop_thread(self):
+        print("Stopping RTI thread.")
+        time.sleep(.5)
         self._stop_event.set()
 
     def write(self, byte):

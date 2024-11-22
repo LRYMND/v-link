@@ -24,21 +24,21 @@ const rtiChannel = io("ws://localhost:4001/rti")
 
 const Settings = () => {
 
-
+  /* Load Stores */
   const modules = APP((state) => state.modules);
   const app = modules['app']((state) => state)
 
   const settings = app.settings;
   const system = app.system;
 
-
+  /* Create states */
   const [currentSettings, setCurrentSettings] = useState(structuredClone(settings));
   const [activeTab, setActiveTab] = useState(1);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<ReactNode>(null); // State for modal content
 
-  // Create combined data store for dropdown
+  /* Create combined data store for dropdown */
   const dataStores = {}
   Object.entries(modules).map(([key, module]) => {
     const currentModule = module((state) => state);
@@ -53,13 +53,9 @@ const Settings = () => {
   };
 
   /* Open Modal */
-  const openModal = () => {  
+  const openModal = (content) => {  
     // Open the modal with dynamic content
-    setModalContent(
-      <div>
-        <p><strong>Press a Key or ESC.</strong>.</p>
-      </div>
-    );
+    setModalContent(content);
     setIsModalOpen(true);
   };
 
@@ -142,6 +138,13 @@ const Settings = () => {
 
   /* I/O Functionality */
   function systemTask(request) {
+    if (request != 'reset') {
+      openModal(
+        <div>
+          <p><strong>Exiting...</strong>.</p>
+        </div>
+      );
+    }
     sysChannel.emit("systemTask", request);
   }
 
@@ -239,7 +242,11 @@ const Settings = () => {
       */
 
       const handleBinding = (setting) => {
-        openModal();
+        openModal(
+          <div>
+            <p><strong>Press a Key or ESC.</strong>.</p>
+          </div>
+        );
         // Define the key press handler
         const handleKeyPress = (event) => {
           const pressedKey = event.code; // Get the key code

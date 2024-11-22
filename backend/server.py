@@ -33,30 +33,30 @@ class ServerThread(threading.Thread):
         self.server = None  # Initialize self.server
 
     def run(self):
-        print('Starting Server...')
+        if (shared_state.verbose): print('Starting Server...')
         self.server = eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 4001)), self.app, log=open(os.devnull,"w"))
 
     def stop_thread(self):
         print('Stopping Server...')
+        time.sleep(.5)
         if self.server:
             self.server.stop()
             self.server = None  # Reset self.server to avoid AttributeError
 
     @staticmethod
     def toggle_hdmi():
-        # Set commands based on Raspberry Pi model
-        print("toggling")
+        # Toggle HDMI based on display protocol
         hdmi_on, hdmi_off = (
             ("wlr-randr --output HDMI-A-1 --on", "wlr-randr --output HDMI-A-1 --off")
-            if shared_state.rpiModel == 5
+            if shared_state.sessionType == 'wayland'
             else ("vcgencmd display_power 1", "vcgencmd display_power 0")
         )
 
         if  not shared_state.hdmiStatus or not shared_state.rtiStatus:
-            print("off")
+            if (shared_state.verbose): print("HDMI Off")
             os.system(hdmi_off)
         else:
-            print("on")
+            if (shared_state.verbose): print("HDMI On")
             os.system(hdmi_on)
         
     # Add custom headers to all responses
@@ -80,7 +80,7 @@ class ServerThread(threading.Thread):
     # Send notification when frontend connects via socket.io
     @socketio.on('connect', namespace='/')
     def handle_connect():
-        print("Client connected")
+        if (shared_state.verbose): print("Client connected")
 
 
 
@@ -107,7 +107,7 @@ class ServerThread(threading.Thread):
 
         # Toggle module status
         def toggle_state():
-            print('toggle')
+            if (shared_state.verbose): print('Toggling Thread')
             getattr(shared_state, toggle_attr).set()
             socketio.emit('state', not shared_state.THREAD_STATES[module], namespace=namespace)
 
@@ -150,12 +150,12 @@ class ServerThread(threading.Thread):
         elif args == 'rti':
             shared_state.rtiStatus = not shared_state.rtiStatus
             shared_state.hdmiStatus = shared_state.rtiStatus
-            print("hdmi status", shared_state.hdmiStatus)
-            print("rti status", shared_state.rtiStatus)
+            if (shared_state.verbose): print("hdmi status", shared_state.hdmiStatus)
+            if (shared_state.verbose): print("rti status", shared_state.rtiStatus)
             socketio.emit('state', shared_state.rtiStatus, namespace="/rti")
             ServerThread.toggle_hdmi()
         elif args == 'hdmi':
             shared_state.hdmiStatus = not shared_state.hdmiStatus
             ServerThread.toggle_hdmi()
         else:
-            print('Unknown action:', args)
+            if (shared_state.verbose): print('Unknown action:', args)

@@ -1,7 +1,4 @@
 # backend/ __init__.py
-
-print("Starting V-Link")
-
 # Import modules
 
 from .server              import ServerThread

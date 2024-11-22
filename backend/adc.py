@@ -18,7 +18,7 @@ try:
     i2c = busio.I2C(board.SCL, board.SDA)
     ads = ADS.ADS1115(i2c)
 except Exception as e:
-    print(e)
+    print("i2c error: ", e)
 PULL_UP = 2000
 STEP = 0.5
 
@@ -42,6 +42,8 @@ class ADCThread(threading.Thread):
             self.start_adc()
 
     def stop_thread(self):
+        print("Stopping ADC thread.")
+        time.sleep(.5)
         self._stop_event.set()
         self.client.disconnect()
         #self.disconnect_from_socketio()
@@ -120,10 +122,11 @@ class ADCThread(threading.Thread):
                 time.sleep(2)
                 current_retry += 1
 
-        if self.client.connected:
-            print("ADCThread connected to Socket.IO")
-        else:
-            print("ADCThread failed to connect to Socket.IO.")
+        if(shared_state.verbose):
+            if self.client.connected:
+                print("ADC connected to Socket.IO")
+            else:
+                print("ADC failed to connect to Socket.IO.")
 
     def disconnect_from_socketio(self):
         print("Disconnecting ADCThread")

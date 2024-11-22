@@ -50,10 +50,13 @@ chmod +x Installer.sh
 ./Installer.sh
 
 #Test Hardware (Requires V-Link HAT)
-python3 /home/$USER/v-link/HWT.py
+python /home/$USER/v-link/HWT.py
 
 #Execute
-python3 /home/$USER/v-link/V-Link.py
+python /home/$USER/v-link/V-Link.py
+
+#Advanced Options:
+python /home/$USER/v-link/V-Link.py -h
 ```
 
 #### When updating the app, please remove any entries from these locations:
@@ -86,7 +89,7 @@ cd /home/$USER/v-link/frontend
 npm run vite
 
 cd /home/$USER/v-link
-python3 V-Link.py dev
+python V-Link.py -h
 ```
 
 ```
@@ -225,7 +228,7 @@ We currently investigate the possibility of using the OEM LCD unit, however it's
 * [LCD Display](https://de.aliexpress.com/item/32835602509.html?spm=a2g0o.order_list.0.0.30e65c5fXw0Aa6&gatewayAdapt=glo2deu)
 * [6.5" Touch Screen Module](https://www.ebay.de/itm/170981315406)
 
-In order to mod your display you need to disassemble the case and take the OEM components out. Afterwards mount the new Screen in place. A custom 3D-printable bracket for easy installation can be found in the /resources folder. Be aware the the LCD from aliexpress come in different thickness, sadly it's not easy to determine which one you're getting one but if you have the option go for the slimmest variant.
+In order to mod your display you need to disassemble the case and take the OEM components out. Afterwards mount the new Screen in place. A custom 3D-printable bracket for easy installation can be found in the /resources folder. Be aware that the the LCDs from aliexpress come in different thicknesses. Unfortunately you can't really determine which one you're getting but if you have the option go for the slimmest variant.
 
 ![DISPLAY MOUNT](resources/media/display_mount.jpg?raw=true "Display Mount")
 

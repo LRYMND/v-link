@@ -43,7 +43,7 @@ class VCANThread(threading.Thread):
             self.can_bus.shutdown()
 
     def stop_thread(self):
-        print("Stopping CanBusTestThread")
+        print("Stopping VCAN thread.")
         self._stop_event.set()
         self.stop_canbus()
 
@@ -51,9 +51,8 @@ class VCANThread(threading.Thread):
         try:
             if self.can_bus:
                 self.can_bus.shutdown()
-                print('Canbus stopped.')
         except Exception as e:
-            print(f'Error stopping CAN Bus: {e}')
+            print(f'Error stopping VCAN: {e}')
 
     def check_message(self, message):
         # Define the request array

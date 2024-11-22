@@ -6,8 +6,11 @@ import threading
 class SharedState:
     def __init__(self):
         #Global Variables
+        self.verbose = False
+
         self.rpiModel = 5
-        self.isDev = False
+        self.sessionType = "wayland"
+
         self.vCan = False
         self.vLin = False
 

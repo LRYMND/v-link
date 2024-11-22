@@ -58,7 +58,7 @@ class CANThread(threading.Thread):
 
     def initialize_canbus(self):
         try:
-            if(shared_state.isDev):
+            if(shared_state.vCan):
                 self.can_bus = can.interface.Bus(channel='vcan0', bustype='socketcan', bitrate=500000)
             else:    
                 self.can_bus = can.interface.Bus(channel='can0', bustype='socketcan', bitrate=500000)    
@@ -66,6 +66,8 @@ class CANThread(threading.Thread):
             print(f'Error initializing CAN Bus: {e}')
 
     def stop_thread(self):
+        print("Stopping CAN thread.")
+        time.sleep(.5)
         self._stop_event.set()
         self.stop_canbus()
 
@@ -83,11 +85,11 @@ class CANThread(threading.Thread):
                 print(f"Socket.IO connection failed. Retry {current_retry}/{max_retries}. Error: {e}")
                 time.sleep(.5)
                 current_retry += 1
-
-        if self.client.connected:
-            print("Socket.IO connected successfully")
-        else:
-            print("Failed to connect to Socket.IO.")
+        if(shared_state.verbose):
+            if self.client.connected:
+                print("CAN connected to Socket.IO")
+            else:
+                print("CAN failed to connect to Socket.IO.")
 
     def emit_data_to_frontend(self, data):
         if self.client and self.client.connected:
@@ -136,12 +138,12 @@ class CANThread(threading.Thread):
                 try:
                     self.request(self.config.msg_hs)
                 except Exception as e:
-                    print(e) 
+                    print("can error: ", e)
                 time.sleep(self.config.refresh_rate)
             x += 1
             if x == self.config.interval:
                 try:
                     self.request(self.config.msg_ls)
                 except Exception as e:
-                    print(e) 
+                    print("can error: ", e) 
                 x = 0

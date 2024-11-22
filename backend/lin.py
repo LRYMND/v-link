@@ -108,7 +108,6 @@ class LINThread(threading.Thread):
 
     def run(self):
         if not shared_state.vLin:
-            print("bla")
             try:
                 if(shared_state.rpiModel == 5):
                     self.LINSerial = serial.Serial(port="/dev/ttyAMA0", baudrate=9600, timeout=1)
@@ -116,12 +115,13 @@ class LINThread(threading.Thread):
                     self.LINSerial = serial.Serial(port="/dev/ttyS0", baudrate=9600, timeout=1)
                 self.read_from_serial()
             except Exception as e:
-                print(e)
+                print("uart error: ", e)
         else:
             self.read_from_file()
 
     def stop_thread(self):
-        print("Stopping LIN bus thread.")
+        print("Stopping LIN thread.")
+        time.sleep(.5)
         self._stop_event.set()
 
     def read_from_serial(self):

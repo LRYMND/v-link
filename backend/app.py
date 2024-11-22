@@ -23,12 +23,14 @@ class APPThread(threading.Thread):
             time.sleep(.1)
 
     def stop_thread(self):
+        print("Stopping Browser thread.")
         self.close_browser()
         shared_state.toggle_app.clear()
 
 
     def start_browser(self):
-        log_level_flag = "--log-level=3"
+        if shared_state.verbose: log_level_flag = "--log-level=3 >/dev/null 2>&1"
+        else:                    log_level_flag = "--log-level=3 >/dev/null 2>&1"
 
         if shared_state.isKiosk:
             flags = "--window-size=800,480 --kiosk --enable-experimental-web-platform-features --enable-features=SharedArrayBuffer --autoplay-policy=no-user-gesture-required --disable-extensions  --remote-debugging-port=9222"
@@ -39,7 +41,7 @@ class APPThread(threading.Thread):
 
 
         self.browser = subprocess.Popen(command, shell=True)
-        print(f"Chromium browser started with PID: {self.browser.pid}")
+        if(shared_state.verbose): print(f"Chromium browser started with PID: {self.browser.pid}")
 
     def close_browser(self):
         if self.browser:
