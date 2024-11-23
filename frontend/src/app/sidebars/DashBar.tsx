@@ -19,7 +19,6 @@ const DashBar = () => {
         <div className={`dashbar ${app.settings.general.colorTheme.value}`} style={{
             height: `${app.settings.side_bars.topBarHeight.value}px`,
             display: 'flex',
-            position: 'absolute',
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
@@ -104,7 +103,7 @@ const DashBar = () => {
                     </svg>
                 </div>
                 <div className='column'>
-                    <div className='row' style={{ justifyContent: 'center' }}>
+                    <div className='row' style={{ justifyContent: 'center'}}>
                         <div style={{ display: 'flex', gap: '20px' }}>
                             <svg className={`status-icon status-icon--${(system.wifiState ? "active" : "inactive")}`}>
                                 <use xlinkHref="/assets/svg/wifi.svg#wifi"></use>

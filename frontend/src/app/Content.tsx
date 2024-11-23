@@ -24,6 +24,11 @@ const Content = () => {
   };
 
   useEffect(() => {
+    // The hotkey for changing the pages needs to be stores in the system store so App.tsx has access.
+    app.update({system: {switch: app.settings.app_bindings.switch.value}})
+  }, [app.settings.app_bindings.switch]);
+
+  useEffect(() => {
     // Provide the parent's handler reference with the local function
     if(key.keyStroke == app.system.switch)
       cycleView()
@@ -55,7 +60,7 @@ const Content = () => {
         <div className='content' style={{
           height: `${app.system.view === "Carplay" ? "0" : app.system.contentSize.height}px`,
           width: `${app.system.contentSize.width}px`,
-          marginTop: `${app.settings.side_bars.topBarHeight.value}px`,
+          //marginTop: `${app.settings.side_bars.topBarHeight.value}px`,
           background: 'var(--backgroundColor)',
           fontFamily: 'Helvetica',
           display: 'flex',

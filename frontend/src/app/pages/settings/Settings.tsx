@@ -39,6 +39,8 @@ const Settings = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<ReactNode>(null); // State for modal content
 
+  const [reset, setReset] = useState(false)
+
   /* Create combined data store for dropdown */
   const dataStores = {}
   Object.entries(modules).map(([key, module]) => {
@@ -126,6 +128,7 @@ const Settings = () => {
       newSettings[key][name].value = convertedValue || targetSetting;
       newSettings[key][name].type = selectStore;
     } else {
+      console.log(key, name, targetSetting)
       newSettings[key][name].value = targetSetting
     }
 
@@ -148,11 +151,17 @@ const Settings = () => {
         </div>
       );
     }
+
     sysChannel.emit("systemTask", request);
+    setReset(true)
   }
 
+
   useEffect(() => {
-    setCurrentSettings(app.settings)
+    if(reset) {
+      setCurrentSettings(app.settings)
+      setReset(false)
+    }
   }, [app.settings])
 
   /* Toggle Threads */
@@ -242,7 +251,8 @@ const Settings = () => {
 
 
 
-      const handleBinding = (setting) => {
+      const handleBinding = (key, setting) => {
+        console.log(key, setting)
         openModal(
           <div>
             <p><strong>Press a Key or ESC.</strong>.</p>
@@ -251,9 +261,9 @@ const Settings = () => {
         // Define the key press handler
         const handleKeyPress = (event) => {
           if(event.code === 'Escape') {
-            handleSettingChange("app", "bindings", setting, "Unassigned", settingsObj);
+            handleSettingChange("app", key, setting, "Unassigned", settingsObj);
           } else {
-            handleSettingChange("app", "bindings", setting, event.code, settingsObj);
+            handleSettingChange("app", key, setting, event.code, settingsObj);
           }
 
           setIsModalOpen(false); // Close the modal
@@ -305,7 +315,7 @@ const Settings = () => {
                 textScale={system.textScale}
                 textColor={'var(--textColorDefault)'}
                 isActive={true}
-                onClick={() => { handleBinding(setting)}}
+                onClick={() => { handleBinding(key, setting)}}
                 backgroundColor={'var(--boxColorDarker)'}
                 />
               ) :
@@ -351,7 +361,7 @@ const Settings = () => {
         {modalContent}
       </SimpleModal>
 
-      <div key={JSON.stringify(currentSettings)} className={`settings ${settings.general.colorTheme.value}`} style={{
+      <div key={JSON.stringify(reset)} className={`settings ${settings.general.colorTheme.value}`} style={{
         width: '100%',
         height: '100%',
         display: 'flex',

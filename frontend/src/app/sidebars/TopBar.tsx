@@ -28,7 +28,6 @@ const TopBar = () => {
     <div className={`topbar ${app.settings.general.colorTheme.value}`} style={{
       height: `${app.settings.side_bars.topBarHeight.value}px`,
       display: 'flex',
-      position: 'absolute',
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',

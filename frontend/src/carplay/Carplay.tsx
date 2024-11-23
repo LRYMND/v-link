@@ -220,7 +220,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
           style={{
             position: 'absolute',
             width: '100%',
-            height: '100%',
+            height: height,
             display: app.system.view === "Carplay" ? 'flex' : 'none',
             justifyContent: 'center',
             alignItems: 'center',
@@ -278,7 +278,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
           id="video"
           style={
             isPlugged && app.system.view === "Carplay"
-              ? { height: '100%', overflow: 'hidden', marginTop: app.settings.side_bars.dashBar.value ? app.settings.side_bars.topBarHeight.value : 0 }
+              ? { height: '100%', overflow: 'hidden'}
               : { display: 'none' }
           }
         />

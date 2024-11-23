@@ -49,7 +49,7 @@ function App() {
           const action = Object.keys(mmi!.bindings).find(key =>
             mmi!.bindings[key] === event.code
           )
-          console.log(action)
+          //console.log(action)
           if (action !== undefined) {
             setKeyCommand(action)
             setCommandCounter(prev => prev + 1)
@@ -67,7 +67,7 @@ function App() {
   }
 
   return (
-    <div style={{ overflow: 'hidden' }}>
+    <div style={{ overflow: 'hidden'}}>
       <Socket />
       <Cardata />
       <Splash />
