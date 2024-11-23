@@ -175,7 +175,7 @@ dtoverlay=gpio-poweroff,gpiopin=0
 #No Splash on boot
 disable_splash=1
 ```
-*(Don't forget to copy the custom overlays from the devicetree folder of this repository to /boot/overlays!)*
+*(Don't forget to copy the custom overlays from the devicetree folder of this repository to /boot/firmware/overlays!)*
 
 #### Further Setup:
 
