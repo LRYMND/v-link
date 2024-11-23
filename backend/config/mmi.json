@@ -8,7 +8,7 @@
         "left": "ArrowLeft",
         "right": "ArrowRight",
         "selectDown": "Space",
-        "selectUp": "ArrowUp",
+        "selectUp": "Undefined",
         "back": "Backspace",
         "down": "ArrowDown",
         "home": "KeyH",

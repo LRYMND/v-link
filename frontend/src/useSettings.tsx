@@ -46,7 +46,7 @@ const useSettings = (module) => {
     // Function to handle incoming settings from socket
     const handleSettings = (receivedSettings) => {
       userSettings.setState({ ...receivedSettings }); // Assuming receivedSettings is formatted properly
-      console.log(`Loaded settings for ${module}:`, receivedSettings); // Log loaded settings
+      //console.log(`Loaded settings for ${module}:`, receivedSettings); // Log loaded settings
     };
 
     // Listen for incoming settings updates
@@ -55,7 +55,7 @@ const useSettings = (module) => {
 
     // Listen for status updates
     const handleStatusUpdate = (statusData) => {
-      console.log(`Status update for ${module}:`, statusData); // Log status updates
+      //console.log(`Status update for ${module}:`, statusData); // Log status updates
     };
     
     socket.on('status', handleStatusUpdate); // Add status listener

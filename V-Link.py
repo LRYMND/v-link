@@ -190,7 +190,8 @@ def display_thread_states():
     print('Device: ', vlink.rpiModel, ' | ', vlink.rpiProtocol)
     print("")
     print("=" * 52)  # Decorative line
-
+    print("")
+    print("Thread states:")
     table_data = [
         ["Server", "App", "CAN", "LIN", "ADC", "RTI", "VCAN"],
         [

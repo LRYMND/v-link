@@ -2,12 +2,14 @@
   
 ## Welcome to the Boosted Moose V-Link project!
 
-Let's face it. MMIs from the 2000s suck. This project aims to implement live vehicle data as well as AndroidAuto/Apple CarPlay in an OEM like fashion and enhance the driving experience of retro cars. The heart of this project is the open source V-Link app. It's running natively on Raspberry Pi OS which enables full support of an OS without the restrictions of 3rd party images. A custom made HAT builds the bridge between the Raspberry Pi and the car and works plug and play with the app.
+Let's face it. MMIs from the 2000s suck. This is a personal project that I started because I couldn't find a suitable aftermarket solution. I wanted to implement live vehicle data as well as AndroidAuto/Apple CarPlay in an OEM like fashion to enhance the driving experience of retro cars and give the user the ability to tinker around. The heart of this project is the open source V-Link app. It's running natively on Raspberry Pi OS which enables full support of an OS without the restrictions of 3rd party images. A custom made HAT builds the bridge between the Raspberry Pi and the car and works plug and play with the app.
 
-This project is in ongoing development. Do you want to participate, got any tips for improvement or need help?  
+This project is in ongoing development. Do you want to participate, got any tips for improvement or need help?
 
 * [Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
 * [V-Link Discord Server](https://discord.gg/V4RQG6p8vM)
+
+Feel free to fork the project. Create a new branch, commit your changes and open a pull request.
 
 ## Content
 
@@ -188,9 +190,10 @@ sudo ip link set can2 type can bitrate 125000
 sudo ip link set up can2
 ```
 
-Enabling uinput:
+Enabling uinput & vcan:
 ```
 sudo modprobe uinput
+sudo modprobe vcan
 ```
 
 Rules for /etc/udev/rules.d/42-vlink.rules:

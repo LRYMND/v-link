@@ -1,4 +1,4 @@
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, useRef, ReactNode } from 'react';
 import { APP } from '../../../store/Store';
 
 import { io } from "socket.io-client";
@@ -25,11 +25,12 @@ const rtiChannel = io("ws://localhost:4001/rti")
 const Settings = () => {
 
   /* Load Stores */
-  const modules = APP((state) => state.modules);
-  const app = modules['app']((state) => state)
+  const app = APP((state) => state)
+  const modules = APP((state) => state.modules)
 
   const settings = app.settings;
   const system = app.system;
+
 
   /* Create states */
   const [currentSettings, setCurrentSettings] = useState(structuredClone(settings));
@@ -55,14 +56,17 @@ const Settings = () => {
   /* Open Modal */
   const openModal = (content) => {  
     // Open the modal with dynamic content
+    app.update({system: { modal: true}})
     setModalContent(content);
     setIsModalOpen(true);
+    app.update({system: { modal: false}})
   };
 
   /* Add Settings */
   const handleAddSetting = (key, currentSettings) => {
     if (currentSettings.constants.chart_input_current < currentSettings.constants.chart_input_max) {
       const newSetting = {
+        type: "can",
         value: "rpm",
         label: `Value ${currentSettings.constants.chart_input_current + 1}`,
       };
@@ -88,7 +92,6 @@ const Settings = () => {
     }
   };
 
-
   /* Remove Settings */
   const handleRemoveSetting = (key, currentSettings) => {
     if (currentSettings.constants.chart_input_current > 1) {
@@ -113,7 +116,7 @@ const Settings = () => {
 
   /* Change Settings */
   const handleSettingChange = (selectStore, key, name, targetSetting, currentSettings) => {
-    console.log(selectStore, key, name, targetSetting, currentSettings, dataStores)
+    //console.log(selectStore, key, name, targetSetting, currentSettings, dataStores)
     const newSettings = structuredClone(currentSettings);
     let convertedValue
       if(selectStore != 'app') {
@@ -136,7 +139,7 @@ const Settings = () => {
     appChannel.emit("load");
   }
 
-  /* I/O Functionality */
+  /* Reset Settings */
   function systemTask(request) {
     if (request != 'reset') {
       openModal(
@@ -148,6 +151,11 @@ const Settings = () => {
     sysChannel.emit("systemTask", request);
   }
 
+  useEffect(() => {
+    setCurrentSettings(app.settings)
+  }, [app.settings])
+
+  /* Toggle Threads */
   function handleIO(module, channel) {
     channel.emit("toggle");
   }
@@ -203,23 +211,20 @@ const Settings = () => {
 
       // Get options
       //Check if value is a number or boolean
-      const dropdown = (typeof value === 'number' || typeof value === 'boolean' || key === 'bindings') 
+      const dropdown = (typeof value === 'number' || typeof value === 'boolean' || key.includes('bindings')) 
         ? null                                                                    //Yes? Return null
         : (content.options || Object.keys(dataOptions).map((key) =>               //No?  Create dropdown from options
           key
         ))              
       // Check for boolean setting
       const isBoolean = typeof value === 'boolean';                               // Checks if the setting is a boolean.
-      const isBinding = key === 'bindings'
+      const isBinding = key.includes('bindings')                                  // Checks if the setting handles bindings
+
 
       const handleChange = (event) => {
         const { name, value, checked, type } = event.target;                      // Grab info from the handler
-        console.log(name, value, checked, type)
         const newValue = type === 'checkbox' ? checked :                          // Check if type is a boolean
                          type === 'number' ? Number(value) : value;               // Check if type is a number
-
-        console.log(dataOptions)
-        console.log(newValue)
 
         //const newStore = dataOptions[newValue]                                    // Define store for selected setting. E.g. "Boost" -> "Oil Pressure" requires a change from "can" to "adc" store.
         let selectStore
@@ -230,16 +235,12 @@ const Settings = () => {
         }
 
         const targetSetting = isBoolean ? checked : newValue                      // Handle targetSetting based on type
-        console.log(selectStore, key, name, targetSetting, currentSettings)
+        //console.log(selectStore, key, name, targetSetting, currentSettings)
 
         handleSettingChange(selectStore, key, name, targetSetting, settingsObj);     // Execute change of settings
       };
 
-      /*
-      const handleBinding = () => {
-        console.log("Press key to change binding")
-      };
-      */
+
 
       const handleBinding = (setting) => {
         openModal(
@@ -249,8 +250,12 @@ const Settings = () => {
         );
         // Define the key press handler
         const handleKeyPress = (event) => {
-          const pressedKey = event.code; // Get the key code
-          if(event.code != 'Escape') handleSettingChange("app", "bindings", setting, pressedKey, settingsObj);
+          if(event.code === 'Escape') {
+            handleSettingChange("app", "bindings", setting, "Unassigned", settingsObj);
+          } else {
+            handleSettingChange("app", "bindings", setting, event.code, settingsObj);
+          }
+
           setIsModalOpen(false); // Close the modal
           document.removeEventListener('keydown', handleKeyPress); // Clean up listener
         };
@@ -336,7 +341,7 @@ const Settings = () => {
   }
 
   const clickTest = () => {
-    console.log('Click :)');
+    //console.log('Click :)');
   };
 
 
@@ -346,7 +351,7 @@ const Settings = () => {
         {modalContent}
       </SimpleModal>
 
-      <div className={`settings ${settings.general.colorTheme.value}`} style={{
+      <div key={JSON.stringify(currentSettings)} className={`settings ${settings.general.colorTheme.value}`} style={{
         width: '100%',
         height: '100%',
         display: 'flex',
@@ -456,7 +461,7 @@ const Settings = () => {
                     <SimpleButton
                       height={'100%'}
                       text={<b>SYSTEM</b>}
-                      textSize={2.5}
+                      textSize={2}
                       textScale={system.textScale}
                       textColor={activeTab === 1 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
                       isActive={true}
@@ -467,7 +472,7 @@ const Settings = () => {
                     <SimpleButton
                       height={'100%'}
                       text={<b>DATA</b>}
-                      textSize={2.5}
+                      textSize={2}
                       textScale={system.textScale}
                       textColor={activeTab === 2 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
                       isActive={true}
@@ -478,7 +483,7 @@ const Settings = () => {
                     <SimpleButton
                       height={'100%'}
                       text={<b>INTERFACE</b>}
-                      textSize={2.5}
+                      textSize={2}
                       textScale={system .textScale}
                       textColor={activeTab === 3 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
                       isActive={true}
@@ -516,14 +521,14 @@ const Settings = () => {
                               />
                               <span className='divider'></span>
                               <div className='row' style={{ flex: '0 0 40%', marginRight: '10px', height: '5vh' }}>
-                                <SimpleButton
-                                  text={system.canState ? "Off" : "On"}
-                                  textSize={2.2}
-                                  textScale={system.textScale}
-                                  textColor={'var(--textColorDefault)'}
+                                <SimpleCheckbox
+                                  name={"canState"}
+                                  checked={system.canState}
+                                  onChange={() => { handleIO("can", canChannel) }}
+                                  colorActive={'var(--themeDefault)'}
+                                  colorInactive={'var(--boxColorDark)'}
+                                  borderColor={'var(--boxColorDarker)'}
                                   isActive={true}
-                                  onClick={() => { handleIO("can", canChannel) }}
-                                  backgroundColor={'var(--boxColorDarker)'}
                                 />
                               </div>
                             </div>
@@ -537,14 +542,14 @@ const Settings = () => {
                               />
                               <span className='divider'></span>
                               <div className='row' style={{ flex: '0 0 40%', marginRight: '10px', height: '5vh' }}>
-                                <SimpleButton
-                                  text={system.linState ? "Off" : "On"}
-                                  textSize={2.2}
-                                  textScale={system.textScale}
-                                  textColor={'var(--textColorDefault)'}
+                                <SimpleCheckbox
+                                  name={"linState"}
+                                  checked={system.linState}
+                                  onChange={() => { handleIO("lin", linChannel) }}
+                                  colorActive={'var(--themeDefault)'}
+                                  colorInactive={'var(--boxColorDark)'}
+                                  borderColor={'var(--boxColorDarker)'}
                                   isActive={true}
-                                  onClick={() => { handleIO("lin", linChannel) }}
-                                  backgroundColor={'var(--boxColorDarker)'}
                                 />
                               </div>
                             </div>
@@ -558,14 +563,14 @@ const Settings = () => {
                               />
                               <span className='divider'></span>
                               <div className='row' style={{ flex: '0 0 40%', marginRight: '10px', height: '5vh' }}>
-                                <SimpleButton
-                                  text={system.adcState ? "Off" : "On"}
-                                  textSize={2.2}
-                                  textScale={system.textScale}
-                                  textColor={'var(--textColorDefault)'}
+                                <SimpleCheckbox
+                                  name={"adcState"}
+                                  checked={system.adcState}
+                                  onChange={() => { handleIO("adc", adcChannel) }}
+                                  colorActive={'var(--themeDefault)'}
+                                  colorInactive={'var(--boxColorDark)'}
+                                  borderColor={'var(--boxColorDarker)'}
                                   isActive={true}
-                                  onClick={() => { handleIO("adc", adcChannel) }}
-                                  backgroundColor={'var(--boxColorDarker)'}
                                 />
                               </div>
                             </div>
@@ -579,14 +584,14 @@ const Settings = () => {
                               />
                               <span className='divider'></span>
                               <div className='row' style={{ flex: '0 0 40%', marginRight: '10px', height: '5vh' }}>
-                                <SimpleButton
-                                  text={system.rtiState ? "Off" : "On"}
-                                  textSize={2.2}
-                                  textScale={system.textScale}
-                                  textColor={'var(--textColorDefault)'}
+                                <SimpleCheckbox
+                                  name={"rtiState"}
+                                  checked={system.rtiState}
+                                  onChange={() => { handleIO("rti", rtiChannel) }}
+                                  colorActive={'var(--themeDefault)'}
+                                  colorInactive={'var(--boxColorDark)'}
+                                  borderColor={'var(--boxColorDarker)'}
                                   isActive={true}
-                                  onClick={() => { handleIO("rti", rtiChannel) }}
-                                  backgroundColor={'var(--boxColorDarker)'}
                                 />
                               </div>
                             </div>
@@ -609,10 +614,12 @@ const Settings = () => {
                                 textScale={system.textScale}
                               />
                               <span className='divider'></span>
-                              <div className='row' style={{ flex: '0 0 40%', marginRight: '10px', gap: '10%', height: '5vh' }}>
+                              <div className='row' style={{ flex: '0 0 40%', marginTop: '15px', marginRight: '10px', gap: '10%', height: '5vh' }}>
                                 <div className='input'>
                                   <SimpleButton
                                     text={"+"}
+                                    width={'4rem'}
+                                    height={'2rem'}
                                     textSize={2.5}
                                     textScale={system.textScale}
                                     textColor={'var(--textColorDefault)'}
@@ -624,6 +631,8 @@ const Settings = () => {
                                 <div className='input'>
                                   <SimpleButton
                                     text={"-"}
+                                    width={'4rem'}
+                                    height={'2rem'}
                                     textSize={2.5}
                                     textScale={system.textScale}
                                     textColor={'var(--textColorDefault)'}
@@ -640,8 +649,8 @@ const Settings = () => {
 
                         {activeTab === 3 &&
                           <>
-                            {renderSetting("bindings", currentSettings)}
-                            <p />
+                            {renderSetting("app_bindings", currentSettings)}
+                            {renderSetting("mmi_bindings", currentSettings)}
                           </>
                         }
 

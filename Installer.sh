@@ -149,11 +149,8 @@ fi
 # Step 5: Download overlay files to /boot/overlays
 if confirm_action "install the custom DTOverlays? (Required for V-Link HAT)"; then
     # Set the target overlay directory based on rpiModel
-    if [ "$rpiModel" -eq 5 ]; then
-        OVERLAY_DIR="/boot/firmware/overlays"
-    else
-        OVERLAY_DIR="/boot/overlays"
-    fi
+    OVERLAY_DIR="/boot/firmware/overlays"
+
 
     # Renaming pwrkey service so ign logic works:
     echo "Renaming /etc/xdg/autostart/pwrkey.desktop to pwrkey.desktop.backup"
@@ -174,19 +171,15 @@ iface can0 can static
         bitrate 500000
 auto can1
 iface can1 can static
-        bitrate 500000
+        bitrate 125000
 EOF'
 fi
 
 # Step 6: Append lines to /boot/config.txt or /boot/firmware/config.txt
-if confirm_action "append lines to config.txt"; then
-    if [ -f /boot/config.txt ]; then
-        CONFIG_PATH="/boot/config.txt"
-    else
-        CONFIG_PATH="/boot/firmware/config.txt"
-    fi
+if confirm_action "append lines to /boot/firmware/config.txt"; then
+    CONFIG_PATH="/boot/firmware/config.txt"
 
-    #Determin RPi version and set config.txt accordingly.
+    #Determine RPi version and set config.txt accordingly.
     if [[ "$rpiModel" -eq 5 ]]; then
         sudo bash -c 'cat >> /boot/firmware/config.txt <<EOF
 
@@ -284,7 +277,7 @@ fi
 if confirm_action "reboot the system now"; then
     sudo reboot
 else
-    echo "Reboot was skipped. Please reboot manually to apply all changes."
+    echo "Reboot was skipped. Please reboot manually to apply the changes."
 fi
 
-echo "All Done. Drive carefully :)"
+echo "Installation finished. Drive carefully :)"

@@ -152,7 +152,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
     const element = mainElem?.current
     if (!element) return;
     const observer = new ResizeObserver(() => {
-      console.log("size change")
+      //console.log("size change")
       carplayWorker.postMessage({ type: 'frame' })
     })
     observer.observe(element)

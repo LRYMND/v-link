@@ -74,7 +74,7 @@ const MMI = create<MMIStore>((set) => ({
     const mergedSettings: MMIConfig = {
       //...DEFAULT_CONFIG,
       ...settings,
-      bindings: settings.bindings || DEFAULT_BINDINGS,
+      bindings: settings.mmi_bindings || DEFAULT_BINDINGS,
     };
     set({ settings: mergedSettings });
   },
@@ -98,6 +98,9 @@ const APP = create((set) => ({
   system: {
     version: '2.2.0',
     view: 'Carplay',
+    switch: 'ArrowUp',
+    lastKey: '',
+    modal: false,
 
     initialized: false,
     startedUp: false,
@@ -208,8 +211,17 @@ const RTI = create((set) => ({
 }));
 
 
+// Store to easily broadcast Keystrokes from App.tsx
+const KEY = create((set) => ({
+  keyStroke: "",
+  setKeyStroke: (key) => {
+    set({ keyStroke: key });
+    setTimeout(() => set({ keyStroke: "" }), 0);
+  },
+}));
 
 
 
 
-export { DATA, APP, MMI, CAN, LIN, ADC, RTI };
+
+export { DATA, APP, MMI, CAN, LIN, ADC, RTI, KEY };

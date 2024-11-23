@@ -24,7 +24,7 @@ const LineChart = ({
 }) => {
 
     // Load Settings
-    const Modules = APP((state) => state.modules);
+    const modules = APP((state) => state.modules);
     const settings = APP((state) => state.settings);
     const data = DATA((state) => state.data);
 
@@ -38,7 +38,7 @@ const LineChart = ({
         const value = data[settings.dash_charts[key].value]                                 // Read corresponding live value
 
         const type = settings.dash_charts[key].type                                         // Get sensor type (e.g. 'can')
-        const config = Modules[type]((state) => state.settings.sensors[sensor]);            // Load sensor configuration
+        const config = modules[type]((state) => state.settings.sensors[sensor]);            // Load sensor configuration
 
         /* Build dataset based on sensors */
         datasets[i - 1] = {
@@ -55,6 +55,7 @@ const LineChart = ({
 
     const [dataStreams, setDataStreams] = useState(datasets.map(dataset => Array.from({ length: length }, (_, index) => dataset.yMin)));
     const [colorVariations, setColorVariations] = useState([])
+
 
     const dataRefs = useRef(datasets.map(() => 0));
 

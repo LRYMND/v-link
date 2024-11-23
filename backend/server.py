@@ -140,7 +140,7 @@ class ServerThread(threading.Thread):
             subprocess.run("sudo reboot -h now", shell=True)
         elif args == 'reset':
             settings.reset_settings("app")
-            socketio.emit("application", settings.load_settings("app"), namespace='/settings')
+            socketio.emit("settings", settings.load_settings("app"), namespace='/app')
         elif args == 'quit':
             shared_state.exit_event.set()
         elif args == 'restart':

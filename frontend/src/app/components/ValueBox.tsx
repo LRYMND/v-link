@@ -18,8 +18,8 @@ const ValueBox = ({
   height,
   width = '100%',
 
-  labelSize = '3vh',
-  valueSize = '6vh',
+  labelSize = '2vh',
+  valueSize = '3vh',
 }) => {
 
   // Load Settings
@@ -55,6 +55,7 @@ const ValueBox = ({
         alignSelf: 'center',
         marginLeft: 'auto',
         marginRight: '5%',
+        marginBottom: '10%',
         fontSize: valueSize,
         color: value >= settings.limit_start ? limitColor : valueColor,
       }}>

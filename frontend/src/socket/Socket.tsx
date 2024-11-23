@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { APP, MMI, CAN, LIN, ADC, RTI } from './store/Store';
-import { ExtraConfig } from './carplay/Config'
+import { APP, MMI, CAN, LIN, ADC, RTI } from '../store/Store';
 
 const modules = {
   app: APP,
@@ -18,7 +17,7 @@ Object.keys(modules).forEach(module => {
   socket[module] = io(`ws://localhost:4001/${module}`);
 });
 
-export const Settings = () => {
+export const Socket = () => {
 
   // Initialize all Zustand stores and map them to module names
   const store = Object.fromEntries(
@@ -60,7 +59,6 @@ export const Settings = () => {
 
 
   /* Handle Text Resize */
-  
   useEffect(() => {
 
     if (store['app'].system.initialized) {
@@ -102,7 +100,7 @@ export const Settings = () => {
     if (Object.entries(store['app'].modules).length > 0 && !store['app'].system.initialized) {
       console.log('All settings loaded successfully!');
       Object.keys(modules).forEach(module => {
-        console.log(module, "settings:", store[module])
+        //console.log(module, "settings:", store[module])
       });
       store['app'].update({ system: { initialized: true } })
     }
@@ -112,14 +110,14 @@ export const Settings = () => {
   /* Wait for Settings */
   useEffect(() => {    
     const handleSettings = (module) => (data) => {
+      console.log("updating settings")
       store[module].update({ settings: data });
       setLoadedModules(current => current + 1)
     };
 
     const handleState = (module) => (data) => {
       store['app'].update({system: { [module + "State"] :data}})
-      console.log("handling state, ", module, data)
-      //store[module].update({ system: { state: data } })
+      //console.log("handling state, ", module, data)
     }
 
 

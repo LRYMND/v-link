@@ -18,7 +18,7 @@ const SimpleInput = ({ name, type, value, textSize, textScale, textColor, isActi
 
   const handleChange = () => {
     if (isActive && onChange) {
-      onClick();
+      onChange(event);
     }
   };
 
@@ -27,7 +27,7 @@ const SimpleInput = ({ name, type, value, textSize, textScale, textColor, isActi
     style={inputStyle}
     type={type}
     name={name}
-    value={value}
+    defaultValue={value}
     onChange={handleChange} />
 
   );

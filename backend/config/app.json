@@ -97,7 +97,7 @@
     },
     "gauge_3": {
       "type": "can",
-      "value": "boost",
+      "value": "coolant",
       "label": "Gauge 3"
     },
     "value_1": {
@@ -169,7 +169,7 @@
 
     "length": {
       "type": null,
-      "value": 100,
+      "value": 500,
       "label": "Length"
     },
     "value_1": {
@@ -200,8 +200,8 @@
     }
   },
 
-  "bindings": {
-    "title": "Key Map",
+  "mmi_bindings": {
+    "title": "MMI Keymap",
     "type": "interface",
 
     "left": {
@@ -253,6 +253,27 @@
       "type": "lin",
       "value": "KeyV",
       "label": "Previous"
+    }
+  },
+
+  "app_bindings": {
+    "title": "Application Keymap",
+    "type": "interface",
+
+    "switch": {
+      "type": "lin",
+      "value": "ArrowUp",
+      "label": "Switch Pages"
+    },
+    "left": {
+      "type": "lin",
+      "value": "ArrowLeft",
+      "label": "Left"
+    },
+    "right": {
+      "type": "lin",
+      "value": "ArrowRight",
+      "label": "Right"
     }
   },
 

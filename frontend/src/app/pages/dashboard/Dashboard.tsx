@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { APP } from '../../../store/Store';
+import { useState, useEffect, useRef } from 'react';
+import { APP, KEY } from '../../../store/Store';
 
 import Classic from './classic/Classic';
 import Race from './race/Race';
@@ -13,7 +13,7 @@ import '../../../themes.scss';
 
 function Dashboard() {
   const app = APP((state) => state);
-
+  const key = KEY((state) => state);
 
   // Component mapping by name
   const componentMap = {
@@ -25,7 +25,7 @@ function Dashboard() {
   const components = [Classic, Race, Charts]; // Array of component functions
   const totalPages = components.length; // Calculate the total number of pages
   const sliderWidth = totalPages * app.system.contentSize.width;
-  const paginationSize = 15;
+  const paginationSize = 20;
 
   // Find the index of the component based on the default dashboard value from settings
   const componentName = app.settings.general.defaultDash.value;
@@ -85,6 +85,13 @@ function Dashboard() {
       swipeLeft();
     }
   }
+
+  useEffect(() => {
+    if (key.keyStroke == app.settings.app_bindings.left.value)
+      swipeRight() //Physically swiping to the right, shows the page to the left.
+    if (key.keyStroke == app.settings.app_bindings.right.value)
+      swipeLeft()  //Physically swiping to the left, shows the page to the right.
+  }, [key.keyStroke]);
 
   return (
     <div className={`dashboard ${app.settings.general.colorTheme.value}`}
