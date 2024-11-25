@@ -41,9 +41,10 @@ class ButtonHandler:
     def __init__(self):
         self.config = Config()
         self.frame_count = 0
+        self.long_press_frame_count = 0
         self.last_button_name = None
-        self.last_button_time = None
         self.frame_threshold = self.config.linSettings["frame_threshold"]
+        self.long_press_frame_treshold = self.config.linSettings["long_press_frame_treshold"]
 
         # Convert button and joystick commands from hex strings to bytes and store in dictionaries
         self.button_codes = {
@@ -56,24 +57,38 @@ class ButtonHandler:
         }
 
     def handle_button_press(self, frame_data):
-        # Look up button name using both button and joystick mappings
-        button_name = self.button_codes.get(frame_data) or self.joystick_codes.get(frame_data)
+        # Look up both button and joystick codes
+        button_name = self.button_codes.get(frame_data) or self.joystick_codes.get(frame_data) 
 
         if button_name:
-            # Check if the button is the same as the last one pressed
+            # joystick
+            if button_name in self.joystick_codes.values():
+                return button_name, False  # Joystick buttons only trigger short press
+
+            # Check if the button is the same as the last one pressed, otherwise count other button
             if button_name == self.last_button_name:
                 self.frame_count += 1
+                self.long_press_frame_count += 1
             else:
                 self.frame_count = 1
+                self.long_press_frame_count += 1
                 self.last_button_name = button_name
 
-            # Check if the frame count exceeds the threshold
-            if self.frame_count >= self.frame_threshold:
+            # short press
+            if self.frame_count == self.frame_threshold:
+                self.frame_count = 0
+                return button_name, False
+
+            # long press based on long press treshold
+            if self.long_press_frame_count >= self.long_press_frame_treshold:
+                self.long_press_frame_count = 0
                 return button_name, True
-            return button_name, False
+            
+            return button_name, None
         else:
             # Reset frame count if no button is detected
             self.frame_count = 0
+            self.long_press_frame_count = 0
             self.last_button_name = None
 
         return None, False
@@ -87,19 +102,24 @@ class LINThread(threading.Thread):
         self.button_handler = ButtonHandler()
         self.LINSerial = None
         self.mouseSpeed = self.config.linSettings["mouse_speed"]
+        self.mouseMode = False
 
         # Initialize uinput device for mouse and keyboard
         self.device = uinput.Device([
             uinput.REL_X,        # Relative X axis (horizontal movement)
             uinput.REL_Y,        # Relative Y axis (vertical movement)
             uinput.BTN_LEFT,     # Left mouse button
-            uinput.BTN_RIGHT,    # Right mouse button
+            # uinput.BTN_RIGHT,    # Right mouse button
             uinput.KEY_BACKSPACE,
             uinput.KEY_N,
             uinput.KEY_V,
             uinput.KEY_G,
             uinput.KEY_B,
-            uinput.KEY_SPACE
+            uinput.KEY_SPACE,
+            uinput.KEY_UP,
+            uinput.KEY_DOWN,
+            uinput.KEY_LEFT,
+            uinput.KEY_RIGHT
         ])
 
         self._stop_event = threading.Event()
@@ -167,13 +187,11 @@ class LINThread(threading.Thread):
     def handle_swm_frame(self):
         # Check SWM_ID in frame against linSettings
         swm_id = bytes.fromhex(self.config.linSettings["swm_id"][2:])
-        
         if self.linframe.get_byte(0) != swm_id:
             return 
         
+        # do not continue on zero values (nothing being pressed)
         zero_code = bytes.fromhex(self.config.linSettings["zero_code"][2:])
-        
-        # If the zero code is matched, return
         if self.linframe.get_byte(5) == zero_code:
             return 
 
@@ -185,45 +203,33 @@ class LINThread(threading.Thread):
         self.linframe.reset()
 
     def handle_buttons(self):
-        # Concatenate bytes to form the frame data
         frame_data = b"".join(self.linframe.get_byte(i) for i in range(5))
         checksum = self.linframe.get_byte(5)
-        
-        # Format the frame data for printing/logging
-        formatted_frame_data = " ".join(f"{byte:02X}" for byte in frame_data) + f" {checksum.hex().upper()}"
 
         # Check if frame_data matches IGN_KEY_ON from linSettings
         ign_key_on = bytes.fromhex("".join(cmd.replace("0x", "") for cmd in self.config.linSettings["ign_on"]))
         if frame_data == ign_key_on:
             return
-        
-        # Get the button name and action activation status
-        button_name, activate_action = self.button_handler.handle_button_press(frame_data)
-        
+
+        button_name, is_long_press = self.button_handler.handle_button_press(frame_data)
         if button_name:
-            if button_name == "BTN_BACK":
-                self.shutdown_frame_count += 1
-                # Access shutdown threshold from linSettings
-                shutdown_threshold = self.config.linSettings["shutdown_threshold"]
+            if is_long_press:
+                if button_name == "BTN_BACK":
+                    # Toggle RTI (open/close)
+                    shared_state.rtiStatus = not shared_state.rtiStatus
+                    print(f"Toggled RTI status to {shared_state.rtiStatus}")
 
-                if self.shutdown_frame_count >= shutdown_threshold:
-                    if shared_state.rtiStatus:
-                        # Stop RTI thread if running
-                        shared_state.rtiStatus = False
-                    self.shutdown_frame_count = 0
+                elif button_name == "BTN_ENTER":
+                    # Toggle mouse mode
+                    self.mouseMode = not self.mouseMode
+                    print(f"Toggled mouse mode to {self.mouseMode}")
             else:
-                # Reset shutdown frame count if a different button is pressed
-                self.shutdown_frame_count = 0
-
-            # Perform button actions if action activation is required
-            if activate_action:
+                print(f'Pressing: {button_name}')
                 self.execute_action(button_name)
-                # Uncomment the line below for debugging/logging purposes
-                # print(f"[{formatted_frame_data}] Activated: {button_name}")
         else:
-            # Log unrecognized frames
+            formatted_frame_data = " ".join(f"{byte:02X}" for byte in frame_data) + f" {checksum.hex().upper()}"
             print(f"Unrecognized frame: {formatted_frame_data}")
-
+    
     def execute_action(self, button_name):
         try:
             match button_name:
@@ -232,36 +238,49 @@ class LINThread(threading.Thread):
                 # It's possible to configure the actions through the app.
                 case "BTN_ENTER":
                     print('Enter')
-                    if not shared_state.rtiStatus:
-                        shared_state.rtiStatus = True
-                    self.device.emit(uinput.KEY_SPACE, 1)
+                    if(self.mouseMode):
+                        self.device.emit_click(uinput.BTN_LEFT, 1)
+                    else:
+                        self.device.emit_click(uinput.KEY_SPACE, 1)
                 case "BTN_BACK":
                     print('Back')
-                    self.device.emit(uinput.KEY_BACKSPACE, 1)
+                    self.device.emit_click(uinput.KEY_BACKSPACE, 1)
                 case "BTN_NEXT":
                     print('Next')
-                    self.device.emit(uinput.KEY_N, 1)
+                    self.device.emit_click(uinput.KEY_N, 1)
                 case "BTN_PREV":
                     print('Previous')
-                    self.device.emit(uinput.KEY_V, 1)
+                    self.device.emit_click(uinput.KEY_V, 1)
                 case "BTN_VOL_UP":
                     print('Volume up')
-                    self.device.emit(uinput.KEY_G, 1)
+                    self.device.emit_click(uinput.KEY_G, 1)
                 case "BTN_VOL_DOWN":
                     print('Volume down')
-                    self.device.emit(uinput.KEY_B, 1)
+                    self.device.emit_click(uinput.KEY_B, 1)
                 case "BTN_UP":
                     print('Joystick up')
-                    self.move_mouse(0, -1)
+                    if(self.mouseMode):
+                        self.move_mouse(0, -1)
+                    else:
+                        self.device.emit_click(uinput.KEY_UP, 1)
                 case "BTN_DOWN":
                     print('Joystick down')
-                    self.move_mouse(0, 1)
+                    if(self.mouseMode):
+                        self.move_mouse(0, 1)
+                    else:
+                        self.device.emit_click(uinput.KEY_DOWN, 1)
                 case "BTN_LEFT":
                     print('Joystick left')
-                    self.move_mouse(-1, 0)
+                    if(self.mouseMode):
+                        self.move_mouse(-1, 0)
+                    else:
+                        self.device.emit_click(uinput.KEY_LEFT, 1)
                 case "BTN_RIGHT":
                     print('Joystick right')
-                    self.move_mouse(1, 0)
+                    if(self.mouseMode):
+                        self.move_mouse(1, 0)
+                    else:
+                        self.device.emit_click(uinput.KEY_RIGHT, 1)
         except Exception as e:
             print(f"Error in action: {e}")
 

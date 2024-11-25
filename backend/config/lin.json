@@ -11,10 +11,10 @@
     "sync_id": "0x55",
     "zero_code": "0xFF",
     "ign_on": ["0x50", "0x0E", "0x00", "0xF1"],
-    "frame_threshold": 4,
-    "shutdown_threshold": 10,
-    "mouse_speed": 8,
-    "mouse_multiplier": 3,
+    "frame_threshold": 8,
+    "long_press_frame_treshold": 10,
+    "mouse_speed": 3,
+    "mouse_multiplier": 2,
 
     "commands": {
         "button": {
