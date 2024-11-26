@@ -61,7 +61,7 @@ python /home/$USER/v-link/V-Link.py
 python /home/$USER/v-link/V-Link.py -h
 ```
 
-#### When updating the app, please remove any entries from these locations:
+#### When updating the app, please remove any `V-Link` entries from these locations:
 ```
 /etc/udev/rules.d/
 /etc/xdg/autostart/
@@ -260,9 +260,9 @@ The connections below are the bare minimum for the app to function properly on t
 
 ### > 4.2 Steering Wheel Controls (WIP)
 
-In order to implement the steering wheel controls, you need to connect the HAT to the LIN bus of your car. The app will convert the signals from the steering wheel buttons to keyboard/mouse HID events. The easiest place to find the LIN Bus is the "ICM Connector A" behind the waterfall. Either connect a DuPont wire to the associated pin or disassemble the ICM and solder a small wire to it.
+In order to implement the steering wheel controls, you need to connect the HAT to the LIN bus of your car. The app will convert the signals from the steering wheel buttons to keyboard/mouse HID events. The easiest place to find the LIN Bus is the "ICM Connector A" behind the waterfall. Disassemble the ICM and solder a small wire to it as shown in the picture below, or add a small wire to the ICM's wiring harness.
 
- ![ICM_CONNECTOR_IMAGE](resources/schematics/icm.png?raw=true "LIN Connector")
+ ![ICM_CONNECTOR_IMAGE](resources/schematics/icm.png?raw=true "ICM PCB")
 
 #### Control folding mechanism:
 ```
@@ -279,13 +279,13 @@ In order to implement the steering wheel controls, you need to connect the HAT t
 | 'Joystick' | Navigate    | Control mouse      |
 ```
 
-Holding down 'prev' button for 2 seconds toggles between normal and mouse mode. The button mappings can be adjusted in the app.
+Holding down `Enter` button for ~2 seconds toggles between normal and mouse mode. The button mappings can be adjusted in the app.
 
 ---
 
 ### > 4.3 RTI folding mechanism
 
-Connect Pin 4 from the RTI to the RTI pin of the HAT. Again, either use a DuPont wire or solder directly to the RTI PCB/connector.
+Connect Pin 4 from the RTI to the RTI pin of the HAT. You can solder directly to the RTI PCB/connector, or you can plug a DuPont wire into the connector. This can be done on the RTI side of the cable, or on the other side of the cable in the glove box. 
 
 ![RTI_CONNECTOR_IMAGE](resources/schematics/rti.png?raw=true "RTI Connector")
 

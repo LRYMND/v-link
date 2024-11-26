@@ -116,7 +116,7 @@ EOF'
 
 
     # Step 4.4: Download the file
-    download_url="https://github.com/LRYMND/v-link/releases/download/v2.1.0/V-Link.zip"
+    download_url="https://github.com/LRYMND/v-link/releases/download/v2.2.0/V-Link.zip"
     output_path="/home/$USER/v-link"
     echo "Downloading files to: $output_path"
     mkdir -p $output_path
