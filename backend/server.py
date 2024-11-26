@@ -32,6 +32,10 @@ class ServerThread(threading.Thread):
         self.socketio = socketio
         self.server = None  # Initialize self.server
 
+            # Register modules
+        for module in modules:
+            self.register_socketio(module)
+
     def run(self):
         if (shared_state.verbose): print('Starting Server...')
         self.server = eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 4001)), self.app, log=open(os.devnull,"w"))
@@ -42,6 +46,49 @@ class ServerThread(threading.Thread):
         if self.server:
             self.server.stop()
             self.server = None  # Reset self.server to avoid AttributeError
+
+       # Create event handler
+    def register_socketio(self, module):
+        namespace = f'/{module}'
+        toggle_attr = f'toggle_{module}'
+
+        # Emit module Data
+        def emit_data(data):
+            socketio.emit('data', data, namespace=namespace)
+
+        # Save module settings
+        def save_settings(data):
+            settings.save_settings(module, data)
+
+        # Emit module settings
+        def load_settings():
+            socketio.emit('settings', settings.load_settings(module), namespace=namespace)
+
+        # Emit module status
+        def emit_state():
+            socketio.emit('state', shared_state.THREAD_STATES[module], namespace=namespace)
+
+        # Toggle module status
+        def toggle_state():
+            if (shared_state.verbose): print('Toggling Thread')
+            getattr(shared_state, toggle_attr).set()
+            socketio.emit('state', not shared_state.THREAD_STATES[module], namespace=namespace)
+
+
+        load_settings.__name__  = f'load_settings_{module}'
+        save_settings.__name__  = f'save_settings_{module}'
+        emit_state.__name__     = f'emit_status_{module}'
+        toggle_state.__name__   = f'handle_toggle_{module}'
+        emit_data.__name__      = f'handle_data_{module}'
+
+
+
+        socketio.on_event('load', load_settings, namespace=namespace)
+        socketio.on_event('save', save_settings, namespace=namespace)
+        socketio.on_event('ping', emit_state, namespace=namespace)
+        socketio.on_event('data', emit_data, namespace=namespace)
+
+        socketio.on_event('toggle', toggle_state, namespace=namespace)
 
     @staticmethod
     def toggle_hdmi():
@@ -84,53 +131,10 @@ class ServerThread(threading.Thread):
 
 
 
-    # Create event handler
-    def register_socketio(module):
-        namespace = f'/{module}'
-        toggle_attr = f'toggle_{module}'
-
-        # Emit module Data
-        def emit_data(data):
-            socketio.emit('data', data, namespace=namespace)
-
-        # Save module settings
-        def save_settings(data):
-            settings.save_settings(module, data)
-
-        # Emit module settings
-        def load_settings():
-            socketio.emit('settings', settings.load_settings(module), namespace=namespace)
-
-        # Emit module status
-        def emit_state():
-            socketio.emit('state', shared_state.THREAD_STATES[module], namespace=namespace)
-
-        # Toggle module status
-        def toggle_state():
-            if (shared_state.verbose): print('Toggling Thread')
-            getattr(shared_state, toggle_attr).set()
-            socketio.emit('state', not shared_state.THREAD_STATES[module], namespace=namespace)
-
-
-        load_settings.__name__  = f'load_settings_{module}'
-        save_settings.__name__  = f'save_settings_{module}'
-        emit_state.__name__     = f'emit_status_{module}'
-        toggle_state.__name__   = f'handle_toggle_{module}'
-        emit_data.__name__      = f'handle_data_{module}'
-
-
-
-        socketio.on_event('load', load_settings, namespace=namespace)
-        socketio.on_event('save', save_settings, namespace=namespace)
-        socketio.on_event('ping', emit_state, namespace=namespace)
-        socketio.on_event('data', emit_data, namespace=namespace)
-
-        socketio.on_event('toggle', toggle_state, namespace=namespace)
+ 
         
 
-    # Register modules
-    for module in modules:
-        register_socketio(module)
+
 
 
     # Handle IO tasks

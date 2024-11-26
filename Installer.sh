@@ -165,14 +165,33 @@ if confirm_action "install the custom DTOverlays? (Required for V-Link HAT)"; th
         https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/mcp2515-can2.dtbo
 
     echo "Adding autostart entries for CAN at /etc/network/interfaces."
-    sudo bash -c 'cat >> /etc/network/interfaces <<EOF
-auto can0
-iface can0 can static
-        bitrate 500000
-auto can1
-iface can1 can static
-        bitrate 125000
-EOF'
+		# Create a single .network file for both CAN0 and CAN1
+NETWORK_FILE="/etc/systemd/network/42-vlink.network"
+echo "Creating configuration file for can0 and can1"
+sudo bash -c "cat > $NETWORK_FILE" <<EOL
+[Match]
+Name=can0
+
+[CAN]
+BitRate=500000
+
+[Network]
+# No IP configuration for raw CAN
+
+[Match]
+Name=can1
+
+[CAN]
+BitRate=125000
+
+[Network]
+# No IP configuration for raw CAN
+EOL
+
+    # Enable and restart systemd-networkd
+    echo "Enabling and restarting systemd-networkd service"
+    sudo systemctl enable systemd-networkd.service
+    sudo systemctl restart systemd-networkd.service
 fi
 
 # Step 6: Append lines to /boot/config.txt or /boot/firmware/config.txt
@@ -265,7 +284,7 @@ fi
 
 # Step 7: Create autostart file for V-Link
 if confirm_action "create autostart file for V-Link"; then
-        sudo bash -c "cat > /etc/xdg/autostart/v-link.desktop <<EOL
+        sudo bash -c "cat > /etc/xdg/autostart/vlink.desktop <<EOL
 [Desktop Entry]
 Name=V-Link
 Exec=sh -c '. $output_path/venv/bin/activate && python3 $output_path/V-Link.py'

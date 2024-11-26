@@ -75,10 +75,13 @@ class VLINK:
         thread_class = self.threads[thread_name].__class__
 
         if not self.threads[thread_name].is_alive():
+            print('Starting', thread_name)
             self.threads[thread_name] = thread_class()
             thread = self.threads[thread_name]
             thread.daemon = True
             thread.start()
+
+            # Update shared_state immediately after starting the thread
             shared_state.THREAD_STATES[thread_name] = True
             if(shared_state.verbose): print(f'{thread_name} thread started.')
         else:
@@ -91,6 +94,8 @@ class VLINK:
             if(shared_state.verbose): print(f'Stopping {thread_name} thread.')
             thread.stop_thread()
             thread.join()
+            
+            # Update shared_state immediately after stopping the thread
             shared_state.THREAD_STATES[thread_name] = False
             if(shared_state.verbose): print(f'{thread_name} thread stopped.')
 
@@ -106,10 +111,12 @@ class VLINK:
 
     def join_threads(self):
         for thread_name in self.threads:
+            print('Closing ', thread_name)
             self.stop_thread(thread_name)
 
         for thread_name, thread in self.threads.items():
             if thread.is_alive():
+                print('Joining ', thread_name)
                 thread.join()
                 shared_state.THREAD_STATES[thread_name] = False
         print('Done.')
@@ -144,13 +151,13 @@ class VLINK:
 
             shared_state.toggle_app.set()
             
-            time.sleep(1)
-            sys.exit(0)
+            #time.sleep(1)
+            #sys.exit(0)
 
     def print_thread_states(self):
         if(shared_state.verbose):
-            for thread_name, thread in self.threads.items():
-                state = 'Alive' if thread.is_alive() else 'Not Alive'
+            for thread_name in self.threads:
+                state = 'Alive' if shared_state.THREAD_STATES[thread_name] else 'Not Alive'
                 print(f'{thread_name} Thread: {state}')
 
 
@@ -214,19 +221,26 @@ if __name__ == '__main__':
 
     vlink = VLINK()
 
-    vlink.start_thread('server')
     vlink.detect_rpi()
-
     args = setup_arguments()
-    
+
+
+
+
     # Update shared_state based on arguments
     shared_state.verbose = args.verbose
     shared_state.vCan = args.vcan
     shared_state.vLin = args.vlin
-    shared_state.isFlask = args.vite
+    shared_state.vite = args.vite
     shared_state.isKiosk = args.nokiosk
 
-    # Start vcan if flag is enabled
+    # Start start server is no flag was set
+    if(not shared_state.vite):
+        vlink.start_thread('server')
+        time.sleep(3)
+
+
+    # Start vcan if flag was set
     if(shared_state.vCan):
         vlink.start_thread('vcan')
         time.sleep(.05)
@@ -245,13 +259,15 @@ if __name__ == '__main__':
     vlink.print_thread_states()
 
     try:
-        while(True):
+        while not vlink.exit_event.is_set():  # Loop will exit when exit_event is set
             vlink.process_toggle_event()
             vlink.process_exit_event()
-            if not shared_state.verbose: display_thread_states()
+            if not shared_state.verbose:
+                display_thread_states()
             time.sleep(.1)
     except KeyboardInterrupt:
-            print('\nExiting...')
-            #vlink.join_threads()
-            sys.exit(0)
-    
+        print('\nExiting...')
+    finally:
+        # Make sure we join threads on exit
+        vlink.join_threads()
+        sys.exit(0)

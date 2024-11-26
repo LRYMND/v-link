@@ -69,6 +69,7 @@ class CANThread(threading.Thread):
         print("Stopping CAN thread.")
         time.sleep(.5)
         self._stop_event.set()
+        self.client.disconnect()
         self.stop_canbus()
 
     def stop_canbus(self):

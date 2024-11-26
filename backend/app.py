@@ -9,7 +9,7 @@ from .shared.shared_state import shared_state
 class APPThread(threading.Thread):
     def __init__(self):
         super().__init__()
-        self.url = f"http://localhost:{4001 if shared_state.isFlask else 5173}"
+        self.url = f"http://localhost:{4001 if shared_state.vite else 5173}"
         self.browser = None
         self._stop_event = threading.Event()
 

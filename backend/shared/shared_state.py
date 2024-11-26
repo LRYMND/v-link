@@ -14,7 +14,7 @@ class SharedState:
         self.vCan = False
         self.vLin = False
 
-        self.isFlask = True
+        self.vite = True
         self.isKiosk = True
 
         self.rtiStatus = False
