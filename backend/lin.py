@@ -101,7 +101,10 @@ class LINThread(threading.Thread):
         self.linframe = LinFrame()
         self.button_handler = ButtonHandler()
         self.LINSerial = None
-        self.mouseSpeed = self.config.linSettings["mouse_speed"]
+        self.mouseBaseSpeed = self.config.linSettings["mouse_speed"]
+        self.mouseMultiplier = self.config.linSettings["mouse_multiplier"]
+        self.mouseMaxSpeed = self.config.linSettings["mouse_max_speed"]
+        self.mouseSpeed = self.mouseBaseSpeed
         self.mouseMode = False
 
         # Initialize uinput device for mouse and keyboard
@@ -193,6 +196,7 @@ class LINThread(threading.Thread):
         # do not continue on zero values (nothing being pressed)
         zero_code = bytes.fromhex(self.config.linSettings["zero_code"][2:])
         if self.linframe.get_byte(5) == zero_code:
+            self.mouseSpeed = self.mouseBaseSpeed # reset mouse speed on button release
             return 
 
         if not self.linframe.is_valid():
@@ -285,7 +289,9 @@ class LINThread(threading.Thread):
             print(f"Error in action: {e}")
 
     def move_mouse(self, dx, dy):
+        # Increment mouse speed, with a capped max speed
+        self.mouseSpeed = min(self.mouseSpeed + self.mouseMultiplier, self.mouseMaxSpeed)
+
         # Move mouse relative to current position using uinput
-        self.device.emit(uinput.REL_X, dx * self.mouseSpeed)
-        self.device.emit(uinput.REL_Y, dy * self.mouseSpeed)
-        self.mouseSpeed += self.config.linSettings["mouse_multiplier"]
+        self.device.emit(uinput.REL_X, int(dx * self.mouseSpeed))
+        self.device.emit(uinput.REL_Y, int(dy * self.mouseSpeed))
