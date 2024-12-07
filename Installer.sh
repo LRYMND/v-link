@@ -20,6 +20,7 @@ user_exit() {
 }
 
 echo "Installing V-Link"
+sudo -v
 
 # Determine Raspberry Pi Version
 if [ -f /proc/device-tree/model ]; then
@@ -96,24 +97,6 @@ if confirm_action "install Boosted Moose V-Link now"; then
         echo -e "Unable to create permissions\n"
     fi
 
-        # Step 4.3: Add uinput to /etc/modules
-    echo "Enabling uinput"
-    sudo bash -c 'cat >> /etc/systemd/system/uinput.service <<EOF
-[Unit]
-Description=Load uinput module at startup
-After=network.target
-
-[Service]
-Type=oneshot
-ExecStart=/sbin/modprobe uinput
-RemainAfterExit=true
-
-[Install]
-WantedBy=multi-user.target
-EOF'
-
-    sudo systemctl enable uinput.service && systemctl start uinput.service && systemctl daemon-reload
-
 
     # Step 4.4: Download the file
     download_url="https://github.com/LRYMND/v-link/releases/download/v2.2.0/V-Link.zip"
@@ -163,16 +146,6 @@ if confirm_action "install the custom DTOverlays? (Required for V-Link HAT)"; th
         https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/mcp2515-can1.dtbo
     sudo wget -O "$OVERLAY_DIR/mcp2515-can2.dtbo" \
         https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/mcp2515-can2.dtbo
-
-    echo "Adding autostart entries for CAN at /etc/network/interfaces."
-    sudo bash -c 'cat >> /etc/network/interfaces <<EOF
-auto can0
-iface can0 can static
-        bitrate 500000
-auto can1
-iface can1 can static
-        bitrate 125000
-EOF'
 fi
 
 # Step 6: Append lines to /boot/config.txt or /boot/firmware/config.txt
@@ -263,9 +236,31 @@ EOF'
     fi
 fi
 
+# Step 7: Create V-Link systemd service
+if confirm_action "create systemd services for V-Link"; then
+    sudo bash -c "cat > /etc/systemd/system/vlink.service <<EOF
+[Unit]
+Description=V-Link Services
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/sbin/modprobe uinput
+ExecStart=/bin/bash -c '/sbin/ip link set can0 up type can bitrate 500000'
+ExecStart=/bin/bash -c '/sbin/ip link set can1 up type can bitrate 125000'
+ExecStop=/bin/bash -c '/sbin/ip link set can0 down; /sbin/ip link set can1 down'
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
+EOF"
+        sudo systemctl enable vlink.service && systemctl daemon-reload
+fi
+
+
 # Step 7: Create autostart file for V-Link
 if confirm_action "create autostart file for V-Link"; then
-        sudo bash -c "cat > /etc/xdg/autostart/v-link.desktop <<EOL
+    sudo bash -c "cat > /etc/xdg/autostart/v-link.desktop <<EOL
 [Desktop Entry]
 Name=V-Link
 Exec=sh -c '. $output_path/venv/bin/activate && python3 $output_path/V-Link.py'
@@ -274,7 +269,7 @@ EOL"
 fi
 
 # Step 8: Prompt to reboot the system
-if confirm_action "reboot the system now"; then
+if confirm_action "reboot the system now to apply the changes"; then
     sudo reboot
 else
     echo "Reboot was skipped. Please reboot manually to apply the changes."

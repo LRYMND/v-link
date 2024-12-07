@@ -99,6 +99,13 @@ Node v18.12.1
 NPM 8.19.2
 ```
 
+### > Uninstall:
+```
+cd ~/home/$USER/v-link/
+sudo chmod +x Uninstall.sh
+./Uninstall.sh
+```
+
 #### Entries in /boot/firmware/config.txt:
 
 ```
