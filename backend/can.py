@@ -69,7 +69,6 @@ class CANThread(threading.Thread):
         print("Stopping CAN thread.")
         time.sleep(.5)
         self._stop_event.set()
-        self.stop_canbus()
 
     def stop_canbus(self):
         if self.can_bus:
@@ -102,7 +101,7 @@ class CANThread(threading.Thread):
 
             timer = time.time()
 
-            while True:
+            while not self._stop_event.is_set():
                 current_time = time.time()
                 received = self.filter(self.can_bus.recv(.01), message)
                 
@@ -111,7 +110,7 @@ class CANThread(threading.Thread):
                 
 
     def receive(self, sensors):
-        while not self._stop_event.set():
+        while not self._stop_event.is_set():
             data = self.can_bus.recv()
 
             for message in sensors:
@@ -133,17 +132,22 @@ class CANThread(threading.Thread):
 
     def run_can_bus(self):
         x = 0
-        while not self._stop_event.is_set():
-            if x <= self.config.interval:
-                try:
-                    self.request(self.config.msg_hs)
-                except Exception as e:
-                    print("can error: ", e)
-                time.sleep(self.config.refresh_rate)
-            x += 1
-            if x == self.config.interval:
-                try:
-                    self.request(self.config.msg_ls)
-                except Exception as e:
-                    print("can error: ", e) 
-                x = 0
+        try:
+            while not self._stop_event.is_set():
+                if x <= self.config.interval:
+                    try:
+                        self.request(self.config.msg_hs)
+                    except Exception as e:
+                        print("can error: ", e)
+                    time.sleep(self.config.refresh_rate)
+                x += 1
+                if x == self.config.interval:
+                    try:
+                        self.request(self.config.msg_ls)
+                    except Exception as e:
+                        print("can error: ", e) 
+                    x = 0
+        except Exception as e:
+            print(e)
+        finally:
+            self.stop_canbus()

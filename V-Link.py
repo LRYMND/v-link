@@ -1,8 +1,44 @@
-import threading
-import time
+"""
+    V-Link - A modular, open-source infotainment system.
+    Copyright (C) 2024
+    Author:     Louis Raymond - github.com/lrymnd
+    Co-Author:  Tigo Passchier - github.com/tigo2000
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
 import sys
 import os
+
+def activate_venv():
+    venv_path = f"/home/{os.getenv('USER')}/v-link/venv"
+    activate_script = os.path.join(venv_path, "bin", "activate")
+
+    if not os.path.exists(activate_script):
+        raise FileNotFoundError(f"Activation script for venv not found: {activate_script}")
+
+    # Update PATH to include the virtual environment
+    os.environ["PATH"] = os.path.join(venv_path, "bin") + os.pathsep + os.environ.get("PATH", "")
+    # Add site-packages to sys.path
+    site_packages = os.path.join(venv_path, "lib", f"python{sys.version_info.major}.{sys.version_info.minor}", "site-packages")
+    sys.path.insert(0, site_packages)
+
+activate_venv()
+
+import time
 import argparse
+
 
 from tabulate import tabulate
 
@@ -69,7 +105,22 @@ class VLINK:
 
         except FileNotFoundError:
             return 'Not running on a Raspberry Pi or file at /proc/device-tree/model not found.'
+    
+    def start_modules(self):
+        if(shared_state.vCan):
+            self.start_thread('vcan')
+        time.sleep(.05)
 
+        # Start main threads:
+        self.start_thread('can')
+        time.sleep(.05)
+        self.start_thread('rti')
+        time.sleep(.05)
+        self.start_thread('lin')
+        time.sleep(.05)
+        self.start_thread('adc')
+        time.sleep(.5)
+        self.start_thread('app')
 
     def start_thread(self, thread_name):
         thread_class = self.threads[thread_name].__class__
@@ -90,9 +141,13 @@ class VLINK:
         if thread.is_alive():
             if(shared_state.verbose): print(f'Stopping {thread_name} thread.')
             thread.stop_thread()
-            thread.join()
+            try:
+                thread.join()
+            except Exception as e:
+                print(e)
             shared_state.THREAD_STATES[thread_name] = False
             if(shared_state.verbose): print(f'{thread_name} thread stopped.')
+
 
     def toggle_thread(self, thread_name):
         if shared_state.THREAD_STATES[thread_name]:
@@ -102,17 +157,13 @@ class VLINK:
             self.start_thread(thread_name)
             if(shared_state.verbose): print('start thread')
 
-        #self.print_thread_states()
 
     def join_threads(self):
-        for thread_name in self.threads:
-            self.stop_thread(thread_name)
-
         for thread_name, thread in self.threads.items():
+            self.stop_thread(thread_name)
             if thread.is_alive():
-                thread.join()
                 shared_state.THREAD_STATES[thread_name] = False
-        print('Done.')
+
 
     def process_toggle_event(self):
         if shared_state.toggle_can.is_set():
@@ -140,19 +191,32 @@ class VLINK:
         if self.exit_event.is_set():
             self.exit_event.clear()
             shared_state.rtiStatus = False
+
             time.sleep(5)
 
             shared_state.toggle_app.set()
-            
+
+
+    def process_restart_event(self):
+        if shared_state.restart_event.is_set():
+            shared_state.restart_event.clear()
+            for thread_name in self.threads:
+                if(thread_name != 'server'):
+                    self.stop_thread(thread_name)
+                       
+            time.sleep(.5)
+            print('Restarting...')
             time.sleep(1)
-            sys.exit(0)
+            
+            self.start_modules()
+
 
     def print_thread_states(self):
         if(shared_state.verbose):
             for thread_name, thread in self.threads.items():
                 state = 'Alive' if thread.is_alive() else 'Not Alive'
                 print(f'{thread_name} Thread: {state}')
-
+                
 
 
 def clear_screen():
@@ -160,6 +224,7 @@ def clear_screen():
         os.system('cls')
     else:
         os.system('clear')
+
 
 def non_blocking_input(prompt):
     try:
@@ -182,6 +247,7 @@ def setup_arguments():
     parser.add_argument("--nokiosk", action="store_false", help="Start in windowed mode")
 
     return parser.parse_args()
+
 
 def display_thread_states():
     clear_screen()
@@ -223,35 +289,26 @@ if __name__ == '__main__':
     shared_state.verbose = args.verbose
     shared_state.vCan = args.vcan
     shared_state.vLin = args.vlin
-    shared_state.isFlask = args.vite
+    shared_state.vite = args.vite
     shared_state.isKiosk = args.nokiosk
 
-    # Start vcan if flag is enabled
-    if(shared_state.vCan):
-        vlink.start_thread('vcan')
-        time.sleep(.05)
-
     # Start main threads:
-    vlink.start_thread('can')
-    time.sleep(.05)
-    vlink.start_thread('rti')
-    time.sleep(.05)
-    vlink.start_thread('lin')
-    time.sleep(.05)
-    vlink.start_thread('adc')
-    time.sleep(.5)
-    vlink.start_thread('app')
-
+    vlink.start_modules()
     vlink.print_thread_states()
 
     try:
-        while(True):
+        while not vlink.exit_event.is_set():
             vlink.process_toggle_event()
             vlink.process_exit_event()
-            if not shared_state.verbose: display_thread_states()
+            vlink.process_restart_event()
+
+            if not shared_state.verbose:
+                display_thread_states()
+
             time.sleep(.1)
     except KeyboardInterrupt:
-            print('\nExiting...')
-            #vlink.join_threads()
+            print('\nCleaning up threads, please wait...')
+    finally:
+            vlink.join_threads()
+            print('Done.')
             sys.exit(0)
-    

@@ -9,7 +9,7 @@ from .shared.shared_state import shared_state
 class APPThread(threading.Thread):
     def __init__(self):
         super().__init__()
-        self.url = f"http://localhost:{4001 if shared_state.isFlask else 5173}"
+        self.url = f"http://localhost:{4001 if shared_state.vite else 5173}"
         self.browser = None
         self._stop_event = threading.Event()
 
@@ -18,12 +18,12 @@ class APPThread(threading.Thread):
 
         while not self._stop_event.is_set():
             if(shared_state.toggle_app.is_set()):
-                self._stop_event.set()
                 self.stop_thread()
             time.sleep(.1)
 
     def stop_thread(self):
-        print("Stopping Browser thread.")
+        print("Stopping APP thread.")
+        self._stop_event.set()
         self.close_browser()
         shared_state.toggle_app.clear()
 
@@ -45,7 +45,6 @@ class APPThread(threading.Thread):
 
     def close_browser(self):
         if self.browser:
-            print(f"Closing App...")
             try:
                 # Use subprocess to run a command that kills the process and its children
                 subprocess.run(['pkill', '-P', str(self.browser.pid)])

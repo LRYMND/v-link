@@ -8,6 +8,7 @@ import os
 
 from ..shared.shared_state import shared_state
 
+
 class VCANThread(threading.Thread):
     def __init__(self):
         super(VCANThread, self).__init__()
@@ -26,40 +27,41 @@ class VCANThread(threading.Thread):
         self.VALUES = [INTAKE, BOOST, COOLANT, LAMBDA1, LAMBDA2, VOLTAGE]
         self.TEMPLATE = [0xcd, 0x7a, 0xa6, 0x00, 0x00, 0x40, 0x0, 0x0]
 
-
         script_directory = os.path.dirname(os.path.abspath(__file__))
         setup_script_path = os.path.join(script_directory, 'setup.sh')
         subprocess.run([setup_script_path], shell=True)
 
-
     def run(self):
         try:
             self.can_bus = can.interface.Bus(channel='vcan0', bustype='socketcan', bitrate=500000)
-            # Enter a loop to continuously check for messages on vcan0
+            # Use a timeout for recv to allow periodic checks of _stop_event
             while not self._stop_event.is_set():
-                message = self.can_bus.recv()
-                self.check_message(message)
+                try:
+                    # Timeout set to 1 second for responsiveness
+                    message = self.can_bus.recv(timeout=1.0)
+                    if message:
+                        self.check_message(message)
+                except can.CanError as e:
+                    print(f"CAN error: {e}")
+        except Exception as e:
+            print(e)
         finally:
-            self.can_bus.shutdown()
+            self.stop_canbus()
 
     def stop_thread(self):
         print("Stopping VCAN thread.")
+        time.sleep(.5)
         self._stop_event.set()
-        self.stop_canbus()
 
     def stop_canbus(self):
-        try:
-            if self.can_bus:
-                self.can_bus.shutdown()
-        except Exception as e:
-            print(f'Error stopping VCAN: {e}')
+        if self.can_bus:
+            self.can_bus.shutdown()
 
     def check_message(self, message):
         # Define the request array
         request = [
             [0x12, 0x9D],
             [0x10, 0x34],
-
             [0x10, 0xCE],
             [0x10, 0xD8],
             [0x10, 0x0A],

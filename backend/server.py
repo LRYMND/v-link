@@ -4,7 +4,6 @@ import time
 import subprocess
 import eventlet
 
-from werkzeug.serving       import run_with_reloader
 from flask                  import Flask, send_from_directory, render_template
 from flask_socketio         import SocketIO
 from flask_cors             import CORS
@@ -24,24 +23,46 @@ socketio = SocketIO(server, cors_allowed_origins="*", async_mode='eventlet')
 modules = ["app", "mmi", "can", "lin", "adc", "rti"]
 
 class ServerThread(threading.Thread):
-
     def __init__(self):
-        threading.Thread.__init__(self)
-        self.daemon = True
+        super().__init__()
+        self.daemon = True  # Ensure thread stops when main program exits
         self.app = server
-        self.socketio = socketio
-        self.server = None  # Initialize self.server
+        self.stop_event = threading.Event()
+        self.server_socket = eventlet.listen(('0.0.0.0', 4001))
 
     def run(self):
-        if (shared_state.verbose): print('Starting Server...')
-        self.server = eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 4001)), self.app, log=open(os.devnull,"w"))
+        if shared_state.verbose:
+            print("Starting Eventlet WSGI server...")
+
+        try:
+            # Run the server in a green thread
+            eventlet.spawn(self._serve)
+            # Keep the thread alive until stop_event is set
+            while not self.stop_event.is_set():
+                eventlet.sleep(0.1)
+        except Exception as e:
+            print(e)
+
+    def _serve(self):
+        try:
+            eventlet.wsgi.server(
+                self.server_socket,
+                self.app,
+                log=open(os.devnull, "w"),  # Suppress logs
+            )
+        except eventlet.StopServe:
+            if shared_state.verbose:
+                print("Server stopped gracefully.")
 
     def stop_thread(self):
-        print('Stopping Server...')
-        time.sleep(.5)
-        if self.server:
-            self.server.stop()
-            self.server = None  # Reset self.server to avoid AttributeError
+        if shared_state.verbose:
+            print("Stopping Eventlet server...")
+            time.sleep(.5)
+
+        # Raise StopServe to terminate the WSGI server loop
+        eventlet.spawn(self.server_socket.close)
+        self.stop_event.set()
+
 
     @staticmethod
     def toggle_hdmi():
@@ -144,9 +165,7 @@ class ServerThread(threading.Thread):
         elif args == 'quit':
             shared_state.exit_event.set()
         elif args == 'restart':
-            shared_state.toggle_can.set()
-            shared_state.toggle_adc.set()
-            shared_state.toggle_app.set()
+            shared_state.restart_event.set()
         elif args == 'rti':
             shared_state.rtiStatus = not shared_state.rtiStatus
             shared_state.hdmiStatus = shared_state.rtiStatus

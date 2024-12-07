@@ -14,7 +14,7 @@ class SharedState:
         self.vCan = False
         self.vLin = False
 
-        self.isFlask = True
+        self.vite = True
         self.isKiosk = True
 
         self.rtiStatus = False
@@ -29,6 +29,7 @@ class SharedState:
         self.toggle_rti = threading.Event()
 
         self.exit_event = threading.Event()
+        self.restart_event = threading.Event()
 
         self.THREAD_STATES = {
             "server":   False,

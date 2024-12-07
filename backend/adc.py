@@ -45,14 +45,13 @@ class ADCThread(threading.Thread):
         print("Stopping ADC thread.")
         time.sleep(.5)
         self._stop_event.set()
-        self.client.disconnect()
-        #self.disconnect_from_socketio()
 
 
     def start_adc(self):
         while not self._stop_event.is_set():
             self.read_sensor()
             time.sleep(.1)
+        #self.disconnect_from_socketio()
 
 
     def read_settings(self):
@@ -114,25 +113,18 @@ class ADCThread(threading.Thread):
     def connect_to_socketio(self):
         max_retries = 5
         current_retry = 0
-        while not self.client.connected and current_retry < max_retries and not self._stop_event.is_set():
+        while not self.client.connected and current_retry < max_retries:
             try:
                 self.client.connect('http://localhost:4001', namespaces=['/adc'])
+                if(shared_state.verbose):
+                    if self.client.connected:
+                        print("ADC connected to Socket.IO")
+                    else:
+                        print("ADC failed to connect to Socket.IO.")
             except Exception as e:
                 print(f"ADCThread: Socket.IO connection failed. Retry {current_retry}/{max_retries}. Error: {e}")
                 time.sleep(2)
                 current_retry += 1
-
-        if(shared_state.verbose):
-            if self.client.connected:
-                print("ADC connected to Socket.IO")
-            else:
-                print("ADC failed to connect to Socket.IO.")
-
-    def disconnect_from_socketio(self):
-        print("Disconnecting ADCThread")
-        self.client.disconnect()
-        if not self.client.connected:
-            print("ADCThread disconnected.")
 
     def emit_data_to_frontend(self, data):
         if self.client and self.client.connected:
