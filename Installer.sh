@@ -20,6 +20,7 @@ user_exit() {
 }
 
 echo "Installing V-Link"
+echo "Please enter your password below. The installer needs sudo rights to install certain services. More info can be found in Installer.sh"
 sudo -v
 
 # Determine Raspberry Pi Version
@@ -245,9 +246,8 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStartPre=/sbin/modprobe uinput
-ExecStart=/bin/bash -c '/sbin/ip link set can0 up type can bitrate 500000'
-ExecStart=/bin/bash -c '/sbin/ip link set can1 up type can bitrate 125000'
+ExecStartPre=/bin/bash -c '/sbin/ip link set can0 down || true; /sbin/ip link set can1 down || true'
+ExecStart=/bin/bash -c '/sbin/modprobe uinput; /sbin/ip link set can0 up type can bitrate 500000; /sbin/ip link set can1 up type can bitrate 125000'
 ExecStop=/bin/bash -c '/sbin/ip link set can0 down; /sbin/ip link set can1 down'
 RemainAfterExit=true
 
@@ -260,10 +260,12 @@ fi
 
 # Step 7: Create autostart file for V-Link
 if confirm_action "create autostart file for V-Link"; then
+
+
     sudo bash -c "cat > /etc/xdg/autostart/v-link.desktop <<EOL
 [Desktop Entry]
 Name=V-Link
-Exec=sh -c '. $output_path/venv/bin/activate && python3 $output_path/V-Link.py'
+Exec=sh -c 'systemctl restart vlink.service && python $output_path/V-Link.py'
 Type=Application
 EOL"
 fi
