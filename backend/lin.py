@@ -67,8 +67,7 @@ class LINThread(threading.Thread):
             uinput.KEY_BACKSPACE,
             uinput.KEY_N,
             uinput.KEY_V,
-            uinput.KEY_G,
-            uinput.KEY_B,
+            uinput.KEY_H,
             uinput.KEY_SPACE,
             uinput.KEY_UP,
             uinput.KEY_DOWN,
@@ -85,6 +84,8 @@ class LINThread(threading.Thread):
         self.current_button = None
         self.current_joystick_button = None
         self.last_button_at = None
+        self.long_press_executed = False
+        self.last_joystick_at = 0
 
         self.mouse_mode = False
         
@@ -93,6 +94,7 @@ class LINThread(threading.Thread):
         self.mouse_speed = lin_settings["mouse_speed"]
         self.click_timeout = lin_settings.get("click_timeout", 300) # in milliseconds
         self.long_press_duration = lin_settings.get("long_press_duration", 2000) # in milliseconds
+
 
         # Button and joystick mappings
         self.button_mappings = self._parse_command_mappings(
@@ -130,7 +132,7 @@ class LINThread(threading.Thread):
         try:
             while not self._stop_event.is_set():
                 self._process_incoming_byte(self.lin_serial.read(1))
-                self.timeout_button()
+                self._timeout_button()
         except KeyboardInterrupt:
             print("Live data collection terminated.")
         except serial.SerialException as e:
@@ -182,7 +184,7 @@ class LINThread(threading.Thread):
         self._handle_joystick()
 
     def _handle_buttons(self):
-        frame_data = b"".join(self.lin_frame.get_byte(i) for i in range(5))
+        frame_data = b"".join(self.lin_frame.get_byte(i).to_bytes(1, 'big') for i in range(5))
         button_name = self.button_mappings.get(frame_data)
 
         if not button_name:
@@ -205,7 +207,9 @@ class LINThread(threading.Thread):
         # Trigger long press action if duration is exceeded and not already triggered
         if self.button_state == ButtonState.PRESSED and time_elapsed(self.button_down_at) > self.long_press_duration:
             self.button_state = ButtonState.LONG_PRESSED
-            self._trigger_long_press_action(button_name)
+            if not self.long_press_executed:  # Trigger only once
+                self._trigger_long_press_action(button_name)
+                self.long_press_executed = True
 
     def _press_button(self, button_name):
         """Press a button and trigger corresponding action."""
@@ -215,12 +219,15 @@ class LINThread(threading.Thread):
             case "BTN_ENTER":
                 print('Enter')
                 if self.mouse_mode:
-                    self.input_device.emit_click(uinput.BTN_LEFT)
+                    print('Left mouse click')
+                    self.input_device.emit(uinput.BTN_LEFT, 1)
+                    self.input_device.emit(uinput.BTN_LEFT, 0)
                 else:
-                    self.input_device.emit_click(uinput.KEY_SPACE)
+                    print('Spacebar')
+                    self.input_device.emit_click(uinput.KEY_SPACE, 1)
             case "BTN_BACK":
                 print('Back')
-                self.input_device.emit_click(uinput.KEY_BACKSPACE)
+                self.input_device.emit_click(uinput.KEY_BACKSPACE, 1)
             case "BTN_NEXT":
                 print('Next')
                 self.input_device.emit_click(uinput.KEY_N, 1)
@@ -229,17 +236,14 @@ class LINThread(threading.Thread):
                 self.input_device.emit_click(uinput.KEY_V, 1)
             case "BTN_VOL_UP":
                 print('Volume up')
-                self.input_device.emit_click(uinput.KEY_G, 1)
             case "BTN_VOL_DOWN":
                 print('Volume down')
-                self.input_device.emit_click(uinput.KEY_B, 1)
         
     def _trigger_long_press_action(self, button_name):
         """Perform a long press action."""
         print(f"Long press action triggered for {button_name}")
         match button_name:
             case "BTN_ENTER":
-                self.input_device.emit_click(uinput.BTN_LEFT)
                 shared_state.rtiStatus = not shared_state.rtiStatus
                 print(f"Toggled RTI status to {shared_state.rtiStatus}")
             case "BTN_PREV":
@@ -247,15 +251,18 @@ class LINThread(threading.Thread):
                 print(f"Toggled mouse mode to {self.mouse_mode}")
 
     def _release_button(self, button_name, press_duration):
-        """Reset button state, and start long press if duration was reached."""
+        """Reset button state and ensure no redundant long-press actions."""
         print(f"Button released: {button_name} after {press_duration}ms")
 
-        if self.button_state == ButtonState.LONG_PRESSED:
-            self._trigger_long_press_action(button_name)
-        
-        self.button_state = ButtonState.RELEASED
-        self.current_button = None
+        if self.long_press_executed:
+            print(f"Long press action already handled for {button_name}, skipping.")
+            self.long_press_executed = False
+        else:
+            print(f"Button {button_name} released without long press action.")
+
+        # Reset button state
         self.button_state = ButtonState.IDLE
+        self.current_button = None
 
     def _timeout_button(self):
         """Automatically release a button if it exceeds the click timeout."""
@@ -263,24 +270,19 @@ class LINThread(threading.Thread):
             self._release_button(self.current_button, time_elapsed(self.button_down_at))
 
     def _handle_joystick(self):
-        """Handle and perform joystick actions based on the current mode (mouse or keyboard)."""
-        frame_data = b"".join(self.lin_frame.get_byte(i) for i in range(5))
+        """Handle joystick actions based on the current mode (mouse or keyboard)."""
+        frame_data = b"".join(self.lin_frame.get_byte(i).to_bytes(1, 'big') for i in range(5))
         joystick_name = self.joystick_mappings.get(frame_data)
-
-        if not joystick_name:
-            if self.joystick_state != JoystickState.IDLE:
-                self._timeout_joystick()
-            return
 
         now = current_time_ms()
 
-        if joystick_name != self.current_joystick_button:
-            # New joystick action detected
-            self.current_joystick_button = joystick_name
-            self.joystick_state = JoystickState.MOVING
-            self.last_joystick_button_at = now
+        # If no joystick input, reset state but don't reset the timeout
+        if not joystick_name:
+            self.joystick_state = JoystickState.IDLE
+            self.current_joystick_button = None
+            return
 
-        # Perform joystick action
+        # Mouse mode: Continuous movement
         if self.mouse_mode:
             match joystick_name:
                 case "BTN_UP":
@@ -291,16 +293,25 @@ class LINThread(threading.Thread):
                     self._move_mouse(-1, 0)
                 case "BTN_RIGHT":
                     self._move_mouse(1, 0)
-        else:
-            match joystick_name:
-                case "BTN_UP":
-                    self.input_device.emit_click(uinput.KEY_UP)
-                case "BTN_DOWN":
-                    self.input_device.emit_click(uinput.KEY_DOWN)
-                case "BTN_LEFT":
-                    self.input_device.emit_click(uinput.KEY_LEFT)
-                case "BTN_RIGHT":
-                    self.input_device.emit_click(uinput.KEY_RIGHT)
+            return
+
+        # Enforce click timeout for keyboard mode
+        if now - self.last_joystick_at < self.click_timeout:
+            return
+
+        print(f"Joystick moved: {joystick_name}")
+        self.last_joystick_at = now  # Update timestamp to enforce timeout
+
+        # Perform single key press for keyboard mode
+        match joystick_name:
+            case "BTN_UP":
+                self.input_device.emit_click(uinput.KEY_UP, 1)
+            case "BTN_DOWN":
+                self.input_device.emit_click(uinput.KEY_H, 1)
+            case "BTN_LEFT":
+                self.input_device.emit_click(uinput.KEY_LEFT, 1)
+            case "BTN_RIGHT":
+                self.input_device.emit_click(uinput.KEY_RIGHT, 1)
 
     def _move_mouse(self, dx, dy):
         scaled_dx = int(dx * self.mouse_speed)
@@ -310,10 +321,3 @@ class LINThread(threading.Thread):
         self.input_device.emit(uinput.REL_Y, scaled_dy)
 
         print(f"Moving mouse, dx={scaled_dx}, dy={scaled_dy}, speed={self.mouse_speed}")
-
-    def _timeout_joystick(self):
-        """Reset joystick state after inactivity."""
-        if self.current_joystick_button and time_elapsed(self.last_joystick_button_at) > self.click_timeout:
-            print(f"Joystick released: {self.current_joystick_button}")
-            self.joystick_state = JoystickState.IDLE
-            self.current_joystick_button = None
