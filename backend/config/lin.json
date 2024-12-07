@@ -11,11 +11,9 @@
     "sync_id": "0x55",
     "zero_code": "0xFF",
     "ign_on": ["0x50", "0x0E", "0x00", "0xF1"],
-    "frame_threshold": 8,
-    "long_press_frame_treshold": 30,
-    "mouse_speed": 3,
-    "mouse_multiplier": 2,
-    "mouse_max_speed": 40,
+    "long_press_duration": 1500,
+    "click_timeout": 300,
+    "mouse_speed": 8,
 
     "commands": {
         "button": {

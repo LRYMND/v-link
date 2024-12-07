@@ -3,20 +3,26 @@ import time
 import sys
 import serial
 import uinput
+from enum import Enum, auto
 from pathlib import Path
 from . import settings
 from .shared.shared_state import shared_state
 
+def current_time_ms():
+    return int(time.time() * 1000)
+
+def time_elapsed(start_time):
+    return current_time_ms() - start_time
+
 class Config:
     def __init__(self):
-        self.linSettings = settings.load_settings("lin")
-
+        self.lin_settings = settings.load_settings("lin")
 
 class LinFrame:
     kMaxBytes = 8
 
     def __init__(self):
-        self.bytes = []
+        self.bytes = bytearray()
 
     def append_byte(self, b):
         self.bytes.append(b)
@@ -31,93 +37,37 @@ class LinFrame:
         return len(self.bytes)
 
     def reset(self):
-        self.bytes = []
+        self.bytes.clear()
 
     def is_valid(self):
         return len(self.bytes) >= 6
+    
+class ButtonState(Enum):
+    IDLE = auto()
+    PRESSED = auto()
+    LONG_PRESSED = auto()
+    RELEASED = auto()
 
-
-class ButtonHandler:
-    def __init__(self):
-        self.config = Config()
-        self.frame_count = 0
-        self.long_press_frame_count = 0
-        self.last_button_name = None
-        self.frame_threshold = self.config.linSettings["frame_threshold"]
-        self.long_press_frame_treshold = self.config.linSettings["long_press_frame_treshold"]
-
-        # Convert button and joystick commands from hex strings to bytes and store in dictionaries
-        self.button_codes = {
-            bytes.fromhex("".join(cmd.replace("0x", "") for cmd in command)): name
-            for name, command in self.config.linSettings["commands"]["button"].items()
-        }
-        self.joystick_codes = {
-            bytes.fromhex("".join(cmd.replace("0x", "") for cmd in command)): name
-            for name, command in self.config.linSettings["commands"]["joystick"].items()
-        }
-
-    def handle_button_press(self, frame_data):
-        # Look up both button and joystick codes
-        button_name = self.button_codes.get(frame_data) or self.joystick_codes.get(frame_data) 
-
-        if button_name:
-            # joystick
-            if button_name in self.joystick_codes.values():
-                return button_name, False  # Joystick buttons only trigger short press
-
-            # Check if the button is the same as the last one pressed, otherwise count other button
-            if button_name == self.last_button_name:
-                self.frame_count += 1
-                self.long_press_frame_count += 1
-            else:
-                self.frame_count = 1
-                self.long_press_frame_count += 1
-                self.last_button_name = button_name
-
-            # short press
-            if self.frame_count == self.frame_threshold:
-                self.frame_count = 0
-                return button_name, False
-
-            # long press based on long press treshold
-            if self.long_press_frame_count >= self.long_press_frame_treshold:
-                self.long_press_frame_count = 0
-                return button_name, True
-            
-            return button_name, None
-        else:
-            # Reset frame count if no button is detected
-            self.frame_count = 0
-            self.long_press_frame_count = 0
-            self.last_button_name = None
-
-        return None, False
-
-
+class JoystickState(Enum):
+    IDLE = auto()
+    MOVING = auto()
+    
 class LINThread(threading.Thread):
     def __init__(self):
         super(LINThread, self).__init__()
         self.config = Config()
-        self.linframe = LinFrame()
-        self.button_handler = ButtonHandler()
-        self.LINSerial = None
-        self.mouseBaseSpeed = self.config.linSettings["mouse_speed"]
-        self.mouseMultiplier = self.config.linSettings["mouse_multiplier"]
-        self.mouseMaxSpeed = self.config.linSettings["mouse_max_speed"]
-        self.mouseSpeed = self.mouseBaseSpeed
-        self.mouseMode = False
+        self.lin_frame = LinFrame()
+        self.lin_serial = None
 
-        # Initialize uinput device for mouse and keyboard
-        self.device = uinput.Device([
+        # input device initialization
+        self.input_device = uinput.Device([
             uinput.REL_X,        # Relative X axis (horizontal movement)
             uinput.REL_Y,        # Relative Y axis (vertical movement)
-            uinput.BTN_LEFT,     # Left mouse button
-            # uinput.BTN_RIGHT,    # Right mouse button
+            uinput.BTN_LEFT,     # Mouse left click
             uinput.KEY_BACKSPACE,
             uinput.KEY_N,
             uinput.KEY_V,
-            uinput.KEY_G,
-            uinput.KEY_B,
+            uinput.KEY_H,
             uinput.KEY_SPACE,
             uinput.KEY_UP,
             uinput.KEY_DOWN,
@@ -127,37 +77,70 @@ class LINThread(threading.Thread):
 
         self._stop_event = threading.Event()
         self.daemon = True
-        self.linframe = LinFrame()
+
+        # State variables
+        self.button_state = ButtonState.IDLE
+        self.joystick_state = JoystickState.IDLE
+        self.current_button = None
+        self.current_joystick_button = None
+        self.last_button_at = None
+        self.long_press_executed = False
+        self.last_joystick_at = 0
+
+        self.mouse_mode = False
+        
+        # Timing config
+        lin_settings = self.config.lin_settings
+        self.mouse_speed = lin_settings["mouse_speed"]
+        self.click_timeout = lin_settings.get("click_timeout", 300) # in milliseconds
+        self.long_press_duration = lin_settings.get("long_press_duration", 2000) # in milliseconds
+
+
+        # Button and joystick mappings
+        self.button_mappings = self._parse_command_mappings(
+            lin_settings["commands"]["button"]
+        )
+        self.joystick_mappings = self._parse_command_mappings(
+            lin_settings["commands"]["joystick"]
+        )
+
+    def _parse_command_mappings(self, commands):
+        return {
+            bytes.fromhex("".join(cmd.replace("0x", "") for cmd in command)): name
+            for name, command in commands.items()
+        }
 
     def run(self):
         if not shared_state.vLin:
             try:
-                if(shared_state.rpiModel == 5):
-                    self.LINSerial = serial.Serial(port="/dev/ttyAMA0", baudrate=9600, timeout=1)
-                else:
-                    self.LINSerial = serial.Serial(port="/dev/ttyS0", baudrate=9600, timeout=1)
-                self.read_from_serial()
+                port = "/dev/ttyAMA0" if shared_state.rpiModel == 5 else "/dev/ttyS0"
+                
+                self.lin_serial = serial.Serial(port=port, baudrate=9600, timeout=1)
+                self._read_from_serial()
             except Exception as e:
-                print("uart error: ", e)
+                print("UART error: ", e)
         else:
-            self.read_from_file()
+            self._read_from_file()
 
     def stop_thread(self):
         print("Stopping LIN thread.")
         time.sleep(.5)
         self._stop_event.set()
+        del self.input_device # Remove uinput device
 
-    def read_from_serial(self):
+    def _read_from_serial(self):
         try:
             while not self._stop_event.is_set():
-                self.process_incoming_byte(self.LINSerial.read(1))
+                self._process_incoming_byte(self.lin_serial.read(1))
+                self._timeout_button()
         except KeyboardInterrupt:
             print("Live data collection terminated.")
-        finally:
-            if self.LINSerial.is_open:
-                self.LINSerial.close()
+        except serial.SerialException as e:
+            print(f"Serial communication error: {e}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
 
-    def read_from_file(self):
+    def _read_from_file(self):
         print("Replaying LIN bus data from file...")
         try:
             with open(Path(__file__).parent / "dev/lin_test.txt", "r") as file:
@@ -166,132 +149,175 @@ class LINThread(threading.Thread):
                         break
                     frame_data = [int(byte, 16) for byte in line.strip().split()]
                     for byte in frame_data:
-                        self.process_incoming_byte(byte.to_bytes(1, 'big'))
+                        self._process_incoming_byte(byte.to_bytes(1, 'big'))
                     time.sleep(0.1)
         except KeyboardInterrupt:
             print("Replay terminated.")
 
-    def process_incoming_byte(self, byte):
-        n = self.linframe.num_bytes()
+    def _process_incoming_byte(self, byte):
+        n = self.lin_frame.num_bytes()
+        sync_id = bytes.fromhex(self.config.lin_settings["sync_id"][2:])
 
-        # Access SYNC_ID from linSettings and convert it to bytes
-        sync_id = bytes.fromhex(self.config.linSettings["sync_id"][2:])
-        
-        # Check if the incoming byte matches SYNC_ID and conditions for handling the frame
-        if byte == sync_id and n > 2 and self.linframe.get_byte(n - 1) == b'\x00':
-            self.linframe.pop_byte()
-            self.handle_swm_frame()
-            self.linframe.reset()
-        elif n == self.linframe.kMaxBytes:
-            self.linframe.reset()
+        if byte == sync_id and n > 2 and self.lin_frame.get_byte(n - 1) == 0x00:
+            self.lin_frame.pop_byte()
+            self._handle_frame()
+            self.lin_frame.reset()
+        elif n == self.lin_frame.kMaxBytes:
+            self.lin_frame.reset()
         else:
-            self.linframe.append_byte(byte)
+            self.lin_frame.append_byte(byte[0] if isinstance(byte, bytes) else byte)
 
-    def handle_swm_frame(self):
-        # Check SWM_ID in frame against linSettings
-        swm_id = bytes.fromhex(self.config.linSettings["swm_id"][2:])
-        if self.linframe.get_byte(0) != swm_id:
-            return 
+    def _handle_frame(self):
+        """Process a complete LIN frame."""
+        swm_id = bytes.fromhex(self.config.lin_settings["swm_id"][2:])
+        if self.lin_frame.get_byte(0) != swm_id[0]:
+            return
         
-        # do not continue on zero values (nothing being pressed)
-        zero_code = bytes.fromhex(self.config.linSettings["zero_code"][2:])
-        if self.linframe.get_byte(5) == zero_code:
-            self.mouseSpeed = self.mouseBaseSpeed # reset mouse speed on button release
-            return 
-
-        if not self.linframe.is_valid():
+        zero_code = bytes.fromhex(self.config.lin_settings["zero_code"][2:])
+        if self.lin_frame.get_byte(5) == zero_code[0]:
             return
 
-        # Handle buttons if the frame is valid
-        self.handle_buttons()
-        self.linframe.reset()
-
-    def handle_buttons(self):
-        frame_data = b"".join(self.linframe.get_byte(i) for i in range(5))
-        checksum = self.linframe.get_byte(5)
-
-        # Check if frame_data matches IGN_KEY_ON from linSettings
-        ign_key_on = bytes.fromhex("".join(cmd.replace("0x", "") for cmd in self.config.linSettings["ign_on"]))
-        if frame_data == ign_key_on:
+        if not self.lin_frame.is_valid():
             return
 
-        button_name, is_long_press = self.button_handler.handle_button_press(frame_data)
-        if button_name:
-            if is_long_press:
-                if button_name == "BTN_BACK":
-                    # Toggle RTI (open/close)
-                    shared_state.rtiStatus = not shared_state.rtiStatus
-                    print(f"Toggled RTI status to {shared_state.rtiStatus}")
+        self._handle_buttons()
+        self._handle_joystick()
 
-                elif button_name == "BTN_ENTER":
-                    # Toggle mouse mode
-                    self.mouseMode = not self.mouseMode
-                    print(f"Toggled mouse mode to {self.mouseMode}")
-            else:
-                print(f'Pressing: {button_name}')
-                self.execute_action(button_name)
+    def _handle_buttons(self):
+        frame_data = b"".join(self.lin_frame.get_byte(i).to_bytes(1, 'big') for i in range(5))
+        button_name = self.button_mappings.get(frame_data)
+
+        if not button_name:
+            if self.button_state != ButtonState.IDLE:
+                self._timeout_button()  # Check if the current button needs to be released
+            return
+
+        now = current_time_ms()
+
+        if button_name != self.current_button:
+            if self.current_button:
+                self._release_button(self.current_button, time_elapsed(self.button_down_at))
+            self._press_button(button_name)
+            self.current_button = button_name
+            self.button_state = ButtonState.PRESSED
+            self.button_down_at = now
+
+        self.last_button_at = now
+
+        # Trigger long press action if duration is exceeded and not already triggered
+        if self.button_state == ButtonState.PRESSED and time_elapsed(self.button_down_at) > self.long_press_duration:
+            self.button_state = ButtonState.LONG_PRESSED
+            if not self.long_press_executed:  # Trigger only once
+                self._trigger_long_press_action(button_name)
+                self.long_press_executed = True
+
+    def _press_button(self, button_name):
+        """Press a button and trigger corresponding action."""
+        print(f"Button pressed: {button_name}")
+        
+        match button_name:
+            case "BTN_ENTER":
+                print('Enter')
+                if self.mouse_mode:
+                    print('Left mouse click')
+                    self.input_device.emit(uinput.BTN_LEFT, 1)
+                    self.input_device.emit(uinput.BTN_LEFT, 0)
+                else:
+                    print('Spacebar')
+                    self.input_device.emit_click(uinput.KEY_SPACE, 1)
+            case "BTN_BACK":
+                print('Back')
+                self.input_device.emit_click(uinput.KEY_BACKSPACE, 1)
+            case "BTN_NEXT":
+                print('Next')
+                self.input_device.emit_click(uinput.KEY_N, 1)
+            case "BTN_PREV":
+                print('Previous')
+                self.input_device.emit_click(uinput.KEY_V, 1)
+            case "BTN_VOL_UP":
+                print('Volume up')
+            case "BTN_VOL_DOWN":
+                print('Volume down')
+        
+    def _trigger_long_press_action(self, button_name):
+        """Perform a long press action."""
+        print(f"Long press action triggered for {button_name}")
+        match button_name:
+            case "BTN_ENTER":
+                shared_state.rtiStatus = not shared_state.rtiStatus
+                print(f"Toggled RTI status to {shared_state.rtiStatus}")
+            case "BTN_PREV":
+                self.mouse_mode = not self.mouse_mode
+                print(f"Toggled mouse mode to {self.mouse_mode}")
+
+    def _release_button(self, button_name, press_duration):
+        """Reset button state and ensure no redundant long-press actions."""
+        print(f"Button released: {button_name} after {press_duration}ms")
+
+        if self.long_press_executed:
+            print(f"Long press action already handled for {button_name}, skipping.")
+            self.long_press_executed = False
         else:
-            formatted_frame_data = " ".join(f"{byte:02X}" for byte in frame_data) + f" {checksum.hex().upper()}"
-            print(f"Unrecognized frame: {formatted_frame_data}")
-    
-    def execute_action(self, button_name):
-        try:
-            match button_name:
-                # Emulate the SWC module as keyboard.
-                # These configurations need to stay hardcoded.
-                # It's possible to configure the actions through the app.
-                case "BTN_ENTER":
-                    print('Enter')
-                    if(self.mouseMode):
-                        self.device.emit_click(uinput.BTN_LEFT, 1)
-                    else:
-                        self.device.emit_click(uinput.KEY_SPACE, 1)
-                case "BTN_BACK":
-                    print('Back')
-                    self.device.emit_click(uinput.KEY_BACKSPACE, 1)
-                case "BTN_NEXT":
-                    print('Next')
-                    self.device.emit_click(uinput.KEY_N, 1)
-                case "BTN_PREV":
-                    print('Previous')
-                    self.device.emit_click(uinput.KEY_V, 1)
-                case "BTN_VOL_UP":
-                    print('Volume up')
-                    self.device.emit_click(uinput.KEY_G, 1)
-                case "BTN_VOL_DOWN":
-                    print('Volume down')
-                    self.device.emit_click(uinput.KEY_B, 1)
+            print(f"Button {button_name} released without long press action.")
+
+        # Reset button state
+        self.button_state = ButtonState.IDLE
+        self.current_button = None
+
+    def _timeout_button(self):
+        """Automatically release a button if it exceeds the click timeout."""
+        if self.current_button and time_elapsed(self.last_button_at) > self.click_timeout:
+            self._release_button(self.current_button, time_elapsed(self.button_down_at))
+
+    def _handle_joystick(self):
+        """Handle joystick actions based on the current mode (mouse or keyboard)."""
+        frame_data = b"".join(self.lin_frame.get_byte(i).to_bytes(1, 'big') for i in range(5))
+        joystick_name = self.joystick_mappings.get(frame_data)
+
+        now = current_time_ms()
+
+        # If no joystick input, reset state but don't reset the timeout
+        if not joystick_name:
+            self.joystick_state = JoystickState.IDLE
+            self.current_joystick_button = None
+            return
+
+        # Mouse mode: Continuous movement
+        if self.mouse_mode:
+            match joystick_name:
                 case "BTN_UP":
-                    print('Joystick up')
-                    if(self.mouseMode):
-                        self.move_mouse(0, -1)
-                    else:
-                        self.device.emit_click(uinput.KEY_UP, 1)
+                    self._move_mouse(0, -1)
                 case "BTN_DOWN":
-                    print('Joystick down')
-                    if(self.mouseMode):
-                        self.move_mouse(0, 1)
-                    else:
-                        self.device.emit_click(uinput.KEY_DOWN, 1)
+                    self._move_mouse(0, 1)
                 case "BTN_LEFT":
-                    print('Joystick left')
-                    if(self.mouseMode):
-                        self.move_mouse(-1, 0)
-                    else:
-                        self.device.emit_click(uinput.KEY_LEFT, 1)
+                    self._move_mouse(-1, 0)
                 case "BTN_RIGHT":
-                    print('Joystick right')
-                    if(self.mouseMode):
-                        self.move_mouse(1, 0)
-                    else:
-                        self.device.emit_click(uinput.KEY_RIGHT, 1)
-        except Exception as e:
-            print(f"Error in action: {e}")
+                    self._move_mouse(1, 0)
+            return
 
-    def move_mouse(self, dx, dy):
-        # Increment mouse speed, with a capped max speed
-        self.mouseSpeed = min(self.mouseSpeed + self.mouseMultiplier, self.mouseMaxSpeed)
+        # Enforce click timeout for keyboard mode
+        if now - self.last_joystick_at < self.click_timeout:
+            return
 
-        # Move mouse relative to current position using uinput
-        self.device.emit(uinput.REL_X, int(dx * self.mouseSpeed))
-        self.device.emit(uinput.REL_Y, int(dy * self.mouseSpeed))
+        print(f"Joystick moved: {joystick_name}")
+        self.last_joystick_at = now  # Update timestamp to enforce timeout
+
+        # Perform single key press for keyboard mode
+        match joystick_name:
+            case "BTN_UP":
+                self.input_device.emit_click(uinput.KEY_UP, 1)
+            case "BTN_DOWN":
+                self.input_device.emit_click(uinput.KEY_H, 1)
+            case "BTN_LEFT":
+                self.input_device.emit_click(uinput.KEY_LEFT, 1)
+            case "BTN_RIGHT":
+                self.input_device.emit_click(uinput.KEY_RIGHT, 1)
+
+    def _move_mouse(self, dx, dy):
+        scaled_dx = int(dx * self.mouse_speed)
+        scaled_dy = int(dy * self.mouse_speed)
+
+        self.input_device.emit(uinput.REL_X, scaled_dx)
+        self.input_device.emit(uinput.REL_Y, scaled_dy)
+
+        print(f"Moving mouse, dx={scaled_dx}, dy={scaled_dy}, speed={self.mouse_speed}")
