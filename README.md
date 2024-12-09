@@ -48,8 +48,8 @@ When using the Installer, all prerequisites and resources should be downloaded a
 ```
 #Download and Install
 wget "https://github.com/LRYMND/v-link/releases/download/v2.2.0/Installer.sh"
-chmod +x Installer.sh
-./Installer.sh
+sudo chmod +x Installer.sh
+sudo ./Installer.sh
 
 #Test Hardware (Requires V-Link HAT)
 python /home/$USER/v-link/HWT.py
