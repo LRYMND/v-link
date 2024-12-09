@@ -26,18 +26,24 @@ const TopBar = () => {
 
   return (
     <div className={`topbar ${app.settings.general.colorTheme.value}`} style={{
+      background: 'var(--bgGradient2)',
       height: `${app.settings.side_bars.topBarHeight.value}px`,
+      width: `100%`,
       display: 'flex',
-      flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
       top: 0,
-      width: '100%',
-      background: 'var(--background-color)'
     }}>
-      <div className='row' style={{ height: "100%", justifyContent: 'center' }}>
-        <div className='column'>
-          <div className='row' style={{ justifyContent: 'center' }}>
+      <div style={{
+        display: 'flex',
+        flexDirection:'row',
+        height: `${app.settings.side_bars.topBarHeight.value * 2}px`,
+        width: `${app.system.contentSize.width - (app.settings.general.contentPadding.value * 2)}px`,
+        marginTop: '-40px',
+        alignItems: 'flex-end',
+        }}>
+        <div className='column' style={{height: `${app.settings.side_bars.topBarHeight.value}px`}}>
+          <div className='row'>
             <div style={{ display: 'flex', alignItems:'center', gap: '20px' }}>
               <svg className={`status-icon status-icon--${(app.system.wifiState ? "active" : "inactive")}`}>
                 <use xlinkHref="/assets/svg/wifi.svg#wifi"></use>
@@ -51,12 +57,12 @@ const TopBar = () => {
             </div>
           </div>
         </div>
-        <div className='column' style={{justifyContent: 'flex-start', flex:`0 1 50%`}}>
+        <div className='column' style={{height: `${app.settings.side_bars.topBarHeight.value}px`, justifyContent: 'flex-start', flex:`0 1 50%`}}>
           <svg viewBox="0 0 350.8 48.95" xmlns="http://www.w3.org/2000/svg">
-            <use xlinkHref="/assets/svg/banner.svg#volvo"></use>
+            <use xlinkHref="/assets/svg/typo.svg#volvo"></use>
           </svg>
         </div>
-        <div className='column'>
+        <div className='column' style={{height: `${app.settings.side_bars.topBarHeight.value}px`, justifyContent:'center'}}>
           <h2 style={{ color: "var(--themeDefault)" }}>{time.toLocaleTimeString('sv-SV', { hour: '2-digit', minute: '2-digit' })} </h2>
         </div>
       </div>

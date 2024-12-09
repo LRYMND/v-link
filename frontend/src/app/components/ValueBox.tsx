@@ -18,8 +18,8 @@ const ValueBox = ({
   height,
   width = '100%',
 
-  labelSize = '2vh',
-  valueSize = '3vh',
+  labelSize = '3vmin',
+  valueSize = '5vmin',
 }) => {
 
   // Load Settings
@@ -34,28 +34,23 @@ const ValueBox = ({
   return (
     <div className='value-box' style={{
       display: 'flex',
-      justifyContent: 'space-between',
+      alignItems: 'center',
+      justifyContent: 'space-around',
       flexDirection: style,
+      
       height: height, 
       width: width,
       borderRadius: '10px',
-      backgroundColor: boxColor,
+      background: 'linear-gradient(0deg, #101010, #151515',
       border: `${borderWidth} solid ${borderColor}`
     }}>
       <div className='value-box__label' style={{
-        alignSelf: 'flex-start',
-        marginLeft: '1%',
-        marginTop: '1%',
         fontSize: labelSize,
         color: textColorDefault,
       }}>
         {settings.label}:
       </div>
       <div className='value-box__data' style={{
-        alignSelf: 'center',
-        marginLeft: 'auto',
-        marginRight: '5%',
-        marginBottom: '10%',
         fontSize: valueSize,
         color: value >= settings.limit_start ? limitColor : valueColor,
       }}>

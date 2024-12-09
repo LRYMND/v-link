@@ -42,7 +42,7 @@ function App() {
 
     // Check if a key for switching the pages was assigned
     if (system.switch) {
-    
+
       // If user is not switching the page, send control to CarPlay
       if (event.code != system.switch) {
         if (Object.values(mmi!.bindings).includes(event.code)) {
@@ -67,7 +67,7 @@ function App() {
   }
 
   return (
-    <div style={{ overflow: 'hidden'}}>
+    <div style={{ overflow: 'hidden', background: 'var(--bgGradient1)', }}>
       <Socket />
       <Cardata />
       <Splash />
@@ -78,7 +78,7 @@ function App() {
           {system.interface.topBar && (<TopBar />)}
 
           <Carplay receivingVideo={receivingVideo} setReceivingVideo={setReceivingVideo} commandCounter={commandCounter} command={keyCommand} />
-          <Content/>
+          <Content />
 
           {system.interface.navBar && (<NavBar />)}
         </> : <></>}

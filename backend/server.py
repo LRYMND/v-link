@@ -62,23 +62,6 @@ class ServerThread(threading.Thread):
         # Raise StopServe to terminate the WSGI server loop
         eventlet.spawn(self.server_socket.close)
         self.stop_event.set()
-
-
-    @staticmethod
-    def toggle_hdmi():
-        # Toggle HDMI based on display protocol
-        hdmi_on, hdmi_off = (
-            ("wlr-randr --output HDMI-A-1 --on", "wlr-randr --output HDMI-A-1 --off")
-            if shared_state.sessionType == 'wayland'
-            else ("vcgencmd display_power 1", "vcgencmd display_power 0")
-        )
-
-        if  not shared_state.hdmiStatus or not shared_state.rtiStatus:
-            if (shared_state.verbose): print("HDMI Off")
-            os.system(hdmi_off)
-        else:
-            if (shared_state.verbose): print("HDMI On")
-            os.system(hdmi_on)
         
     # Add custom headers to all responses
     @server.after_request
@@ -162,19 +145,18 @@ class ServerThread(threading.Thread):
         elif args == 'reset':
             settings.reset_settings("app")
             socketio.emit("settings", settings.load_settings("app"), namespace='/app')
-        elif args == 'quit':
-            shared_state.exit_event.set()
-        elif args == 'restart':
-            shared_state.restart_event.set()
         elif args == 'rti':
             shared_state.rtiStatus = not shared_state.rtiStatus
             shared_state.hdmiStatus = shared_state.rtiStatus
             if (shared_state.verbose): print("hdmi status", shared_state.hdmiStatus)
             if (shared_state.verbose): print("rti status", shared_state.rtiStatus)
             socketio.emit('state', shared_state.rtiStatus, namespace="/rti")
-            ServerThread.toggle_hdmi()
+            shared_state.hdmi_event.set()
+        elif args == 'quit':
+            shared_state.exit_event.set()
+        elif args == 'restart':
+            shared_state.restart_event.set()
         elif args == 'hdmi':
-            shared_state.hdmiStatus = not shared_state.hdmiStatus
-            ServerThread.toggle_hdmi()
+            shared_state.hdmi_event.set()
         else:
             if (shared_state.verbose): print('Unknown action:', args)

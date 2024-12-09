@@ -210,6 +210,24 @@ class VLINK:
             
             self.start_modules()
 
+    def process_hdmi_event(self):
+        if shared_state.hdmi_event.is_set():
+            shared_state.hdmi_event.clear()
+            hdmi_on, hdmi_off = (
+                ("wlr-randr --output HDMI-A-1 --on", "wlr-randr --output HDMI-A-1 --off")
+                if shared_state.sessionType == 'wayland'
+                else ("vcgencmd display_power 1", "vcgencmd display_power 0")
+            )
+
+            if  not shared_state.hdmiStatus:
+                if (shared_state.verbose): print("HDMI Off")
+                os.system(hdmi_off)
+            else:
+                if (shared_state.verbose): print("HDMI On")
+                os.system(hdmi_on)
+
+            shared_state.hdmiStatus = not shared_state.hdmiStatus
+
 
     def print_thread_states(self):
         if(shared_state.verbose):
@@ -301,6 +319,7 @@ if __name__ == '__main__':
             vlink.process_toggle_event()
             vlink.process_exit_event()
             vlink.process_restart_event()
+            vlink.process_hdmi_event()
 
             if not shared_state.verbose:
                 display_thread_states()

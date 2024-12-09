@@ -42,19 +42,18 @@ const Charts = () => {
                                 unit={true}
 
                                 textColorDefault={'var(--textColorDefault)'}
-                                valueColor={'var(--textColorDefault)'}
+                                valueColor={'var(--themeDefault)'}
                                 limitColor={'var(--themeAccent)'}
-                                boxColor={'var(--backgroundColor)'}
+                                boxColor={'var(--boxColorDarker)'}
                                 borderColor={'var(--boxColorDark)'}
 
-                                borderWidth={'.75vh'}
-                                style={"column"}
+                                borderWidth={'0px'}
 
                                 height={"10vh"}
                                 width={"100%"}
 
-                                labelSize={`calc(3vh * ${app.system.textScale})`}
-                                valueSize={`calc(6vh * ${app.system.textScale})`}
+                                labelSize={`calc(3vmin * ${app.system.textScale}`}
+                                valueSize={`calc(5vmin * ${app.system.textScale}`}
                             />
                         </div>
                     );
@@ -71,10 +70,10 @@ const Charts = () => {
         <>
             {ready ?
                 <>
-                    <div className='row'>
+                    <div className='row' style={{overflow:'auto'}}>
                         <LineChart
                             setCount={setCount}
-                            width={app.system.contentSize.width - app.settings.constants.padding}
+                            width={app.system.contentSize.width - (app.settings.general.contentPadding.value * 2)}
                             height={app.system.contentSize.height * 0.6}
                             padding={70}  // Update with the desired padding
                             tickCountX={5}  // Update with the desired number of X-axis ticks

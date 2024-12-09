@@ -20,8 +20,20 @@ user_exit() {
 }
 
 echo "Installing V-Link"
-echo "Please enter your password below. The installer needs sudo rights to install certain services. More info can be found in Installer.sh"
-sudo -v
+
+if [[ $EUID -ne 0 ]]; then
+  echo "This script must be run as root to install certain services. Please use sudo. More information can be found in the source of this installer." >&2
+  exit 1
+fi
+
+if [ -z "$SUDO_USER" ]; then
+    # Fallback: Get the current user
+    CURRENT_USER=$(whoami)
+else
+    CURRENT_USER=$SUDO_USER
+fi
+
+echo "Running the script as: $CURRENT_USER"
 
 # Determine Raspberry Pi Version
 if [ -f /proc/device-tree/model ]; then
@@ -83,25 +95,10 @@ fi
 if confirm_action "install Boosted Moose V-Link now"; then
     # Step 4.1: Install dependencies
     sudo apt-get install -y ffmpeg libudev-dev libusb-dev build-essential
-    # Step 4.2: Create udev rules
-    echo "Creating combined udev rule"
-    RULE_FILE=/etc/udev/rules.d/42-v-link.rules
-
-    # Write all rules into a single file
-    echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="1314", ATTR{idProduct}=="152*", MODE="0660", GROUP="plugdev"' | sudo tee $RULE_FILE
-    echo 'KERNEL=="ttyS0", MODE="0660", GROUP="plugdev"' | sudo tee -a $RULE_FILE
-    echo 'KERNEL=="uinput", MODE="0660", GROUP="plugdev"' | sudo tee -a $RULE_FILE
-
-    if [[ $? -eq 0 ]]; then
-        echo -e "Permissions created\n"
-    else
-        echo -e "Unable to create permissions\n"
-    fi
-
-
+    
     # Step 4.4: Download the file
     download_url="https://github.com/LRYMND/v-link/releases/download/v2.2.0/V-Link.zip"
-    output_path="/home/$USER/v-link"
+    output_path="/home/$CURRENT_USER/v-link"
     echo "Downloading files to: $output_path"
     mkdir -p $output_path
     curl -L $download_url --output $output_path/V-Link.zip
@@ -127,7 +124,9 @@ if confirm_action "install Boosted Moose V-Link now"; then
     pip3 install -r $requirements
     echo -e "\nV-Link installation completed.\n"
 else
-    user_exit
+    if confirm_action "do you want to abort the installation"; then
+        user_exit
+    fi
 fi
 
 # Step 5: Download overlay files to /boot/overlays
@@ -246,9 +245,9 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStartPre=/bin/bash -c '/sbin/ip link set can0 down || true; /sbin/ip link set can1 down || true'
-ExecStart=/bin/bash -c '/sbin/modprobe uinput; /sbin/ip link set can0 up type can bitrate 500000; /sbin/ip link set can1 up type can bitrate 125000'
-ExecStop=/bin/bash -c '/sbin/ip link set can0 down; /sbin/ip link set can1 down'
+ExecStartPre=/bin/bash -c '/usr/sbin/ip link set can0 down || true; /usr/sbin/ip link set can1 down || true'
+ExecStart=/bin/bash -c '/usr/sbin/modprobe uinput; /usr/sbin/ip link set can0 up type can bitrate 500000; /usr/sbin/ip link set can1 up type can bitrate 125000'
+ExecStop=/bin/bash -c '/usr/sbin/ip link set can0 down; /usr/sbin/ip link set can1 down'
 RemainAfterExit=true
 
 [Install]
@@ -257,20 +256,67 @@ EOF"
         sudo systemctl enable vlink.service && systemctl daemon-reload
 fi
 
+# Step 8: Create V-Link systemd service
+if confirm_action "create udev rules for V-Link"; then
+    echo "Creating combined udev rule"
+    RULE_FILE=/etc/udev/rules.d/42-vlink.rules
 
-# Step 7: Create autostart file for V-Link
+    # Write all rules into a single file
+    echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="1314", ATTR{idProduct}=="152*", MODE="0660", GROUP="plugdev"' | sudo tee $RULE_FILE
+    echo 'KERNEL=="ttyS0", MODE="0660", GROUP="plugdev"' | sudo tee -a $RULE_FILE
+    echo 'KERNEL=="uinput", MODE="0660", GROUP="plugdev"' | sudo tee -a $RULE_FILE
+
+    if [[ $? -eq 0 ]]; then
+        echo -e "Permissions created\n"
+    else
+        echo -e "Unable to create permissions\n"
+    fi
+fi
+
+
+# Step 9: Create autostart file for V-Link
 if confirm_action "create autostart file for V-Link"; then
+    output_path="/home/$CURRENT_USER/v-link"
 
-
-    sudo bash -c "cat > /etc/xdg/autostart/v-link.desktop <<EOL
+    sudo bash -c "cat > /etc/xdg/autostart/vlink.desktop <<EOL
 [Desktop Entry]
 Name=V-Link
-Exec=sh -c 'systemctl restart vlink.service && python $output_path/V-Link.py'
+Exec=sh -c 'sudo systemctl restart vlink.service && python $output_path/V-Link.py'
 Type=Application
 EOL"
 fi
 
-# Step 8: Prompt to reboot the system
+# Step 10: Enable sudo permission for systemctl restart
+if confirm_action "enable V-Link to restart vlink.service as sudo"; then
+    SERVICE_NAME="vlink"
+    SUDOERS_FILE="/etc/sudoers.d/$SERVICE_NAME"
+    CURRENT_USER=$(whoami)
+
+    # Check if the sudoers file already exists
+    if [[ -f "$SUDOERS_FILE" ]]; then
+        echo "Sudoers file for $SERVICE_NAME already exists at $SUDOERS_FILE. Skipping creation."
+    else
+        echo "Creating sudoers rule for user '$CURRENT_USER' to restart '$SERVICE_NAME'..."
+
+        # Write the rule to a new sudoers file
+        {
+            echo "# Allow $CURRENT_USER to restart $SERVICE_NAME without a password"
+            echo "$CURRENT_USER ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart $SERVICE_NAME.service"
+        } > "$SUDOERS_FILE"
+
+        # Validate the sudoers file syntax
+        if visudo -c -f "$SUDOERS_FILE" &>/dev/null; then
+            echo "Sudoers rule added successfully in $SUDOERS_FILE."
+            sudo chmod 0440 /etc/sudoers.d/$SERVICE_NAME
+        else
+            echo "Error: Sudoers rule syntax is invalid. Aborting."
+            rm -f "$SUDOERS_FILE"
+            exit 1
+        fi
+    fi
+fi
+
+# Step 11: Prompt to reboot the system
 if confirm_action "reboot the system now to apply the changes"; then
     sudo reboot
 else

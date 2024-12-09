@@ -39,7 +39,33 @@ const Settings = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<ReactNode>(null); // State for modal content
 
+  const [save, setSave] = useState(true)
   const [reset, setReset] = useState(false)
+  const [moose, setMoose] = useState(false)
+
+  const [isDragging, setIsDragging] = useState(false);  // State to track if the user is dragging
+  const [startY, setStartY] = useState(0);  // The initial Y position of the mouse
+  const [scrollTop, setScrollTop] = useState(0);  // To track the scroll position
+  const containerRef = useRef(null);  // Reference for the scrollable container
+
+  // Function to handle mouse down event (start of dragging)
+  const handleMouseDown = (e) => {
+    setIsDragging(true);  // User is dragging
+    setStartY(e.clientY);  // Save the initial mouse Y position
+    setScrollTop(containerRef.current.scrollTop);  // Save the current scroll position
+  };
+
+  // Function to handle mouse move event (dragging in progress)
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;  // Only scroll if dragging
+    const deltaY = startY - e.clientY;  // Calculate how much the mouse has moved
+    containerRef.current.scrollTop = scrollTop + deltaY;  // Adjust scroll position based on movement
+  };
+
+  // Function to handle mouse up event (end of dragging)
+  const handleMouseUp = () => {
+    setIsDragging(false);  // Stop dragging when mouse is released
+  };
 
   /* Create combined data store for dropdown */
   const dataStores = {}
@@ -47,7 +73,7 @@ const Settings = () => {
     const currentModule = module((state) => state);
     if (currentModule.settings.type === 'data')
       //console.log(key)
-      Object.assign(dataStores, {[key]: currentModule.settings.sensors})
+      Object.assign(dataStores, { [key]: currentModule.settings.sensors })
   });
 
   /* Switch Tabs */
@@ -56,12 +82,12 @@ const Settings = () => {
   };
 
   /* Open Modal */
-  const openModal = (content) => {  
+  const openModal = (content) => {
     // Open the modal with dynamic content
-    app.update({system: { modal: true}})
+    app.update({ system: { modal: true } })
     setModalContent(content);
     setIsModalOpen(true);
-    app.update({system: { modal: false}})
+    app.update({ system: { modal: false } })
   };
 
   /* Add Settings */
@@ -119,10 +145,11 @@ const Settings = () => {
   /* Change Settings */
   const handleSettingChange = (selectStore, key, name, targetSetting, currentSettings) => {
     //console.log(selectStore, key, name, targetSetting, currentSettings, dataStores)
+    setSave(false)
     const newSettings = structuredClone(currentSettings);
     let convertedValue
-      if(selectStore != 'app') {
-        convertedValue = Object.keys(dataStores[selectStore]).find(
+    if (selectStore != 'app') {
+      convertedValue = Object.keys(dataStores[selectStore]).find(
         (messageKey) => dataStores[selectStore][messageKey].label === targetSetting
       );
       newSettings[key][name].value = convertedValue || targetSetting;
@@ -137,14 +164,15 @@ const Settings = () => {
 
   /* Save Settings */
   function saveSettings() {
-    app.update({settings: currentSettings});
+    setSave(true)
+    app.update({ settings: currentSettings });
     appChannel.emit("save", currentSettings);
     appChannel.emit("load");
   }
 
   /* Reset Settings */
   function systemTask(request) {
-    if (request != 'reset') {
+    if (!['reset', 'rti', 'hdmi'].includes(request)) {
       openModal(
         <div>
           <p><strong>Exiting...</strong>.</p>
@@ -158,7 +186,7 @@ const Settings = () => {
 
 
   useEffect(() => {
-    if(reset) {
+    if (reset) {
       setCurrentSettings(app.settings)
       setReset(false)
     }
@@ -212,19 +240,19 @@ const Settings = () => {
             const label = dataStores[storeType][key].label       // YES? Grab label from combined data store
             dataOptions[label] = storeType                       // YES? Grab data type from combined data store
           });
-        }); 
-      } else {        
+        });
+      } else {
         label = content.label                                    // NO?  Grab label from "system"-store
         value = content.value                                    // NO?  Grab value from "system"-store
       }
 
       // Get options
       //Check if value is a number or boolean
-      const dropdown = (typeof value === 'number' || typeof value === 'boolean' || key.includes('bindings')) 
+      const dropdown = (typeof value === 'number' || typeof value === 'boolean' || key.includes('bindings'))
         ? null                                                                    //Yes? Return null
         : (content.options || Object.keys(dataOptions).map((key) =>               //No?  Create dropdown from options
           key
-        ))              
+        ))
       // Check for boolean setting
       const isBoolean = typeof value === 'boolean';                               // Checks if the setting is a boolean.
       const isBinding = key.includes('bindings')                                  // Checks if the setting handles bindings
@@ -233,7 +261,7 @@ const Settings = () => {
       const handleChange = (event) => {
         const { name, value, checked, type } = event.target;                      // Grab info from the handler
         const newValue = type === 'checkbox' ? checked :                          // Check if type is a boolean
-                         type === 'number' ? Number(value) : value;               // Check if type is a number
+          type === 'number' ? Number(value) : value;               // Check if type is a number
 
         //const newStore = dataOptions[newValue]                                    // Define store for selected setting. E.g. "Boost" -> "Oil Pressure" requires a change from "can" to "adc" store.
         let selectStore
@@ -260,7 +288,7 @@ const Settings = () => {
         );
         // Define the key press handler
         const handleKeyPress = (event) => {
-          if(event.code === 'Escape') {
+          if (event.code === 'Escape') {
             handleSettingChange("app", key, setting, "Unassigned", settingsObj);
           } else {
             handleSettingChange("app", key, setting, event.code, settingsObj);
@@ -269,7 +297,7 @@ const Settings = () => {
           setIsModalOpen(false); // Close the modal
           document.removeEventListener('keydown', handleKeyPress); // Clean up listener
         };
-      
+
         // Add event listener for key press
         document.addEventListener('keydown', handleKeyPress);
       };
@@ -308,27 +336,27 @@ const Settings = () => {
                   isActive={true}
                 />
               ) :
-              isBinding ? (
-                <SimpleButton
-                text={value}
-                textSize={2.2}
-                textScale={system.textScale}
-                textColor={'var(--textColorDefault)'}
-                isActive={true}
-                onClick={() => { handleBinding(key, setting)}}
-                backgroundColor={'var(--boxColorDarker)'}
-                />
-              ) :
-                <SimpleInput
-                type='number'
-                name={setting}
-                value={value}
-                onChange={handleChange}
-                textSize={2.2}
-                textScale={system.textScale}
-                textColor={'var(--textColorDefault)'}
-                isActive={true}
-              />
+                isBinding ? (
+                  <SimpleButton
+                    text={value}
+                    textSize={2.2}
+                    textScale={system.textScale}
+                    textColor={'var(--textColorDefault)'}
+                    isActive={true}
+                    onClick={() => { handleBinding(key, setting) }}
+                    backgroundColor={'var(--boxColorDarker)'}
+                  />
+                ) :
+                  <SimpleInput
+                    type='number'
+                    name={setting}
+                    value={value}
+                    onChange={handleChange}
+                    textSize={2.2}
+                    textScale={system.textScale}
+                    textColor={'var(--textColorDefault)'}
+                    isActive={true}
+                  />
             )}
           </div>
         </div>
@@ -371,142 +399,124 @@ const Settings = () => {
 
         <div className='column' style={{ padding: '0px', height: '90%', justifyContent: 'space-around' }}>
           <div className='row' style={{ height: '90%' }}>
-            <div className='column' style={{ gap: '20px' }}>
+            <div className='column' style={{ gap: '3vh' }}>
               <div className='row' style={{ height: '10%' }}>
                 <h1>SETTINGS</h1>
               </div>
-              <div className='frame'>
-                <div className='column'>
-                  <div className='row'>
-                    <SimpleLabel
-                      textColor={'var(--textColorLight)'}
-                      text={<h3> Wireless Connections: </h3>}
-                      textSize={2.2}
-                      textScale={system.textScale}
-                    />
-                  </div>
 
-                  <div className='row' style={{ marginBottom: '10%' }}>
-                    <div className='column'>
-                      <SimpleButton
-                        text={"Coming Soon"}
-                        textSize={2.2}
-                        textScale={system.textScale}
-                        textColor={'var(--textColorDefault)'}
-                        isActive={false}
-                        onClick={clickTest}
-                        backgroundColor={'var(--boxColorDark)'}
-                      />
-                    </div>
-                  </div>
-                </div>
+              <div className='row'>
+                <button className="nav-button" onClick={() => handleTabChange(1)} style={{ fill: (activeTab === 1) ? 'var(--themeDefault)' : 'var(--boxColorLighter)' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width='3vh' height='3vh'>
+                    <use xlinkHref="/assets/svg/settings2.svg#settings2"></use>
+                  </svg>
+                </button>
+                <SimpleButton
+                  height={'100%'}
+                  text={<b>GENERAL</b>}
+                  textSize={2}
+                  textScale={system.textScale}
+                  textColor={activeTab === 1 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
+                  isActive={true}
+                  backgroundColor={activeTab === 1 ? 'transparent' : 'transparent'}
+                  onClick={() => handleTabChange(1)}
+                />
               </div>
 
+              <div className='row'>
+                <button className="nav-button" onClick={() => handleTabChange(2)} style={{ fill: (activeTab === 2) ? 'var(--themeDefault)' : 'var(--boxColorLighter)' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width='3vh' height='3vh'>
+                    <use xlinkHref="/assets/svg/car.svg#car"></use>
+                  </svg>
+                </button>
+                <SimpleButton
+                  height={'100%'}
+                  text={<b>INTERFACE</b>}
+                  textSize={2}
+                  textScale={system.textScale}
+                  textColor={activeTab === 2 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
+                  isActive={true}
+                  backgroundColor={activeTab === 2 ? 'transparent' : 'transparent'}
+                  onClick={() => handleTabChange(2)}
+                />
+              </div>
 
-              <div className='frame'>
-                <div className='column' style={{ gap: '0px', width: '100%', height: '90%', justifyContent: 'center' }}>
-                  <div className='row'>
-                    <SimpleLabel
-                      textColor={'var(--textColorLight)'}
-                      text={<h3> I/O: </h3>}
-                      textSize={2.2}
-                      textScale={system.textScale}
-                    />
-                  </div>
+              <div className='row'>
+                <button className="nav-button" onClick={() => handleTabChange(3)} style={{ fill: (activeTab === 3) ? 'var(--themeDefault)' : 'var(--boxColorLighter)' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width='3vh' height='3vh'>
+                    <use xlinkHref="/assets/svg/steering.svg#steering"></use>
+                  </svg>
+                </button>
+                <SimpleButton
+                  height={'100%'}
+                  text={<b>KEYMAP</b>}
+                  textSize={2}
+                  textScale={system.textScale}
+                  textColor={activeTab === 3 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
+                  isActive={true}
+                  backgroundColor={activeTab === 1 ? 'transparent' : 'transparent'}
+                  onClick={() => handleTabChange(3)}
+                />
+              </div>
 
-                  <div className='row' style={{ height: '50%', justifyContent: 'center' }}>
-                    <div className='column' style={{ gap: '10%' }}>
-                      <SimpleButton
-                        text={"Reboot"}
-                        textSize={2.2}
-                        textScale={system.textScale}
-                        textColor={'var(--textColorDefault)'}
-                        isActive={true}
-                        onClick={() => { systemTask('reboot') }}
-                        backgroundColor={'var(--boxColorDark)'}
-                      />
-                      <SimpleButton
-                        text={"Restart"}
-                        textSize={2.2}
-                        textScale={system.textScale}
-                        textColor={'var(--textColorDefault)'}
-                        isActive={true}
-                        onClick={() => { systemTask('restart') }}
-                        backgroundColor={'var(--boxColorDark)'}
-                      />
+              <div className='row'>
+                <button className="nav-button" onClick={() => handleTabChange(4)} style={{ fill: (activeTab === 4) ? 'var(--themeDefault)' : 'var(--boxColorLighter)' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width='3vh' height='3vh'>
+                    <use xlinkHref="/assets/svg/io.svg#io"></use>
+                  </svg>
+                </button>
+                <SimpleButton
+                  height={'100%'}
+                  text={<b>SYSTEM</b>}
+                  textSize={2}
+                  textScale={system.textScale}
+                  textColor={activeTab === 4 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
+                  isActive={true}
+                  backgroundColor={activeTab === 1 ? 'transparent' : 'transparent'}
+                  onClick={() => handleTabChange(4)}
+                />
+              </div>
+
+              <div className='row'>
+                <button className="nav-button" onClick={() => {
+                  setMoose(true)
+                  openModal(
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <h1>You found the Turbo-Button!</h1>
+                      <p>Sadly, it doesn't do anything.</p>
                     </div>
-
-                    <div className='column' style={{ gap: '10%' }}>
-                      <SimpleButton
-                        text={"Quit"}
-                        textSize={2.2}
-                        textScale={system.textScale}
-                        textColor={'var(--textColorDefault)'}
-                        isActive={true}
-                        onClick={() => { systemTask('quit') }}
-                        backgroundColor={'var(--boxColorDark)'}
-                      />
-                      <SimpleButton
-                        text={"Reset"}
-                        textSize={2.2}
-                        textScale={system.textScale}
-                        textColor={'var(--textColorDefault)'}
-                        isActive={true}
-                        onClick={() => { systemTask('reset') }}
-                        backgroundColor={'var(--boxColorDark)'}
-                      />
-                    </div>
-                  </div>
-
-                  <div className='row'>
-                    <label><i>v{system.version}</i></label>
-                  </div>
-                </div>
+                  )
+                }} style={{ fill: moose ? 'var(--themeDefault)' : 'transparent' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width='3vh' height='3vh'>
+                    <use xlinkHref="/assets/svg/moose.svg#moose"></use>
+                  </svg>
+                </button>
+                <SimpleButton
+                  height={'100%'}
+                  text={<i>V-Link v{system.version}</i>}
+                  textSize={1.5}
+                  textScale={system.textScale}
+                  textColor={'var(--textColorDark)'}
+                  isActive={false}
+                  backgroundColor={activeTab === 1 ? 'transparent' : 'transparent'}
+                  onClick={() => handleTabChange(4)}
+                />
               </div>
             </div>
-            <div className='column' style={{ flex: '0 1 70%', gap: '10px' }}>
+
+
+            <div className='column' style={{ flex: '0 1 70%', gap: '3vh' }}>
               <div className='frame'>
-                <div className='row' style={{ height: '20%', justifyContent: 'flex-start', paddingTop: '2vh' }}>
-                  <div className="scroller__tab">
-                    <SimpleButton
-                      height={'100%'}
-                      text={<b>SYSTEM</b>}
-                      textSize={2}
-                      textScale={system.textScale}
-                      textColor={activeTab === 1 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
-                      isActive={true}
-                      backgroundColor={activeTab === 1 ? 'var(--boxColorDark)' : 'var(--boxColorDarker)'}
-                      onClick={() => handleTabChange(1)}
-                    />
-
-                    <SimpleButton
-                      height={'100%'}
-                      text={<b>DATA</b>}
-                      textSize={2}
-                      textScale={system.textScale}
-                      textColor={activeTab === 2 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
-                      isActive={true}
-                      backgroundColor={activeTab === 2 ? 'var(--boxColorDark)' : 'var(--boxColorDarker)'}
-                      onClick={() => handleTabChange(2)}
-                    />
-
-                    <SimpleButton
-                      height={'100%'}
-                      text={<b>INTERFACE</b>}
-                      textSize={2}
-                      textScale={system .textScale}
-                      textColor={activeTab === 3 ? 'var(--textColorLight)' : 'var(--textColorDark)'}
-                      isActive={true}
-                      backgroundColor={activeTab === 3 ? 'var(--boxColorDark)' : 'var(--boxColorDarker)'}
-                      onClick={() => handleTabChange(3)}
-                    />
-                  </div>
-                </div>
-
                 <div className='row' style={{ height: '70%' }}>
-                  <div className='frame' style={{ margin: '10px', height: '100%', backgroundColor: 'var(--boxColorDark)' }}>
+                  <div className='frame' style={{ height: '100%', backgroundColor: 'var(--boxColorDark)' }}>
                     <div className='column' style={{ height: '80%', justifyContent: 'center' }}>
-                      <div className='scroller  scrollbar-styles' style={{ height: '90%', width: '90%', justifyContent: 'flex-start' }}>
+                      <div
+                        ref={containerRef}
+                        className='scroller  scrollbar-styles'
+                        style={{ height: '90%', width: '90%', justifyContent: 'flex-start' }}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}>
 
                         {activeTab === 1 &&
                           <>
@@ -664,13 +674,79 @@ const Settings = () => {
                           </>
                         }
 
-                        {/*activeTab === 4 &&
+                        {activeTab === 4 &&
                           <>
-                            {renderSetting("comfort", currentSettings)}
-                            {renderSetting("lights", currentSettings)}
+                            <div className='row' style={{ height: '90%', justifyContent: 'center' }}>
+                              <div className='column' style={{ gap: '3vh' }}>
+                                <SimpleButton
+                                  text={"Quit"}
+                                  textSize={2.2}
+                                  textScale={system.textScale}
+                                  textColor={'var(--textColorDefault)'}
+                                  isActive={true}
+                                  onClick={() => { systemTask('quit') }}
+                                  backgroundColor={'var(--warmGreyMedium)'}
+                                />
+
+                                <SimpleButton
+                                  text={"Restart"}
+                                  textSize={2.2}
+                                  textScale={system.textScale}
+                                  textColor={'var(--textColorDefault)'}
+                                  isActive={true}
+                                  onClick={() => { systemTask('restart') }}
+                                  backgroundColor={'var(--warmGreyMedium)'}
+                                />
+
+                                <SimpleButton
+                                  text={"Reboot"}
+                                  textSize={2.2}
+                                  textScale={system.textScale}
+                                  textColor={'var(--textColorDefault)'}
+                                  isActive={true}
+                                  onClick={() => { systemTask('reboot') }}
+                                  backgroundColor={'var(--warmGreyMedium)'}
+                                />
+                              </div>
+
+                              <div className='column' style={{ gap: '3vh' }}>
+
+                                <SimpleButton
+                                  text={"Reset"}
+                                  textSize={2.2}
+                                  textScale={system.textScale}
+                                  textColor={'var(--textColorDefault)'}
+                                  isActive={true}
+                                  onClick={() => { systemTask('reset') }}
+                                  backgroundColor={'var(--warmGreyMedium)'}
+                                />
+
+                                <SimpleButton
+                                  height={'100%'}
+                                  text={<div>{system.rtiState ? "Close RTI" : "Open RTI"}</div>}
+                                  textSize={2.2}
+                                  textScale={system.textScale}
+                                  textColor={'var(--textColorDefault)'}
+                                  isActive={true}
+                                  onClick={() => { systemTask("rti") }}
+                                  backgroundColor={'var(--warmGreyMedium)'}
+                                />
+
+                                <SimpleButton
+                                  height={'100%'}
+                                  text={<div>Toggle HDMI</div>}
+                                  textSize={2.2}
+                                  textScale={system.textScale}
+                                  textColor={'var(--textColorDefault)'}
+                                  isActive={true}
+                                  onClick={() => { systemTask("hdmi") }}
+                                  backgroundColor={'var(--warmGreyMedium)'}
+                                />
+                              </div>
+                            </div>
                             <p />
                           </>
-                        */}
+                        }
 
                         {/*activeTab === 0 &&
                           <>
@@ -682,36 +758,24 @@ const Settings = () => {
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div className='row' style={{ paddingTop: '2vh', paddingBottom: '2vh', height: '20%' }}>
-                  <div className='column'>
-                    <SimpleButton
-                      text={<h3>Save Settings</h3>}
-                      textSize={2.2}
-                      textScale={system.textScale}
-                      textColor={'var(--textColorLight)'}
-                      isActive={true}
-                      onClick={() => { saveSettings() }}
-                      backgroundColor={'var(--boxColorDark)'}
-                    />
-                  </div>
-                  <div className='column'>
-                    <SimpleButton
-                      text={<h3>{system.rtiState ? "Close RTI" : "Open RTI"}</h3>}
-                      textSize={2.2}
-                      textScale={system.textScale}
-                      textColor={'var(--textColorLight)'}
-                      isActive={true}
-                      onClick={() => { systemTask("rti") }}
-                      backgroundColor={'var(--boxColorDark)'}
-                    />
-                  </div>
-                </div>
+              <div className='row' style={{ height: '10vh' }}>
+                <SimpleButton
+                  height={'100%'}
+                  text={save ? 'All Settings saved.': 'Save Settings'}
+                  textSize={2}
+                  textScale={system.textScale}
+                  textColor={'var(--textColorLight)'}
+                  isActive={save ? false : true}
+                  onClick={() => { saveSettings() }}
+                  backgroundColor={'var(--warmGreyLight)'}
+                />
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </div >
     </>
   )
 };

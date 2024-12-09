@@ -12,20 +12,20 @@ import "./../../../../themes.scss"
 const Classic = () => {
 	const app = APP((state) => state);
 
-	const gaugeSize = 0.65 // 0.1 - 1.0 -> Percentage of parent div height
+	const gaugeSize = 0.75 // 0.1 - 1.0 -> Percentage of parent div height
 	const gauges = 3
 	const [size, setSize] = useState(0);
 
 	useEffect(() => {
-		const width = (app.system.contentSize.width - (app.settings.general.dashboardPadding.value * 2)) / gauges
-		const height = (app.system.contentSize.height * gaugeSize)
+		const width = (app.system.contentSize.width - (app.settings.general.contentPadding.value * 2)) / gauges
+		const height = (app.system.contentSize.height  - (app.settings.general.contentPadding.value * 2)) * gaugeSize
 
 		if (width <= height) {
 			setSize(width)
 		} else if (width >= height) {
 			setSize(height)
 		}
-	}, [app.system.contentSize, app.settings.general.dashboardPadding.value])
+	}, [app.system.contentSize, app.settings.general.contentPadding.value])
 
 
 	return (
@@ -58,7 +58,7 @@ const Classic = () => {
 						needleWidth={2}
 
 						borderColor={'var(--boxColorDefault)'}
-						backgroundColor={'black'}
+						backgroundColor={'var(--coldGreyDark)'}
 						progressBackgroundColor={'var(--boxColorLighter)'}
 						progressFillerColor={'var(--themeDefault)'}
 						tickColor={'var(--boxColorLighter)'}
@@ -97,7 +97,7 @@ const Classic = () => {
 						needleWidth={2}
 
 						borderColor={'var(--boxColorDefault)'}
-						backgroundColor={'black'}
+						backgroundColor={'var(--coldGreyDark)'}
 						progressBackgroundColor={'var(--boxColorLighter)'}
 						progressFillerColor={'var(--themeDefault)'}
 						tickColor={'var(--boxColorLighter)'}
@@ -136,7 +136,7 @@ const Classic = () => {
 						needleWidth={2}
 
 						borderColor={'var(--boxColorDefault)'}
-						backgroundColor={'black'}
+						backgroundColor={'var(--coldGreyDark)'}
 						progressBackgroundColor={'var(--boxColorLighter)'}
 						progressFillerColor={'var(--themeDefault)'}
 						tickColor={'var(--boxColorLighter)'}
@@ -163,14 +163,13 @@ const Classic = () => {
 						boxColor={'var(--boxColorDarker)'}
 						borderColor={'var(--boxColorDark)'}
 
-						borderWidth={'.75vh'}
-						style={"column"}
+						borderWidth={'0px'}
 
 						height={"10vh"}
 						width={"100%"}
 
-						labelSize={`calc(3vh * ${app.system.textScale}`}
-						valueSize={`calc(6vh * ${app.system.textScale}`}
+						labelSize={`calc(3vmin * ${app.system.textScale}`}
+						valueSize={`calc(5vmin * ${app.system.textScale}`}
 					/>
 				</div>
 				<div className="column">
@@ -186,14 +185,13 @@ const Classic = () => {
 						boxColor={'var(--boxColorDarker)'}
 						borderColor={'var(--boxColorDark)'}
 
-						borderWidth={'.75vh'}
-						style={"column"}
+						borderWidth={'0px'}
 
 						height={"10vh"}
 						width={"100%"}
 
-						labelSize={`calc(3vh * ${app.system.textScale}`}
-						valueSize={`calc(6vh * ${app.system.textScale}`}
+						labelSize={`calc(3vmin * ${app.system.textScale}`}
+						valueSize={`calc(5vmin * ${app.system.textScale}`}
 					/>
 				</div>
 				<div className="column">
@@ -209,14 +207,13 @@ const Classic = () => {
 						boxColor={'var(--boxColorDarker)'}
 						borderColor={'var(--boxColorDark)'}
 
-						borderWidth={'.75vh'}
-						style={"column"}
+						borderWidth={'0px'}
 
 						height={"10vh"}
 						width={"100%"}
 
-						labelSize={`calc(3vh * ${app.system.textScale}`}
-						valueSize={`calc(6vh * ${app.system.textScale}`}
+						labelSize={`calc(3vmin * ${app.system.textScale}`}
+						valueSize={`calc(5vmin * ${app.system.textScale}`}
 					/>
 				</div>
 			</div >

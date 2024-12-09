@@ -211,7 +211,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
 
   return (
     <div
-      style={{ height: '100%', width: '100%', touchAction: 'none', overflow: 'hidden' }}
+      style={{ height: '100%', width: '100%', touchAction: 'none', overflow: 'hidden'}}
       id={'main'}
       className={`app ${app.settings.general.colorTheme.value}`}
     >
@@ -224,6 +224,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
             display: app.system.view === "Carplay" ? 'flex' : 'none',
             justifyContent: 'center',
             alignItems: 'center',
+            background: 'var(--bgGradient1)',
           }}
         >
           {deviceFound === false && (
@@ -237,7 +238,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
             }}>
               <div className="column">
                 <h3>Connect phone or click to pair dongle.</h3>
-                <p />
+                <p/>
                 <button className="button-styles nav-button" onClick={onClick} style={{ fill: 'var(--boxColorLighter)' }}>
                   <svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" height={"25px"} width={"100px"}>
                     <use xlinkHref="/assets/svg/link.svg#link"></use>

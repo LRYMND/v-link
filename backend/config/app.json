@@ -57,7 +57,7 @@
         "Large"
       ]
     },
-    "dashboardPadding": {
+    "contentPadding": {
       "value": 30,
       "label": "Dashboard Padding"
     }

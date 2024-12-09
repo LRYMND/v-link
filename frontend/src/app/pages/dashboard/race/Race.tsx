@@ -10,7 +10,7 @@ const Race = () => {
 	const app = APP((state) => state);
 
 	return (
-		<div className="column" style={{ justifyContent: 'space-around', gap: '0' }}>
+		<div className="column" style={{alignSelf:'center'}}>
 			<div className="row" style={{ height: '60%' }}>
 				<LinearGauge
 					sensor1={app.settings.dash_race.progress_1.value}
@@ -19,9 +19,9 @@ const Race = () => {
 					sensor2={app.settings.dash_race.progress_2.value}
 					type2={app.settings.dash_race.progress_2.type}
 
-					width={app.system.contentSize.width - app.settings.constants.padding}
-					height={app.system.contentSize.height * 0.4}
-					padding={app.settings.general.dashboardPadding.value}
+					width={app.system.contentSize.width - (app.settings.constants.padding * 2) - 10}
+					height={app.system.contentSize.height * 0.5}
+					padding={app.settings.general.contentPadding.value}
 					numberOfRectangles={50}
 					spacing={5}
 					bigTicks={9}
@@ -45,19 +45,18 @@ const Race = () => {
 						unit={true}
 
 						textColorDefault={'var(--textColorDefault)'}
-						valueColor={'var(--textColorDefault)'}
+						valueColor={'var(--themeDefault)'}
 						limitColor={'var(--themeAccent)'}
-						boxColor={'var(--backgroundColor)'}
+						boxColor={'var(--boxColorDarker)'}
 						borderColor={'var(--boxColorDark)'}
 
-						borderWidth={'.75vh'}
-						style={"column"}
+						borderWidth={'0px'}
 
 						height={"10vh"}
 						width={"100%"}
 
-						labelSize={`calc(3vh * ${app.system.textScale}`}
-						valueSize={`calc(6vh * ${app.system.textScale}`}
+						labelSize={`calc(3vmin * ${app.system.textScale}`}
+						valueSize={`calc(5vmin * ${app.system.textScale}`}
 					/>
 
 				</div>
@@ -69,19 +68,18 @@ const Race = () => {
 						unit={true}
 
 						textColorDefault={'var(--textColorDefault)'}
-						valueColor={'var(--textColorDefault)'}
+						valueColor={'var(--themeDefault)'}
 						limitColor={'var(--themeAccent)'}
-						boxColor={'var(--backgroundColor)'}
+						boxColor={'var(--boxColorDarker)'}
 						borderColor={'var(--boxColorDark)'}
 
-						borderWidth={'.75vh'}
-						style={"column"}
+						borderWidth={'0px'}
 
 						height={"10vh"}
 						width={"100%"}
 
-						labelSize={`calc(3vh * ${app.system.textScale}`}
-						valueSize={`calc(6vh * ${app.system.textScale}`}
+						labelSize={`calc(3vmin * ${app.system.textScale}`}
+						valueSize={`calc(5vmin * ${app.system.textScale}`}
 					/>
 				</div>
 				<div className="column">
@@ -92,19 +90,18 @@ const Race = () => {
 						unit={true}
 
 						textColorDefault={'var(--textColorDefault)'}
-						valueColor={'var(--textColorDefault)'}
+						valueColor={'var(--themeDefault)'}
 						limitColor={'var(--themeAccent)'}
-						boxColor={'var(--backgroundColor)'}
+						boxColor={'var(--boxColorDarker)'}
 						borderColor={'var(--boxColorDark)'}
 
-						borderWidth={'.75vh'}
-						style={"column"}
+						borderWidth={'0px'}
 
 						height={"10vh"}
 						width={"100%"}
 
-						labelSize={`calc(3vh * ${app.system.textScale}`}
-						valueSize={`calc(6vh * ${app.system.textScale}`}
+						labelSize={`calc(3vmin * ${app.system.textScale}`}
+						valueSize={`calc(5vmin * ${app.system.textScale}`}
 					/>
 				</div>
 			</div>
@@ -117,19 +114,18 @@ const Race = () => {
 						unit={true}
 
 						textColorDefault={'var(--textColorDefault)'}
-						valueColor={'var(--textColorDefault)'}
+						valueColor={'var(--themeDefault)'}
 						limitColor={'var(--themeAccent)'}
-						boxColor={'var(--backgroundColor)'}
+						boxColor={'var(--boxColorDarker)'}
 						borderColor={'var(--boxColorDark)'}
 
-						borderWidth={'.75vh'}
-						style={"column"}
+						borderWidth={'0px'}
 
 						height={"10vh"}
 						width={"100%"}
 
-						labelSize={`calc(3vh * ${app.system.textScale}`}
-						valueSize={`calc(6vh * ${app.system.textScale}`}
+						labelSize={`calc(3vmin * ${app.system.textScale}`}
+						valueSize={`calc(5vmin * ${app.system.textScale}`}
 					/>
 				</div>
 				<div className="column">
@@ -140,19 +136,18 @@ const Race = () => {
 						unit={true}
 
 						textColorDefault={'var(--textColorDefault)'}
-						valueColor={'var(--textColorDefault)'}
+						valueColor={'var(--themeDefault)'}
 						limitColor={'var(--themeAccent)'}
-						boxColor={'var(--backgroundColor)'}
+						boxColor={'var(--boxColorDarker)'}
 						borderColor={'var(--boxColorDark)'}
 
-						borderWidth={'.75vh'}
-						style={"column"}
+						borderWidth={'0px'}
 
 						height={"10vh"}
 						width={"100%"}
 
-						labelSize={`calc(3vh * ${app.system.textScale}`}
-						valueSize={`calc(6vh * ${app.system.textScale}`}
+						labelSize={`calc(3vmin * ${app.system.textScale}`}
+						valueSize={`calc(5vmin * ${app.system.textScale}`}
 					/>
 				</div>
 				<div className="column">
@@ -163,19 +158,18 @@ const Race = () => {
 						unit={true}
 
 						textColorDefault={'var(--textColorDefault)'}
-						valueColor={'var(--textColorDefault)'}
+						valueColor={'var(--themeDefault)'}
 						limitColor={'var(--themeAccent)'}
-						boxColor={'var(--backgroundColor)'}
+						boxColor={'var(--boxColorDarker)'}
 						borderColor={'var(--boxColorDark)'}
 
-						borderWidth={'.75vh'}
-						style={"column"}
+						borderWidth={'0px'}
 
 						height={"10vh"}
 						width={"100%"}
 
-						labelSize={`calc(3vh * ${app.system.textScale}`}
-						valueSize={`calc(6vh * ${app.system.textScale}`}
+						labelSize={`calc(3vmin * ${app.system.textScale}`}
+						valueSize={`calc(5vmin * ${app.system.textScale}`}
 					/>
 				</div>
 			</div>

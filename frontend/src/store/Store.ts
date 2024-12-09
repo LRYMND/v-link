@@ -97,7 +97,7 @@ const DATA = create((set) => ({
 const APP = create((set) => ({
   system: {
     version: '2.2.0',
-    view: 'Carplay',
+    view: '',
     switch: 'ArrowUp',
     lastKey: '',
     modal: false,
