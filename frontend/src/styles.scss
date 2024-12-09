@@ -53,7 +53,7 @@ body {
     justify-content: center;
     align-items: center;
 
-    background-color: var(--boxColorDefault);
+    background: var(--boxGradient);
     border-radius: 10px;
 
     overflow: hidden;
@@ -78,11 +78,12 @@ body {
     overflow-x: hidden;
 
     border-radius: 10px;
-    background-color: var(--boxColorDark);
 
     padding-left: 2.5vw;
     padding-right: 2.5vw;
     padding-top: 1vh;
+    
+    -webkit-overflow-scrolling: touch;
 
     &__tab {
         flex: 0 1 30%;
@@ -187,7 +188,7 @@ body {
 
 .scrollbar-styles {
     &::-webkit-scrollbar {
-        width: 1.4rem;
+        width: 5px;
         cursor: auto;
     }
 

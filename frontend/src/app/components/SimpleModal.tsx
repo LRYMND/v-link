@@ -8,7 +8,9 @@ const SimpleModal = ({ isOpen, onClose, children }) => {
     <div style={modalStyles.overlay}>
         {children}
         <button style={modalStyles.closeButton} onClick={onClose}>
-          X
+          <div style ={{marginRight: '2vw'}}>
+          <h2>X</h2>
+          </div>
         </button>
     </div>,
     document.getElementById('root') // The modal renders in this DOM element
@@ -22,7 +24,7 @@ const modalStyles = {
     left: 0,
     width: '100vw',
     height: '100vh',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

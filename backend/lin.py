@@ -245,6 +245,7 @@ class LINThread(threading.Thread):
         match button_name:
             case "BTN_ENTER":
                 shared_state.rtiStatus = not shared_state.rtiStatus
+                shared_state.hdmi_event.set()
                 print(f"Toggled RTI status to {shared_state.rtiStatus}")
             case "BTN_PREV":
                 self.mouse_mode = not self.mouse_mode

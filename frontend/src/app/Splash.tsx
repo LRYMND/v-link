@@ -36,13 +36,17 @@ const SplashScreen = () => {
           color: 'white',
         }}>
 
-          <div className='column'>
+          <div className='column' style={{width: '100%', gap:'3vh'}}>
             <div className='row' style={{ justifyContent: 'center'}}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" style={{ fill: 'white' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20vh" height="20vh" style={{ fill: 'white' }}>
                 <use xlinkHref="/assets/svg/moose.svg#moose"></use>
                 </svg>
             </div>
-            <h1>V-LINK</h1>
+            <div className='row' style={{ justifyContent: 'center', alignItems:'center'}}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="40vh" height="10vh" style={{ fill: 'white' }}>
+                <use xlinkHref="/assets/svg/vlink.svg#vlink"></use>
+                </svg>
+            </div>
             <p>v {app.system.version}</p>
           </div>
 

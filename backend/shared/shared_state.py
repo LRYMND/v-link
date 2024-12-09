@@ -30,6 +30,7 @@ class SharedState:
 
         self.exit_event = threading.Event()
         self.restart_event = threading.Event()
+        self.hdmi_event = threading.Event()
 
         self.THREAD_STATES = {
             "server":   False,

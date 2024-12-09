@@ -7,7 +7,6 @@ import Charts from './charts/Charts';
 
 import Pagination from '../../components/Pagination';
 
-import './dashboard.scss';
 import '../../../styles.scss';
 import '../../../themes.scss';
 
@@ -24,8 +23,10 @@ function Dashboard() {
 
   const components = [Classic, Race, Charts]; // Array of component functions
   const totalPages = components.length; // Calculate the total number of pages
-  const sliderWidth = totalPages * app.system.contentSize.width;
-  const paginationSize = 20;
+  const sliderWidth = totalPages * (app.system.contentSize.width);
+  const paginationSize = 15;
+  const pageWidth = app.system.contentSize.width - (app.settings.general.contentPadding.value * 2);
+  const pageHeight = app.system.contentSize.height - (app.settings.general.contentPadding.value) - paginationSize;
 
   // Find the index of the component based on the default dashboard value from settings
   const componentName = app.settings.general.defaultDash.value;
@@ -43,6 +44,7 @@ function Dashboard() {
   function swipeLeft() {
     if (currentPageIndex < totalPages - 1) {
       setCurrentPageIndex(currentPageIndex + 1);
+      console.log(app.settings.general.contentPadding.value)
     }
   }
 
@@ -101,32 +103,55 @@ function Dashboard() {
         height: `${app.system.contentSize.height}px`,
       }}
     >
-      <div
-        ref={swipeContainerRef}
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          width: `${sliderWidth}px`,
-          height: `${app.system.contentSize.height - paginationSize}px`,
-          transform: `translateX(-${(currentPageIndex * ((sliderWidth / totalPages)))}px)`,
-          transition: "transform 0.5s ease-in-out",
-        }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onDoubleClick={handleDoubleClick}
-      >
-        {components.map((Component, index) => (
-          <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: `${(sliderWidth / totalPages)}px` }}>
-            <div className='column' style={{ width: `${app.system.contentSize.width - (app.settings.general.dashboardPadding.value * 2)}px`, height: `${app.system.contentSize.height}px` }}>
-              <Component />
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+      }}>
+        <div
+          ref={swipeContainerRef}
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            width: `${sliderWidth}px`,
+            height: `${pageHeight + (paginationSize / 2)}px`,
+            transform: `translateX(-${(currentPageIndex * ((sliderWidth / totalPages)))}px)`,
+            transition: "transform 0.75s ease-in-out",
+          }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onDoubleClick={handleDoubleClick}
+        >
+          {components.map((Component, index) => (
+            <div key={index} style={{
+              display: 'flex',
+              justifyContent: 'center',
+              width: `${(app.system.contentSize.width)}px`,
+            }}>
+              <div style={{
+                width: `${pageWidth}px`,
+                height: `${pageHeight}px`,
+                background: 'var(--boxGradient)',
+                borderRadius: '20px',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <Component />
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-      <div className='row'>
-        <Pagination pages={components.length} colorActive='var(--themeDefault)' colorInactive='var(--boxColorDark)' currentPage={currentPageIndex} dotSize={paginationSize / 2} />
+          ))}
+        </div>
+        <div className='row'>
+          <Pagination
+            pages={components.length}
+            colorActive='var(--themeDefault)'
+            colorInactive='var(--boxColorDark)'
+            currentPage={currentPageIndex}
+            dotSize={paginationSize / 2}
+          />
+        </div>
       </div>
     </div>
   );

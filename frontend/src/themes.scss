@@ -2,7 +2,7 @@
     --backgroundColor: #000000;
 
     --textColorLight: #dddddd;
-    --textColorDefault: #888888;
+    --textColorDefault: #aeaeae;
     --textColorDark: #535353;
 
     --boxColorLighter: #444444;
@@ -10,6 +10,28 @@
     --boxColorDefault:  #303030;
     --boxColorDark:  #252525;
     --boxColorDarker:  #181818;
+    --boxColorDarkest:  #121212;
+
+
+    --warmGreyDark: #111111;
+    --warmGreyMedium: #131313;
+    --warmGreyLight: #151515;
+
+    --coldGreyDark: #161616;
+    --coldGreyMedium: #181818;
+    --coldGreyLight: #202020;
+    
+    --boxColor5:  #050505;
+    --boxColor6:  #060606;
+    --boxColor7:  #070707;
+    --boxColor8:  #080808;
+    --boxColor9:  #090909;
+    --boxColor10: #101010;
+
+    --bgGradient1: linear-gradient(0deg, var(--warmGreyDark), var(--warmGreyMedium), var(--warmGreyLight));
+    --bgGradient2: linear-gradient(0deg, var(--warmGreyLight), var(--warmGreyMedium), var(--warmGreyDark));
+    --boxGradient: linear-gradient(0deg, var(--coldGreyDark), var(--coldGreyMedium), var(--coldGreyLight));
+
 }
 
 .Blue {

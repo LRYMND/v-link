@@ -1,68 +1,70 @@
 import { APP } from '../../store/Store';
 
-import "./../../styles.scss"
-import "./../../themes.scss"
+import "./../../styles.scss";
+import "./../../themes.scss";
 
 const NavBar = () => {
-	const app = APP((state) => state);
+    const app = APP((state) => state);
 
-	return (
-		<div className={`navbar ${app.settings.general.colorTheme.value}`} style={{
-			height: `${app.settings.side_bars.navBarHeight.value}px`,
-			display: 'flex',
-			position: 'absolute',
-			flexDirection: 'column',
-			justifyContent: 'center',
-			alignItems: 'center',
-			bottom: 0,
-			width: '100%',
-			background: 'var(--background-color)'
-		}}>
-			<div className="row">
-				<svg height="2" width="100%">
-					<defs>
-						<linearGradient id={'gradient'} x1="0%" y1="0%" x2="100%" y2="0%">
-							<stop offset="0%" stopColor="black" stopOpacity="1" />
-							<stop offset="33%" stopColor="var(--boxColorDefault)" stopOpacity="1" />
-							<stop offset="66%" stopColor="var(--boxColorDefault)" stopOpacity="1" />
-							<stop offset="100%" stopColor="black" stopOpacity="1" />
-						</linearGradient>
-					</defs>
+    const buttonWidth = app.settings.side_bars.navBarHeight.value * 0.5; // Same as button width
 
-					<rect
-						width="100%"
-						height="2"
-						style={{ fill: `url(#${'gradient'})` }}
-					/>
-				</svg>
-			</div>
-			<div className="row">
-				<div className="column">
-					<button className="nav-button" onClick={() => app.update({system: { view: 'Dashboard' }})} style={{ fill: (app.system.view === 'Dashboard') ? 'var(--themeDefault)' : 'var(--boxColorLighter)' }}>
-						<svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width={(app.settings.side_bars.navBarHeight.value * 0.6)} height={(app.settings.side_bars.navBarHeight.value * 0.6)}>
-							<use xlinkHref="/assets/svg/gauge.svg#gauge"></use>
-						</svg>
-					</button>
-				</div>
-				<div className="column">
-					<button className="nav-button" onClick={() => app.update({system: { view: 'Carplay' }})} style={{ fill: (app.system.view === 'Carplay') ? 'var(--themeDefault)' : 'var(--boxColorLighter)' }}>
-						<svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width={(app.settings.side_bars.navBarHeight.value * 0.6)} height={(app.settings.side_bars.navBarHeight.value * 0.6)}>
-							<use xlinkHref="/assets/svg/carplay.svg#carplay"></use>
-						</svg>
-					</button>
-				</div>
-				<div className="column">
-					<button className="nav-button" onClick={() => app.update({system: { view: 'Settings' }})} style={{ fill: (app.system.view === 'Settings') ? 'var(--themeDefault)' : 'var(--boxColorLighter)' }}>
-						<svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" width={(app.settings.side_bars.navBarHeight.value * 0.6)} height={(app.settings.side_bars.navBarHeight.value * 0.6)}>
-							<use xlinkHref="/assets/svg/settings.svg#settings"></use>
-						</svg>
-					</button>
-				</div>
-			</div>
-
-		</div >
-	);
+    return (
+        <div
+            className={`navbar ${app.settings.general.colorTheme.value}`}
+            style={{
+                height: `${app.settings.side_bars.navBarHeight.value}px`,
+                display: 'flex',
+                position: 'absolute',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                bottom: 0,
+                width: '100%',
+                backgroundColor: 'var(--warmGreyMedium)',
+            }}
+        >
+            <div className="row">
+                {['Dashboard', 'Carplay', 'Settings'].map((view) => (
+                    <div className="column" key={view} style={{ position: 'relative' }}>
+                        <button
+                            className="nav-button"
+                            onClick={() => app.update({ system: { view } })}
+                            style={{
+                                fill:
+                                    app.system.view === view
+                                        ? 'var(--themeDefault)'
+                                        : 'var(--boxColorLighter)',
+                                zIndex: 2,  // Ensure button stays above the glow bar
+                            }}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="nav-icon"
+                                width={buttonWidth}
+                                height={buttonWidth}
+                            >
+                                <use xlinkHref={`/assets/svg/${view.toLowerCase()}.svg#${view.toLowerCase()}`}></use>
+                            </svg>
+                        </button>
+                        {app.system.view === view && (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 0,  // Position the glow bar just below the button
+                                    left: '50%',
+                                    transform: 'translateX(-50%)', // Center the glow bar
+                                    width: buttonWidth * 1.5,  // Same width as the button
+                                    height: '1px',
+                                    backgroundColor: 'var(--themeDefault)',
+                                    boxShadow: `0 0 15px 2px var(--themeDefault)`, // Glow effect
+                                }}
+                            />
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 };
-
 
 export default NavBar;

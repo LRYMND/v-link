@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { APP, MMI, CAN, LIN, ADC, RTI } from '../store/Store';
+import App from '../App';
 
 // Define all modules for easy iteration and reference
 const modules = {
@@ -100,6 +101,7 @@ export const Socket = () => {
       console.log("modules loaded");
       store['app'].update({ modules: modules });
       store['app'].update({ system: { initialized: true } });
+      store['app'].update({ system: { view: store['app'].settings.general.startPage.value}})
     }
   }, [loadedModules]);
 

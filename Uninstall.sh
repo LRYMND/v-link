@@ -44,23 +44,29 @@ if confirm_action "remove entries from /boot/firmware/overlays"; then
     remove_if_exists "/boot/firmware/overlays/mcp2515-can2.dtbo"
 fi
 
-# Step 3: Remove all entries from /etc/network/interfaces related to vlink
-if confirm_action "remove entries from /etc/network/interfaces"; then
-    sudo sed -i '1,/$/d' /etc/network/interfaces
-fi
-
-# Step 4: Remove v-link.desktop from /etc/xdg/autostart
+# Step 3: Remove v-link.desktop from /etc/xdg/autostart
 if confirm_action "remove entries from /etc/xdg/autostart"; then
     remove_if_exists "/etc/xdg/autostart/v-link.desktop"
 fi
 
-# Step 5: Remove vlink.service from /etc/systemd/system
+# Step 4: Remove vlink.service from /etc/systemd/system
 if confirm_action "remove entries from /etc/systemd/system"; then
     remove_if_exists "/etc/systemd/system/vlink.service"
 fi
 
-# Step 6: Remove entries from /boot/firmware/config.txt starting with [V-Link and ending with disable_splash=1
+# Step 5: Remove vlink.service from /etc/systemd/system
+if confirm_action "remove rules from /etc/udev/rules.d/"; then
+    remove_if_exists "/etc/udev/rules.d/42-vlink.rules"
+fi
+
+# Step 6: Remove vlink rule from /etc/sudoers.d/
+if confirm_action "remove rules from /etc/sudoers.d/"; then
+    remove_if_exists "/etc/sudoers.d/vlink"
+fi
+
+# Step 7: Remove entries from /boot/firmware/config.txt starting with [V-Link and ending with disable_splash=1
 if confirm_action "remove entries from /boot/firmware/config.txt"; then
+    sudo mv /etc/xdg/autostart/pwrkey.desktop.backup /etc/xdg/autostart/pwrkey.desktop
     sudo sed -i '/\[V-LINK/,/disable_splash=1/d' /boot/firmware/config.txt
 fi
 
