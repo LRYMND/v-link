@@ -294,6 +294,7 @@ def display_thread_states():
 
 
 if __name__ == '__main__':
+    shared_state.hdmi_event.set()
     clear_screen()
 
     vlink = VLINK()
@@ -319,7 +320,7 @@ if __name__ == '__main__':
             vlink.process_toggle_event()
             vlink.process_exit_event()
             vlink.process_restart_event()
-            vlink.process_hdmi_event()
+            #vlink.process_hdmi_event() # temporarily disabled
 
             if not shared_state.verbose:
                 display_thread_states()
