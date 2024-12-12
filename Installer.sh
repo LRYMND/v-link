@@ -14,9 +14,15 @@ confirm_action() {
     done
 }
 
+# Function to exit the script
 user_exit() {
     echo "Aborted by user. Exiting."
     exit 1
+}
+
+# Function to ensure user ownership of files and directories
+ensure_user_ownership() {
+    sudo chown -R "$CURRENT_USER:$CURRENT_USER" "$1"
 }
 
 echo "Installing V-Link"
@@ -94,46 +100,52 @@ fi
 # Step 4: Install Volvo V-Link
 if confirm_action "install Boosted Moose V-Link now"; then
     # Step 4.1: Install dependencies
-    sudo apt-get install -y ffmpeg libudev-dev libusb-dev build-essential
-    
+    sudo apt-get install -y ffmpeg libudev-dev libusb-dev build-essential python3-venv
+
     # Step 4.4: Download the file
     download_url="https://github.com/LRYMND/v-link/releases/download/v2.2.0/V-Link.zip"
     output_path="/home/$CURRENT_USER/v-link"
     echo "Downloading files to: $output_path"
-    mkdir -p $output_path
-    curl -L $download_url --output $output_path/V-Link.zip
+    sudo mkdir -p "$output_path"
+    sudo curl -L "$download_url" --output "$output_path/V-Link.zip"
+    ensure_user_ownership "$output_path"
 
     # Step 4.5: Unzip the contents
     echo "Unzipping the contents..."
-    unzip $output_path/V-Link.zip -d $output_path
+    sudo -u "$CURRENT_USER" unzip "$output_path/V-Link.zip" -d "$output_path"
 
     # Step 4.6: Setup virtual environment
-    cd $output_path
+    cd "$output_path"
     if [ -d "venv" ]; then
         echo "Virtual environment already exists."
-        . venv/bin/activate
+        source venv/bin/activate
     else
         echo "Creating virtual environment..."
-        python3 -m venv venv
-        . venv/bin/activate
+        sudo -u "$CURRENT_USER" python3 -m venv venv
+        source venv/bin/activate
     fi
 
     # Step 4.7: Install requirements
     requirements="$output_path/requirements.txt"
-    echo "Installing requirements..."
-    pip3 install -r $requirements
+    if [ -f "$requirements" ]; then
+        echo "Installing requirements..."
+        pip install -r "$requirements"
+    else
+        echo "Requirements file not found: $requirements"
+    fi
+
     echo -e "\nV-Link installation completed.\n"
+    ensure_user_ownership "$output_path"
 else
     if confirm_action "do you want to abort the installation"; then
         user_exit
     fi
 fi
 
+
 # Step 5: Download overlay files to /boot/overlays
 if confirm_action "install the custom DTOverlays? (Required for V-Link HAT)"; then
-    # Set the target overlay directory based on rpiModel
     OVERLAY_DIR="/boot/firmware/overlays"
-
 
     # Renaming pwrkey service so ign logic works:
     echo "Renaming /etc/xdg/autostart/pwrkey.desktop to pwrkey.desktop.backup"
@@ -152,7 +164,7 @@ fi
 if confirm_action "append lines to /boot/firmware/config.txt"; then
     CONFIG_PATH="/boot/firmware/config.txt"
 
-    #Determine RPi version and set config.txt accordingly.
+    # Determine RPi version and set config.txt accordingly.
     if [[ "$rpiModel" -eq 5 ]]; then
         sudo bash -c 'cat >> /boot/firmware/config.txt <<EOF
 
@@ -256,7 +268,7 @@ EOF"
         sudo systemctl enable v-link.service && systemctl daemon-reload
 fi
 
-# Step 8: Create V-Link systemd service
+# Step 8: Create V-Link udev rules
 if confirm_action "create udev rules for V-Link"; then
     echo "Creating combined udev rule"
     RULE_FILE=/etc/udev/rules.d/42-v-link.rules
@@ -272,7 +284,6 @@ if confirm_action "create udev rules for V-Link"; then
         echo -e "Unable to create permissions\n"
     fi
 fi
-
 
 # Step 9: Create autostart file for V-Link
 if confirm_action "create autostart file for V-Link"; then
