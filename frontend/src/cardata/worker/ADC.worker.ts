@@ -18,7 +18,7 @@ const update = (data) => {
     if (settings && data != null) {
         Object.keys(settings).forEach((key) => {
             const message = settings[key];
-            const id = message.v-link_id;
+            const id = message.app_id;
             const regex = new RegExp(id, 'g');
 
             if (regex.test(data)) {

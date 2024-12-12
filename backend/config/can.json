@@ -50,7 +50,7 @@
                 "0x12",
                 "0x9D"
             ],
-            "v-link_id": "map:",
+            "app_id": "map:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -69,7 +69,7 @@
                 "0x10",
                 "0xCE"
             ],
-            "v-link_id": "iat:",
+            "app_id": "iat:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -88,7 +88,7 @@
                 "0x10",
                 "0xD8"
             ],
-            "v-link_id": "col:",
+            "app_id": "col:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -107,7 +107,7 @@
                 "0x10",
                 "0x0A"
             ],
-            "v-link_id": "vol:",
+            "app_id": "vol:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -126,7 +126,7 @@
                 "0x10",
                 "0x34"
             ],
-            "v-link_id": "ld1:",
+            "app_id": "ld1:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -145,7 +145,7 @@
                 "0x10",
                 "0x2C"
             ],
-            "v-link_id": "ld2:",
+            "app_id": "ld2:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -164,7 +164,7 @@
                 "0x10",
                 "0x1D"
             ],
-            "v-link_id": "rpm:",
+            "app_id": "rpm:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -183,7 +183,7 @@
                 "0x10",
                 "0xA5"
             ],
-            "v-link_id": "spd:",
+            "app_id": "spd:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",

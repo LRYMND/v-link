@@ -4,7 +4,7 @@
 
     "sensors": {
         "pressure": {
-            "v-link_id": "oilp:",
+            "app_id": "oilp:",
             "label": "Oil Pressure",
             "unit": "kPa",
             "min_value": 0,
@@ -18,7 +18,7 @@
             }
         },
         "temperature": {
-            "v-link_id": "oilt:",
+            "app_id": "oilt:",
             "label": "Oil Temperature",
             "unit": "°C",
             "min_value": 0,
