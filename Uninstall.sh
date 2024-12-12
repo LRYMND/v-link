@@ -46,7 +46,7 @@ fi
 
 # Step 3: Remove v-link.desktop from /etc/xdg/autostart
 if confirm_action "remove entries from /etc/xdg/autostart"; then
-    remove_if_exists "/etc/xdg/autostart/v-link.desktop"
+    remove_if_exists "/etc/xdg/autostart/vlink.desktop"
 fi
 
 # Step 4: Remove vlink.service from /etc/systemd/system
@@ -64,7 +64,12 @@ if confirm_action "remove rules from /etc/sudoers.d/"; then
     remove_if_exists "/etc/sudoers.d/vlink"
 fi
 
-# Step 7: Remove entries from /boot/firmware/config.txt starting with [V-Link and ending with disable_splash=1
+# Step 7: Remove settings from ~/.config
+if confirm_action "remove all user settings from ~/.config"; then
+    remove_if_exists "/home/$USER/.config/v-link"
+fi
+
+# Step 8: Remove entries from /boot/firmware/config.txt starting with [V-Link and ending with disable_splash=1
 if confirm_action "remove entries from /boot/firmware/config.txt"; then
     sudo mv /etc/xdg/autostart/pwrkey.desktop.backup /etc/xdg/autostart/pwrkey.desktop
     sudo sed -i '/\[V-LINK/,/disable_splash=1/d' /boot/firmware/config.txt
