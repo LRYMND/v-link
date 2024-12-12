@@ -14,9 +14,15 @@ confirm_action() {
     done
 }
 
+# Function to exit the script
 user_exit() {
     echo "Aborted by user. Exiting."
     exit 1
+}
+
+# Function to ensure user ownership of files and directories
+ensure_user_ownership() {
+    sudo chown -R "$CURRENT_USER:$CURRENT_USER" "$1"
 }
 
 echo "Installing V-Link"
@@ -94,54 +100,60 @@ fi
 # Step 4: Install Volvo V-Link
 if confirm_action "install Boosted Moose V-Link now"; then
     # Step 4.1: Install dependencies
-    sudo apt-get install -y ffmpeg libudev-dev libusb-dev build-essential
-    
+    sudo apt-get install -y ffmpeg libudev-dev libusb-dev build-essential python3-venv
+
     # Step 4.4: Download the file
     download_url="https://github.com/LRYMND/v-link/releases/download/v2.2.0/V-Link.zip"
     output_path="/home/$CURRENT_USER/v-link"
     echo "Downloading files to: $output_path"
-    mkdir -p $output_path
-    curl -L $download_url --output $output_path/V-Link.zip
+    sudo mkdir -p "$output_path"
+    sudo curl -L "$download_url" --output "$output_path/V-Link.zip"
+    ensure_user_ownership "$output_path"
 
     # Step 4.5: Unzip the contents
     echo "Unzipping the contents..."
-    unzip $output_path/V-Link.zip -d $output_path
+    sudo -u "$CURRENT_USER" unzip "$output_path/V-Link.zip" -d "$output_path"
 
     # Step 4.6: Setup virtual environment
-    cd $output_path
+    cd "$output_path"
     if [ -d "venv" ]; then
         echo "Virtual environment already exists."
-        . venv/bin/activate
+        source venv/bin/activate
     else
         echo "Creating virtual environment..."
-        python3 -m venv venv
-        . venv/bin/activate
+        sudo -u "$CURRENT_USER" python3 -m venv venv
+        source venv/bin/activate
     fi
 
     # Step 4.7: Install requirements
     requirements="$output_path/requirements.txt"
-    echo "Installing requirements..."
-    pip3 install -r $requirements
+    if [ -f "$requirements" ]; then
+        echo "Installing requirements..."
+        pip install -r "$requirements"
+    else
+        echo "Requirements file not found: $requirements"
+    fi
+
     echo -e "\nV-Link installation completed.\n"
+    ensure_user_ownership "$output_path"
 else
     if confirm_action "do you want to abort the installation"; then
         user_exit
     fi
 fi
 
+
 # Step 5: Download overlay files to /boot/overlays
 if confirm_action "install the custom DTOverlays? (Required for V-Link HAT)"; then
-    # Set the target overlay directory based on rpiModel
     OVERLAY_DIR="/boot/firmware/overlays"
-
 
     # Renaming pwrkey service so ign logic works:
     echo "Renaming /etc/xdg/autostart/pwrkey.desktop to pwrkey.desktop.backup"
     sudo mv /etc/xdg/autostart/pwrkey.desktop /etc/xdg/autostart/pwrkey.desktop.backup
 
     # Download the overlays to the determined directory
-    sudo wget -O "$OVERLAY_DIR/vlink.dtbo" \
-        https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/vlink.dtbo
+    sudo wget -O "$OVERLAY_DIR/v-link.dtbo" \
+        https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/v-link.dtbo
     sudo wget -O "$OVERLAY_DIR/mcp2515-can1.dtbo" \
         https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/mcp2515-can1.dtbo
     sudo wget -O "$OVERLAY_DIR/mcp2515-can2.dtbo" \
@@ -152,7 +164,7 @@ fi
 if confirm_action "append lines to /boot/firmware/config.txt"; then
     CONFIG_PATH="/boot/firmware/config.txt"
 
-    #Determine RPi version and set config.txt accordingly.
+    # Determine RPi version and set config.txt accordingly.
     if [[ "$rpiModel" -eq 5 ]]; then
         sudo bash -c 'cat >> /boot/firmware/config.txt <<EOF
 
@@ -166,7 +178,7 @@ force_eeprom_read=0
 dtparam=spi=on
 dtparam=i2c_arm=on
 
-dtoverlay=vlink
+dtoverlay=v-link
 dtparam=uart0=on
 dtoverlay=uart2-pi5
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
@@ -194,7 +206,7 @@ dtparam=spi=on
 enable_uart=1
 dtparam=i2c_arm=on
 
-dtoverlay=vlink
+dtoverlay=v-link
 dtoverlay=uart3
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
 dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
@@ -221,7 +233,7 @@ dtparam=spi=on
 enable_uart=1
 dtparam=i2c_arm=on
 
-dtoverlay=vlink
+dtoverlay=v-link
 dtoverlay=uart3
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
 dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
@@ -238,7 +250,7 @@ fi
 
 # Step 7: Create V-Link systemd service
 if confirm_action "create systemd services for V-Link"; then
-    sudo bash -c "cat > /etc/systemd/system/vlink.service <<EOF
+    sudo bash -c "cat > /etc/systemd/system/v-link.service <<EOF
 [Unit]
 Description=V-Link Services
 After=network.target
@@ -253,13 +265,13 @@ RemainAfterExit=true
 [Install]
 WantedBy=multi-user.target
 EOF"
-        sudo systemctl enable vlink.service && systemctl daemon-reload
+        sudo systemctl enable v-link.service && systemctl daemon-reload
 fi
 
-# Step 8: Create V-Link systemd service
+# Step 8: Create V-Link udev rules
 if confirm_action "create udev rules for V-Link"; then
     echo "Creating combined udev rule"
-    RULE_FILE=/etc/udev/rules.d/42-vlink.rules
+    RULE_FILE=/etc/udev/rules.d/42-v-link.rules
 
     # Write all rules into a single file
     echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="1314", ATTR{idProduct}=="152*", MODE="0660", GROUP="plugdev"' | sudo tee $RULE_FILE
@@ -273,22 +285,21 @@ if confirm_action "create udev rules for V-Link"; then
     fi
 fi
 
-
 # Step 9: Create autostart file for V-Link
 if confirm_action "create autostart file for V-Link"; then
     output_path="/home/$CURRENT_USER/v-link"
 
-    sudo bash -c "cat > /etc/xdg/autostart/vlink.desktop <<EOL
+    sudo bash -c "cat > /etc/xdg/autostart/v-link.desktop <<EOL
 [Desktop Entry]
 Name=V-Link
-Exec=sh -c 'sudo systemctl restart vlink.service && python $output_path/V-Link.py'
+Exec=sh -c 'sudo systemctl restart v-link.service && python $output_path/V-Link.py'
 Type=Application
 EOL"
 fi
 
 # Step 10: Enable sudo permission for systemctl restart
-if confirm_action "enable V-Link to restart vlink.service as sudo"; then
-    SERVICE_NAME="vlink"
+if confirm_action "enable V-Link to restart v-link.service as sudo"; then
+    SERVICE_NAME="v-link"
     SUDOERS_FILE="/etc/sudoers.d/$SERVICE_NAME"
     CURRENT_USER=$(whoami)
 

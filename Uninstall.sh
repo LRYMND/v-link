@@ -37,31 +37,31 @@ if confirm_action "remove all application files"; then
     remove_if_exists "/home/$USER/v-link"
 fi
 
-# Step 2: Remove vlink.dtbo, mcp2515-can1, and mcp2515-can2 from /boot/firmware/overlays
+# Step 2: Remove v-link.dtbo, mcp2515-can1, and mcp2515-can2 from /boot/firmware/overlays
 if confirm_action "remove entries from /boot/firmware/overlays"; then
-    remove_if_exists "/boot/firmware/overlays/vlink.dtbo"
+    remove_if_exists "/boot/firmware/overlays/v-link.dtbo"
     remove_if_exists "/boot/firmware/overlays/mcp2515-can1.dtbo"
     remove_if_exists "/boot/firmware/overlays/mcp2515-can2.dtbo"
 fi
 
 # Step 3: Remove v-link.desktop from /etc/xdg/autostart
 if confirm_action "remove entries from /etc/xdg/autostart"; then
-    remove_if_exists "/etc/xdg/autostart/vlink.desktop"
+    remove_if_exists "/etc/xdg/autostart/v-link.desktop"
 fi
 
-# Step 4: Remove vlink.service from /etc/systemd/system
+# Step 4: Remove v-link.service from /etc/systemd/system
 if confirm_action "remove entries from /etc/systemd/system"; then
-    remove_if_exists "/etc/systemd/system/vlink.service"
+    remove_if_exists "/etc/systemd/system/v-link.service"
 fi
 
-# Step 5: Remove vlink.service from /etc/systemd/system
+# Step 5: Remove v-link.service from /etc/systemd/system
 if confirm_action "remove rules from /etc/udev/rules.d/"; then
-    remove_if_exists "/etc/udev/rules.d/42-vlink.rules"
+    remove_if_exists "/etc/udev/rules.d/42-v-link.rules"
 fi
 
-# Step 6: Remove vlink rule from /etc/sudoers.d/
+# Step 6: Remove v-link rule from /etc/sudoers.d/
 if confirm_action "remove rules from /etc/sudoers.d/"; then
-    remove_if_exists "/etc/sudoers.d/vlink"
+    remove_if_exists "/etc/sudoers.d/v-link"
 fi
 
 # Step 7: Remove settings from ~/.config

@@ -50,7 +50,7 @@
                 "0x12",
                 "0x9D"
             ],
-            "vlink_id": "map:",
+            "v-link_id": "map:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -69,7 +69,7 @@
                 "0x10",
                 "0xCE"
             ],
-            "vlink_id": "iat:",
+            "v-link_id": "iat:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -88,7 +88,7 @@
                 "0x10",
                 "0xD8"
             ],
-            "vlink_id": "col:",
+            "v-link_id": "col:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -107,7 +107,7 @@
                 "0x10",
                 "0x0A"
             ],
-            "vlink_id": "vol:",
+            "v-link_id": "vol:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -126,7 +126,7 @@
                 "0x10",
                 "0x34"
             ],
-            "vlink_id": "ld1:",
+            "v-link_id": "ld1:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -145,7 +145,7 @@
                 "0x10",
                 "0x2C"
             ],
-            "vlink_id": "ld2:",
+            "v-link_id": "ld2:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -164,7 +164,7 @@
                 "0x10",
                 "0x1D"
             ],
-            "vlink_id": "rpm:",
+            "v-link_id": "rpm:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
@@ -183,7 +183,7 @@
                 "0x10",
                 "0xA5"
             ],
-            "vlink_id": "spd:",
+            "v-link_id": "spd:",
             "req_id": "0x000FFFFE",
             "rep_id": "0x00400021",
             "action": "0xA6",
