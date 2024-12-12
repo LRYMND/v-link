@@ -140,8 +140,8 @@ if confirm_action "install the custom DTOverlays? (Required for V-Link HAT)"; th
     sudo mv /etc/xdg/autostart/pwrkey.desktop /etc/xdg/autostart/pwrkey.desktop.backup
 
     # Download the overlays to the determined directory
-    sudo wget -O "$OVERLAY_DIR/vlink.dtbo" \
-        https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/vlink.dtbo
+    sudo wget -O "$OVERLAY_DIR/v-link.dtbo" \
+        https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/v-link.dtbo
     sudo wget -O "$OVERLAY_DIR/mcp2515-can1.dtbo" \
         https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/mcp2515-can1.dtbo
     sudo wget -O "$OVERLAY_DIR/mcp2515-can2.dtbo" \
@@ -166,7 +166,7 @@ force_eeprom_read=0
 dtparam=spi=on
 dtparam=i2c_arm=on
 
-dtoverlay=vlink
+dtoverlay=v-link
 dtparam=uart0=on
 dtoverlay=uart2-pi5
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
@@ -194,7 +194,7 @@ dtparam=spi=on
 enable_uart=1
 dtparam=i2c_arm=on
 
-dtoverlay=vlink
+dtoverlay=v-link
 dtoverlay=uart3
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
 dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
@@ -221,7 +221,7 @@ dtparam=spi=on
 enable_uart=1
 dtparam=i2c_arm=on
 
-dtoverlay=vlink
+dtoverlay=v-link
 dtoverlay=uart3
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
 dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
@@ -238,7 +238,7 @@ fi
 
 # Step 7: Create V-Link systemd service
 if confirm_action "create systemd services for V-Link"; then
-    sudo bash -c "cat > /etc/systemd/system/vlink.service <<EOF
+    sudo bash -c "cat > /etc/systemd/system/v-link.service <<EOF
 [Unit]
 Description=V-Link Services
 After=network.target
@@ -253,13 +253,13 @@ RemainAfterExit=true
 [Install]
 WantedBy=multi-user.target
 EOF"
-        sudo systemctl enable vlink.service && systemctl daemon-reload
+        sudo systemctl enable v-link.service && systemctl daemon-reload
 fi
 
 # Step 8: Create V-Link systemd service
 if confirm_action "create udev rules for V-Link"; then
     echo "Creating combined udev rule"
-    RULE_FILE=/etc/udev/rules.d/42-vlink.rules
+    RULE_FILE=/etc/udev/rules.d/42-v-link.rules
 
     # Write all rules into a single file
     echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="1314", ATTR{idProduct}=="152*", MODE="0660", GROUP="plugdev"' | sudo tee $RULE_FILE
@@ -278,17 +278,17 @@ fi
 if confirm_action "create autostart file for V-Link"; then
     output_path="/home/$CURRENT_USER/v-link"
 
-    sudo bash -c "cat > /etc/xdg/autostart/vlink.desktop <<EOL
+    sudo bash -c "cat > /etc/xdg/autostart/v-link.desktop <<EOL
 [Desktop Entry]
 Name=V-Link
-Exec=sh -c 'sudo systemctl restart vlink.service && python $output_path/V-Link.py'
+Exec=sh -c 'sudo systemctl restart v-link.service && python $output_path/V-Link.py'
 Type=Application
 EOL"
 fi
 
 # Step 10: Enable sudo permission for systemctl restart
-if confirm_action "enable V-Link to restart vlink.service as sudo"; then
-    SERVICE_NAME="vlink"
+if confirm_action "enable V-Link to restart v-link.service as sudo"; then
+    SERVICE_NAME="v-link"
     SUDOERS_FILE="/etc/sudoers.d/$SERVICE_NAME"
     CURRENT_USER=$(whoami)
 

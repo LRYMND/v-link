@@ -58,7 +58,7 @@ from backend.shared.shared_state import shared_state
 rpiModel = ""
 rpiProtocol = ""
 
-class VLINK:
+class v-link:
     def __init__(self):
         self.exit_event = shared_state.exit_event
         self.rpiModel = ""
@@ -271,7 +271,7 @@ def display_thread_states():
     clear_screen()
     # Display the app name and version
     print("V-Link 2.2.0 | Boosted Moose")
-    print('Device: ', vlink.rpiModel, ' | ', vlink.rpiProtocol)
+    print('Device: ', v-link.rpiModel, ' | ', v-link.rpiProtocol)
     print("")
     print("=" * 52)  # Decorative line
     print("")
@@ -297,10 +297,10 @@ if __name__ == '__main__':
     shared_state.hdmi_event.set()
     clear_screen()
 
-    vlink = VLINK()
+    v-link = v-link()
 
-    vlink.start_thread('server')
-    vlink.detect_rpi()
+    v-link.start_thread('server')
+    v-link.detect_rpi()
 
     args = setup_arguments()
     
@@ -312,15 +312,15 @@ if __name__ == '__main__':
     shared_state.isKiosk = args.nokiosk
 
     # Start main threads:
-    vlink.start_modules()
-    vlink.print_thread_states()
+    v-link.start_modules()
+    v-link.print_thread_states()
 
     try:
-        while not vlink.exit_event.is_set():
-            vlink.process_toggle_event()
-            vlink.process_exit_event()
-            vlink.process_restart_event()
-            #vlink.process_hdmi_event() # temporarily disabled
+        while not v-link.exit_event.is_set():
+            v-link.process_toggle_event()
+            v-link.process_exit_event()
+            v-link.process_restart_event()
+            #v-link.process_hdmi_event() # temporarily disabled
 
             if not shared_state.verbose:
                 display_thread_states()
@@ -329,6 +329,6 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
             print('\nCleaning up threads, please wait...')
     finally:
-            vlink.join_threads()
+            v-link.join_threads()
             print('Done.')
             sys.exit(0)

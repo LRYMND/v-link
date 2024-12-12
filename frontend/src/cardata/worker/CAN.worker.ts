@@ -18,8 +18,8 @@ const update = (data) => {
     if (settings && data != null) {
         Object.keys(settings).forEach((key) => {
             const message = settings[key];
-            const vlinkId = message.vlink_id;
-            const regex = new RegExp(vlinkId, 'g');
+            const id = message.v-link_id;
+            const regex = new RegExp(id, 'g');
 
             if (regex.test(data)) {
                 const value = data.replace(regex, "");

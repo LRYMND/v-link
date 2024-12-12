@@ -120,7 +120,7 @@ dtoverlay=disable-bt
 enable_uart=1
 
 dtparam=i2c_arm=on
-dtoverlay=vlink
+dtoverlay=v-link
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
 dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
 
@@ -144,7 +144,7 @@ dtparam=spi=on
 enable_uart=1
 dtparam=i2c_arm=on
 
-dtoverlay=vlink
+dtoverlay=v-link
 dtoverlay=uart3
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
 dtoverlay=mcp2515-can2,oscillator=16000000,interrupt=22
@@ -169,7 +169,7 @@ dtparam=spi=on
 enable_uart=1
 dtparam=i2c_arm=on
 
-dtoverlay=vlink
+dtoverlay=v-link
 dtparam=uart0=on
 dtoverlay=uart2-pi5
 dtoverlay=mcp2515-can1,oscillator=16000000,interrupt=24
@@ -203,7 +203,7 @@ sudo modprobe uinput
 sudo modprobe vcan
 ```
 
-Rules for /etc/udev/rules.d/42-vlink.rules:
+Rules for /etc/udev/rules.d/42-v-link.rules:
 ```
 SUBSYSTEM=="usb", ATTR{idVendor}=="1314", ATTR{idProduct}=="152*", MODE="0660", GROUP="plugdev"
 KERNEL=="ttyS0", MODE="0660", GROUP="plugdev"
