@@ -69,7 +69,12 @@ if confirm_action "remove all user settings from ~/.config"; then
     remove_if_exists "/home/$USER/.config/v-link"
 fi
 
-# Step 8: Remove entries from /boot/firmware/config.txt starting with [V-Link and ending with disable_splash=1
+# Step 8: Remove logo and cursor on boot
+if confirm_action "revert boot changes (remove no-logo and cursor hiding)"; then    
+    sudo sed -i '1{s/ logo.nologo vt.global_cursor_default=0//}' /boot/firmware/cmdline.txt
+fi
+
+# Step 9: Remove entries from /boot/firmware/config.txt starting with [V-Link and ending with disable_splash=1
 if confirm_action "remove entries from /boot/firmware/config.txt"; then
     sudo mv /etc/xdg/autostart/pwrkey.desktop.backup /etc/xdg/autostart/pwrkey.desktop
     sudo sed -i '/\[V-LINK/,/disable_splash=1/d' /boot/firmware/config.txt

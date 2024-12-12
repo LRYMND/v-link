@@ -2,31 +2,7 @@
 
 # V-Link Installer - https://www.github.com/lrymnd/v-link
 
-# Function to prompt the user for confirmation
-confirm_action() {
-    while true; do
-        read -p "Do you want to $1? (y/n): " choice
-        case "$choice" in 
-            y|Y ) return 0;;
-            n|N ) return 1;;
-            * ) echo "Invalid input. Please enter 'y' or 'n'.";;
-        esac
-    done
-}
-
-# Function to exit the script
-user_exit() {
-    echo "Aborted by user. Exiting."
-    exit 1
-}
-
-# Function to ensure user ownership of files and directories
-ensure_user_ownership() {
-    sudo chown -R "$CURRENT_USER:$CURRENT_USER" "$1"
-}
-
-echo "Installing V-Link"
-
+# CHECK PERMISSION
 if [[ $EUID -ne 0 ]]; then
   echo "This script must be run as root to install certain services. Please use sudo. More information can be found in the source of this installer." >&2
   exit 1
@@ -39,7 +15,33 @@ else
     CURRENT_USER=$SUDO_USER
 fi
 
-echo "Running the script as: $CURRENT_USER"
+# HELPER FUNCTIONS
+confirm_action() {
+    while true; do
+        read -p "Do you want to $1? (y/n): " choice
+        case "$choice" in 
+            y|Y ) return 0;;
+            n|N ) return 1;;
+            * ) echo "Invalid input. Please enter 'y' or 'n'.";;
+        esac
+    done
+}
+
+fix_ownership() {
+    sudo chown -R "$CURRENT_USER:$CURRENT_USER" "$1"
+}
+
+user_exit() {
+    echo "Aborted by user. Exiting."
+    exit 1
+}
+
+setup_complete() {
+    echo "Setup complete. Drive carefully :)"
+}
+
+# SETUP
+echo "Installing V-Link"
 
 # Determine Raspberry Pi Version
 if [ -f /proc/device-tree/model ]; then
@@ -108,7 +110,7 @@ if confirm_action "install Boosted Moose V-Link now"; then
     echo "Downloading files to: $output_path"
     sudo mkdir -p "$output_path"
     sudo curl -L "$download_url" --output "$output_path/V-Link.zip"
-    ensure_user_ownership "$output_path"
+    fix_ownership "$output_path"
 
     # Step 4.5: Unzip the contents
     echo "Unzipping the contents..."
@@ -135,7 +137,7 @@ if confirm_action "install Boosted Moose V-Link now"; then
     fi
 
     echo -e "\nV-Link installation completed.\n"
-    ensure_user_ownership "$output_path"
+    fix_ownership "$output_path"
 else
     if confirm_action "do you want to abort the installation"; then
         user_exit
@@ -327,11 +329,27 @@ if confirm_action "enable V-Link to restart v-link.service as sudo"; then
     fi
 fi
 
-# Step 11: Prompt to reboot the system
+# Step 11: Remove logo and cursor on boot
+if confirm_action "boot the raspberry without logo"; then
+    FILE="/boot/firmware/cmdline.txt"
+
+    # Text to append
+    APPEND_TEXT="logo.nologo vt.global_cursor_default=0"
+
+    # Ensure the file exists
+    if [[ ! -f "$FILE" ]]; then
+        echo "Error: File $FILE does not exist."
+        exit 1
+    fi
+
+    sudo sed -i "1{s/$/ $APPEND_TEXT/}" "$FILE"
+fi
+
+# Step 12: Prompt to reboot the system
 if confirm_action "reboot the system now to apply the changes"; then
+    setup_complete
     sudo reboot
 else
     echo "Reboot was skipped. Please reboot manually to apply the changes."
+    setup_complete
 fi
-
-echo "Installation finished. Drive carefully :)"
