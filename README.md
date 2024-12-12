@@ -4,6 +4,8 @@
 
 Let's face it. MMIs from the 2000s suck. This is a personal project that I started because I couldn't find a suitable aftermarket solution. I wanted to implement live vehicle data as well as AndroidAuto/Apple CarPlay in an OEM like fashion to enhance the driving experience of retro cars and give the user the ability to tinker around. The heart of this project is the open source V-Link app. It's running natively on Raspberry Pi OS which enables full support of an OS without the restrictions of 3rd party images. A custom made HAT builds the bridge between the Raspberry Pi and the car and works plug and play with the app.
 
+To use this application you need a Raspberry Pi, the V-Link Hat (optional) and an HDMI-screen, preferably with touch support.
+
 This project is in ongoing development. Do you want to participate, got any tips for improvement or need help?
 
 * [Swedespeed Forum](https://www.swedespeed.com/threads/volvo-rtvi-raspberry-media-can-interface.658254/)
@@ -44,7 +46,9 @@ For the best user experience a RPi 4 or 5 is recommended.
 
 ### > Run the App:
 
-When using the Installer, all prerequisites and resources should be downloaded automatically.
+When using the Installer everything is being set up automatically.
+Before updating, please uninstall the app. (See below)
+
 ```
 #Download and Install
 wget "https://github.com/LRYMND/v-link/releases/download/v2.2.0/Installer.sh"
@@ -59,15 +63,6 @@ python /home/$USER/v-link/V-Link.py
 
 #Advanced Options:
 python /home/$USER/v-link/V-Link.py -h
-```
-
-#### When updating the app, please remove any `V-Link` entries from these locations:
-```
-/etc/udev/rules.d/
-/etc/xdg/autostart/
-/etc/network/interfaces
-/home/$USER/.config
-/boot/firmware/config.txt
 ```
 
 #### In case you get an error when installing the requirements run these commands:
@@ -104,6 +99,19 @@ NPM 8.19.2
 cd ~/home/$USER/v-link/
 sudo chmod +x Uninstall.sh
 ./Uninstall.sh
+```
+
+The Uninstall.sh script removes entries from the following location. However this is only supported from 2.2.0 onwards.
+Earlier installations need to be removed manually.
+
+```
+/etc/udev/rules.d/
+/etc/xdg/autostart/
+/etc/network/interfaces
+/home/$USER/.config
+/boot/firmware/config.txt
+/etc/systemd/system/
+/etc/sudoers.d/
 ```
 
 #### Entries in /boot/firmware/config.txt:

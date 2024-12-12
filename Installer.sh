@@ -149,10 +149,6 @@ fi
 if confirm_action "install the custom DTOverlays? (Required for V-Link HAT)"; then
     OVERLAY_DIR="/boot/firmware/overlays"
 
-    # Renaming pwrkey service so ign logic works:
-    echo "Renaming /etc/xdg/autostart/pwrkey.desktop to pwrkey.desktop.backup"
-    sudo mv /etc/xdg/autostart/pwrkey.desktop /etc/xdg/autostart/pwrkey.desktop.backup
-
     # Download the overlays to the determined directory
     sudo wget -O "$OVERLAY_DIR/v-link.dtbo" \
         https://github.com/LRYMND/v-link/raw/master/resources/dtoverlays/v-link.dtbo
@@ -164,6 +160,10 @@ fi
 
 # Step 6: Append lines to /boot/config.txt or /boot/firmware/config.txt
 if confirm_action "append lines to /boot/firmware/config.txt"; then
+    # Renaming pwrkey service so ign logic works:
+    echo "Renaming /etc/xdg/autostart/pwrkey.desktop to pwrkey.desktop.backup"
+    sudo mv /etc/xdg/autostart/pwrkey.desktop /etc/xdg/autostart/pwrkey.desktop.backup
+
     CONFIG_PATH="/boot/firmware/config.txt"
 
     # Determine RPi version and set config.txt accordingly.
