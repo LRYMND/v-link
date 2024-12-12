@@ -34,13 +34,13 @@ class Config:
             rep_id_bytes = [rep_id]
             scale = sensor['scale']
             is_16bit = sensor['is_16bit']
-            v-link_id = sensor['v-link_id']
+            id = sensor['app_id']
 
             refresh_rate = sensor['refresh_rate']
             if refresh_rate == "high":
-                self.msg_hs.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, v-link_id))
+                self.msg_hs.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, id))
             elif refresh_rate == "low":
-                self.msg_ls.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, v-link_id))
+                self.msg_ls.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, id))
 
 class CANThread(threading.Thread):
     def __init__(self):
@@ -124,6 +124,7 @@ class CANThread(threading.Thread):
                 converted_value = eval(message[3], {'value': value})
 
                 data = message[5] + str(float(converted_value))
+                print(data)
                 self.emit_data_to_frontend(data)
                 sys.stdout.flush()
                 return True

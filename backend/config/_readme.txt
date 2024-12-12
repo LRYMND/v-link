@@ -19,7 +19,7 @@
 //  boost: {
 //      //CAN-Bus parameter:
 //      parameter: ['12', '9D'],            // Request parameter
-//      v-link_id: "map:",                   // Identifier for V-Link app
+//      app_id: "map:",                   // Identifier for V-Link app
 //      req_id: req_id[0],                  // ID for the request message
 //      rep_id: rep_id[0],                  // ID for the expected reply
 //      action: command[3],                 // Type of operation
