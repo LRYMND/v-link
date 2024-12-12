@@ -124,7 +124,6 @@ class CANThread(threading.Thread):
                 converted_value = eval(message[3], {'value': value})
 
                 data = message[5] + str(float(converted_value))
-                print(data)
                 self.emit_data_to_frontend(data)
                 sys.stdout.flush()
                 return True

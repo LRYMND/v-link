@@ -44,7 +44,7 @@ const SplashScreen = () => {
             </div>
             <div className='row' style={{ justifyContent: 'center', alignItems:'center'}}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="40vh" height="10vh" style={{ fill: 'white' }}>
-                <use xlinkHref="/assets/svg/v-link.svg#v-link"></use>
+                <use xlinkHref="/assets/svg/vlink.svg#vlink"></use>
                 </svg>
             </div>
             <p>v {app.system.version}</p>
