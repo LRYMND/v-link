@@ -1,290 +1,294 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { DATA, APP } from '../../store/Store';
 import convert from 'color-convert';
+import { saveAs } from 'file-saver'; // Import FileSaver.js for downloading the file
 import "./../../themes.scss";
 import "./../../styles.scss";
-import App from '../../App';
 
-// Bézier Curve Function
-const bzCurve = (ctx, points, f = 0.3, t = 0.6) => {
-    ctx.beginPath();
-    ctx.moveTo(points[0].x, points[0].y);
-
-    let dx1 = 0, dy1 = 0, m, dx2, dy2;
-    let preP = points[0];
-
-    for (let i = 1; i < points.length; i++) {
-        const curP = points[i];
-        const nexP = points[i + 1];
-
-        if (nexP) {
-            m = (nexP.y - preP.y) / (nexP.x - preP.x);  // gradient
-            dx2 = (nexP.x - curP.x) * -f;
-            dy2 = dx2 * m * t;
-        } else {
-            dx2 = 0;
-            dy2 = 0;
-        }
-
-        ctx.bezierCurveTo(
-            preP.x - dx1, preP.y - dy1,
-            curP.x + dx2, curP.y + dy2,
-            curP.x, curP.y
-        );
-
-        dx1 = dx2;
-        dy1 = dy2;
-        preP = curP;
-    }
-
-    ctx.stroke();
-};
-
-// Main LineChart Component
 const LineChart = ({
+    length = 2500,
+    resolution = 100,
+    interpolation = true,
     setCount,
     width,
     height,
-    padding,
     tickCountX,
     tickCountY,
-    length,
-    interval,
     color_xGrid,
     color_yGrid,
-    color_axis,
     color_dash_charts,
     backgroundColor
 }) => {
-    // Load Settings
+    const steps = parseInt(length / resolution);
     const modules = APP((state) => state.modules);
     const settings = APP((state) => state.settings);
     const data = DATA((state) => state.data);
 
-    const datasets = [];
-    for (let i = 1; i <= setCount; i++) {
-        const key = "value_" + i;
+    const datasets = Array.from({ length: setCount }, (_, i) => {
+        const key = `value_${i + 1}`;
         const sensor = settings.dash_charts[key].value;
         const value = data[sensor];
         const type = settings.dash_charts[key].type;
         const config = modules[type]((state) => state.settings.sensors[sensor]);
 
-        datasets[i - 1] = {
+        return {
             label: config.label,
             color: 'var(--themeDefault)',
             yMin: config.min_value,
             yMax: config.max_value,
             data: value,
-            interval: 100,
         };
-    }
+    });
 
-    const [ready, setReady] = useState(false);
-    const [dataStreams, setDataStreams] = useState(datasets.map(dataset => Array(length).fill(dataset.yMin)));
-    const [colorVariations, setColorVariations] = useState([]);
-    const canvasRef = useRef(null);
+    // Initialize dataStreams and recordedData with empty arrays for each dataset
+    const [dataStreams, setDataStreams] = useState(datasets.map(() => Array(steps).fill(0)));
+    const [recordedData, setRecordedData] = useState(datasets.map(() => [])); // Empty arrays for each dataset
+    const [isRecording, setIsRecording] = useState(false); // State to toggle recording
 
-    // Track last received data point for each dataset separately
-    const lastDataPoints = useRef(datasets.map(() => datasets[0].yMin));
-
-    useEffect(() => {
-        if (colorVariations) setReady(true);
-    }, [colorVariations]);
-
-    useEffect(() => {
-        const chartColors = generateColorVariations();
-        setColorVariations(chartColors);
-    }, []);
-
-    const generateColorVariations = () => {
-        const hueStep = 25;
-        const saturationStep = -10;
-        const brightnessStep = 5;
+    const generateColors = () => {
         const baseColor = color_dash_charts.replace(/#/g, '');
         const hsbColor = convert.hex.hsv(baseColor);
-        return Array.from({ length: dataStreams.length }, (_, i) => {
-            const modifiedHsbColor = [
-                (hsbColor[0] + i * hueStep) % 360,
-                Math.max(0, Math.min(100, hsbColor[1] + i * saturationStep)),
-                Math.max(0, Math.min(100, hsbColor[2] + i * brightnessStep)),
-            ];
-            return '#' + convert.hsv.hex(modifiedHsbColor);
+        return datasets.map((_, i) => {
+            const hue = (hsbColor[0] + i * 25) % 360;
+            return `#${convert.hsv.hex([hue, hsbColor[1], hsbColor[2]])}`;
         });
     };
 
-    const xScale = width / (length - 1);
+    const colors = generateColors();
 
-    const renderGrid = (ctx) => {
-        // Calculate the shared Y-axis range across all datasets
-        const globalYMin = Math.min(...datasets.map(dataset => dataset.yMin));
-        const globalYMax = Math.max(...datasets.map(dataset => dataset.yMax));
+    const renderGrid = () => {
+        const xStep = width / tickCountX;
+        const yStep = height / tickCountY;
 
-        // Create X-Grid
-        const xTickDistance = (length - 1) / tickCountX;
-        for (let i = 1; i < tickCountX; i++) {  // Start at 1 to skip the leftmost line
-            const xPos = i * xTickDistance * xScale;
-            ctx.beginPath();
-            ctx.moveTo(xPos, 0);
-            ctx.lineTo(xPos, height);
-            ctx.strokeStyle = color_xGrid;
-            ctx.lineWidth = 1;
-            ctx.stroke();
+        const gridLines = [];
+
+        for (let i = 1; i < tickCountX; i++) {
+            gridLines.push(
+                <line
+                    key={`x-${i}`}
+                    x1={i * xStep}
+                    y1={0}
+                    x2={i * xStep}
+                    y2={height}
+                    stroke={color_xGrid}
+                    strokeWidth="1"
+                />
+            );
         }
 
-        // Create a unified Y-Grid
-        const yTickDistance = (globalYMax - globalYMin) / tickCountY;
-        for (let i = 1; i < tickCountY; i++) {  // Start at 1 to skip the topmost line
-            const yPos = height - ((i * yTickDistance) / (globalYMax - globalYMin)) * height;
-            ctx.beginPath();
-            ctx.moveTo(0, yPos);
-            ctx.lineTo(width, yPos);
-            ctx.strokeStyle = color_yGrid; // Ensure this matches the desired grid color
-            ctx.lineWidth = 1;
-            ctx.stroke();
+        for (let i = 1; i < tickCountY; i++) {
+            gridLines.push(
+                <line
+                    key={`y-${i}`}
+                    x1={0}
+                    y1={i * yStep}
+                    x2={width}
+                    y2={i * yStep}
+                    stroke={color_yGrid}
+                    strokeWidth="1"
+                />
+            );
         }
+
+        return gridLines;
     };
 
+    const catmullRomSpline = (p0, p1, p2, p3, t) => {
+        const t2 = t * t;
+        const t3 = t2 * t;
 
-    const renderLineCharts = () => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
+        const f0 = -t3 + 2 * t2 - t;
+        const f1 = 3 * t3 - 5 * t2 + 2;
+        const f2 = -3 * t3 + 4 * t2 + t;
+        const f3 = t3 - t2;
 
-        ctx.clearRect(0, 0, width, height); // Clear the canvas before drawing new data
+        const x = 0.5 * (p0.x * f0 + p1.x * f1 + p2.x * f2 + p3.x * f3);
+        const y = 0.5 * (p0.y * f0 + p1.y * f1 + p2.y * f2 + p3.y * f3);
 
-        // Render Grid
-        renderGrid(ctx);
+        return { x, y };
+    };
 
-        datasets.forEach((dataset, datasetIndex) => {
-            const newData = Math.abs(dataset.data);
+    const renderCurve = () => {
+        const leftOffset = -5;
+        const rightOffset = -5;
 
-            // Initialize the data array for the dataset if it doesn't exist
-            if (!dataStreams[datasetIndex]) {
-                dataStreams[datasetIndex] = [];
+        const paths = datasets.map((dataset, i) => {
+            const points = [];
+            const yScale = height / (dataset.yMax - dataset.yMin);
+
+            dataStreams[i].forEach((value, j) => {
+                if (value !== null) {
+                    const x = ((j / (steps - 2)) * width) + leftOffset;
+                    const y = height - (value - dataset.yMin) * yScale;
+                    points.push({ x, y });
+                }
+            });
+
+            let pathData = "";
+            for (let j = 1; j < points.length - 2; j++) {
+                const p0 = points[j - 1];
+                const p1 = points[j];
+                const p2 = points[j + 1];
+                const p3 = points[j + 2];
+
+                for (let t = 0; t <= 1; t += 0.1) {
+                    const point = catmullRomSpline(p0, p1, p2, p3, t);
+                    pathData += j === 1 && t === 0 ? `M${point.x},${point.y}` : `L${point.x},${point.y}`;
+                }
             }
 
-            // If the new data is different from the last valid data, push the new data
-            // If it's the same, push null (to skip drawing this duplicate value)
-            if (newData !== lastDataPoints.current[datasetIndex]) {
-                dataStreams[datasetIndex].push(newData); // Add new data point
-            } else {
-                dataStreams[datasetIndex].push(null); // Add null for duplicate value
-            }
+            pathData += `L${width + rightOffset},${points[points.length - 1].y}`;
 
-            lastDataPoints.current[datasetIndex] = newData; // Update the last valid data for comparison
-
-            // Create valid data points for drawing, skipping null values
-            const validDataPoints = dataStreams[datasetIndex]
-                .map((value, index) => {
-                    //console.log(dataStreams[datasetIndex])
-                    // If the first element is null, replace it with the last valid value
-                    if (index === 0 && value === null) {
-                        return {
-                            x: xScale, // Extend slightly outside the left edge
-                            y: height - ((lastDataPoints.current[datasetIndex] - dataset.yMin) / (dataset.yMax - dataset.yMin)) * height
-                        };
-                    }
-
-                    // If the value is null, skip it
-                    if (value === null) return null;
-
-                    // If not null, map it to valid points
-                    return {
-                        x: index * xScale,
-                        y: height - ((value - dataset.yMin) / (dataset.yMax - dataset.yMin)) * height
-                    };
-                })
-                .filter(point => point !== null); // Remove null points for rendering
-
-            if (validDataPoints.length > 0) {
-                const lastPoint = validDataPoints[validDataPoints.length - 1];
-                validDataPoints.push({
-                    x: width + xScale, // Extend slightly outside the right edge
-                    y: lastPoint.y     // Keep the last y value constant
-                });
-            }
-
-            // Only render the line if there are valid points
-            if (validDataPoints.length > 1) {
-                ctx.strokeStyle = colorVariations[datasetIndex];
-                ctx.lineWidth = 2;
-
-                // Call the bzCurve function to draw the Bézier curve using valid data points
-                bzCurve(ctx, validDataPoints);
-            }
+            return (
+                <path
+                    key={i}
+                    d={pathData}
+                    fill="none"
+                    stroke={colors[i]}
+                    strokeWidth="2"
+                />
+            );
         });
+
+        return paths;
     };
 
+    const renderDots = () => {
+        const dots = datasets.map((dataset, i) => {
+            const yScale = height / (dataset.yMax - dataset.yMin);
+
+            return dataStreams[i].map((value, j) => {
+                if (value !== null) {
+                    const x = (j * resolution / length) * width;
+                    const y = height - (value - dataset.yMin) * yScale;
+
+                    return (
+                        <circle
+                            key={`dot-${i}-${j}`}
+                            cx={x}
+                            cy={y}
+                            r="3"
+                            fill={colors[i]}
+                        />
+                    );
+                }
+                return null;
+            });
+        });
+
+        return dots;
+    };
+
+    const handleExport = () => {
+        const date = new Date();
+        const timestamp = date.toISOString().replace(/[-:T.]/g, '_'); // Format timestamp for the filename
+
+        const exportObj = datasets.map((dataset, i) => {
+            return {
+                label: dataset.label,
+                data: recordedData[i].map((value) => ({
+                    timestamp: value.timestamp, // Use the stored timestamp for each data point
+                    value: value.value
+                }))
+            };
+        });
+
+        const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+        saveAs(blob, `v-link_record_${timestamp}.json`);
+    };
 
     useEffect(() => {
         const timer = setInterval(() => {
             const newDataStreams = datasets.map((dataset, index) => {
                 let value = Math.abs(dataset.data);
                 if (isNaN(value)) value = 0;
+                value = Math.max(dataset.yMin, Math.min(dataset.yMax, value));
 
-
-                // Compare with the previous value
-                if (value != Math.abs(parseFloat(lastDataPoints.current[index]))) {
-                    //console.log(value, Math.abs(parseFloat(lastDataPoints.current[index])))
-                    value = Math.max(dataset.yMin, Math.min(dataset.yMax, value));
-                } else {
-                    value = null
-                }
-                lastDataPoints.current[index] = value;  // Update the last value for this dataset
-                return [value, ...dataStreams[index].slice(0, length - 1)];
+                return [value, ...dataStreams[index].slice(0, steps - 1)];
             });
 
-            setDataStreams(newDataStreams);  // Update the state with the new data
-        }, interval);
+            setDataStreams(newDataStreams);
+
+            // Only update recorded data if we're recording
+            if (isRecording) {
+                const updatedRecordedData = datasets.map((dataset, index) => {
+                    const newData = [{
+                        value: dataStreams[index][0],
+                        timestamp: new Date().toISOString() // Capture timestamp when data arrives
+                    }, ...recordedData[index].slice(0, steps - 1)];
+
+                    return newData;
+                });
+                setRecordedData(updatedRecordedData);
+            }
+        }, resolution);
 
         return () => clearInterval(timer);
-    }, [datasets, dataStreams, interval]);
+    }, [dataStreams, isRecording]);
 
-    useEffect(() => {
-        if (ready) {
-            renderLineCharts(); // Draw on the canvas after data is ready
+    const handleToggleRecording = () => {
+        if (isRecording) {
+            handleExport(); // Export data when the user stops the recording
         }
-    }, [ready, dataStreams, colorVariations]);
+        setIsRecording(!isRecording); // Toggle the recording state
+    };
 
     return (
-        <div style={{
-            display: "flex",
-            flexDirection: "column",
-            alignSelf: "flex-start",
-            backgroundColor,
-            borderRadius: '20px',
-            overflow: 'auto',
-            boxShadow: '0px 5px 10px 0px black',
-            position: 'relative', // Allow positioning text on top of the canvas
-        }}>
-            {ready && (
-                <canvas ref={canvasRef} width={width} height={height} />
-            )}
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                backgroundColor,
+                borderRadius: '20px',
+                overflow: 'hidden',
+                position: 'relative',
+                alignSelf: 'flex-start'
+            }}
+        >
+            <svg width={width} height={height} style={{ backgroundColor }}>
+                {renderGrid()}
+                {interpolation ? renderCurve() : renderDots()}
+            </svg>
 
-            <div style={{
-                position: 'absolute',
-                bottom: '10px',  // Keep it near the bottom
-                right: '10px',   // Position it on the right side
-                display: 'flex',
-                flexDirection: 'column',  // Stack labels vertically
-                alignItems: 'flex-end',    // Align labels to the right
-                backgroundColor: 'transparent',  // No background for the container
-                zIndex: 2, // Ensure the labels appear on top of the chart
-            }}>
-                {datasets.map((dataset, index) => (
-                    <div key={index} style={{
-                        backgroundColor: 'black', // Label's background color
-                        color: colorVariations[index], // Text color matching dataset's color
-                        padding: '2px 8px',
-                        margin: '2px 0',  // Adjust spacing between labels
-                        borderRadius: '5px',
-                        fontSize: '14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                    }}>
+            <div
+                style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                    position: 'absolute',
+                    bottom: '10px',
+                    right: '10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}
+            >
+                {datasets.map((dataset, i) => (
+                    <div
+                        key={i}
+                        style={{
+                            color: colors[i],
+                            borderRadius: '5px',
+                            fontSize: '14px',
+                        }}
+                    >
                         {dataset.label}
                     </div>
                 ))}
             </div>
+
+            <button
+                onClick={handleToggleRecording}
+                style={{
+                    position: 'absolute',
+                    top: '10px',
+                    left: '10px',
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px',
+                    borderRadius: '5px',
+                }}
+            >
+                {isRecording ? 'Stop Recording' : 'Start Recording'}
+            </button>
         </div>
     );
 };

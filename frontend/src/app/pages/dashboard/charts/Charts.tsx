@@ -79,6 +79,8 @@ const Charts = () => {
                             tickCountX={5}  // Update with the desired number of X-axis ticks
                             tickCountY={5}  // Update with the desired number of Y-axis ticks
                             length={app.settings.dash_charts.length.value}
+                            resolution={app.settings.dash_charts.resolution.value}
+                            interpolation={app.settings.dash_charts.interpolation.value}
                             backgroundColor={'var(--backgroundColor)'}
                             color_label={'var(--textColorDefault)'}
                             color_xGrid={'var(--textColorDark)'}
