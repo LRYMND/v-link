@@ -279,16 +279,36 @@ const LineChart = ({
                 style={{
                     position: 'absolute',
                     top: '10px',
-                    left: '10px',
-                    backgroundColor: '#4CAF50',
-                    color: 'white',
-                    border: 'none',
-                    padding: '10px',
-                    borderRadius: '5px',
+                    right: '10px',
+                    background: 'none',  // Remove background to only show the SVG
+                    border: 'none',      // Remove default button border
+                    padding: '0',
+                    cursor: 'pointer',
+                    outline: 'none',     // Remove default outline on focus
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                 }}
             >
-                {isRecording ? 'Stop Recording' : 'Start Recording'}
+                <svg
+                    width="30"
+                    height="30"
+                    viewBox="0 0 40 40"
+                    xmlns="http://www.w3.org/2000/svg"
+                    style={{
+                        fill: isRecording ? 'red' : color_xGrid, // Change color based on recording state
+                        borderRadius: '50%',
+                        stroke: 'black',  // Black outline for the button
+                        strokeWidth: 4,   // Set outline thickness
+                    }}
+                >
+                    {/* Outer circle (the button's background) */}
+                    <circle cx="15" cy="15" r="15" />
+                    {/* Inner circle (the gap in the middle) */}
+                    <circle cx="15" cy="15" r="8" fill={isRecording ? 'red' : color_xGrid} />
+                </svg>
             </button>
+
         </div>
     );
 };
