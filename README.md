@@ -114,6 +114,14 @@ Earlier installations need to be removed manually.
 /etc/sudoers.d/
 ```
 
+### > Additional functionality:
+
+CAN and ADC data can be recorded from the chart dashboard. This data can be downloaded and evaluated with plotter.py from the /resources/tools/ folder.
+
+```
+python plotter.py $PATH_TO_JSON
+```
+
 #### Entries in /boot/firmware/config.txt:
 
 ```
@@ -331,9 +339,8 @@ The use of this soft- and hardware is at your own risk. The author and distribut
 
 ## 07 | Known Issues
 
-- In a few cases, CarPlay will connect but the stream is not visible. Restarting the app resolves this.
+- In a few cases, CarPlay will connect but the stream is not visible. Restarting carplay on the phone resolves this.
 - In a few cases, CAN bus communication is not working right away. Restarting the app resolves this.
-- Minor scaling issues in the UI that will be addressed over time.
 
 
 ## 08 | Roadmap
