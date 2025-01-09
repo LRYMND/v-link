@@ -40,6 +40,9 @@ function Dashboard() {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
+  const [movedDistance, setMovedDistance] = useState(0);
+
+  const clickThreshold = 10; // Define how much the mouse must move (in pixels) to be considered a drag
 
   function swipeLeft() {
     if (currentPageIndex < totalPages - 1) {
@@ -57,10 +60,13 @@ function Dashboard() {
   function handleMouseDown(event) {
     setIsDragging(true);
     setStartX(event.clientX);
+    setMovedDistance(0); // Reset the moved distance when mouse is pressed
   }
 
   function handleMouseMove(event) {
     if (isDragging) {
+      const distanceMoved = event.clientX - startX;
+      setMovedDistance(Math.abs(distanceMoved)); // Track the absolute distance moved
       setCurrentX(event.clientX);
     }
   }
@@ -68,10 +74,13 @@ function Dashboard() {
   function handleMouseUp() {
     if (isDragging) {
       setIsDragging(false);
-      if (startX - currentX > 100) {
-        swipeLeft();
-      } else if (startX - currentX < -100) {
-        swipeRight();
+      if (movedDistance > clickThreshold) {
+        // Only trigger swipe if the mouse moved beyond the threshold
+        if (startX - currentX > 100) {
+          swipeLeft();
+        } else if (startX - currentX < -100) {
+          swipeRight();
+        }
       }
       setCurrentX(startX);
     }
@@ -90,9 +99,9 @@ function Dashboard() {
 
   useEffect(() => {
     if (key.keyStroke == app.settings.app_bindings.left.value)
-      swipeRight() //Physically swiping to the right, shows the page to the left.
+      swipeRight(); // Physically swiping to the right, shows the page to the left.
     if (key.keyStroke == app.settings.app_bindings.right.value)
-      swipeLeft()  //Physically swiping to the left, shows the page to the right.
+      swipeLeft(); // Physically swiping to the left, shows the page to the right.
   }, [key.keyStroke]);
 
   return (

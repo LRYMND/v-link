@@ -169,8 +169,18 @@
 
     "length": {
       "type": null,
-      "value": 2500,
-      "label": "Length"
+      "value": 5000,
+      "label": "Length (ms)"
+    },
+    "resolution": {
+      "type": null,
+      "value": 50,
+      "label": "Resolution (ms)"
+    },
+    "interpolation": {
+      "type": null,
+      "value": true,
+      "label": "Interpolation"
     },
     "value_1": {
       "type": "adc",
