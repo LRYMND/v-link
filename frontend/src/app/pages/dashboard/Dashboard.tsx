@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { APP, KEY } from '../../../store/Store';
 
+import styled, { css, useTheme } from 'styled-components';
+import { NavBlocker } from '../../../theme/styles/Container'
+
+
+
 import Classic from './classic/Classic';
 import Race from './race/Race';
 import Charts from './charts/Charts';
@@ -10,9 +15,32 @@ import Pagination from '../../components/Pagination';
 import '../../../styles.scss';
 import '../../../themes.scss';
 
+const Text1 = styled.p`
+font-family: ${({ theme }) => theme.fonts.inter};
+font-weight: ${({ theme }) => theme.fontWeights.light};
+font-size: 1rem;
+`;
+
+const Text2 = styled.p`
+font-family: ${({ theme }) => theme.fonts.spartan};
+font-weight: ${({ theme }) => theme.fontWeights.light};
+font-size: 1rem;
+`;
+
+const Content = styled.div`
+    display: flex;
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    //background: ${({ theme }) => theme.colors.gradients.gradient1};
+    border-radius: 7px;
+`;
+
 function Dashboard() {
   const app = APP((state) => state);
   const key = KEY((state) => state);
+
+  const theme = useTheme();
 
   // Component mapping by name
   const componentMap = {
@@ -107,52 +135,52 @@ function Dashboard() {
   return (
     <div className={`dashboard ${app.settings.general.colorTheme.value}`}
       style={{
-        position: "relative",
         width: `${app.system.contentSize.width}px`,
-        height: `${app.system.contentSize.height}px`,
+        height: `100%`,
       }}
     >
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-      }}>
-        <div
-          ref={swipeContainerRef}
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            width: `${sliderWidth}px`,
-            height: `${pageHeight + (paginationSize / 2)}px`,
-            transform: `translateX(-${(currentPageIndex * ((sliderWidth / totalPages)))}px)`,
-            transition: "transform 0.75s ease-in-out",
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onDoubleClick={handleDoubleClick}
-        >
-          {components.map((Component, index) => (
-            <div key={index} style={{
-              display: 'flex',
-              justifyContent: 'center',
-              width: `${(app.system.contentSize.width)}px`,
-            }}>
-              <div style={{
-                width: `${pageWidth}px`,
-                height: `${pageHeight}px`,
-                background: 'var(--boxGradient)',
-                borderRadius: '20px',
+      <Content>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-around',
+          height: '100%',
+        }}>
+          <div
+            ref={swipeContainerRef}
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              width: `${sliderWidth}px`,
+              height: `100%`,
+              transform: `translateX(-${(currentPageIndex * ((sliderWidth / totalPages)))}px)`,
+              transition: "transform 0.75s ease-in-out",
+            }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onDoubleClick={handleDoubleClick}
+          >
+            {components.map((Component, index) => (
+              <div key={index} style={{
                 display: 'flex',
-                flexDirection: 'column'
+                justifyContent: 'center',
+                width: `${(app.system.contentSize.width)}px`,
               }}>
-                <Component />
+                <div style={{
+                  width: `${pageWidth}px`,
+                  height: `100%`,
+                  borderRadius: '7px',
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}>
+                  <Component />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-        <div className='row'>
+            ))}
+          </div>
+          <div className='row'>
           <Pagination
             pages={components.length}
             colorActive='var(--themeDefault)'
@@ -160,8 +188,9 @@ function Dashboard() {
             currentPage={currentPageIndex}
             dotSize={paginationSize / 2}
           />
+          </div>
         </div>
-      </div>
+      </Content>
     </div>
   );
 }

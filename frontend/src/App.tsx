@@ -1,22 +1,29 @@
 import { useState, useEffect } from 'react'
 
+import { theme } from './theme/Theme';
+import styled, { ThemeProvider } from 'styled-components';
+
+
 import { APP, MMI, KEY } from './store/Store';
 import { Socket } from './socket/Socket'
-
-import { shallow } from 'zustand/shallow'
 
 import Splash from './app/Splash'
 import Content from './app/Content'
 
 import Carplay from './carplay/Carplay'
 import Cardata from './cardata/Cardata'
-
-import NavBar from './app/sidebars/NavBar';
 import TopBar from './app/sidebars/TopBar';
-import DashBar from './app/sidebars/DashBar';
 
 import './App.css'
+import './theme/fonts.module.css';
 
+const AppContainer = styled.div`
+  position: absolute;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #111111, #141414);
+`;
 
 function App() {
   const mmi = MMI((state) => state);
@@ -29,6 +36,7 @@ function App() {
   const [keyCommand, setKeyCommand] = useState('')
 
   useEffect(() => {
+    console.log(system)
     document.addEventListener('keydown', mmiKeyDown)
     return () => {
       document.removeEventListener('keydown', mmiKeyDown)
@@ -67,22 +75,27 @@ function App() {
   }
 
   return (
-    <div style={{ overflow: 'hidden', background: 'var(--bgGradient1)', }}>
+    <AppContainer>
       <Socket />
       <Cardata />
       <Splash />
 
-      {system.startedUp ?
-        <>
-          {system.interface.dashBar && (<DashBar />)}
-          {system.interface.topBar && (<TopBar />)}
+      {system.startedUp ? (
+        <ThemeProvider theme={theme}>
 
-          <Carplay receivingVideo={receivingVideo} setReceivingVideo={setReceivingVideo} commandCounter={commandCounter} command={keyCommand} />
+          {/*<Carplay
+            receivingVideo={receivingVideo}
+            setReceivingVideo={setReceivingVideo}
+            commandCounter={commandCounter}
+            command={keyCommand}
+          />*/}
+         
           <Content />
-
-          {system.interface.navBar && (<NavBar />)}
-        </> : <></>}
-    </div>
+        </ThemeProvider>
+      ) : (
+        <></>
+      )}
+    </AppContainer>
   )
 }
 

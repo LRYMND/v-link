@@ -1,70 +1,53 @@
 import { APP } from '../../store/Store';
+import { IconLarge } from '../../theme/styles/Icons';
+import styled, { css, useTheme } from 'styled-components';
 
-import "./../../styles.scss";
-import "./../../themes.scss";
 
-const NavBar = () => {
-    const app = APP((state) => state);
+const Navbar = styled.div`
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
 
-    const buttonWidth = app.settings.side_bars.navBarHeight.value * 0.5; // Same as button width
+  background-color:${({ theme }) => `${theme.colors.navbar}`};
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: ${({ app }) => `${app.settings.side_bars.navBarHeight.value}px`};
+  animation: ${({ app, theme, isActive }) => css`
+    ${isActive
+      ? theme.animations.getSlideDown(app.settings.side_bars.navBarHeight.value)
+      : theme.animations.getSlideUp(app.settings.side_bars.navBarHeight.value)} 0.3s ease-in-out forwards
+  `};
+`;
 
-    return (
-        <div
-            className={`navbar ${app.settings.general.colorTheme.value}`}
-            style={{
-                height: `${app.settings.side_bars.navBarHeight.value}px`,
-                display: 'flex',
-                position: 'absolute',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                bottom: 0,
-                width: '100%',
-                backgroundColor: 'var(--warmGreyMedium)',
-            }}
-        >
-            <div className="row">
-                {['Dashboard', 'Carplay', 'Settings'].map((view) => (
-                    <div className="column" key={view} style={{ position: 'relative' }}>
-                        <button
-                            className="nav-button"
-                            onClick={() => app.update({ system: { view } })}
-                            style={{
-                                fill:
-                                    app.system.view === view
-                                        ? 'var(--themeDefault)'
-                                        : 'var(--boxColorLighter)',
-                                zIndex: 2,  // Ensure button stays above the glow bar
-                            }}
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="nav-icon"
-                                width={buttonWidth}
-                                height={buttonWidth}
-                            >
-                                <use xlinkHref={`/assets/svg/${view.toLowerCase()}.svg#${view.toLowerCase()}`}></use>
-                            </svg>
-                        </button>
-                        {app.system.view === view && (
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    bottom: 0,  // Position the glow bar just below the button
-                                    left: '50%',
-                                    transform: 'translateX(-50%)', // Center the glow bar
-                                    width: buttonWidth * 1.5,  // Same width as the button
-                                    height: '1px',
-                                    backgroundColor: 'var(--themeDefault)',
-                                    boxShadow: `0 0 15px 2px var(--themeDefault)`, // Glow effect
-                                }}
-                            />
-                        )}
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
+const NavButton = styled.button`
+    background: none;
+    border: none;
+
+    &:hover {
+        cursor: pointer;
+    }
+`;
+
+const NavBar = ( { isActive } ) => {
+  const app = APP((state) => state);
+  const theme = useTheme();
+
+  return (
+    <Navbar app={app} theme={theme} isActive={isActive}>
+        {['Dashboard', 'Carplay', 'Settings'].map((view) => (
+          <div className="column" key={view} style={{ position: 'relative' }}>
+            <NavButton onClick={() => app.update({system: {view}})}>
+              <IconLarge isActive={app.system.view === view}>
+                <use xlinkHref={`/assets/svg/${view.toLowerCase()}.svg#${view.toLowerCase()}`}></use>
+              </IconLarge>
+            </NavButton>
+          </div>
+        ))}
+    </Navbar>
+  );
 };
 
 export default NavBar;

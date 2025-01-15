@@ -1,3 +1,8 @@
+import styled from 'styled-components';
+
+import { useTheme } from 'styled-components';
+import { Display4, Body } from '../../theme/styles/Typography';
+
 import { useState, useEffect } from 'react';
 import { DATA, APP } from '../../store/Store';
 
@@ -25,6 +30,7 @@ const LinearGauge = ({
     indicatorColor,
     backgroundColor
 }) => {
+    const theme = useTheme();
     const SVG_NS = 'http://www.w3.org/2000/svg';
 
     // Load Settings
@@ -433,16 +439,17 @@ const LinearGauge = ({
 
         return (
             <>
-                <text
-                    x={rect1_x}  // Adjust the x-coordinate for text position
-                    y={rect1_y}  // Adjust the y-coordinate for text position
-                    fill={(value1 > limitStart ? limitColor : progressColor)}  // Adjust the text color
-                    fontSize={rect1_height}  // Adjust the font size
-                    textAnchor="end"
-                >
-                    {checkData(value1)}   {/* Replace with your state variable */}
-                </text>
-
+                <Display4>
+                    <text
+                        x={rect1_x}  // Adjust the x-coordinate for text position
+                        y={rect1_y}  // Adjust the y-coordinate for text position
+                        fill={(value1 > limitStart ? limitColor : progressColor)}  // Adjust the text color
+                        fontSize={theme.typography.display4.fontSize}  // Adjust the font size
+                        textAnchor="end"
+                    >
+                        {checkData(value1)}   {/* Replace with your state variable */}
+                    </text>
+                </Display4>
                 <text
                     x={rect1_x}  // Adjust the x-coordinate for text position
                     y={rect1_y}  // Adjust the y-coordinate for text position

@@ -221,7 +221,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
             position: 'absolute',
             width: '100%',
             height: height,
-            display: app.system.view === "Carplay" ? 'flex' : 'none',
+            display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             background: 'var(--bgGradient1)',
@@ -241,7 +241,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
                 <p/>
                 <button className="button-styles nav-button" onClick={onClick} style={{ fill: 'var(--boxColorLighter)' }}>
                   <svg xmlns="http://www.w3.org/2000/svg" className="nav-icon" height={"25px"} width={"100px"}>
-                    <use xlinkHref="/assets/svg/link.svg#link"></use>
+                    <use xlinkHref="/assets/svg/buttons/link.svg#link"></use>
                   </svg>
                 </button>
               </div>
@@ -278,7 +278,7 @@ function Carplay({ command, commandCounter }: CarplayProps) {
           ref={canvasRef}
           id="video"
           style={
-            isPlugged && app.system.view === "Carplay"
+            isPlugged === "Carplay"
               ? { height: '100%', overflow: 'hidden'}
               : { display: 'none' }
           }

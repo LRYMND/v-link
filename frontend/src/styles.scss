@@ -1,3 +1,6 @@
+
+
+
 body {
     background: var(--backgroundColor);
     color: var(--textColorDefault);
@@ -219,44 +222,4 @@ body {
     text-align: center;
     text-decoration: none;
     display: inline-block;
-}
-
-input[type=checkbox] {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    display: inline-block;
-    vertical-align: text-bottom;
-    width: 1rem;
-    height: 1rem;
-    padding: .05rem;
-
-    background-clip: content-box;
-    border: .1rem solid var(--textColorDefault);
-    border-radius: 5px;
-    background-color: var(--boxColorDefault);
-    margin-right: 2rem;
-
-    color: #ffffff;
-
-    &:hover {
-        cursor: pointer;
-    }
-
-    &:checked {
-        background-color: var(--themeDefault);
-    }
-
-    &:focus {
-        outline: none !important;
-    }
-
-    &:disabled {
-        background-color: var(--boxColorDark);
-        cursor: default;
-    }
-
-    &:disabled+span {
-        color: var(--textColorDark);
-    }
 }

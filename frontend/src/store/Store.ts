@@ -100,6 +100,8 @@ const APP = create((set) => ({
     view: '',
     switch: 'ArrowUp',
     lastKey: '',
+
+    settingPage: 1,
     modal: false,
 
     initialized: false,
@@ -108,19 +110,27 @@ const APP = create((set) => ({
     windowSize: {
       width: 800,
       height: 480 },
+
     contentSize: {
       width: 800,
       height: 480
     },
+
     carplaySize: {
       width: 800,
       height: 460
+    },
+
+    carplay: {
+      stream: false,
+      phone: false,
     },
 
     interface: {
       dashBar: true,
       topBar: true,
       navBar: true,
+      sideBar: true,
       content: true,
       carplay: false
     },

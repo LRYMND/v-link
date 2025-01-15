@@ -239,7 +239,7 @@ const LineChart = ({
                 display: "flex",
                 flexDirection: "column",
                 backgroundColor,
-                borderRadius: '20px',
+                borderRadius: '7px',
                 overflow: 'hidden',
                 position: 'relative',
                 alignSelf: 'flex-start'

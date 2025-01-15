@@ -32,7 +32,7 @@
     },
     "startPage": {
       "value": "Dashboard",
-      "label": "Page on StartUp",
+      "label": "Startpage",
       "options": [
         "Dashboard",
         "Carplay",
@@ -58,7 +58,7 @@
       ]
     },
     "contentPadding": {
-      "value": 30,
+      "value": 20,
       "label": "Dashboard Padding"
     }
   },
@@ -76,8 +76,12 @@
       "label": "TopBar Height"
     },
     "navBarHeight": {
-      "value": 65,
+      "value": 70,
       "label": "NavBar Height"
+    },
+    "sideBarWidth": {
+      "value": 150,
+      "label": "SideBar Width"
     }
   },
 

@@ -44,7 +44,7 @@ export const Socket = () => {
         const navBar = store['app'].settings.side_bars.navBarHeight.value;
         const dashBar = store['app'].settings.side_bars.dashBar.value ? topBar : 0;
 
-        const newContentSize = { width: window.innerWidth, height: (window.innerHeight - (topBar + navBar)) };
+        const newContentSize = { width: window.innerWidth, height: (window.innerHeight - (topBar)) };
         const newCarplaySize = { width: window.innerWidth, height: (window.innerHeight - dashBar) };
 
         store['app'].update({
@@ -88,7 +88,7 @@ export const Socket = () => {
         store['app'].update({ system: { interface: { dashBar: true } } });
       }
     } else {
-      store['app'].update({ system: { interface: { dashBar: false, topBar: true, navBar: true, content: true, carplay: false } } });
+      store['app'].update({ system: { interface: { dashBar: false, topBar: true, navBar: true, sideBar: true, content: true, carplay: false } } });
     }
   }, [store['app'].system.view, store['app'].system.phoneState]);
 
