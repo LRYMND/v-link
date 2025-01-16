@@ -1,5 +1,6 @@
 import { APP } from '../../store/Store';
 import { IconLarge } from '../../theme/styles/Icons';
+import { GlowLarge } from '../../theme/styles/Effects';
 import styled, { css, useTheme } from 'styled-components';
 
 
@@ -31,22 +32,56 @@ const NavButton = styled.button`
     }
 `;
 
-const NavBar = ( { isActive } ) => {
+const Indicator = styled.div`
+    position: absolute;
+    bottom: 0;
+    z-index: 1;
+
+    display: ${({ isActive }) => `${isActive ? 'none' : 'flex'}`};
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    height: 20px;
+    background: none;
+    border: none;
+`;
+
+const Blob = styled.div`
+    width: 100px;
+    height: 5px;
+    background: ${({ theme, isHovering }) => `${isHovering ? theme.colors.theme.blue.active : theme.colors.medium}`};
+    
+    border-radius: 2.5px;
+    border: none;
+
+    /* Add transition for background color change */
+    transition: background 0.4s ease-in-out;
+`;
+
+const NavBar = ({ isActive, isHovering }) => {
   const app = APP((state) => state);
   const theme = useTheme();
 
   return (
-    <Navbar app={app} theme={theme} isActive={isActive}>
+    <>
+      <Indicator isActive={isActive}>
+        <GlowLarge color={theme.colors.theme.blue.active} opacity={isHovering ? 0.75 : 0}>
+          <Blob theme={theme} isActive={isActive} isHovering={isHovering}/>
+        </GlowLarge>
+      </Indicator>
+      <Navbar app={app} theme={theme} isActive={isActive}>
         {['Dashboard', 'Carplay', 'Settings'].map((view) => (
           <div className="column" key={view} style={{ position: 'relative' }}>
-            <NavButton onClick={() => app.update({system: {view}})}>
+            <NavButton onClick={() => app.update({ system: { view } })}>
               <IconLarge isActive={app.system.view === view}>
                 <use xlinkHref={`/assets/svg/${view.toLowerCase()}.svg#${view.toLowerCase()}`}></use>
               </IconLarge>
             </NavButton>
           </div>
         ))}
-    </Navbar>
+      </Navbar>
+    </>
   );
 };
 

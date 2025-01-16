@@ -36,21 +36,21 @@ const getSlideRight = (height) => keyframes`
   }
 `;
 
-const getVerticalExpand = (height) => keyframes`
+const getVerticalExpand = (minHeight, maxHeight) => keyframes`
   0% {
-    height: 0px; /* Hidden */
+    height: ${minHeight}px; /* Hidden */
   }
   100% {
-    height: ${height}px; /* Fully visible */
+    height: ${maxHeight}px; /* Fully visible */
   }
 `;
 
-const getVerticalCollapse = (height) => keyframes`
+const getVerticalCollapse = (minHeight, maxHeight) => keyframes`
   0% {
-    height: ${height}px; /* Fully visible */
+    height: ${maxHeight}px; /* Fully visible */
   }
   100% {
-    height: 0px; /* Hidden */
+    height: ${minHeight}px; /* Hidden */
   }
 `;
 
@@ -69,6 +69,7 @@ const getHorizontalCollapse = (minWidth, maxWidth) => keyframes`
   }
   100% {
     width: ${minWidth}px; /* Collapsing to the hidden width */
+    display: 'none'
   }
 `;
 

@@ -17,7 +17,7 @@ export const theme = {
 
   interaction: {
     toggleHeight: '20px',
-    buttonHeight: '30px',
+    buttonHeight: '35px',
     buttonWidth: '200px',
   },
 

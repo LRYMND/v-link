@@ -1,12 +1,11 @@
-import { useState, useEffect, } from "react";
+import { useState, useEffect } from "react";
 import { APP } from '../../store/Store';
 import styled, { useTheme } from 'styled-components';
 
-import { StatusIcon } from '../../theme/styles/TopBar';
 import { IconSmall } from '../../theme/styles/Icons';
 import { Caption1 } from '../../theme/styles/Typography';
 
-export const Topbar = styled.div`
+const Topbar = styled.div`
   box-sizing: border-box;
   background: ${({ theme }) => theme.colors.gradients.gradient1};
   height: ${({ app }) => `${app.settings.side_bars.topBarHeight.value}px`};
@@ -23,7 +22,7 @@ export const Topbar = styled.div`
   gap: 10px;
 `;
 
-export const Left = styled.div`
+const Left = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: left;
@@ -32,7 +31,7 @@ export const Left = styled.div`
   height: 100%;
 `;
 
-export const Middle = styled.div`
+const Middle = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -40,7 +39,7 @@ export const Middle = styled.div`
   height: 100%;
 `;
 
-export const Right = styled.div`
+const Right = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: right;
@@ -50,23 +49,26 @@ export const Right = styled.div`
   gap: 10px;
 `;
 
-export const Scroller = styled.div`
+const Scroller = styled.div`
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  align-items: flex-start;
   overflow: hidden;
+  transition: height 0.3s ease-in-out;
 `;
 
-export const ScrollerContent = styled.div`
+const ScrollerContent = styled.div`
   width: 100%;
-  height: 100%;
-`
+  height: ${({ height }) => height}; 
+  transition: height 0.3s ease-in-out;
+  display: ${({ isVisible }) => (isVisible ? 'block' : 'none')};
+`;
 
 const TopBar = () => {
-
-  const app = APP((state) => state)
+  const app = APP((state) => state);
   const theme = useTheme();
 
   const [time, setDate] = useState(new Date());
@@ -83,15 +85,29 @@ const TopBar = () => {
     };
   }, []);
 
+  // Conditionally determine which content to show
+
+  const [carplay, setCarplay] = useState(true)
+  useEffect (() => {
+    if(app.system.streamState && app.system.view === 'Carplay')
+      setCarplay(true)
+    else
+      setCarplay(false)
+  })
+
   return (
     <Topbar theme={theme} app={app}>
       <Left>
         <Scroller>
-          <ScrollerContent>
-            <Caption1>{time.toLocaleTimeString('sv-SV', { hour: '2-digit', minute: '2-digit' })}</Caption1>
+          {/* First Content: Time */}
+          <ScrollerContent height={carplay ? app.settings.side_bars.topBarHeight.value : 0}>
+          <Caption1>Important System Information</Caption1>
           </ScrollerContent>
-          <ScrollerContent>
-            <Caption1>Important System Information</Caption1>
+
+          {/* Second Content: System Info */}
+          <ScrollerContent height={carplay ? 0 : app.settings.side_bars.topBarHeight.value}>
+          <Caption1>{time.toLocaleTimeString('sv-SV', { hour: '2-digit', minute: '2-digit' })}</Caption1>
+            
           </ScrollerContent>
         </Scroller>
       </Left>
@@ -101,19 +117,18 @@ const TopBar = () => {
         </svg>
       </Middle>
       <Right>
-          <IconSmall isActive={false}>
-            <use xlinkHref="/assets/svg/bluetooth.svg#bluetooth" />
-          </IconSmall>
-          <IconSmall isActive={app.system.phoneState}>
-            <use xlinkHref="/assets/svg/phone.svg#phone" />
-          </IconSmall>
-          <IconSmall isActive={app.system.wifiState}>
-            <use xlinkHref="/assets/svg/wifi.svg#wifi" />
-          </IconSmall>
+        <IconSmall isActive={false}>
+          <use xlinkHref="/assets/svg/bluetooth.svg#bluetooth" />
+        </IconSmall>
+        <IconSmall isActive={app.system.phoneState}>
+          <use xlinkHref="/assets/svg/phone.svg#phone" />
+        </IconSmall>
+        <IconSmall isActive={app.system.wifiState}>
+          <use xlinkHref="/assets/svg/wifi.svg#wifi" />
+        </IconSmall>
       </Right>
     </Topbar>
   );
 };
-
 
 export default TopBar;

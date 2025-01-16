@@ -21,42 +21,41 @@ const MainContainer = styled.div`
   display: ${({ app }) => (app.system.view === 'Carplay' ? 'flex' : 'flex')};
   flex-direction: row;
   position: relative;
-  justify-content: right;
-  align-items: right;
-  background: '${({ theme }) => `${theme.colors.gradients.gradient1}`}';
+  justify-content: space-between;
+  align-items: flex-end;
+  //background: '${({ theme }) => `${theme.colors.gradients.gradient1}`}';
 `;
 
 const Card = styled.div`
   height: 100%;
   width: 100%;
+
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   justify-content: center;
-  overflow: hidden;
-  padding-top: 5px;
+
+
+
+  padding-top: 0px;
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;
   box-sizing: border-box;
 
-  transform-origin: right;
-
-  /* Set the width based on current view */
-  width: ${({ currentView, minWidth, maxWidth }) =>
-    currentView != 'Settings'
-      ? `${maxWidth}px` /* Use maxWidth when Settings is active */
-      : `${minWidth}px`}; /* Default to minWidth when other views are active */
+  overflow: hidden;
 
   /* Apply the animation based on the current view */
-  animation: ${({ theme, currentView, minWidth, maxWidth, fadeLength }) => {
-    if (currentView === 'Settings') {
+  animation: ${({ theme, currentView, carPlay, minHeight, maxHeight, collapseLength }) => {
+
+    if (currentView === 'Carplay' && carPlay) {
       return css`
-        ${theme.animations.getHorizontalCollapse(minWidth, maxWidth)} ${fadeLength}s ease-in-out forwards;
+        ${theme.animations.getVerticalCollapse(minHeight, maxHeight)} ${collapseLength}s ease-in-out forwards;
+        padding: 0;
       `;
     } else {
       return css`
-        ${theme.animations.getHorizontalExpand(minWidth, maxWidth)} ${fadeLength}s ease-in-out forwards;
+        ${theme.animations.getVerticalExpand(minHeight, maxHeight)} ${collapseLength}s ease-in-out forwards;
       `;
     }
   }};
@@ -65,38 +64,35 @@ const Card = styled.div`
   transition: none;
 `;
 
-const View = styled.div`
-  height: 100%;
+const Page = styled.div`
   width: 100%;
+  height: 100%;
+
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
 
-  padding: 20px;
   box-sizing: border-box;
 
   border-radius: 7px;
   background: ${({ theme }) => theme.colors.gradients.gradient1};
+
+  overflow: hidden;
 `;
 
 const NavBlocker = styled.div`
   width: 100%;
-  align-self: center;
-  animation: ${({ app, theme, isActive }) => css`
-    ${isActive
-      ? theme.animations.getVerticalExpand(
-        app.settings.side_bars.navBarHeight.value -
-        app.settings.general.contentPadding.value
-      )
-      : theme.animations.getVerticalCollapse(
-        app.settings.side_bars.navBarHeight.value -
-        app.settings.general.contentPadding.value
-      )} 0.3s ease-in-out forwards;
-  `};
   height: ${({ app, isActive }) =>
     isActive
       ? `${app.settings.side_bars.navBarHeight.value - app.settings.general.contentPadding.value}px`
       : '50px'};
+
+  animation: ${({ app, theme, isActive, collapseLength, minHeight, maxHeight }) => css`
+    ${isActive
+      ? theme.animations.getVerticalExpand(minHeight, maxHeight)
+      : theme.animations.getVerticalCollapse(minHeight, maxHeight)} ${collapseLength}s ease-in-out forwards;
+  `};
+
   transition: height 0.3s ease-in-out;
 `;
 
@@ -114,27 +110,61 @@ const Content = () => {
 
   const theme = useTheme();
 
+  /* CARPLAY TESTCODE */
+  const handleCarplay = () => {
+    setTimeout(() => {
+      setCarPlay(true)
+
+      // Hide Elements when stream is revealead
+      if (app.system.streamState && app.system.view === 'Carplay') {
+        setNavActive(false);
+        setFadeMain('fade-out');
+      }
+    }, 3000); // 3 seconds
+  };
+
+  useEffect(() => {
+    if (app.system.streamState)
+      handleCarplay()
+  }, [app.system.streamState])
+
+  /* CARPLAY TESTCODE */
+
 
   /* Fading Logic */
-  const fadeLength = 300; //ms
+  const fadeLength = 200; //ms
+  const collapseLength = 400; //ms
   const [fadeMain, setFadeMain] = useState('fade-in');
+  const [fadePage, setFadePage] = useState('fade-in');
   const [currentView, setCurrentView] = useState(app.system.view);
+  const [carPlay, setCarPlay] = useState(false);
 
   useEffect(() => {
     if (app.system.view !== currentView) {
-      setFadeMain('fade-out'); // Trigger fade-out for the current view
+      setFadePage('fade-out'); // Trigger fade-out for the current view
 
       setTimeout(() => {
         setCurrentView(app.system.view); // Switch to the new view
-        setFadeMain('fade-in'); // Trigger fade-in for the new view
+        if (carPlay && app.system.view === 'Carplay') { setNavActive(false); return; }
+        else
+          setFadePage('fade-in');
       }, fadeLength); // Duration should match the CSS animation time
     }
-  }, [app.system.view]);
+  }, [app.system.view, carPlay]);
 
 
   /* NavBar Logic */
   const timerRef = useRef(null); // Store the timer ID
   const [navActive, setNavActive] = useState(true)
+  const [isHovering, setIsHovering] = useState(false);
+
+  const checkMouseY = (mouseY) => {
+    const deadZone = 85; // Percentage
+    if(mouseY > window.innerHeight * (deadZone / 100))
+      return true;
+    else
+      return false;
+  }
 
   useEffect(() => {
     console.log('view', navActive)
@@ -153,15 +183,29 @@ const Content = () => {
   }, [app.system.view, navActive]);
 
   const handleClick = (event) => {
-    // Trigger the nav bar to show when clicking lower part of the screen
-    if (event.clientY > window.innerHeight * 2 / 3) {
-      setNavActive(true);
-    }
+    if(app.system.view != 'Settings')
+      setNavActive(checkMouseY(event.clientY));
   };
 
-  useEffect (() => {
-    console.log(navActive)
-  }, navActive)
+  // Mouse position check to update isHovering state
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      // Check if mouse is in the bottom third of the screen
+      setIsHovering(checkMouseY(event.clientY))
+    };
+
+    // Attach the mouse move event
+    window.addEventListener('mousemove', handleMouseMove);
+
+    // Clean up the event listener when component unmounts
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log('isHovering?', isHovering)
+  }, [isHovering])
 
   /* Render Pages */
   const renderView = () => {
@@ -196,33 +240,42 @@ const Content = () => {
     if (key.keyStroke === app.system.switch) cycleView();
   }, [key.keyStroke]);
 
+  useEffect(() => {
+    console.log(navActive)
+  }, [navActive])
+
 
   return (
     <>
       {app.system.startedUp ? (
         <>
           <TopBar app={app} />
-          <NavBar isActive={navActive} />
-
+          <NavBar isActive={navActive} isHovering={isHovering}/>
           <MainContainer app={app} onClick={handleClick}>
-            <SideBar />
-
+            <SideBar collapseLength={collapseLength} />
             <Card
               theme={theme}
               currentView={currentView}
-              minWidth={app.system.windowSize.width - app.settings.side_bars.sideBarWidth.value}
-              maxWidth={app.system.windowSize.width}
-              fadeLength={(fadeLength / 1000)}
+              carPlay={carPlay}
+              maxHeight={app.system.windowSize.height - app.settings.side_bars.topBarHeight.value}
+              minHeight={0}
+              collapseLength={(collapseLength / 1000)}
             >
-              <View theme={theme}>
-                <Fade className={fadeMain} fadeLength={fadeLength}>
+              <Page theme={theme}>
+                <Fade className={fadePage} fadeLength={(fadeLength / 1000)}>
                   {renderView()}
                 </Fade>
-                <NavBlocker app={app} theme={theme} isActive={navActive} />
-              </View>
+              </Page>
+              <NavBlocker
+                app={app}
+                theme={theme}
+                isActive={navActive}
+                collapseLength={collapseLength / 1000}
+                minHeight={0}
+                maxHeight={app.settings.side_bars.navBarHeight.value - app.settings.general.contentPadding.value}
+              />
             </Card>
           </MainContainer>
-
         </>
       ) : (
         <></>

@@ -22,7 +22,7 @@ const AppContainer = styled.div`
   overflow: hidden;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, #111111, #141414);
+  background: linear-gradient(180deg, #0D0D0D, #1C1C1C);
 `;
 
 function App() {
@@ -88,8 +88,7 @@ function App() {
             setReceivingVideo={setReceivingVideo}
             commandCounter={commandCounter}
             command={keyCommand}
-          />*/}
-         
+          />*/}         
           <Content />
         </ThemeProvider>
       ) : (

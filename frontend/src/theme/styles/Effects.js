@@ -2,16 +2,11 @@ import styled from 'styled-components';
 import hexToRgba from '../../app/components/HexToRGBA'
 
 export const Fade = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
     width: 100%;
     height: 100%;
 
-    opacity: 0; /* Initial state */
-    transition: opacity 0.3s ease-in;
+    opacity: 0;
+    transition: opacity ${({ fadeLength }) => `${fadeLength}s`} ease-in;
 
     &.fade-in {
         opacity: 1;
@@ -23,6 +18,8 @@ export const Fade = styled.div`
 `;
 
 export const GlowLarge = styled.div`
-  box-shadow: 0 0 50px ${({ color }) => hexToRgba(color, 0.75)};
+  box-shadow: 0 0 50px ${({ color, opacity }) => hexToRgba(color, opacity)};
+
+  transition: box-shadow 0.4s ease-in-out;
   background: none;
 `;

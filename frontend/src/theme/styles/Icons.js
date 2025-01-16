@@ -56,9 +56,8 @@ export const IconExtraLarge = styled.svg`
         isActive ? theme.colors.theme.blue.active : theme.colors.medium};
     transition: fill 0.3s ease-in-out;
     filter: ${({ color }) =>
-        `drop-shadow(0 0px 40px ${hexToRgba(color, 1)})
-         drop-shadow(0 0px 70px ${hexToRgba(color, 1)})
-         drop-shadow(0 0px 100px ${hexToRgba(color, 1)})`};
+        `drop-shadow(0 0px 100px ${hexToRgba(color, 1)})
+        `};
     &:hover {
         fill: ${({ theme }) =>  theme.colors.theme.blue.default };
     }

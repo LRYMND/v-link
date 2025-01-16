@@ -15,7 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["@webgpu/types"],
+    "types": ["@webgpu/types", "react", "react-dom"],
     "typeRoots": ["types", "node_modules/@types"]
   },
   "include": ["src", "types", "src/store"]

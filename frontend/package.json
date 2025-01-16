@@ -20,8 +20,6 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@types/color-convert": "^2.0.3",
     "@types/node": "^16.18.40",
-    "@types/react": "^18.2.20",
-    "@types/react-dom": "^18.2.7",
     "@webgpu/types": "^0.1.40",
     "buffer": "^6.0.3",
     "events": "^3.3.0",
@@ -51,6 +49,8 @@
   },
   "devDependencies": {
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.3",

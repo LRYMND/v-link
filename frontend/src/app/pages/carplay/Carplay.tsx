@@ -9,29 +9,27 @@ import { Typography } from '../../../theme/styles/Typography';
 
 import { APP, KEY } from '../../../store/Store';
 
+const CarPlay = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+`;
 
 
 function Carplay() {
+    const app = APP((state) => state);
     const theme = useTheme()
 
     const Body2 = Typography.Body2
 
-    /* Fade Content */
-    const [fadeClass, setFadeClass] = useState('');
-
-    useEffect(() => {
-        // Add a small delay to ensure transition works
-        const timeout = setTimeout(() => {
-            setFadeClass('fade-in');
-        }, 0); // Can also use a small positive value if needed (e.g., 50ms)
-
-        return () => {
-            clearTimeout(timeout);
-        };
-    }, []);
-
     const onClick = () => {
         console.log(isActive)
+
+        app.update({system: { streamState: true}})
         setIsActive(!isActive)
     };
 
@@ -39,8 +37,7 @@ function Carplay() {
 
 
     return (
-        <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-            <Fade className={fadeClass}>
+        <CarPlay>
                 <Body2>CONNECT PHONE OR CLICK TO PAIR DONGLE.</Body2>
                 <Link onClick={() => onClick()} isActive={isActive}>
                     <FlexBox>
@@ -52,8 +49,7 @@ function Carplay() {
                         </IconExtraLarge>
                     </FlexBox>
                 </Link>
-            </Fade>
-        </div>
+        </CarPlay>
     );
 }
 

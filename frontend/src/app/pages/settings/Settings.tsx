@@ -23,6 +23,7 @@ const rtiChannel = io("ws://localhost:4001/rti")
 const Spacer = styled.div`
     display: flex;
     justify-content: right;
+    align-items: center;
 
     height: 100%;
     width: ${({ theme }) => theme.interaction.buttonWidth};
@@ -57,6 +58,8 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     align-self: right;
+    align-items: flex-end;
+    justify-content: flex-end;
 
     height: 100%;
     width: 100%;
@@ -65,6 +68,8 @@ const Container = styled.div`
 
     padding-left: 50px;
     padding-right: 50px;
+    padding-top: 30px;
+    padding-bottom: 20px;
     box-sizing: border-box;
 `;
 
@@ -324,7 +329,7 @@ const Settings = () => {
 
       return (
         <Element>
-          <Body1>{label}</Body1>
+          <Caption2>{label}</Caption2>
           <Divider />
           <Spacer>
             {dropdown ? (
@@ -374,12 +379,13 @@ const Settings = () => {
 
   return (
     <Container>
+
       <SimpleModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         {modalContent}
       </SimpleModal>
       <ScrollContainer
         className="scroll-container"
-        style={{ width: '100%', height: '100%' }}
+        style={{width: '100%', height: '100%' }}
         horizontal={false}
         hideScrollbars={true}
         ignoreElements='input, select'
@@ -432,7 +438,7 @@ const Settings = () => {
         }
 
         {system.settingPage === 2 &&
-          <div style={{ height: '100%', width: '100%', marginTop: '5px', marginBottom: '5px' }}>
+          <>
             {renderSetting("dash_topbar", currentSettings)}
             {renderSetting("dash_classic", currentSettings)}
             {renderSetting("dash_race", currentSettings)}
@@ -447,7 +453,7 @@ const Settings = () => {
               </Spacer>
             </Element>
             <p />
-          </div>
+          </>
         }
 
         {system.settingPage === 3 &&
@@ -459,7 +465,7 @@ const Settings = () => {
 
         {system.settingPage === 4 &&
           <>
-            <div style={{ display: 'flex', width: '100%', height: '100%', gap: '10px', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', width: '100%', height: '90%', gap: '10px', justifyContent: 'center' }}>
               <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', gap: '10px' }}>
                 <Button onClick={() => { systemTask('quit') }} style={{ height: '100%' }}> Quit </Button>
                 <Button onClick={() => { systemTask('restart') }} style={{ height: '100%' }}> Restart </Button>

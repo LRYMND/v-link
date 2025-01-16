@@ -1,197 +1,154 @@
 import { useState, useEffect, useRef } from 'react';
 import { APP, KEY } from '../../../store/Store';
-
-import styled, { css, useTheme } from 'styled-components';
-import { NavBlocker } from '../../../theme/styles/Container'
-
-
-
+import styled, { useTheme } from 'styled-components';
+import { Fade } from '../../../theme/styles/Effects';
 import Classic from './classic/Classic';
 import Race from './race/Race';
 import Charts from './charts/Charts';
-
 import Pagination from '../../components/Pagination';
-
 import '../../../styles.scss';
 import '../../../themes.scss';
 
-const Text1 = styled.p`
-font-family: ${({ theme }) => theme.fonts.inter};
-font-weight: ${({ theme }) => theme.fontWeights.light};
-font-size: 1rem;
+const DashBoard = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 `;
 
-const Text2 = styled.p`
-font-family: ${({ theme }) => theme.fonts.spartan};
-font-weight: ${({ theme }) => theme.fontWeights.light};
-font-size: 1rem;
+const Wrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 `;
 
-const Content = styled.div`
-    display: flex;
-    flex-grow: 1;
-    width: 100%;
-    height: 100%;
-    //background: ${({ theme }) => theme.colors.gradients.gradient1};
-    border-radius: 7px;
+const PageWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: ${({ direction }) => (direction === 'left' ? '-100%' : direction === 'right' ? '100%' : '0')};
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: scale(${({ isActive }) => (isActive ? 1 : 0.8)});
+  opacity: ${({ isActive }) => (isActive ? 1 : 0)};
+  transition: transform 0.75s ease-in-out, opacity 0.75s ease-in-out, left 0.75s ease-in-out;
 `;
+
+const DRAG_THRESHOLD = 50; // Minimum drag distance to trigger page change
 
 function Dashboard() {
   const app = APP((state) => state);
   const key = KEY((state) => state);
-
   const theme = useTheme();
+  const dashBoardRef = useRef(null);
 
-  // Component mapping by name
-  const componentMap = {
-    Classic: Classic,
-    Race: Race,
-    Charts: Charts,
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [transitioning, setTransitioning] = useState(false);
+  const [dragStart, setDragStart] = useState(0);
+  const [dragEnd, setDragEnd] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const components = [Classic, Race, Charts];
+
+  const swipeLeft = () => {
+    if (!transitioning) {
+      setTransitioning(true);
+      setCurrentPageIndex((prev) => (prev === components.length - 1 ? 0 : prev + 1)); // Loop to first page
+      setTimeout(() => setTransitioning(false), 750); // Match animation duration
+    }
   };
 
-  const components = [Classic, Race, Charts]; // Array of component functions
-  const totalPages = components.length; // Calculate the total number of pages
-  const sliderWidth = totalPages * (app.system.contentSize.width);
-  const paginationSize = 15;
-  const pageWidth = app.system.contentSize.width - (app.settings.general.contentPadding.value * 2);
-  const pageHeight = app.system.contentSize.height - (app.settings.general.contentPadding.value) - paginationSize;
-
-  // Find the index of the component based on the default dashboard value from settings
-  const componentName = app.settings.general.defaultDash.value;
-  const defaultComponentIndex = components.findIndex(
-    (component) => componentMap[componentName] === component
-  );
-
-  const swipeContainerRef = useRef(null);
-
-  const [currentPageIndex, setCurrentPageIndex] = useState(defaultComponentIndex);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [currentX, setCurrentX] = useState(0);
-  const [movedDistance, setMovedDistance] = useState(0);
-
-  const clickThreshold = 10; // Define how much the mouse must move (in pixels) to be considered a drag
-
-  function swipeLeft() {
-    if (currentPageIndex < totalPages - 1) {
-      setCurrentPageIndex(currentPageIndex + 1);
-      console.log(app.settings.general.contentPadding.value)
+  const swipeRight = () => {
+    if (!transitioning) {
+      setTransitioning(true);
+      setCurrentPageIndex((prev) => (prev === 0 ? components.length - 1 : prev - 1)); // Loop to last page
+      setTimeout(() => setTransitioning(false), 750); // Match animation duration
     }
-  }
+  };
 
-  function swipeRight() {
-    if (currentPageIndex > 0) {
-      setCurrentPageIndex(currentPageIndex - 1);
-    }
-  }
+  // Common drag handler logic for mouse and touch events
+  const handleDragStart = (startPos) => {
+    setDragStart(startPos);
+    setIsDragging(false); // Initially, we're not dragging
+  };
 
-  function handleMouseDown(event) {
-    setIsDragging(true);
-    setStartX(event.clientX);
-    setMovedDistance(0); // Reset the moved distance when mouse is pressed
-  }
-
-  function handleMouseMove(event) {
-    if (isDragging) {
-      const distanceMoved = event.clientX - startX;
-      setMovedDistance(Math.abs(distanceMoved)); // Track the absolute distance moved
-      setCurrentX(event.clientX);
-    }
-  }
-
-  function handleMouseUp() {
-    if (isDragging) {
-      setIsDragging(false);
-      if (movedDistance > clickThreshold) {
-        // Only trigger swipe if the mouse moved beyond the threshold
-        if (startX - currentX > 100) {
-          swipeLeft();
-        } else if (startX - currentX < -100) {
-          swipeRight();
-        }
+  const handleDragMove = (currentPos) => {
+    if (!isDragging) {
+      const moveDistance = Math.abs(currentPos - dragStart);
+      if (moveDistance > DRAG_THRESHOLD) {
+        setIsDragging(true); // Start dragging after exceeding threshold
       }
-      setCurrentX(startX);
     }
-  }
 
-  function handleDoubleClick(event) {
+    if (isDragging) {
+      setDragEnd(currentPos); // Update drag position while dragging
+    }
+  };
+
+  const handleDragEnd = () => {
+    if (!isDragging) return; // Ignore if not dragging
+
+    const dragDistance = dragEnd - dragStart;
+    if (Math.abs(dragDistance) > DRAG_THRESHOLD) {
+      dragDistance > 0 ? swipeRight() : swipeLeft(); // Swiped right or left
+    }
+
+    // Reset dragging state
+    setIsDragging(false);
+    setDragStart(0);
+    setDragEnd(0);
+  };
+
+  const handleDoubleClick = (event) => {
     const clickX = event.clientX;
-    const windowWidth = window.innerWidth;
-
-    if (clickX < windowWidth / 2) {
-      swipeRight();
-    } else {
-      swipeLeft();
-    }
-  }
+    const halfWindowWidth = window.innerWidth / 2;
+    clickX < halfWindowWidth ? swipeRight() : swipeLeft(); // Switch pages based on side of screen clicked
+  };
 
   useEffect(() => {
-    if (key.keyStroke == app.settings.app_bindings.left.value)
-      swipeRight(); // Physically swiping to the right, shows the page to the left.
-    if (key.keyStroke == app.settings.app_bindings.right.value)
-      swipeLeft(); // Physically swiping to the left, shows the page to the right.
+    if (key.keyStroke === app.settings.app_bindings.left.value) swipeRight();
+    if (key.keyStroke === app.settings.app_bindings.right.value) swipeLeft();
   }, [key.keyStroke]);
 
   return (
-    <div className={`dashboard ${app.settings.general.colorTheme.value}`}
-      style={{
-        width: `${app.system.contentSize.width}px`,
-        height: `100%`,
-      }}
+    <DashBoard
+      ref={dashBoardRef}
+      className={app.settings.general.colorTheme.value}
+      onMouseDown={(e) => handleDragStart(e.clientX)}
+      onMouseMove={(e) => handleDragMove(e.clientX)}
+      onMouseUp={handleDragEnd}
+      onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
+      onTouchMove={(e) => handleDragMove(e.touches[0].clientX)}
+      onTouchEnd={handleDragEnd}
+      onDoubleClick={handleDoubleClick}
     >
-      <Content>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-around',
-          height: '100%',
-        }}>
-          <div
-            ref={swipeContainerRef}
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              width: `${sliderWidth}px`,
-              height: `100%`,
-              transform: `translateX(-${(currentPageIndex * ((sliderWidth / totalPages)))}px)`,
-              transition: "transform 0.75s ease-in-out",
-            }}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            onDoubleClick={handleDoubleClick}
-          >
-            {components.map((Component, index) => (
-              <div key={index} style={{
-                display: 'flex',
-                justifyContent: 'center',
-                width: `${(app.system.contentSize.width)}px`,
-              }}>
-                <div style={{
-                  width: `${pageWidth}px`,
-                  height: `100%`,
-                  borderRadius: '7px',
-                  display: 'flex',
-                  flexDirection: 'column'
-                }}>
-                  <Component />
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className='row'>
-          <Pagination
-            pages={components.length}
-            colorActive='var(--themeDefault)'
-            colorInactive='var(--boxColorDark)'
-            currentPage={currentPageIndex}
-            dotSize={paginationSize / 2}
-          />
-          </div>
-        </div>
-      </Content>
-    </div>
+      <Wrapper>
+        {components.map((Component, index) => {
+          const isActive = index === currentPageIndex;
+          const direction = index < currentPageIndex ? 'left' : index > currentPageIndex ? 'right' : 'current';
+          return (
+            <PageWrapper key={index} isActive={isActive} direction={direction}>
+              <Fade className={isActive ? 'fade-in' : 'fade-out'} fadeLength={0.75}>
+                <Component />
+              </Fade>
+            </PageWrapper>
+          );
+        })}
+      </Wrapper>
+      <Pagination
+        pages={components.length}
+        colorActive='var(--themeDefault)'
+        colorInactive='var(--boxColorDark)'
+        currentPage={currentPageIndex}
+        dotSize={7.5}
+      />
+    </DashBoard>
   );
 }
 

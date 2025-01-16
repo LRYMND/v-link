@@ -17,20 +17,13 @@ const Sidebar = styled.div`
 
     box-sizing: border-box;
 
-
     overflow: hidden;
 
-    /* Set the width based on current view */
-     width: ${({ currentView, minWidth, maxWidth }) =>
-        currentView === 'Settings'
-            ? `${maxWidth}px`  /* Use maxWidth when Settings is active */
-            : `${minWidth}px`}; /* Default to minWidth when other views are active */
-
     /* Apply the animation based on the current view */
-    animation: ${({ theme, currentView, minWidth, maxWidth }) => css`
+    animation: ${({ theme, currentView, minWidth, maxWidth, collapseLength }) => css`
     ${currentView === 'Settings'
             ? theme.animations.getHorizontalExpand(minWidth, maxWidth)
-            : theme.animations.getHorizontalCollapse(minWidth, maxWidth)} 0.3s ease-in-out forwards;
+            : theme.animations.getHorizontalCollapse(minWidth, maxWidth)} ${collapseLength}s ease-in-out forwards;
     `};
 
   /* Avoid transition conflicts */
@@ -48,21 +41,20 @@ const Menu = styled.div`
     justify-self: flex-start;
     justify-content: flex-start;
     align-items: flex-start;
-
-    margin-left: 30px;
 `;
 
 
-const SideBar = () => {
+const SideBar = ({collapseLength}) => {
 
     const app = APP((state) => state)
     const theme = useTheme();
 
-    const [time, setDate] = useState(new Date());
     const [moose, setMoose] = useState(false);
 
     const [currentPage, setCurrentPage] = useState(app.system.view)
     const [currentTab, setCurrentTab] = useState(app.system.settingPage)
+
+    const padding = '20px'
 
     /* Switch Tabs */
     const handleTabChange = (tabIndex) => {
@@ -74,23 +66,6 @@ const SideBar = () => {
         setCurrentTab(app.system.settingPage)
     }, [app.system.settingPage])
 
-
-
-
-    function updateTime() {
-        setDate(new Date());
-    }
-
-    useEffect(() => {
-        const timer1 = setInterval(updateTime, 10000);
-
-        return function cleanup() {
-            clearInterval(timer1);
-        };
-    }, []);
-
-
-
     return (
 
         <Sidebar
@@ -98,11 +73,12 @@ const SideBar = () => {
             app={app}
             currentPage={currentPage}
             currentView={app.system.view}
+            collapseLength={collapseLength / 1000}
             minWidth={0}
             maxWidth={app.settings.side_bars.sideBarWidth.value}>
-            <Menu>
+            <Menu style={{paddingLeft: padding}}>
                 <Title>SETTINGS</Title>
-                <Link onClick={() => handleTabChange(1)} isActive={currentTab === 1}>
+                <Link onClick={() => handleTabChange(1)} isActive={currentTab === 1} >
                     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'left' }}>
                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px', width: '100%' }}>
                             <IconMedium isActive={currentTab === 1} theme={theme}>
@@ -113,7 +89,7 @@ const SideBar = () => {
                     </div>
                 </Link>
 
-                <Link onClick={() => handleTabChange(2)} isActive={currentTab === 2}>
+                <Link onClick={() => handleTabChange(2)} isActive={currentTab === 2} >
                     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'left' }}>
                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px', width: '100%' }}>
                             <IconMedium isActive={currentTab === 2} theme={theme}>
@@ -124,7 +100,7 @@ const SideBar = () => {
                     </div>
                 </Link>
 
-                <Link onClick={() => handleTabChange(3)} isActive={currentTab === 3}>
+                <Link onClick={() => handleTabChange(3)} isActive={currentTab === 3} >
                     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'left' }}>
                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px', width: '100%' }}>
                             <IconMedium isActive={currentTab === 3} theme={theme}>
@@ -147,27 +123,29 @@ const SideBar = () => {
                     </div>
                 </Link>
 
-
-                <div style={{ width: '100%', height: '40px', display: 'flex', alignItems: 'center', marginTop: '10px' }}>
-                    <Button
-                        onClick={() => {
-                            setMoose(true)
-                            {/* 
-                            openModal(
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                    <h1>You found the Turbo-Button!</h1>
-                                    <p>Sadly, it doesn't do anything.</p>
-                                </div>
-                            )
-                            */}
-                        }}
-                        style={{ background: 'none', color: 'white', width: '20%' }}>
-                        <IconMedium isActive={moose} theme={theme} style={{ fill: !moose ? 'none' : theme.colors.active }}>
-                            <use xlinkHref={`/assets/svg/moose.svg#moose`}></use>
-                        </IconMedium>
-                    </Button>
-                    <Caption1>v2.2.1</Caption1>
-                </div>
+                    <Link onClick={() =>
+                        setMoose(true)
+                        /* 
+                        openModal(
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <h1>You found the Turbo-Button!</h1>
+                                <p>Sadly, it doesn't do anything.</p>
+                            </div>
+                        )
+                        */
+                        }
+                        isActive={moose}
+                        style={{width: theme.icons.medium}}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'left' }}>
+                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px'}}>
+                                <IconMedium theme={theme} style={{ fill: moose ? theme.colors.medium : 'none' }}>
+                                    <use xlinkHref={`/assets/svg/moose.svg#moose`}></use>
+                                </IconMedium>
+                            </div>
+                        </div>
+                        <Caption1 style={{color: theme.colors.light}}> v2.2.1</Caption1>
+                    </Link>
+                    
             </Menu>
         </Sidebar>
 
