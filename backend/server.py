@@ -107,13 +107,18 @@ class ServerThread(threading.Thread):
 
         # Emit module status
         def emit_state():
-            socketio.emit('state', shared_state.THREAD_STATES[module], namespace=namespace)
+            thread_state = shared_state.THREADS.get(module, None)
+            thread_state = thread_state.is_alive() if thread_state else False
+            socketio.emit('state', thread_state, namespace=namespace)
 
         # Toggle module status
         def toggle_state():
             if (shared_state.verbose): print('Toggling Thread')
             getattr(shared_state, toggle_attr).set()
-            socketio.emit('state', not shared_state.THREAD_STATES[module], namespace=namespace)
+
+            thread_state = shared_state.THREADS.get(module, None)
+            thread_state = thread_state.is_alive() if thread_state else False
+            socketio.emit('state', not thread_state, namespace=namespace)
 
 
         load_settings.__name__  = f'load_settings_{module}'
