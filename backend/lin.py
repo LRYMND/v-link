@@ -28,7 +28,8 @@ class LinFrame:
         self.bytes.append(b)
 
     def get_byte(self, index):
-        return self.bytes[index]
+        if 0 <= index < len(self.bytes):
+            return self.bytes[index]
 
     def pop_byte(self):
         return self.bytes.pop()
@@ -111,16 +112,25 @@ class LINThread(threading.Thread):
         }
 
     def run(self):
-        if not shared_state.vLin:
-            try:
+        try:
+            if not shared_state.vLin:
                 port = "/dev/ttyAMA0" if shared_state.rpiModel == 5 else "/dev/ttyS0"
+                try:
+                    self.lin_serial = serial.Serial(port=port, baudrate=9600, timeout=1)
+                except Exception as e:
+                    print("UART error: ", e)
                 
-                self.lin_serial = serial.Serial(port=port, baudrate=9600, timeout=1)
-                self._read_from_serial()
-            except Exception as e:
-                print("UART error: ", e)
-        else:
-            self._read_from_file()
+                while not self._stop_event.is_set():
+                    try:
+                        self._read_from_serial()
+                    except serial.SerialException as e:
+                        print(f"Serial communication error: {e}")
+                    except Exception as e:
+                        print(f"Error in LIN _read_from_serial: {e}")
+            else:
+                self._read_from_file()
+        except Exception as e:
+            print(f"Unexpected error in LIN thread: {e}")
 
     def stop_thread(self):
         print("Stopping LIN thread.")
@@ -155,17 +165,20 @@ class LINThread(threading.Thread):
             print("Replay terminated.")
 
     def _process_incoming_byte(self, byte):
-        n = self.lin_frame.num_bytes()
-        sync_id = bytes.fromhex(self.config.lin_settings["sync_id"][2:])
+        try:
+            n = self.lin_frame.num_bytes()
+            sync_id = bytes.fromhex(self.config.lin_settings["sync_id"][2:])
 
-        if byte == sync_id and n > 2 and self.lin_frame.get_byte(n - 1) == 0x00:
-            self.lin_frame.pop_byte()
-            self._handle_frame()
-            self.lin_frame.reset()
-        elif n == self.lin_frame.kMaxBytes:
-            self.lin_frame.reset()
-        else:
-            self.lin_frame.append_byte(byte[0] if isinstance(byte, bytes) else byte)
+            if byte == sync_id and n > 2 and self.lin_frame.get_byte(n - 1) == 0x00:
+                self.lin_frame.pop_byte()
+                self._handle_frame()
+                self.lin_frame.reset()
+            elif n == self.lin_frame.kMaxBytes:
+                self.lin_frame.reset()
+            else:
+                self.lin_frame.append_byte(byte[0] if isinstance(byte, bytes) else byte)
+        except IndexError as e:
+            print(f"IndexError: {e} while processing incoming bytes.")
 
     def _handle_frame(self):
         """Process a complete LIN frame."""
