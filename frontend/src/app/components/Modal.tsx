@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const SimpleModal = ({ isOpen, onClose, children }) => {
+const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null; // Don't render the modal if it's not open
 
   return ReactDOM.createPortal(
@@ -51,4 +51,4 @@ const modalStyles = {
   },
 };
 
-export default SimpleModal;
+export default Modal;

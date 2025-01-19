@@ -38,9 +38,9 @@ class Config:
 
             refresh_rate = sensor['refresh_rate']
             if refresh_rate == "high":
-                self.msg_hs.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, id))
+                self.msg_hs.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, id, ':'))
             elif refresh_rate == "low":
-                self.msg_ls.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, id))
+                self.msg_ls.append((req_id_bytes, rep_id_bytes, message_bytes, scale, is_16bit, id, ':'))
 
 class CANThread(threading.Thread):
     def __init__(self):

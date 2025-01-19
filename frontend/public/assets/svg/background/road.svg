@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="road" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 94.03 39.92">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Unbenannter_Verlauf_15);
+      }
+
+      .cls-2 {
+        fill: url(#Unbenannter_Verlauf_19);
+      }
+
+      .cls-3 {
+        fill: url(#Unbenannter_Verlauf_22);
+      }
+
+      .cls-4 {
+        fill: url(#Unbenannter_Verlauf_9);
+      }
+    </style>
+    <linearGradient id="Unbenannter_Verlauf_9" x1="15.51" y1="-.03" x2="15.51" y2="39.89" gradientTransform="translate(0 39.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1c1c1c" stop-opacity="0" />
+      <stop offset=".72" stop-color="#0d0d0d" />
+      <stop offset="1" stop-color="#1b1c1b" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="Unbenannter_Verlauf_22" x1="78.52" y1="-.03" x2="78.52" y2="39.89" gradientTransform="translate(0 39.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1c1c1c" stop-opacity="0" />
+      <stop offset=".72" stop-color="#0d0d0d" />
+      <stop offset="1" stop-color="#1b1c1b" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="Unbenannter_Verlauf_19" x1="74.66" y1="-.03" x2="74.66" y2="39.89" gradientTransform="translate(0 39.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1c1c1c" stop-opacity="0" />
+      <stop offset=".72" stop-color="#0d0d0d" />
+      <stop offset="1" stop-color="#1b1c1b" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="Unbenannter_Verlauf_15" x1="19.37" y1="-.03" x2="19.37" y2="39.89" gradientTransform="translate(0 39.89) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1c1c1c" stop-opacity="0" />
+      <stop offset=".72" stop-color="#0d0d0d" />
+      <stop offset="1" stop-color="#1b1c1b" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+  <polyline class="cls-4" points="0 39.87 30.47 0 31.01 0 2 39.92" />
+  <polyline class="cls-3" points="94.03 39.87 63.56 0 63.01 0 92.03 39.92" />
+  <polyline class="cls-2" points="90.03 39.87 62.01 0 59.29 0 79.03 39.92" />
+  <polyline class="cls-1" points="4 39.87 32.01 0 34.74 0 15 39.92" />
+</svg>

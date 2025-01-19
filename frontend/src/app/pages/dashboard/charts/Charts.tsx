@@ -1,97 +1,51 @@
 import { useState, useEffect } from 'react';
+import styled, { useTheme } from 'styled-components';
+
 import { APP } from '../../../../store/Store';
 
-import ValueBox from './../../../components/ValueBox';
-import LineChart from '../../../components/LineChart'
+import DataChart from '../../../components/DataChart'
+import DataList from '../../../components/DataList'
 
-import "./../../../../styles.scss"
-import "./../../../../themes.scss"
+
+const Container = styled.div`
+  display: flex;
+  flex-direction:column;
+  gap: 30px;
+  width: 100%;
+  height: 100%;
+`;
+
+const List = styled.div`
+  display: flex;
+  gap: 20px;
+`;
 
 const Charts = () => {
+    const theme = useTheme()
     const app = APP((state) => state);
 
     const setCount = app.settings.constants.chart_input_current;
-
-    const [themeDefault, setThemeDefault] = useState()
-    const [ready, setReady] = useState(false)
-
-    useEffect(() => {
-        const theme = document.querySelector(`.${app.settings.general.colorTheme.value}`);
-        const computedStyles = getComputedStyle(theme);
-        setThemeDefault(computedStyles.getPropertyValue('--themeDefault'));
-        setReady(true)
-    }, []);
+    const Datalist = DataList(app.settings.dash_charts, setCount, 2 ) // Amount of Items, 2 Columns
 
 
-
-    const renderValueBoxes = () => {
-        const rows = [];
-
-        for (let i = 0; i < setCount; i += 3) {
-            const boxes = [];
-
-            for (let j = 0; j < 3; j++) {
-                const currentIndex = i + j;
-
-                if (currentIndex < setCount) {
-                    boxes.push(
-                        <div key={`value_${currentIndex + 1}`} className="column">
-                            <ValueBox
-                                sensor={app.settings.dash_charts[`value_${currentIndex + 1}`]?.value}
-                                type={app.settings.dash_charts[`value_${currentIndex + 1}`]?.type}
-                                unit={true}
-
-                                textColorDefault={'var(--textColorDefault)'}
-                                valueColor={'var(--themeDefault)'}
-                                limitColor={'var(--themeAccent)'}
-                                boxColor={'var(--boxColorDarker)'}
-                                borderColor={'var(--boxColorDark)'}
-
-                                borderWidth={'0px'}
-
-                                height={"10vh"}
-                                width={"100%"}
-
-                                labelSize={`calc(3vmin * ${app.system.textScale}`}
-                                valueSize={`calc(5vmin * ${app.system.textScale}`}
-                            />
-                        </div>
-                    );
-                }
-            }
-
-            rows.push(<div key={`row_${i}`} className='row'>{boxes}</div>);
-        }
-
-        return rows;
-    };
 
     return (
-        <>
-            {ready ?
-                <>
-                    <div className='row' style={{overflow:'auto'}}>
-                        <LineChart
-                            setCount={setCount}
-                            width={app.system.contentSize.width - (app.settings.general.contentPadding.value * 2)}
-                            height={app.system.contentSize.height * 0.6}
-                            padding={70}  // Update with the desired padding
-                            tickCountX={5}  // Update with the desired number of X-axis ticks
-                            tickCountY={5}  // Update with the desired number of Y-axis ticks
-                            length={app.settings.dash_charts.length.value}
-                            resolution={app.settings.dash_charts.resolution.value}
-                            interpolation={app.settings.dash_charts.interpolation.value}
-                            backgroundColor={'var(--backgroundColor)'}
-                            color_label={'var(--textColorDefault)'}
-                            color_xGrid={'var(--textColorDark)'}
-                            color_yGrid={'var(--textColorDark)'}
-                            color_axis={'var(--textColorDefault)'}
-                            color_dash_charts={themeDefault}
-                        />
-                    </div>
-                    {renderValueBoxes()}
-                </> : <></>}
-        </>
+        <Container>
+            <DataChart
+                length={app.settings.dash_charts.length.value}
+                resolution={app.settings.dash_charts.resolution.value}
+                interpolation={app.settings.dash_charts.interpolation.value}
+                setCount={setCount}
+                tickCountX={5}  // Update with the desired number of X-axis ticks
+                tickCountY={4}  // Update with the desired number of Y-axis ticks
+                color_xGrid={theme.colors.dark}
+                color_yGrid={theme.colors.dark}
+            />
+            <List>
+                {Datalist}
+            </List>
+        </Container>
+
     )
 };
 

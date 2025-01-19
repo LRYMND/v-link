@@ -267,6 +267,8 @@ function Carplay({ command, commandCounter }: CarplayProps) {
         onPointerCancel={sendTouchEvent}
         onPointerOut={sendTouchEvent}
         style={{
+          position: 'absolute',
+          zIndex: 1,
           height: '100%',
           width: '100%',
           padding: 0,
@@ -278,7 +280,8 @@ function Carplay({ command, commandCounter }: CarplayProps) {
           ref={canvasRef}
           id="video"
           style={
-            isPlugged === "Carplay"
+
+            isPlugged && app.system.view === "Carplay"
               ? { height: '100%', overflow: 'hidden'}
               : { display: 'none' }
           }

@@ -10,7 +10,7 @@ export const theme = {
   
   icons: {
     small: '10px',
-    medium: '16px',
+    medium: '18px',
     large: '32px',
     xlarge: '64px',
   },
@@ -36,6 +36,7 @@ export const theme = {
     gradients: {
       gradient1: 'linear-gradient(180deg, #1C1C1C,#0D0D0D)',
       gradient2: 'linear-gradient(180deg, #0D0D0D, #1C1C1C)',
+      gradient3: 'linear-gradient(180deg, #141414, #0D0D0D)',
     },
 
     theme: {
@@ -49,6 +50,8 @@ export const theme = {
         default: '#3C729E',
         active: '#A7CEEE',
         navGlow: '0 0 20px rgba(165, 205, 237, 1)', // Define your glow here
+        highlightDark: '#9E3C3C',
+        highlightLight: '#FF0000',
       },
   
       red: {

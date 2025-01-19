@@ -1,5 +1,5 @@
 import styled, { css, useTheme } from 'styled-components';
-import hexToRgba from '../../app/components/HexToRGBA'
+import hexToRgba from '../../app/helper/HexToRGBA'
 
 export const IconSmall = styled.svg`
     width: ${({ theme }) => theme.icons.small};
@@ -20,8 +20,8 @@ export const IconSmall = styled.svg`
 export const IconMedium = styled.svg`
     width: ${({ theme }) => theme.icons.medium};
     height: ${({ theme }) => theme.icons.medium};
-    fill: ${({ isActive, theme }) =>
-        isActive ? theme.colors.theme.blue.active : theme.colors.medium};
+    stroke: ${({ isActive, theme, color }) =>
+        color ? color : isActive ? theme.colors.theme.blue.active : theme.colors.medium};
     transition: fill 0.3s ease-in-out;
     filter: ${({ isActive, theme }) =>
         isActive ? `drop-shadow(${theme.colors.theme.blue.navGlow})` : 'none'};
@@ -36,8 +36,9 @@ export const IconMedium = styled.svg`
 export const IconLarge = styled.svg`
     width: ${({ theme }) => theme.icons.large};
     height: ${({ theme }) => theme.icons.large};
-    fill: ${({ isActive, theme }) =>
-        isActive ? theme.colors.theme.blue.active : theme.colors.medium};
+    fill:none;
+    stroke: ${({ isActive, theme, color }) =>
+        color ? color : isActive ? theme.colors.theme.blue.active : theme.colors.medium};
     transition: fill 0.3s ease-in-out;
     filter: ${({ isActive, theme }) =>
         isActive ? `drop-shadow(${theme.colors.theme.blue.navGlow})` : 'none'};

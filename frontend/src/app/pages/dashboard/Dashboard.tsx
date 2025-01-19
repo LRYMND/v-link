@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { APP, KEY } from '../../../store/Store';
 import styled, { useTheme } from 'styled-components';
+
 import { Fade } from '../../../theme/styles/Effects';
 import Classic from './classic/Classic';
 import Race from './race/Race';
 import Charts from './charts/Charts';
 import Pagination from '../../components/Pagination';
-import '../../../styles.scss';
-import '../../../themes.scss';
 
 const DashBoard = styled.div`
   height: 100%;
@@ -40,7 +39,7 @@ const PageWrapper = styled.div`
   transition: transform 0.75s ease-in-out, opacity 0.75s ease-in-out, left 0.75s ease-in-out;
 `;
 
-const DRAG_THRESHOLD = 50; // Minimum drag distance to trigger page change
+const DRAG_THRESHOLD = 50;
 
 function Dashboard() {
   const app = APP((state) => state);
@@ -48,58 +47,101 @@ function Dashboard() {
   const theme = useTheme();
   const dashBoardRef = useRef(null);
 
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const components = [
+    { name: "Classic", component: Classic },
+    { name: "Race", component: Race },
+    { name: "Charts", component: Charts },
+  ];
+
+  const defaultComponentIndex = components.findIndex(
+    (item) => item.name === app.settings.general.defaultDash.value
+  );
+  const [currentPageIndex, setCurrentPageIndex] = useState(defaultComponentIndex);
+
   const [transitioning, setTransitioning] = useState(false);
   const [dragStart, setDragStart] = useState(0);
   const [dragEnd, setDragEnd] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
-  const components = [Classic, Race, Charts];
+
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  const resizeDebounceTimeout = useRef(null);
+
+  // Efficiently handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (resizeDebounceTimeout.current) {
+        clearTimeout(resizeDebounceTimeout.current);
+      }
+      resizeDebounceTimeout.current = setTimeout(() => {
+        setWindowSize({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+      }, 100);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(resizeDebounceTimeout.current);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (dashBoardRef.current) {
+      const rect = dashBoardRef.current.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        console.log('dashboardRect: ', rect)
+        app.update({
+          system: {
+            contentSize: { width: rect.width, height: rect.height },
+          },
+        });
+      }
+    }
+  }, [windowSize]);
 
   const swipeLeft = () => {
     if (!transitioning) {
       setTransitioning(true);
-      setCurrentPageIndex((prev) => (prev === components.length - 1 ? 0 : prev + 1)); // Loop to first page
-      setTimeout(() => setTransitioning(false), 750); // Match animation duration
+      setCurrentPageIndex((prev) => (prev === components.length - 1 ? 0 : prev + 1));
+      setTimeout(() => setTransitioning(false), 1000);
     }
   };
 
   const swipeRight = () => {
     if (!transitioning) {
       setTransitioning(true);
-      setCurrentPageIndex((prev) => (prev === 0 ? components.length - 1 : prev - 1)); // Loop to last page
-      setTimeout(() => setTransitioning(false), 750); // Match animation duration
+      setCurrentPageIndex((prev) => (prev === 0 ? components.length - 1 : prev - 1));
+      setTimeout(() => setTransitioning(false), 1000);
     }
   };
 
-  // Common drag handler logic for mouse and touch events
   const handleDragStart = (startPos) => {
     setDragStart(startPos);
-    setIsDragging(false); // Initially, we're not dragging
+    setIsDragging(false);
   };
 
   const handleDragMove = (currentPos) => {
-    if (!isDragging) {
-      const moveDistance = Math.abs(currentPos - dragStart);
-      if (moveDistance > DRAG_THRESHOLD) {
-        setIsDragging(true); // Start dragging after exceeding threshold
-      }
+    if (!isDragging && Math.abs(currentPos - dragStart) > DRAG_THRESHOLD) {
+      setIsDragging(true);
     }
 
     if (isDragging) {
-      setDragEnd(currentPos); // Update drag position while dragging
+      setDragEnd(currentPos);
     }
   };
 
   const handleDragEnd = () => {
-    if (!isDragging) return; // Ignore if not dragging
-
-    const dragDistance = dragEnd - dragStart;
-    if (Math.abs(dragDistance) > DRAG_THRESHOLD) {
-      dragDistance > 0 ? swipeRight() : swipeLeft(); // Swiped right or left
+    if (isDragging && Math.abs(dragEnd - dragStart) > DRAG_THRESHOLD) {
+      dragEnd > dragStart ? swipeRight() : swipeLeft();
     }
 
-    // Reset dragging state
     setIsDragging(false);
     setDragStart(0);
     setDragEnd(0);
@@ -108,7 +150,7 @@ function Dashboard() {
   const handleDoubleClick = (event) => {
     const clickX = event.clientX;
     const halfWindowWidth = window.innerWidth / 2;
-    clickX < halfWindowWidth ? swipeRight() : swipeLeft(); // Switch pages based on side of screen clicked
+    clickX < halfWindowWidth ? swipeRight() : swipeLeft();
   };
 
   useEffect(() => {
@@ -129,7 +171,7 @@ function Dashboard() {
       onDoubleClick={handleDoubleClick}
     >
       <Wrapper>
-        {components.map((Component, index) => {
+        {components.map(({ component: Component }, index) => {
           const isActive = index === currentPageIndex;
           const direction = index < currentPageIndex ? 'left' : index > currentPageIndex ? 'right' : 'current';
           return (
@@ -143,8 +185,8 @@ function Dashboard() {
       </Wrapper>
       <Pagination
         pages={components.length}
-        colorActive='var(--themeDefault)'
-        colorInactive='var(--boxColorDark)'
+        colorActive={theme.colors.theme.blue.active}
+        colorInactive={theme.colors.medium}
         currentPage={currentPageIndex}
         dotSize={7.5}
       />

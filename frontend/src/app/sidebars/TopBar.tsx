@@ -6,19 +6,18 @@ import { IconSmall } from '../../theme/styles/Icons';
 import { Caption1 } from '../../theme/styles/Typography';
 
 const Topbar = styled.div`
-  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  z-index: 1;
   background: ${({ theme }) => theme.colors.gradients.gradient1};
   height: ${({ app }) => `${app.settings.side_bars.topBarHeight.value}px`};
   width: 100%;
   display: flex;
-  z-index: 1;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 20px;
-  padding-right: 20px;
+  box-sizing: border-box;
+  padding: 5px 20px;
   gap: 10px;
 `;
 
@@ -50,21 +49,29 @@ const Right = styled.div`
 `;
 
 const Scroller = styled.div`
+  position: relative; /* Necessary for absolute positioning of children */
+
   width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  overflow: hidden;
-  transition: height 0.3s ease-in-out;
+  height: 30px; /* Fixed height for the scroller */
+
+  overflow: hidden; /* Hide content outside the container */
 `;
 
 const ScrollerContent = styled.div`
+  position: absolute; /* Stack children on top of each other */
+
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
   width: 100%;
-  height: ${({ height }) => height}; 
-  transition: height 0.3s ease-in-out;
-  display: ${({ isVisible }) => (isVisible ? 'block' : 'none')};
+  height: 30px; /* Each child has a fixed height of 30px */
+  gap: 10px;
+
+  top: ${({ active }) => (active ? "0" : "30px")};
+  transition: top 0.3s ease-in-out;
+
+
 `;
 
 const TopBar = () => {
@@ -72,6 +79,7 @@ const TopBar = () => {
   const theme = useTheme();
 
   const [time, setDate] = useState(new Date());
+  const [carplay, setCarplay] = useState(true);
 
   function updateTime() {
     setDate(new Date());
@@ -79,35 +87,28 @@ const TopBar = () => {
 
   useEffect(() => {
     const timer1 = setInterval(updateTime, 10000);
-
-    return function cleanup() {
-      clearInterval(timer1);
-    };
+    return () => clearInterval(timer1);
   }, []);
 
-  // Conditionally determine which content to show
-
-  const [carplay, setCarplay] = useState(true)
-  useEffect (() => {
-    if(app.system.streamState && app.system.view === 'Carplay')
-      setCarplay(true)
-    else
-      setCarplay(false)
-  })
+  useEffect(() => {
+    setCarplay(app.system.streamState && app.system.view === 'Carplay');
+  }, [app.system.streamState, app.system.view]);
 
   return (
     <Topbar theme={theme} app={app}>
       <Left>
         <Scroller>
-          {/* First Content: Time */}
-          <ScrollerContent height={carplay ? app.settings.side_bars.topBarHeight.value : 0}>
-          <Caption1>Important System Information</Caption1>
+          {/* First Content: System Info */}
+          <ScrollerContent active={carplay}>
+            <IconSmall isActive={true}>
+              <use xlinkHref="/assets/svg/icons/thin/oil_temp.svg#oil_temp" />
+            </IconSmall>
+            <Caption1>73°C</Caption1>
           </ScrollerContent>
 
-          {/* Second Content: System Info */}
-          <ScrollerContent height={carplay ? 0 : app.settings.side_bars.topBarHeight.value}>
-          <Caption1>{time.toLocaleTimeString('sv-SV', { hour: '2-digit', minute: '2-digit' })}</Caption1>
-            
+          {/* Second Content: Time */}
+          <ScrollerContent active={!carplay}>
+            <Caption1>{time.toLocaleTimeString('sv-SV', { hour: '2-digit', minute: '2-digit' })}</Caption1>
           </ScrollerContent>
         </Scroller>
       </Left>

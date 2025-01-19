@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 27.5 21.2">
+  <defs>
+  </defs>
+  <g id="map">
+    <circle id="Ellipse_27" class="cls-1" cx="13.75" cy="10.5" r="8.94" />
+    <circle id="Ellipse_28" class="cls-1" cx="13.75" cy="10.5" r="3.25" />
+    <circle id="Ellipse_29" class="cls-1" cx="13.75" cy="10.5" r=".57" />
+    <path id="Vector_33" class="cls-2" d="M13.95,1.56h12.8M22.48,8.47h4.27M26.75.75v8.73" />
+    <path id="Vector_34" class="cls-2" d="M13.55,19.44H.75M5.02,12.53H.75M.75,20.45v-8.94" />
+  </g>
+</svg>

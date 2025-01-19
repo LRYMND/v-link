@@ -54,8 +54,6 @@ const SideBar = ({collapseLength}) => {
     const [currentPage, setCurrentPage] = useState(app.system.view)
     const [currentTab, setCurrentTab] = useState(app.system.settingPage)
 
-    const padding = '20px'
-
     /* Switch Tabs */
     const handleTabChange = (tabIndex) => {
         console.log(tabIndex)
@@ -76,7 +74,7 @@ const SideBar = ({collapseLength}) => {
             collapseLength={collapseLength / 1000}
             minWidth={0}
             maxWidth={app.settings.side_bars.sideBarWidth.value}>
-            <Menu style={{paddingLeft: padding}}>
+            <Menu>
                 <Title>SETTINGS</Title>
                 <Link onClick={() => handleTabChange(1)} isActive={currentTab === 1} >
                     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'left' }}>

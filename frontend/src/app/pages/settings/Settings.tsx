@@ -9,7 +9,7 @@ import { Typography } from '../../../theme/styles/Typography';
 import { APP } from '../../../store/Store';
 
 import { io } from "socket.io-client";
-import SimpleModal from '../../components/SimpleModal';
+import Modal from '../../components/Modal';
 
 
 const appChannel = io("ws://localhost:4001/app")
@@ -19,6 +19,26 @@ const canChannel = io("ws://localhost:4001/can")
 const linChannel = io("ws://localhost:4001/lin")
 const adcChannel = io("ws://localhost:4001/adc")
 const rtiChannel = io("ws://localhost:4001/rti")
+
+const Container = styled.div`
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
+    width: 100%;
+
+    overscroll: hidden;
+
+    gap: 10px;
+
+    box-sizing: border-box;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 30px;
+    padding-bottom: 20px;
+`;
 
 const Spacer = styled.div`
     display: flex;
@@ -53,25 +73,6 @@ const Element = styled.div`
 
     margin-bottom: 7px;
 `
-
-const Container = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-self: right;
-    align-items: flex-end;
-    justify-content: flex-end;
-
-    height: 100%;
-    width: 100%;
-
-    gap: 10px;
-
-    padding-left: 50px;
-    padding-right: 50px;
-    padding-top: 30px;
-    padding-bottom: 20px;
-    box-sizing: border-box;
-`;
 
 
 const Settings = () => {
@@ -336,7 +337,7 @@ const Settings = () => {
               <Select
                 name={setting}
                 isActive={true}
-                textSize={2.2}
+                textSize={theme.typography.caption2.fontSize}
                 textScale={system.textScale}
                 onChange={handleChange}
                 value={value}
@@ -379,10 +380,9 @@ const Settings = () => {
 
   return (
     <Container>
-
-      <SimpleModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         {modalContent}
-      </SimpleModal>
+      </Modal>
       <ScrollContainer
         className="scroll-container"
         style={{width: '100%', height: '100%' }}
@@ -483,9 +483,9 @@ const Settings = () => {
         }
 
       </ScrollContainer>
-      <Button theme={theme} onClick={() => { saveSettings() }} isActive={save ? false : true}>
-        {save ? 'All Settings saved.' : 'Save Settings'}
-      </Button>
+        <Button theme={theme} onClick={() => { saveSettings() }} isActive={save ? false : true}>
+          {save ? 'All Settings saved.' : 'Save Settings'}
+        </Button>
     </Container>
   )
 };

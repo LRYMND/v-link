@@ -74,7 +74,7 @@ class ADCThread(threading.Thread):
             characteristics = value["characteristic"]
             interpolated_value = self.interpolate_value(voltage, resistance, characteristics)
 
-            data = (f"{value['app_id']}{interpolated_value}")
+            data = (f"{value['app_id']}:{interpolated_value}")
             self.emit_data_to_frontend(data)
 
     def interpolate_value(self, voltage, resistance, characteristics):

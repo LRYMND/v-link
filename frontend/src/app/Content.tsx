@@ -11,37 +11,44 @@ import NavBar from '../app/sidebars/NavBar';
 import SideBar from '../app/sidebars/SideBar';
 import TopBar from '../app/sidebars/TopBar';
 
-import './../themes.scss';
-import './../styles.scss';
-
 const MainContainer = styled.div`
-  height: ${({ app }) => `${app.system.windowSize.height - app.settings.side_bars.topBarHeight.value}px`};
-  width: ${({ app }) => `${app.system.windowSize.width}px`};
+  position: relative;
+  height: ${({ height }) => `${height}px`};
+  width: ${({ width }) => `${width}px`};
 
   display: ${({ app }) => (app.system.view === 'Carplay' ? 'flex' : 'flex')};
   flex-direction: row;
-  position: relative;
-  justify-content: space-between;
   align-items: flex-end;
-  //background: '${({ theme }) => `${theme.colors.gradients.gradient1}`}';
+  justify-content: flex-start;
+
+  box-sizing: border-box;
+  padding-top: ${({ app }) => `${app.settings.side_bars.topBarHeight.value}px`};
+  padding-left: ${({ app }) => `${app.settings.general.contentPadding.value}px`};
+  padding-right: ${({ app }) => `${app.settings.general.contentPadding.value}px`};
+  padding-bottom: ${({ app }) => `${app.settings.general.contentPadding.value}px`};
+  
+  background: '${({ theme }) => `${theme.colors.gradients.gradient1}`}';
 `;
 
-const Card = styled.div`
+const Static = styled.div`
+  // Used to calculate contentsizes
+  //display: flex;
+
   height: 100%;
   width: 100%;
 
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-bottom: 20px;
+`
+
+const Card = styled.div`
+  flex: 1;
+
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  //align-items: stretch;
   justify-content: center;
-
-
-
-  padding-top: 0px;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 20px;
-  box-sizing: border-box;
 
   overflow: hidden;
 
@@ -50,30 +57,49 @@ const Card = styled.div`
 
     if (currentView === 'Carplay' && carPlay) {
       return css`
-        ${theme.animations.getVerticalCollapse(minHeight, maxHeight)} ${collapseLength}s ease-in-out forwards;
+        ${theme.animations.getVerticalCollapse(minHeight, maxHeight)} ${collapseLength}s ease-in-out forwards,
+        fadeOut ${collapseLength}s ease-in-out forwards;
         padding: 0;
       `;
     } else {
       return css`
-        ${theme.animations.getVerticalExpand(minHeight, maxHeight)} ${collapseLength}s ease-in-out forwards;
+        ${theme.animations.getVerticalExpand(minHeight, maxHeight)} ${collapseLength}s ease-in-out forwards,
+        fadeIn ${collapseLength}s ease-in-out forwards;
       `;
     }
   }};
-
   /* Avoid transition conflicts */
   transition: none;
+  transform-origin: top;
+
+  /* Add keyframes for fade effects */
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 `;
 
+
 const Page = styled.div`
-  width: 100%;
-  height: 100%;
+  position: relative;  
+  flex: 1;
 
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-
-  box-sizing: border-box;
-
+  
   border-radius: 7px;
   background: ${({ theme }) => theme.colors.gradients.gradient1};
 
@@ -85,7 +111,7 @@ const NavBlocker = styled.div`
   height: ${({ app, isActive }) =>
     isActive
       ? `${app.settings.side_bars.navBarHeight.value - app.settings.general.contentPadding.value}px`
-      : '50px'};
+      : '0'};
 
   animation: ${({ app, theme, isActive, collapseLength, minHeight, maxHeight }) => css`
     ${isActive
@@ -93,6 +119,7 @@ const NavBlocker = styled.div`
       : theme.animations.getVerticalCollapse(minHeight, maxHeight)} ${collapseLength}s ease-in-out forwards;
   `};
 
+  background: none;
   transition: height 0.3s ease-in-out;
 `;
 
@@ -109,6 +136,8 @@ const Content = () => {
   const key = KEY((state) => state);
 
   const theme = useTheme();
+
+  const cardPadding = 20;
 
   /* CARPLAY TESTCODE */
   const handleCarplay = () => {
@@ -129,6 +158,57 @@ const Content = () => {
   }, [app.system.streamState])
 
   /* CARPLAY TESTCODE */
+
+  /* Get content size */
+  const pageRef = useRef(null);
+  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const [contentSize, setContentSize] = useState(null);
+
+  const [mounted, setMounted] = useState(false);
+
+  // Calculate window size
+  useEffect(() => {
+    const handleResize = () => {
+      clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        setWindowSize({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+      }, 100); // Adjust debounce delay as needed
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      clearTimeout(timerRef.current);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    const calculateSize = () => {
+      if (pageRef.current) {
+        const rect = pageRef.current.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          app.update({
+            system: {
+              contentSize: { width: rect.width, height: rect.height },
+            },
+          });
+          setMounted(true); // Mark the component as mounted
+        } else {
+          console.warn("Invalid container dimensions during animation:", rect);
+        }
+      }
+    };
+
+    // Trigger calculation after animations
+    const animationTimeout = setTimeout(calculateSize, 500); // Adjust timeout based on your animation duration
+
+    return () => clearTimeout(animationTimeout);
+  }, [windowSize]);
+
+
 
 
   /* Fading Logic */
@@ -160,11 +240,15 @@ const Content = () => {
 
   const checkMouseY = (mouseY) => {
     const deadZone = 85; // Percentage
-    if(mouseY > window.innerHeight * (deadZone / 100))
+    if (mouseY > window.innerHeight * (deadZone / 100))
       return true;
     else
       return false;
   }
+
+  useEffect(() => {
+    console.log(navActive)
+  }, [navActive])
 
   useEffect(() => {
     console.log('view', navActive)
@@ -183,7 +267,7 @@ const Content = () => {
   }, [app.system.view, navActive]);
 
   const handleClick = (event) => {
-    if(app.system.view != 'Settings')
+    if (app.system.view != 'Settings')
       setNavActive(checkMouseY(event.clientY));
   };
 
@@ -250,30 +334,39 @@ const Content = () => {
       {app.system.startedUp ? (
         <>
           <TopBar app={app} />
-          <NavBar isActive={navActive} isHovering={isHovering}/>
-          <MainContainer app={app} onClick={handleClick}>
+          <NavBar isActive={navActive} isHovering={isHovering} />
+          <MainContainer app={app} height={windowSize.height} width={windowSize.width} onClick={handleClick}>
             <SideBar collapseLength={collapseLength} />
             <Card
               theme={theme}
               currentView={currentView}
               carPlay={carPlay}
-              maxHeight={app.system.windowSize.height - app.settings.side_bars.topBarHeight.value}
+              maxHeight={windowSize.height - app.settings.side_bars.topBarHeight.value - cardPadding}
               minHeight={0}
               collapseLength={(collapseLength / 1000)}
+              ref={pageRef}
             >
               <Page theme={theme}>
+
                 <Fade className={fadePage} fadeLength={(fadeLength / 1000)}>
-                  {renderView()}
+
+                  {mounted ? renderView() : <div style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    justifyContent: 'center'
+                  }}> Not Mounted </div>}
                 </Fade>
+                <NavBlocker
+                  app={app}
+                  theme={theme}
+                  isActive={navActive}
+                  collapseLength={collapseLength / 1000}
+                  minHeight={0}
+                  maxHeight={app.settings.side_bars.navBarHeight.value - app.settings.general.contentPadding.value}
+                />
               </Page>
-              <NavBlocker
-                app={app}
-                theme={theme}
-                isActive={navActive}
-                collapseLength={collapseLength / 1000}
-                minHeight={0}
-                maxHeight={app.settings.side_bars.navBarHeight.value - app.settings.general.contentPadding.value}
-              />
+
             </Card>
           </MainContainer>
         </>

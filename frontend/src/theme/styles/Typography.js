@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 // Display
 export const Display4 = styled.h1`
+    margin: 0;
     font-family: ${({ theme }) => theme.typography.display4.fontFamily};
     font-weight: ${({ theme }) => theme.typography.display4.fontWeight};
     font-size: ${({ theme }) => theme.typography.display4.fontSize};

@@ -27,6 +27,7 @@ export const Button = styled.button`
     width: 100%;
 
     font-size: ${({ theme }) => theme.typography.caption1.fontSize};
+    
     display: flex;
     flex-direction: row;
     justify-content: center;

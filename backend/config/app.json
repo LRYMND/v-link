@@ -105,19 +105,14 @@
       "label": "Gauge 3"
     },
     "value_1": {
-      "type": "can",
-      "value": "lambda1",
-      "label": "Value 1"
+      "type": "adc",
+      "value": "temperature",
+      "label": "Bottom Left"
     },
     "value_2": {
       "type": "can",
-      "value": "lambda2",
-      "label": "Value 2"
-    },
-    "value_3": {
-      "type": "can",
-      "value": "voltage",
-      "label": "Value 3"
+      "value": "boost",
+      "label": "Bottom Right"
     }
   },
 
@@ -125,15 +120,20 @@
     "title": "Race Dash",
     "type": "data",
 
-    "progress_1": {
+    "gauge_1": {
       "type": "can",
       "value": "rpm",
       "label": "Progress Bar"
     },
-    "progress_2": {
+    "gauge_2": {
       "type": "can",
       "value": "boost",
-      "label": "Progress DataBox"
+      "label": "Top Left"
+    },
+    "gauge_3": {
+      "type": "can",
+      "value": "speed",
+      "label": "Center"
     },
     "value_1": {
       "type": "can",

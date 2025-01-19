@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="glow" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 215.38 39.89">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#gradient);
+      }
+    </style>
+    <radialGradient id="gradient" cx="107.65" cy="63.03" fx="107.65" fy="63.03" r="93.57" gradientTransform="translate(18.13 9.42) scale(.83 .17)" gradientUnits="userSpaceOnUse">
+      <stop offset=".08" stop-color="#313333" />
+      <stop offset="1" stop-color="#1c1c1c" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect class="cls-1" width="215.38" height="39.89" />
+</svg>

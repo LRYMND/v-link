@@ -1,9 +1,16 @@
 import styled from 'styled-components';
-import hexToRgba from '../../app/components/HexToRGBA'
+import hexToRgba from '../../app/helper/HexToRGBA'
 
 export const Fade = styled.div`
-    width: 100%;
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
     height: 100%;
+    width: 100%;
+
+    overflow: hidden;
 
     opacity: 0;
     transition: opacity ${({ fadeLength }) => `${fadeLength}s`} ease-in;
