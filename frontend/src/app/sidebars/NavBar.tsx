@@ -1,5 +1,5 @@
 import { APP } from '../../store/Store';
-import { IconLarge } from '../../theme/styles/Icons';
+import { IconNav } from '../../theme/styles/Icons';
 import { GlowLarge } from '../../theme/styles/Effects';
 import styled, { css, useTheme } from 'styled-components';
 
@@ -7,12 +7,12 @@ import styled, { css, useTheme } from 'styled-components';
 const Navbar = styled.div`
   position: absolute;
   bottom: 0;
-  z-index: 1;
+  z-index: 3;
 
   background-color:${({ theme }) => `${theme.colors.navbar}`};
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   width: 100%;
   height: ${({ app }) => `${app.settings.side_bars.navBarHeight.value}px`};
@@ -74,9 +74,9 @@ const NavBar = ({ isActive, isHovering }) => {
         {['Dashboard', 'Carplay', 'Settings'].map((view) => (
           <div className="column" key={view} style={{ position: 'relative' }}>
             <NavButton onClick={() => app.update({ system: { view } })}>
-              <IconLarge isActive={app.system.view === view}>
+              <IconNav isActive={app.system.view === view}>
                 <use xlinkHref={`/assets/svg/${view.toLowerCase()}.svg#${view.toLowerCase()}`}></use>
-              </IconLarge>
+              </IconNav>
             </NavButton>
           </div>
         ))}

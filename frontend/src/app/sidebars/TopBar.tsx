@@ -8,7 +8,7 @@ import { Caption1 } from '../../theme/styles/Typography';
 const Topbar = styled.div`
   position: absolute;
   top: 0;
-  z-index: 1;
+  z-index: 3;
   background: ${({ theme }) => theme.colors.gradients.gradient1};
   height: ${({ app }) => `${app.settings.side_bars.topBarHeight.value}px`};
   width: 100%;

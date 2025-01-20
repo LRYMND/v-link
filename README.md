@@ -51,7 +51,7 @@ Before updating, please uninstall the app. (See below)
 
 ```
 #Download and Install
-wget "https://github.com/LRYMND/v-link/releases/download/v2.2.0/Installer.sh"
+wget "https://github.com/LRYMND/v-link/releases/download/v2.2.1/Installer.sh"
 sudo chmod +x Installer.sh
 sudo ./Installer.sh
 

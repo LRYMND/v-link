@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react';
 import { APP } from '../store/Store';
 
-
-import "./../styles.scss"
-import "./../themes.scss"
-
 const SplashScreen = () => {
   const [showSplash, setShowSplash] = useState(true);
   const app = APP((state) => state)
@@ -36,19 +32,14 @@ const SplashScreen = () => {
           color: 'white',
         }}>
 
-          <div className='column' style={{width: '100%', gap:'3vh'}}>
-            <div className='row' style={{ justifyContent: 'center'}}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20vh" height="20vh" style={{ fill: 'white' }}>
-                <use xlinkHref="/assets/svg/moose.svg#moose"></use>
-                </svg>
-            </div>
-            <div className='row' style={{ justifyContent: 'center', alignItems:'center'}}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="40vh" height="10vh" style={{ fill: 'white' }}>
-                <use xlinkHref="/assets/svg/vlink.svg#vlink"></use>
-                </svg>
-            </div>
-            <p>v {app.system.version}</p>
-          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20vh" height="20vh" style={{ fill: 'white' }}>
+            <use xlinkHref="/assets/svg/moose.svg#moose"></use>
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="40vh" height="10vh" style={{ fill: 'white' }}>
+            <use xlinkHref="/assets/svg/vlink.svg#vlink"></use>
+          </svg>
+          <p>v {app.system.version}</p>
+
 
 
         </div>

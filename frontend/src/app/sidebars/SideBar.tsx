@@ -17,8 +17,6 @@ const Sidebar = styled.div`
 
     box-sizing: border-box;
 
-    overflow: hidden;
-
     /* Apply the animation based on the current view */
     animation: ${({ theme, currentView, minWidth, maxWidth, collapseLength }) => css`
     ${currentView === 'Settings'

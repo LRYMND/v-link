@@ -12,7 +12,10 @@ import SideBar from '../app/sidebars/SideBar';
 import TopBar from '../app/sidebars/TopBar';
 
 const MainContainer = styled.div`
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
   height: ${({ height }) => `${height}px`};
   width: ${({ width }) => `${width}px`};
 
@@ -26,8 +29,8 @@ const MainContainer = styled.div`
   padding-left: ${({ app }) => `${app.settings.general.contentPadding.value}px`};
   padding-right: ${({ app }) => `${app.settings.general.contentPadding.value}px`};
   padding-bottom: ${({ app }) => `${app.settings.general.contentPadding.value}px`};
-  
-  background: '${({ theme }) => `${theme.colors.gradients.gradient1}`}';
+  background: none;
+  //background: '${({ theme }) => `${theme.colors.gradients.gradient1}`}';
 `;
 
 const Static = styled.div`
@@ -140,22 +143,23 @@ const Content = () => {
   const cardPadding = 20;
 
   /* CARPLAY TESTCODE */
-  const handleCarplay = () => {
-    setTimeout(() => {
-      setCarPlay(true)
-
-      // Hide Elements when stream is revealead
-      if (app.system.streamState && app.system.view === 'Carplay') {
-        setNavActive(false);
-        setFadeMain('fade-out');
-      }
-    }, 3000); // 3 seconds
-  };
 
   useEffect(() => {
-    if (app.system.streamState)
-      handleCarplay()
-  }, [app.system.streamState])
+    console.log(app.system.carplay)
+    const user = app.system.carplay.user
+    const phone = app.system.carplay.phone
+    const stream = app.system.carplay.stream
+
+
+    if (user && stream){
+      console.log('carplay enabled')
+      setCarPlay(true)}
+    else
+      setCarPlay(false)
+  }, [app.system.carplay])
+
+
+
 
   /* CARPLAY TESTCODE */
 
@@ -211,6 +215,10 @@ const Content = () => {
 
 
 
+
+
+
+
   /* Fading Logic */
   const fadeLength = 200; //ms
   const collapseLength = 400; //ms
@@ -220,17 +228,40 @@ const Content = () => {
   const [carPlay, setCarPlay] = useState(false);
 
   useEffect(() => {
+    console.log(app.system.interface)
+
+    app.update({system: { interface: { ...app.system.interface, content: false}}})
+  }, [app.system.view, carPlay])
+
+
+
+
+  useEffect(() => {
     if (app.system.view !== currentView) {
       setFadePage('fade-out'); // Trigger fade-out for the current view
-
+      
       setTimeout(() => {
         setCurrentView(app.system.view); // Switch to the new view
-        if (carPlay && app.system.view === 'Carplay') { setNavActive(false); return; }
-        else
+        if (carPlay && app.system.view === 'Carplay') {
+          setNavActive(false);
+          app.update({system: { interface: { ...app.system.interface, content: false}}})
+          return;
+        } else {
           setFadePage('fade-in');
+          app.update({system: { interface: { ...app.system.interface, content: true}}})
+        }
       }, fadeLength); // Duration should match the CSS animation time
     }
   }, [app.system.view, carPlay]);
+
+
+
+
+
+
+
+
+
 
 
   /* NavBar Logic */

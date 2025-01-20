@@ -96,7 +96,7 @@ const DATA = create((set) => ({
 
 const APP = create((set) => ({
   system: {
-    version: '2.2.0',
+    version: '2.2.1',
     view: '',
     switch: 'ArrowUp',
     lastKey: '',
@@ -122,8 +122,11 @@ const APP = create((set) => ({
     },
 
     carplay: {
-      stream: false,
+      user: false,
+      dongle: false,
       phone: false,
+      stream: false,
+      fullscreen: false,
     },
 
     interface: {

@@ -3,7 +3,7 @@ import styled, { useTheme } from 'styled-components';
 
 import { DATA, APP } from '../../store/Store';
 import { Typography } from '../../theme/styles/Typography';
-import { IconLarge } from '../../theme/styles/Icons';
+import { IconLarge, CustomIcon } from '../../theme/styles/Icons';
 
 const Container = styled.div`
   width: 100%;
@@ -118,15 +118,15 @@ const DataBox = (dashPage) => {
     return (
         <Container>
             <Icons>
-                <IconLarge color={theme.colors.light}>
+                <CustomIcon color={theme.colors.light} stroke={2} size={'25px'}>
                     <use xlinkHref={`/assets/svg/icons/bold/${leftID}_bold.svg#${leftID}`}></use>
-                </IconLarge>
-                <IconLarge color={theme.colors.medium}>
+                </CustomIcon>
+                <CustomIcon color={theme.colors.medium} stroke={2} size={'40px'}>
                     <use xlinkHref={`/assets/svg/icons/bold/${'err_bold'}.svg#${'err'}`}></use>
-                </IconLarge>
-                <IconLarge color={theme.colors.light}>
+                </CustomIcon>
+                <CustomIcon color={theme.colors.light} stroke={2} size={'25px'}>
                     <use xlinkHref={`/assets/svg/icons/bold/${rightID}_bold.svg#${rightID}`}></use>
-                </IconLarge>
+                </CustomIcon>
             </Icons>
             <Databox ref={containerRef}>
                 {width > 0 && height > 0 && (

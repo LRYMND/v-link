@@ -33,6 +33,10 @@ export const theme = {
     background: '#141414',
     navbar: '#090909',
 
+    bg1: '#0D0D0D',
+    bg2: '#1C1C1C',
+    bg3: '#1C1C1C',
+
     gradients: {
       gradient1: 'linear-gradient(180deg, #1C1C1C,#0D0D0D)',
       gradient2: 'linear-gradient(180deg, #0D0D0D, #1C1C1C)',

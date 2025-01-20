@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 import { theme } from './theme/Theme';
 import styled, { ThemeProvider } from 'styled-components';
@@ -28,10 +28,10 @@ const AppContainer = styled.div`
 function App() {
   const mmi = MMI((state) => state);
   const key = KEY((state) => state);
+  const app = APP((state) => state)
 
-  const system = APP((state) => state.system)
+  const system = app.system
 
-  const [receivingVideo, setReceivingVideo] = useState(false)
   const [commandCounter, setCommandCounter] = useState(0)
   const [keyCommand, setKeyCommand] = useState('')
 
@@ -74,8 +74,27 @@ function App() {
     }
   }
 
+  // Dimensions of the container
+  const containerRef = useRef(null);
+  const [ready, setReady] = useState(false)
+  /* Observe container resizing and update dimensions. */
+  useEffect(() => {
+    const handleResize = () => {
+      console.log(containerRef.current.offsetWidth, containerRef.current.offsetHeight)
+      app.update({system : { carplaySize: {
+        width: containerRef.current.offsetWidth,
+        height: app.system.carplay.fullscreen ? containerRef.current.offsetHeight : containerRef.current.offsetHeight - 20
+      }}})
+      setReady(true)
+    };
+
+    const resizeObserver = new ResizeObserver(handleResize);
+    if (containerRef.current) resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, []);
+
   return (
-    <AppContainer>
+    <AppContainer ref={containerRef}>
       <Socket />
       <Cardata />
       <Splash />
@@ -83,13 +102,11 @@ function App() {
       {system.startedUp ? (
         <ThemeProvider theme={theme}>
 
-          {/*<Carplay
-            receivingVideo={receivingVideo}
-            setReceivingVideo={setReceivingVideo}
+          {<Carplay
             commandCounter={commandCounter}
             command={keyCommand}
-          />*/}         
-          <Content />
+          />}
+          {<Content />}
         </ThemeProvider>
       ) : (
         <></>

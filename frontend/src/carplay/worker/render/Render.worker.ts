@@ -100,7 +100,14 @@ export class RenderWorker {
       const decoderConfig = getDecoderConfig(frameData)
       if (decoderConfig) {
         this.decoder.configure(decoderConfig)
-        console.log(decoderConfig)
+        console.log(decoderConfig);
+
+        /* V-Link Mod */
+        scope.postMessage({
+          type: 'streamStarted',
+          config: decoderConfig,
+        });
+        /* V-Link Mod */
       }
     }
     if (this.decoder.state === 'configured') {

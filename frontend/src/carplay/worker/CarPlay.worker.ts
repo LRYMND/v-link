@@ -111,4 +111,4 @@ onmessage = async (event: MessageEvent<Command>) => {
   }
 }
 
-export {}
+export { }

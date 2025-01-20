@@ -9,7 +9,7 @@ import { Typography } from '../../../theme/styles/Typography';
 
 import { APP, KEY } from '../../../store/Store';
 
-const CarPlay = styled.div`
+const Container = styled.div`
   height: 100%;
   width: 100%;
   display: flex;
@@ -29,7 +29,7 @@ function Carplay() {
     const onClick = () => {
         console.log(isActive)
 
-        app.update({system: { streamState: true}})
+        app.update({system: { carplay: {...app.system.carplay, user: true }}})
         setIsActive(!isActive)
     };
 
@@ -37,7 +37,7 @@ function Carplay() {
 
 
     return (
-        <CarPlay>
+        <Container>
                 <Body2>CONNECT PHONE OR CLICK TO PAIR DONGLE.</Body2>
                 <Link onClick={() => onClick()} isActive={isActive}>
                     <FlexBox>
@@ -49,7 +49,7 @@ function Carplay() {
                         </IconExtraLarge>
                     </FlexBox>
                 </Link>
-        </CarPlay>
+        </Container>
     );
 }
 

@@ -6,11 +6,9 @@ import { APP } from '../../../../store/Store';
 import RadialGauge from '../../../components/RadialGauge'
 import DataBox from '../../../components/DataBox'
 
-import "./../../../../styles.scss"
-import "./../../../../themes.scss"
 
 const Container = styled.div`
-  display: flex;
+  display: flex; 
   flex-direction:column;
   width: 100%;
   height: 100%;

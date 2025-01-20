@@ -105,7 +105,7 @@ if confirm_action "install Boosted Moose V-Link now"; then
     sudo apt-get install -y ffmpeg libudev-dev libusb-dev build-essential python3-venv
 
     # Step 4.4: Download the file
-    download_url="https://github.com/LRYMND/v-link/releases/download/v2.2.0/V-Link.zip"
+    download_url="https://github.com/LRYMND/v-link/releases/download/v2.2.1/V-Link.zip"
     output_path="/home/$CURRENT_USER/v-link"
     echo "Downloading files to: $output_path"
     sudo mkdir -p "$output_path"
