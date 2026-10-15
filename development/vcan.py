@@ -108,7 +108,7 @@ class VCANThread(threading.Thread):
         self.channel = "vcan0"
 
         script_directory = os.path.dirname(os.path.abspath(__file__))
-        subprocess.run([os.path.join(script_directory, 'setup.sh')], shell=True)
+        subprocess.run(['bash', os.path.join(script_directory, 'setup-vcan.sh')], check=True)
 
         self.ROUTE_DURATION_S = 120.0
         self.route_pos = 0.0
